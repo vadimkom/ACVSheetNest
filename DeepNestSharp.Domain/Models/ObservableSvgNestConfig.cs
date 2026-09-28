@@ -61,15 +61,6 @@ namespace DeepNestSharp.Domain.Models
     }
 
     /// <inheritdoc />
-    [Description("Differentiate children when exporting.")]
-    [Category("File Settings")]
-    public bool DifferentiateChildren
-    {
-      get => svgNestConfig.DifferentiateChildren;
-      set => SetProperty(nameof(DifferentiateChildren), () => svgNestConfig.DifferentiateChildren, v => svgNestConfig.DifferentiateChildren = v, value);
-    }
-
-    /// <inheritdoc />
     [Category("File Settings")]
     public DxfPartNameExport DxfPartNameExport
     {

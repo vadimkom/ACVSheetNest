@@ -107,8 +107,6 @@
       <StackPanel>
         <CheckBox x:Name="mergeLinesCheck" Content="Merge coincident cut lines"
                   ToolTip="{ui:Tr Set_MergeTip}" />
-        <CheckBox x:Name="differentiateCheck" Content="Color-differentiate hole contours" Margin="0,8,0,0"
-                  ToolTip="{ui:Tr Set_DiffTip}" />
         <Grid Margin="0,8,0,0">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -118,8 +116,8 @@
           <ComboBox Grid.Column="1" x:Name="partNameExportCombo" Width="250" HorizontalAlignment="Left"
                     ToolTip="{ui:Tr Set_PartNamesTip}">
             <ComboBoxItem x:Name="partNameItemNone" Tag="None">None</ComboBoxItem>
-            <ComboBoxItem x:Name="partNameItemLayer9" Tag="Layer9">Layer 9 (Engraving / Bends)</ComboBoxItem>
-            <ComboBoxItem x:Name="partNameItemBackground" Tag="Background">Background layer (Display only)</ComboBoxItem>
+            <ComboBoxItem x:Name="partNameItemLayer9" Tag="Paint">PAINT (engraving)</ComboBoxItem>
+            <ComboBoxItem x:Name="partNameItemBackground" Tag="Background">BACKGROUND (display only)</ComboBoxItem>
           </ComboBox>
         </Grid>
       </StackPanel>

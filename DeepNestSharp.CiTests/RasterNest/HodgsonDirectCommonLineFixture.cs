@@ -160,7 +160,7 @@ namespace DeepNestSharp.CiTests.RasterNest
       }
 
       using var output = new MemoryStream();
-      await sheet.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await sheet.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile exported = DxfFile.Load(output);
 

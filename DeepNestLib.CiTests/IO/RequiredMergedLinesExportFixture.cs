@@ -69,7 +69,7 @@ namespace DeepNestLib.CiTests.IO
     private static async Task<IReadOnlyList<DxfLine>> ExportLines(SheetPlacement placement)
     {
       using var output = new MemoryStream();
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
 
       return new DxfLineMerger().SplitLines(DxfFile.Load(output).Entities).OfType<DxfLine>().ToList();

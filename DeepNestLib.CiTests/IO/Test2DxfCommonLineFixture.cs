@@ -90,7 +90,7 @@ namespace DeepNestLib.CiTests.IO
       AssertEightQuarterCircleBulges(boundary.Bulges);
 
       using var output = new MemoryStream();
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile exported = DxfFile.Load(output);
 

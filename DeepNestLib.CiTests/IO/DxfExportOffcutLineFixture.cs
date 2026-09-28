@@ -45,7 +45,7 @@ namespace DeepNestLib.CiTests.IO
       var (sheetPlacement, outPath) = this.BuildPlacement();
       var offcut = new[] { new OffcutLine { X1 = 40.5, Y1 = 0, X2 = 40.5, Y2 = 48 } };
 
-      await new DxfExporter().Export(outPath, sheetPlacement, false, false, offcut);
+      await new DxfExporter().Export(outPath, sheetPlacement, false, offcut);
 
       var lines = DxfFile.Load(outPath).Entities.OfType<DxfLine>()
         .Where(l => l.P1.X == 40.5 && l.P2.X == 40.5)
@@ -67,7 +67,7 @@ namespace DeepNestLib.CiTests.IO
         new OffcutLine { X1 = 0, Y1 = 20.25, X2 = 40.5, Y2 = 20.25 },
       };
 
-      await new DxfExporter().Export(outPath, sheetPlacement, false, false, offcut);
+      await new DxfExporter().Export(outPath, sheetPlacement, false, offcut);
 
       var lines = DxfFile.Load(outPath).Entities.OfType<DxfLine>().ToList();
       lines.Should().Contain(l => l.P1.X == 40.5 && l.P2.X == 40.5 && Math.Max(l.P1.Y, l.P2.Y) == 48, "the vertical cut spans the full height");
@@ -80,8 +80,8 @@ namespace DeepNestLib.CiTests.IO
       var (sheetPlacement, outPath) = this.BuildPlacement();
       string withoutPath = Path.Combine(this.tempDir, "without.dxf");
 
-      await new DxfExporter().Export(outPath, sheetPlacement, false, false, new[] { new OffcutLine { X1 = 40.5, Y1 = 0, X2 = 40.5, Y2 = 48 } });
-      await new DxfExporter().Export(withoutPath, sheetPlacement, false, false);
+      await new DxfExporter().Export(outPath, sheetPlacement, false, new[] { new OffcutLine { X1 = 40.5, Y1 = 0, X2 = 40.5, Y2 = 48 } });
+      await new DxfExporter().Export(withoutPath, sheetPlacement, false);
 
       var with = DxfFile.Load(outPath).Entities.Count;
       var without = DxfFile.Load(withoutPath).Entities.Count;

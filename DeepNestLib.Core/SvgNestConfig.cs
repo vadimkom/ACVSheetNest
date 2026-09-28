@@ -221,20 +221,6 @@ namespace DeepNestLib
     }
 
     /// <inheritdoc />
-    public bool DifferentiateChildren
-    {
-      get
-      {
-        return (bool)this.Read("DifferentiateChildren");
-      }
-
-      set
-      {
-        this.Write("DifferentiateChildren", value);
-      }
-    }
-
-    /// <inheritdoc />
     public DxfPartNameExport DxfPartNameExport
     {
       get

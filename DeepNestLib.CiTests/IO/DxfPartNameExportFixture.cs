@@ -101,7 +101,7 @@ namespace DeepNestLib.CiTests.IO
 
         var sheetPlacement = CreateTestSheetPlacement(tempDxf, 2);
         var exporter = new DxfExporter { PartNameExport = DxfPartNameExport.None };
-        await exporter.Export(tempOut, sheetPlacement, false, false);
+        await exporter.Export(tempOut, sheetPlacement, false);
 
         var outDxf = DxfFile.Load(tempOut);
         outDxf.Entities.OfType<DxfText>().Should().BeEmpty();
@@ -125,13 +125,13 @@ namespace DeepNestLib.CiTests.IO
 
         var sheetPlacement = CreateTestSheetPlacement(tempDxf, 2);
         var exporter = new DxfExporter { PartNameExport = DxfPartNameExport.Background };
-        await exporter.Export(tempOut, sheetPlacement, false, false);
+        await exporter.Export(tempOut, sheetPlacement, false);
 
         var outDxf = DxfFile.Load(tempOut);
 
         // Verify layer definition
-        outDxf.Layers.Should().Contain(l => l.Name == DxfExporter.PartNameLayerBackground);
-        var bgLayer = outDxf.Layers.Single(l => l.Name == DxfExporter.PartNameLayerBackground);
+        outDxf.Layers.Should().Contain(l => l.Name == DxfOutputLayers.Background.Name);
+        var bgLayer = outDxf.Layers.Single(l => l.Name == DxfOutputLayers.Background.Name);
         bgLayer.Color.Index.Should().Be(8);
 
         // Verify text entities
@@ -141,7 +141,7 @@ namespace DeepNestLib.CiTests.IO
         string expectedPartStem = Path.GetFileNameWithoutExtension(tempDxf);
         foreach (var t in texts)
         {
-          t.Layer.Should().Be(DxfExporter.PartNameLayerBackground);
+          t.Layer.Should().Be(DxfOutputLayers.Background.Name);
           t.Value.Should().Be(expectedPartStem);
           t.HorizontalTextJustification.Should().Be(DxfHorizontalTextJustification.Center);
           t.VerticalTextJustification.Should().Be(DxfVerticalTextJustification.Middle);
@@ -172,14 +172,14 @@ namespace DeepNestLib.CiTests.IO
         WriteSquareDxf(tempDxf, 80);
 
         var sheetPlacement = CreateTestSheetPlacement(tempDxf, 1);
-        var exporter = new DxfExporter { PartNameExport = DxfPartNameExport.Layer9 };
-        await exporter.Export(tempOut, sheetPlacement, false, false);
+        var exporter = new DxfExporter { PartNameExport = DxfPartNameExport.Paint };
+        await exporter.Export(tempOut, sheetPlacement, false);
 
         var outDxf = DxfFile.Load(tempOut);
 
-        outDxf.Layers.Should().Contain(l => l.Name == DxfExporter.PartNameLayer9);
-        var layer9 = outDxf.Layers.Single(l => l.Name == DxfExporter.PartNameLayer9);
-        layer9.Color.Index.Should().Be(9);
+        outDxf.Layers.Should().Contain(l => l.Name == DxfOutputLayers.PaintName);
+        var layer9 = outDxf.Layers.Single(l => l.Name == DxfOutputLayers.PaintName);
+        layer9.Color.Index.Should().Be((byte)DxfOutputLayers.Paint.ColorIndex);
 
         var texts = outDxf.Entities.OfType<DxfText>().ToList();
         texts.Should().HaveCount(1);
@@ -242,13 +242,13 @@ namespace DeepNestLib.CiTests.IO
           commonLineGap: gap,
           geometryTolerance: tol);
 
-        var exporter = new DxfExporter { PartNameExport = DxfPartNameExport.Background };
-        await exporter.Export(outPath, sheetPlacement, false, false);
+        var exporter = new DxfExporter { PartNameExport = DxfPartNameExport.Background, RoleLayers = true };
+        await exporter.Export(outPath, sheetPlacement, false);
 
         var exported = DxfFile.Load(outPath);
         exported.Entities.Should().Contain(e => e.Layer == DxfExporter.CommonLineLayer);
 
-        var texts = exported.Entities.OfType<DxfText>().Where(t => t.Layer == DxfExporter.PartNameLayerBackground).ToList();
+        var texts = exported.Entities.OfType<DxfText>().Where(t => t.Layer == DxfOutputLayers.Background.Name).ToList();
         texts.Should().HaveCount(2);
         texts[0].Value.Should().Be("PartCommon");
         texts[1].Value.Should().Be("PartCommon");
@@ -268,8 +268,8 @@ namespace DeepNestLib.CiTests.IO
     /// sheet must carry the bend line and the file name, both turned with the part.
     /// </summary>
     [Theory]
-    [InlineData(DxfPartNameExport.Background, DxfExporter.PartNameLayerBackground)]
-    [InlineData(DxfPartNameExport.Layer9, DxfExporter.PartNameLayer9)]
+    [InlineData(DxfPartNameExport.Background, DxfOutputLayers.BackgroundName)]
+    [InlineData(DxfPartNameExport.Paint, DxfOutputLayers.PaintName)]
     public async Task AFlatPatternCarriesItsFileNameAndItsBendLineOntoTheSheet(DxfPartNameExport mode, string textLayer)
     {
       const string fileName = "Flat-Pattern - top^Tr_300x300.DXF";
@@ -298,7 +298,7 @@ namespace DeepNestLib.CiTests.IO
           PlacementTypeEnum.BoundingBox, Sheet.NewSheet(1, 1250, 2500), new List<IPartPlacement> { placement }, 0, SvgNest.Config.ClipperScale);
 
         string outPath = Path.Combine(dir, "out.dxf");
-        await new DxfExporter { PartNameExport = mode }.Export(outPath, sheet, false, false);
+        await new DxfExporter { PartNameExport = mode }.Export(outPath, sheet, false);
         var outDxf = DxfFile.Load(outPath);
 
         var placed = placement.PlacedPart;
@@ -346,7 +346,7 @@ namespace DeepNestLib.CiTests.IO
           PlacementTypeEnum.BoundingBox, Sheet.NewSheet(1, 1250, 2500), new List<IPartPlacement> { placement }, 0, SvgNest.Config.ClipperScale);
 
         string outPath = Path.Combine(dir, "out.dxf");
-        await new DxfExporter { PartNameExport = DxfPartNameExport.Layer9 }.Export(outPath, sheet, false, false);
+        await new DxfExporter { PartNameExport = DxfPartNameExport.Paint }.Export(outPath, sheet, false);
         var outDxf = DxfFile.Load(outPath);
         var placed = placement.PlacedPart;
 
@@ -365,6 +365,106 @@ namespace DeepNestLib.CiTests.IO
         text.Value.Should().Be("main^R2p_300x200_250x200");
         text.Layer.Should().Be("9");
         GeometryUtil.PointInPolygon(new SvgPoint(text.Location.X, text.Location.Y), placed).Should().BeTrue("the name is written on the part");
+      }
+      finally
+      {
+        try { Directory.Delete(dir, true); } catch { }
+      }
+    }
+
+    /// <summary>
+    /// The laser's CAM sorts a file into operations by its colours. A hole used to come out red, the colour of
+    /// the marking layer, so it was engraved instead of cut; on a common-line sheet the inner cuts, shared cuts,
+    /// outer cuts and offcut each had a colour of their own. Now everything cut is on CUT in one colour, ahead
+    /// of anything else, and the marking and display layers are the only others.
+    /// </summary>
+    [Fact]
+    public async Task APartWithAHoleIsCutOnOneLayerInOneColour()
+    {
+      string dir = Path.Combine(Path.GetTempPath(), $"sheetnest_cut_{Guid.NewGuid():N}");
+      Directory.CreateDirectory(dir);
+      try
+      {
+        string part = Path.Combine(dir, "Plate.dxf");
+        var source = new DxfFile();
+        source.Header.Version = DxfAcadVersion.R2000;
+        source.Entities.Add(new DxfLwPolyline(new[]
+        {
+          new DxfLwPolylineVertex { X = 0, Y = 0 },
+          new DxfLwPolylineVertex { X = 80, Y = 0 },
+          new DxfLwPolylineVertex { X = 80, Y = 60 },
+          new DxfLwPolylineVertex { X = 0, Y = 60 },
+        }) { IsClosed = true, Layer = "Contour", Color = DxfColor.FromIndex(3) });
+        source.Entities.Add(new DxfCircle(new DxfPoint(40, 30, 0), 10) { Layer = "Contour", Color = DxfColor.FromIndex(5) });
+        source.Save(part);
+
+        var sheet = CreateTestSheetPlacement(part, 2);
+        string outPath = Path.Combine(dir, "out.dxf");
+        await new DxfExporter { PartNameExport = DxfPartNameExport.Paint }.Export(outPath, sheet, false);
+        var outDxf = DxfFile.Load(outPath);
+
+        var cut = outDxf.Entities.Where(e => !(e is DxfText)).ToList();
+        cut.Should().NotBeEmpty();
+        cut.Should().OnlyContain(e => e.Layer == DxfOutputLayers.CutName, "outlines and holes are both cut");
+        outDxf.Entities.Should().OnlyContain(e => e.Color.IsByLayer, "the layer gives the colour, so a colour can't say otherwise");
+        outDxf.Entities.OfType<DxfCircle>().Should().HaveCount(2, "one hole per part");
+        outDxf.Entities.OfType<DxfText>().Should().OnlyContain(t => t.Layer == DxfOutputLayers.PaintName);
+        outDxf.Entities.TakeWhile(e => e.Layer == DxfOutputLayers.CutName).Count().Should().Be(cut.Count, "the cut comes first");
+        outDxf.Layers.Select(l => l.Name).Should().BeSubsetOf(new[] { DxfOutputLayers.CutName, DxfOutputLayers.PaintName, DxfOutputLayers.BackgroundName });
+        outDxf.Layers.Single(l => l.Name == DxfOutputLayers.CutName).Color.Index.Should().Be((byte)DxfOutputLayers.Cut.ColorIndex);
+      }
+      finally
+      {
+        try { Directory.Delete(dir, true); } catch { }
+      }
+    }
+
+    [Fact]
+    public async Task ACommonLineSheetIsCutOnOneLayerInOneColour()
+    {
+      string dir = Path.Combine(Path.GetTempPath(), $"sheetnest_clcut_{Guid.NewGuid():N}");
+      Directory.CreateDirectory(dir);
+      try
+      {
+        string dxfPath = Path.Combine(dir, "PartCommon.dxf");
+        WriteSquareDxf(dxfPath, 10);
+        IRawDetail detail = new NestExecutionHelper().LoadRawDetail(new FileInfo(dxfPath));
+        detail.TryConvertToNfp(0, out INfp p1).Should().BeTrue();
+        detail.TryConvertToNfp(0, out INfp p2).Should().BeTrue();
+
+        const double gap = 0.01;
+        const double tol = 1e-4;
+        var parts = new List<IPartPlacement>
+        {
+          new PartPlacement(p1) { Id = 0, Source = 0, X = 0D, Y = 0D },
+          new PartPlacement(p2) { Id = 1, Source = 0, X = 10D + gap, Y = 0D },
+        };
+        var matches = new List<CommonEdge>();
+        for (int a = 0; a < parts[0].Part.Points.Length; a++)
+        {
+          for (int b = 0; b < parts[1].Part.Points.Length; b++)
+          {
+            if (CommonLineGeometryResolver.TryCreateCommonEdge(parts[0], a, parts[1], b, gap, tol, out CommonEdge edge))
+            {
+              matches.Add(edge);
+            }
+          }
+        }
+
+        var sheetPlacement = new SheetPlacement(
+          PlacementTypeEnum.BoundingBox, Sheet.NewSheet(0, 100, 100), parts, 0D, SvgNest.Config.ClipperScale,
+          requiresMergedLines: true, commonEdges: matches, commonLineGap: gap, geometryTolerance: tol);
+
+        string outPath = Path.Combine(dir, "out.dxf");
+        await new DxfExporter { PartNameExport = DxfPartNameExport.Background }.Export(
+          outPath, sheetPlacement, false, new[] { new OffcutLine { X1 = 0, Y1 = 50, X2 = 100, Y2 = 50 } });
+        var outDxf = DxfFile.Load(outPath);
+
+        outDxf.Entities.Where(e => !(e is DxfText)).Should().HaveCountGreaterThan(2)
+          .And.OnlyContain(e => e.Layer == DxfOutputLayers.CutName, "inner, shared, outer and offcut cuts are all cut");
+        outDxf.Entities.Should().OnlyContain(e => e.Color.IsByLayer);
+        outDxf.Entities.OfType<DxfText>().Should().HaveCount(2).And.OnlyContain(t => t.Layer == DxfOutputLayers.BackgroundName);
+        outDxf.Layers.Select(l => l.Name).Should().NotContain(new[] { DxfExporter.CutInnerLayer, DxfExporter.CommonLineLayer, DxfExporter.CutOuterLayer, DxfExporter.OffcutLayer });
       }
       finally
       {

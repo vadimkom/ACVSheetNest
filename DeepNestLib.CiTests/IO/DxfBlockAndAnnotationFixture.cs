@@ -226,7 +226,7 @@ namespace DeepNestLib.CiTests.IO
       var sheetPlacement = new SheetPlacement(PlacementTypeEnum.BoundingBox, sheet, placements, 0, SvgNest.Config.ClipperScale);
       string outPath = Path.Combine(this.tempDir, "out.dxf");
 
-      await new DxfExporter().Export(outPath, sheetPlacement, false, false);
+      await new DxfExporter().Export(outPath, sheetPlacement, false);
 
       var written = DxfFile.Load(outPath).Entities.ToList();
       written.OfType<DxfCircle>().Should().ContainSingle("the hole stays one arc, not a polygon")

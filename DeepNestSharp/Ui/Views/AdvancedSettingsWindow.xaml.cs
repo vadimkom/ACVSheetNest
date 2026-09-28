@@ -52,13 +52,12 @@ namespace DeepNestSharp.Ui.Views
       this.spacingUpDown.Value = System.Math.Max(0, config.Spacing);
       this.marginUpDown.Value = System.Math.Max(0, config.SheetSpacing);
       this.mergeLinesCheck.IsChecked = config.MergeLines;
-      this.differentiateCheck.IsChecked = config.DifferentiateChildren;
       switch (config.DxfPartNameExport)
       {
         case DxfPartNameExport.None:
           this.partNameExportCombo.SelectedIndex = 0;
           break;
-        case DxfPartNameExport.Layer9:
+        case DxfPartNameExport.Paint:
           this.partNameExportCombo.SelectedIndex = 1;
           break;
         case DxfPartNameExport.Background:
@@ -261,7 +260,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.btnResetClusterParts != null) this.btnResetClusterParts.Content = Localization.Get("Settings_Reset");
       if (this.groupDxfExport != null) this.groupDxfExport.Header = Localization.Get("Settings_Group_Dxf");
       if (this.mergeLinesCheck != null) this.mergeLinesCheck.Content = Localization.Get("Settings_MergeLines");
-      if (this.differentiateCheck != null) this.differentiateCheck.Content = Localization.Get("Settings_ColorDiff");
       if (this.partNameExportLabel != null) this.partNameExportLabel.Text = Localization.Get("Settings_PartNames");
       if (this.partNameItemNone != null) this.partNameItemNone.Content = Localization.Get("Settings_PartNames_None");
       if (this.partNameItemLayer9 != null) this.partNameItemLayer9.Content = Localization.Get("Settings_PartNames_Layer9");
@@ -358,11 +356,10 @@ namespace DeepNestSharp.Ui.Views
       this.config.Spacing = System.Math.Max(0, this.spacingUpDown.Value ?? this.config.Spacing);
       this.config.SheetSpacing = System.Math.Max(0, this.marginUpDown.Value ?? this.config.SheetSpacing);
       this.config.MergeLines = this.mergeLinesCheck.IsChecked == true;
-      this.config.DifferentiateChildren = this.differentiateCheck.IsChecked == true;
       this.config.DxfPartNameExport = this.partNameExportCombo.SelectedIndex switch
       {
         0 => DxfPartNameExport.None,
-        1 => DxfPartNameExport.Layer9,
+        1 => DxfPartNameExport.Paint,
         2 => DxfPartNameExport.Background,
         _ => DxfPartNameExport.Background,
       };

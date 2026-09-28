@@ -213,7 +213,6 @@ namespace DeepNestSharp.Domain.ViewModels
             paths[i],
             sheets[i].Sheet,
             MergeLinesForExport(SvgNest.Config.MergeLines, sheets[i].Sheet),
-            SvgNest.Config.DifferentiateChildren,
             sheets[i].Offcut);
         }
       }

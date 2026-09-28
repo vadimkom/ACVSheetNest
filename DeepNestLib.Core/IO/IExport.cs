@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.IO
+namespace DeepNestLib.IO
 {
   using System.Threading.Tasks;
   using DeepNestLib.Placement;
@@ -7,6 +7,6 @@
   {
     string SaveFileDialogFilter { get; }
 
-    Task Export(string path, ISheetPlacement sheetPlacement, bool doMergeLines, bool differentiateChildren, System.Collections.Generic.IReadOnlyCollection<OffcutLine> offcutLines = null);
+    Task Export(string path, ISheetPlacement sheetPlacement, bool doMergeLines, System.Collections.Generic.IReadOnlyCollection<OffcutLine> offcutLines = null);
   }
 }

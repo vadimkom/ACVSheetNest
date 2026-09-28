@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.IO
+namespace DeepNestLib.IO
 {
   using System;
   using System.Collections.Generic;
@@ -13,7 +13,7 @@
   {
     public override string SaveFileDialogFilter => "Svg files (*.svg)|*.svg";
 
-    protected override async Task Export(string path, IEnumerable<INfp> polygons, IEnumerable<ISheet> sheets, bool doMergeLines, bool differentiateChildren, IReadOnlyCollection<OffcutLine> offcutLines = null)
+    protected override async Task Export(string path, IEnumerable<INfp> polygons, IEnumerable<ISheet> sheets, bool doMergeLines, IReadOnlyCollection<OffcutLine> offcutLines = null)
     {
       await Task.Run(() =>
       {

@@ -55,7 +55,9 @@ namespace DeepNestLib.Placement
     /// </summary>
     double GeometryTolerance { get; }
 
-    Task ExportDxf(Stream stream, bool mergeLines, bool differentiateChildren, DxfPartNameExport partNameExport = DxfPartNameExport.None);
+    /// <param name="roleLayers">Keep the geometry's role layers instead of the shop's CUT/PAINT/BACKGROUND
+    /// (<see cref="IO.DxfExporter.RoleLayers"/>); for tests.</param>
+    Task ExportDxf(Stream stream, bool mergeLines, DxfPartNameExport partNameExport = DxfPartNameExport.None, bool roleLayers = false);
 
     string ToJson(bool writeIndented = false);
 

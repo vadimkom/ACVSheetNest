@@ -16,10 +16,16 @@ namespace DeepNestLib.IO
     public const string CommonLineLayer = "02_COMMON_LINE";
     public const string CutOuterLayer = "03_CUT_OUTER";
     public const string OffcutLayer = "04_OFFCUT";
-    public const string PartNameLayer9 = "9";
-    public const string PartNameLayerBackground = "Background";
 
     public DxfPartNameExport PartNameExport { get; set; } = DxfPartNameExport.None;
+
+    /// <summary>
+    /// Keep the layers the geometry is built on (<see cref="CutInnerLayer"/>, <see cref="CommonLineLayer"/>,
+    /// <see cref="CutOuterLayer"/>, <see cref="OffcutLayer"/>, the source drawing's own) instead of writing
+    /// everything cut onto <see cref="DxfOutputLayers.Cut"/>. For tests that check what each line is for; a
+    /// file for the laser never wants it.
+    /// </summary>
+    public bool RoleLayers { get; set; }
 
     public override string SaveFileDialogFilter => "Dxf files (*.dxf)|*.dxf";
 
@@ -27,16 +33,15 @@ namespace DeepNestLib.IO
       string path,
       ISheetPlacement sheetPlacement,
       bool doMergeLines,
-      bool differentiateChildren,
       IReadOnlyCollection<OffcutLine> offcutLines = null)
     {
       if (sheetPlacement.CommonEdges == null || sheetPlacement.CommonEdges.Count == 0)
       {
-        await base.Export(path, sheetPlacement, doMergeLines, differentiateChildren, offcutLines).ConfigureAwait(false);
+        await base.Export(path, sheetPlacement, doMergeLines, offcutLines).ConfigureAwait(false);
         return;
       }
 
-      DxfFile dxf = GenerateCommonLineDxfFile(sheetPlacement, differentiateChildren, offcutLines, this.PartNameExport);
+      DxfFile dxf = this.Finish(GenerateCommonLineDxfFile(sheetPlacement, offcutLines, this.PartNameExport));
       if (dxf.Entities.Count == 0)
       {
         return;
@@ -45,11 +50,11 @@ namespace DeepNestLib.IO
       await Task.Run(() => dxf.Save(path, true)).ConfigureAwait(false);
     }
 
-    public async Task Export(Stream stream, ISheetPlacement sheetPlacement, bool doMergeLines, bool differentiateChildren)
+    public async Task Export(Stream stream, ISheetPlacement sheetPlacement, bool doMergeLines)
     {
       if (sheetPlacement.CommonEdges != null && sheetPlacement.CommonEdges.Count > 0)
       {
-        DxfFile dxf = GenerateCommonLineDxfFile(sheetPlacement, differentiateChildren, null, this.PartNameExport);
+        DxfFile dxf = this.Finish(GenerateCommonLineDxfFile(sheetPlacement, null, this.PartNameExport));
         if (dxf.Entities.Count > 0)
         {
           await Task.Run(() => dxf.Save(stream, true)).ConfigureAwait(false);
@@ -58,12 +63,12 @@ namespace DeepNestLib.IO
         return;
       }
 
-      await Export(stream, sheetPlacement.PolygonsForExport, sheetPlacement.Sheet, doMergeLines, differentiateChildren);
+      await Export(stream, sheetPlacement.PolygonsForExport, sheetPlacement.Sheet, doMergeLines);
     }
 
-    public async Task Export(Stream stream, IEnumerable<INfp> polygons, ISheet sheet, bool doMergeLines, bool differentiateChildren)
+    public async Task Export(Stream stream, IEnumerable<INfp> polygons, ISheet sheet, bool doMergeLines)
     {
-      DxfFile sheetdxf = GenerateDxfFile(polygons, sheet, sheet.Id, doMergeLines, differentiateChildren, null, this.PartNameExport);
+      DxfFile sheetdxf = this.Finish(GenerateDxfFile(polygons, sheet, sheet.Id, doMergeLines, null, this.PartNameExport));
       var dxf = sheetdxf;
       var id = sheet.Id;
 
@@ -78,7 +83,7 @@ namespace DeepNestLib.IO
       }
     }
 
-    protected async override Task Export(string path, IEnumerable<INfp> polygons, IEnumerable<ISheet> sheets, bool doMergeLines, bool differentiateChildren, IReadOnlyCollection<OffcutLine> offcutLines = null)
+    protected async override Task Export(string path, IEnumerable<INfp> polygons, IEnumerable<ISheet> sheets, bool doMergeLines, IReadOnlyCollection<OffcutLine> offcutLines = null)
     {
       try
       {
@@ -87,7 +92,7 @@ namespace DeepNestLib.IO
         for (var i = 0; i < sheets.Count(); i++)
         {
           var sheet = sheetList[i];
-          DxfFile sheetdxf = GenerateDxfFile(polygons, sheet, i, doMergeLines, differentiateChildren, offcutLines, this.PartNameExport);
+          DxfFile sheetdxf = this.Finish(GenerateDxfFile(polygons, sheet, i, doMergeLines, offcutLines, this.PartNameExport));
           dxfexports.Add(sheetdxf, sheet.Id);
         }
 
@@ -135,7 +140,67 @@ namespace DeepNestLib.IO
       return sheetdxf;
     }
 
-    private static IEnumerable<DxfEntity> GetOffsetDxfEntities(IEnumerable<INfp> polygons, ISheet sheet, int i, bool differentiateChildren)
+    /// <summary>
+    /// Puts a finished sheet on the shop's layers. The generators leave the cut on its role layers (or the
+    /// source drawing's own layer, in whatever colour it was drawn), bends and engraved names on
+    /// <see cref="DxfOutputLayers.Paint"/> and display names on <see cref="DxfOutputLayers.Background"/>;
+    /// anything that is not on one of the last two is cut. Every entity is written ByLayer, cut first, so a
+    /// CAM that sorts by colour, by layer or by the order they come in sees the same three.
+    /// </summary>
+    private DxfFile Finish(DxfFile dxf)
+    {
+      if (this.RoleLayers || dxf == null)
+      {
+        return dxf;
+      }
+
+      string Role(DxfEntity e) => e.Layer == DxfOutputLayers.Paint.Name || e.Layer == DxfOutputLayers.Background.Name
+        ? e.Layer
+        : DxfOutputLayers.Cut.Name;
+
+      var ordered = dxf.Entities
+        .Select((e, index) => (Entity: e, Index: index, Rank: Role(e) == DxfOutputLayers.Cut.Name ? 0 : Role(e) == DxfOutputLayers.Paint.Name ? 1 : 2))
+        .OrderBy(t => t.Rank)
+        .ThenBy(t => t.Index)
+        .Select(t => t.Entity)
+        .ToList();
+      dxf.Entities.Clear();
+      foreach (var entity in ordered)
+      {
+        entity.Layer = Role(entity);
+        entity.Color = DxfColor.ByLayer;
+        entity.LineTypeName = "BYLAYER";
+        dxf.Entities.Add(entity);
+      }
+
+      // The colour is the shop's; a line type the drawing gave the layer (bend lines are PHANTOM) is kept, it
+      // only changes how the line looks in CAD.
+      var lineTypes = dxf.Layers
+        .Where(l => !string.IsNullOrWhiteSpace(l.LineTypeName) && dxf.LineTypes.Any(t => string.Equals(t.Name, l.LineTypeName, StringComparison.OrdinalIgnoreCase)))
+        .GroupBy(l => l.Name)
+        .ToDictionary(g => g.Key, g => g.First().LineTypeName);
+      dxf.Layers.Clear();
+      foreach (var layer in new[] { DxfOutputLayers.Cut, DxfOutputLayers.Paint, DxfOutputLayers.Background })
+      {
+        if (layer == DxfOutputLayers.Cut || ordered.Any(e => e.Layer == layer.Name))
+        {
+          dxf.Layers.Add(new DxfLayer(layer.Name, DxfColor.FromIndex((byte)layer.ColorIndex))
+          {
+            LineTypeName = lineTypes.TryGetValue(layer.Name, out string lineType) ? lineType : "CONTINUOUS",
+            IsLayerOn = true,
+          });
+        }
+      }
+
+      if (!dxf.Layers.Any(l => l.Name == "0"))
+      {
+        dxf.Layers.Add(new DxfLayer("0", DxfColor.FromIndex(7)) { LineTypeName = "CONTINUOUS", IsLayerOn = true });
+      }
+
+      return dxf;
+    }
+
+    private static IEnumerable<DxfEntity> GetOffsetDxfEntities(IEnumerable<INfp> polygons, ISheet sheet, int i)
     {
       foreach (var polygon in polygons)
       {
@@ -168,7 +233,7 @@ namespace DeepNestLib.IO
         var sheetXoffset = -sheet.WidthCalculated * i;
         //double sheetYoffset = -sheet.Height * i;
         DxfPoint offsetdistance = new DxfPoint(polygon.X + sheetXoffset, polygon.Y, 0D);
-        List<DxfEntity> newlist = OffsetToNest(fl.Outers, offsetdistance, polygon.Rotation, polygon.IsMirrored, differentiateChildren);
+        List<DxfEntity> newlist = OffsetToNest(fl.Outers, offsetdistance, polygon.Rotation, polygon.IsMirrored);
         foreach (DxfEntity ent in newlist)
         {
           yield return ent;
@@ -176,21 +241,13 @@ namespace DeepNestLib.IO
       }
     }
 
-    private static List<DxfEntity> OffsetToNest(IEnumerable<ILocalContour> contours, DxfPoint offsetdistance, double rotation, bool mirror, bool differentiateChildren)
+    private static List<DxfEntity> OffsetToNest(IEnumerable<ILocalContour> contours, DxfPoint offsetdistance, double rotation, bool mirror)
     {
       var allEntities = new List<DxfEntity>();
       foreach (var contour in contours)
       {
         if (contour is LocalContour<DxfEntity> castContour)
         {
-          if (differentiateChildren && castContour.IsChild)
-          {
-            foreach (var child in castContour.Entities)
-            {
-              child.Color = DxfColorHelpers.GetClosestDefaultIndexColor(255, 0, 0);
-            }
-          }
-
           allEntities.AddRange(castContour.Entities);
         }
       }
@@ -511,7 +568,6 @@ namespace DeepNestLib.IO
 
     private static DxfFile GenerateCommonLineDxfFile(
       ISheetPlacement sheetPlacement,
-      bool differentiateChildren,
       IReadOnlyCollection<OffcutLine> offcutLines = null,
       DxfPartNameExport partNameExport = DxfPartNameExport.None)
     {
@@ -549,14 +605,6 @@ namespace DeepNestLib.IO
             contour.Entities,
             layer,
             sheetPlacement.GeometryTolerance);
-          if (differentiateChildren && contour.IsChild)
-          {
-            foreach (DxfEntity entity in closed)
-            {
-              entity.Color = DxfColorHelpers.GetClosestDefaultIndexColor(255, 0, 0);
-            }
-          }
-
           foreach (DxfEntity entity in closed)
           {
             dxf.Entities.Add(entity);
@@ -583,11 +631,6 @@ namespace DeepNestLib.IO
             IsClosed = true,
             Layer = CutInnerLayer,
           };
-          if (differentiateChildren)
-          {
-            polyline.Color = DxfColorHelpers.GetClosestDefaultIndexColor(255, 0, 0);
-          }
-
           dxf.Entities.Add(polyline);
         }
 
@@ -1429,14 +1472,13 @@ namespace DeepNestLib.IO
       ISheet sheet,
       int i,
       bool doMergeLines,
-      bool differentiateChildren,
       IReadOnlyCollection<OffcutLine> offcutLines = null,
       DxfPartNameExport partNameExport = DxfPartNameExport.None)
     {
       try
       {
         DxfFile sheetdxf = GenerateEmptyDxfFile();
-        IEnumerable<DxfEntity> entities = GetOffsetDxfEntities(polygons.Where(o => o.Sheet.Id == sheet.Id), sheet, i, differentiateChildren).ToList();
+        IEnumerable<DxfEntity> entities = GetOffsetDxfEntities(polygons.Where(o => o.Sheet.Id == sheet.Id), sheet, i).ToList();
 
         // Snap every coordinate to the micro-inch BEFORE merging: the per-part double transforms
         // leave coincident geometry (a common-line shared edge) ~1e-8 apart — irrelevant to the cut
@@ -1477,6 +1519,13 @@ namespace DeepNestLib.IO
 
         foreach (var entity in entityList)
         {
+          // Cut geometry keeps the source drawing's layer here, and a drawing that happened to draw its outline
+          // on the layer the sheet uses for marking would otherwise be engraved instead of cut.
+          if (entity.Layer == DxfOutputLayers.Paint.Name || entity.Layer == DxfOutputLayers.Background.Name)
+          {
+            entity.Layer = DxfOutputLayers.Cut.Name;
+          }
+
           sheetdxf.Entities.Add(entity);
         }
 
@@ -1740,9 +1789,8 @@ namespace DeepNestLib.IO
 
     private static DxfEntity CloneBendEntity(DxfEntity entity, string defaultLayerName)
     {
-      string targetLayer = !string.IsNullOrWhiteSpace(entity.Layer) && !string.Equals(entity.Layer, "0", StringComparison.OrdinalIgnoreCase)
-        ? entity.Layer
-        : defaultLayerName;
+      // Whatever layer the drawing kept its bends on, on the sheet they are marked, never cut.
+      string targetLayer = defaultLayerName;
 
       DxfColor color = entity.Color != null && !entity.Color.IsByLayer && entity.Color.Index != 8 && entity.Color.Index != 7 && entity.Color.Index != 0
         ? entity.Color
@@ -1889,7 +1937,7 @@ namespace DeepNestLib.IO
           continue;
         }
 
-        EnsureBendLayer(targetDxf, info.LayerName, info.LayerDef);
+        EnsureBendLayer(targetDxf, DxfOutputLayers.Paint.Name, info.LayerDef);
         if (info.LineTypes != null)
         {
           foreach (var lt in info.LineTypes)
@@ -1899,7 +1947,7 @@ namespace DeepNestLib.IO
         }
 
         var clones = info.TemplateEntities
-          .Select(e => CloneBendEntity(e, info.LayerName))
+          .Select(e => CloneBendEntity(e, DxfOutputLayers.Paint.Name))
           .Where(e => e != null)
           .ToList();
 
@@ -2084,8 +2132,9 @@ namespace DeepNestLib.IO
         return;
       }
 
-      string layerName = exportMode == DxfPartNameExport.Layer9 ? PartNameLayer9 : PartNameLayerBackground;
-      byte colorIndex = exportMode == DxfPartNameExport.Layer9 ? (byte)9 : (byte)8;
+      var target = exportMode == DxfPartNameExport.Paint ? DxfOutputLayers.Paint : DxfOutputLayers.Background;
+      string layerName = target.Name;
+      byte colorIndex = (byte)target.ColorIndex;
       EnsurePartNameLayer(targetDxf, layerName, colorIndex);
 
       foreach (var placement in placements)
@@ -2134,8 +2183,9 @@ namespace DeepNestLib.IO
         return;
       }
 
-      string layerName = exportMode == DxfPartNameExport.Layer9 ? PartNameLayer9 : PartNameLayerBackground;
-      byte colorIndex = exportMode == DxfPartNameExport.Layer9 ? (byte)9 : (byte)8;
+      var target = exportMode == DxfPartNameExport.Paint ? DxfOutputLayers.Paint : DxfOutputLayers.Background;
+      string layerName = target.Name;
+      byte colorIndex = (byte)target.ColorIndex;
       EnsurePartNameLayer(targetDxf, layerName, colorIndex);
 
       foreach (var polygon in polygons)

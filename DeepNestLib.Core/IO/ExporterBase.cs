@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.IO
+namespace DeepNestLib.IO
 {
   using System.Collections.Generic;
   using System.Threading.Tasks;
@@ -8,17 +8,16 @@
   {
     public abstract string SaveFileDialogFilter { get; }
 
-    public virtual async Task Export(string path, ISheetPlacement sheetPlacement, bool doMergeLines, bool differentiateChildren, IReadOnlyCollection<OffcutLine> offcutLines = null)
+    public virtual async Task Export(string path, ISheetPlacement sheetPlacement, bool doMergeLines, IReadOnlyCollection<OffcutLine> offcutLines = null)
     {
       await Export(
         path,
         sheetPlacement.PolygonsForExport,
         new ISheet[] { sheetPlacement.Sheet, },
         doMergeLines,
-        differentiateChildren,
         offcutLines).ConfigureAwait(false);
     }
 
-    protected abstract Task Export(string path, IEnumerable<INfp> polygons, IEnumerable<ISheet> sheets, bool doMergeLines, bool differentiateChildren, IReadOnlyCollection<OffcutLine> offcutLines = null);
+    protected abstract Task Export(string path, IEnumerable<INfp> polygons, IEnumerable<ISheet> sheets, bool doMergeLines, IReadOnlyCollection<OffcutLine> offcutLines = null);
   }
 }

@@ -89,7 +89,7 @@ namespace DeepNestLib.CiTests.Placement
       reloadedCurve.Radius.Should().BeApproximately(curve.Radius, Tolerance);
 
       using var stream = new MemoryStream();
-      await sheet.ExportDxf(stream, mergeLines: false, differentiateChildren: false);
+      await sheet.ExportDxf(stream, mergeLines: false, roleLayers: true);
       stream.Position = 0;
       DxfFile exported = DxfFile.Load(stream);
       exported.Entities.Where(entity => entity.Layer == DxfExporter.CommonLineLayer)
@@ -152,7 +152,7 @@ namespace DeepNestLib.CiTests.Placement
       curve.Radius.Should().BeApproximately(5D + (Gap / 2D), Tolerance);
 
       using var stream = new MemoryStream();
-      await reloaded.ExportDxf(stream, mergeLines: false, differentiateChildren: false);
+      await reloaded.ExportDxf(stream, mergeLines: false, roleLayers: true);
       stream.Position = 0;
       DxfFile exported = DxfFile.Load(stream);
       exported.Entities.Where(entity => entity.Layer == DxfExporter.CommonLineLayer)
@@ -280,7 +280,7 @@ namespace DeepNestLib.CiTests.Placement
         geometryTolerance: Tolerance);
 
       using var stream = new MemoryStream();
-      await sheet.ExportDxf(stream, mergeLines: false, differentiateChildren: false);
+      await sheet.ExportDxf(stream, mergeLines: false, roleLayers: true);
       stream.Position = 0;
       DxfFile exported = DxfFile.Load(stream);
 
@@ -324,7 +324,7 @@ namespace DeepNestLib.CiTests.Placement
       Func<Task> export = async () =>
       {
         using var stream = new MemoryStream();
-        await reloaded.ExportDxf(stream, mergeLines: false, differentiateChildren: false);
+        await reloaded.ExportDxf(stream, mergeLines: false, roleLayers: true);
       };
       await export.Should().ThrowAsync<CommonLineValidationException>()
         .WithMessage("*fingerprint*stale*");

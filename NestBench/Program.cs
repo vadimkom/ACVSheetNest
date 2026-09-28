@@ -235,7 +235,7 @@ namespace NestBench
             string path = System.IO.Path.Combine(opt.ExportDir, $"nest_sheet{s++}.dxf");
             using (var fs = System.IO.File.Create(path))
             {
-              sp.ExportDxf(fs, false, false).GetAwaiter().GetResult();
+              sp.ExportDxf(fs, false).GetAwaiter().GetResult();
             }
 
             Console.WriteLine($"  EXPORT OK: {path} ({new System.IO.FileInfo(path).Length} bytes)");

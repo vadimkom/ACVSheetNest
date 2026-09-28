@@ -53,8 +53,6 @@ namespace DeepNestLib
 
     public bool ClipByHull { get; set; } = true;
 
-    public bool DifferentiateChildren { get; set; } = true;
-
     public DxfPartNameExport DxfPartNameExport { get; set; } = DxfPartNameExport.Background;
 
     public bool DrawSimplification { get; set; } = true;

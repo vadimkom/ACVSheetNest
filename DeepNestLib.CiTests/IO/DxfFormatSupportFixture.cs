@@ -167,7 +167,7 @@ namespace DeepNestLib.CiTests.IO
         var sheetPlacement = new SheetPlacement(PlacementTypeEnum.BoundingBox, sheet, placements, 0, SvgNest.Config.ClipperScale);
 
         var exporter = new DxfExporter();
-        await exporter.Export(tempOut, sheetPlacement, false, false);
+        await exporter.Export(tempOut, sheetPlacement, false);
 
         File.Exists(tempOut).Should().BeTrue();
         var outDxf = IxMilia.Dxf.DxfFile.Load(tempOut);
@@ -219,7 +219,7 @@ namespace DeepNestLib.CiTests.IO
         var sheetPlacement = new SheetPlacement(PlacementTypeEnum.BoundingBox, sheet, placements, 0, SvgNest.Config.ClipperScale);
 
         var exporter = new DxfExporter();
-        await exporter.Export(tempOut, sheetPlacement, false, false);
+        await exporter.Export(tempOut, sheetPlacement, false);
 
         var outDxf = IxMilia.Dxf.DxfFile.Load(tempOut);
         outDxf.Layers.Should().Contain(l => l.Name == "9");

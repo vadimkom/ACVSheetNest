@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.CiTests.IO
+namespace DeepNestLib.CiTests.IO
 {
   using System;
   using System.Collections.Generic;
@@ -49,7 +49,7 @@
       SheetPlacement placement = this.BuildPlacement();
       using var output = new MemoryStream();
 
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile actual = DxfFile.Load(output);
 
@@ -130,7 +130,7 @@
         geometryTolerance: Tolerance);
       using var output = new MemoryStream();
 
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile actual = DxfFile.Load(output);
 
@@ -150,7 +150,7 @@
       valid.PartPlacements[1].X += 0.004D;
       using var output = new MemoryStream();
 
-      Func<Task> act = () => valid.ExportDxf(output, mergeLines: true, differentiateChildren: false);
+      Func<Task> act = () => valid.ExportDxf(output, mergeLines: true, roleLayers: true);
 
       await act.Should().ThrowAsync<CommonLineValidationException>();
       output.Length.Should().Be(0, "an invalid cluster must never leave a partial ambiguous DXF");
@@ -276,13 +276,12 @@
     {
       SheetPlacement placement = this.BuildPlacement();
       string target = Path.Combine(this.tempDirectory, "with-offcut.dxf");
-      var exporter = new DxfExporter();
+      var exporter = new DxfExporter { RoleLayers = true };
 
       await exporter.Export(
         target,
         placement,
         doMergeLines: false,
-        differentiateChildren: false,
         offcutLines: new[] { new OffcutLine { X1 = 0D, Y1 = 20D, X2 = 20D, Y2 = 20D } });
 
       DxfFile actual = DxfFile.Load(target);
@@ -297,7 +296,7 @@
       SheetPlacement placement = this.BuildPlacement(sheetId: 17, includeOrdinaryPart: true);
       using var output = new MemoryStream();
 
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile actual = DxfFile.Load(output);
 
@@ -341,7 +340,7 @@
       SheetPlacement placement = this.AddOrdinaryPart(this.BuildPlacement(), ellipsePath, 35D, 10D);
       using var output = new MemoryStream();
 
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile actual = DxfFile.Load(output);
 
@@ -370,7 +369,7 @@
       placement.PartPlacements.Single(part => part.Id == 2).Rotation = 90D;
       using var output = new MemoryStream();
 
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile actual = DxfFile.Load(output);
 
@@ -412,7 +411,7 @@
       SheetPlacement placement = this.AddOrdinaryPart(this.BuildPlacement(), splinePath, 35D, 10D);
       using var output = new MemoryStream();
 
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile actual = DxfFile.Load(output);
 
@@ -428,7 +427,7 @@
       SheetPlacement placement = this.BuildLPlacement();
       using var output = new MemoryStream();
 
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfFile actual = DxfFile.Load(output);
 
@@ -499,7 +498,7 @@
         .Should().BeEquivalentTo(new[] { 0.25D, 0.25D });
       using var output = new MemoryStream();
 
-      await reloaded.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await reloaded.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfLwPolyline exported = DxfFile.Load(output).Entities
         .Single(entity => entity.Layer == DxfExporter.CutOuterLayer)
@@ -648,7 +647,7 @@
       }
 
       using var output = new MemoryStream();
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfLwPolyline exported = DxfFile.Load(output).Entities
         .Single(entity => entity.Layer == DxfExporter.CutOuterLayer)
@@ -676,7 +675,7 @@
       }
 
       using var output = new MemoryStream();
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfLwPolyline exported = DxfFile.Load(output).Entities
         .Single(entity => entity.Layer == DxfExporter.CutOuterLayer)
@@ -705,7 +704,7 @@
       }
 
       using var output = new MemoryStream();
-      await placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      await placement.ExportDxf(output, mergeLines: false, roleLayers: true);
       output.Position = 0;
       DxfLwPolyline exported = DxfFile.Load(output).Entities
         .Single(entity => entity.Layer == DxfExporter.CutOuterLayer)
@@ -780,7 +779,7 @@
         geometryTolerance: clustered.GeometryTolerance);
       using var output = new MemoryStream();
 
-      Func<Task> act = () => placement.ExportDxf(output, mergeLines: false, differentiateChildren: false);
+      Func<Task> act = () => placement.ExportDxf(output, mergeLines: false, roleLayers: true);
 
       await act.Should().ThrowAsync<CommonLineValidationException>()
         .WithMessage("*CUT_OUTER*self-intersecting*");

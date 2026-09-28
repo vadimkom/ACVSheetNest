@@ -114,7 +114,7 @@ namespace DeepNestSharp.CiTests.RasterNest
         .Which.GeometryKind.Should().Be(CommonLineGeometryKind.CircularArc);
 
       using var stream = new MemoryStream();
-      await sheet.ExportDxf(stream, mergeLines: false, differentiateChildren: false);
+      await sheet.ExportDxf(stream, mergeLines: false, roleLayers: true);
       stream.Position = 0;
       DxfFile exported = DxfFile.Load(stream);
       exported.Entities.Where(entity => entity.Layer == DxfExporter.CommonLineLayer)
