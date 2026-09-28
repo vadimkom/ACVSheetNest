@@ -1,17 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <PublishSingleFile>false</PublishSingleFile>
     <ApplicationIcon>Branding\sheetnest.ico</ApplicationIcon>
     <DebugType>embedded</DebugType>
-    <AssemblyVersion>1.1.10.0</AssemblyVersion>
-    <FileVersion>1.1.10.0</FileVersion>
-    <InformationalVersion>1.1.10</InformationalVersion>
-    <Version>1.1.10</Version>
+    <AssemblyVersion>1.1.17.0</AssemblyVersion>
+    <FileVersion>1.1.17.0</FileVersion>
+    <InformationalVersion>1.1.17</InformationalVersion>
+    <Version>1.1.17</Version>
     <Product>SheetNest</Product>
     <AssemblyTitle>SheetNest</AssemblyTitle>
     <AssemblyName>SheetNest</AssemblyName>
@@ -62,9 +62,6 @@
     <Content Include="..\MinkowskiDlls\minkowski_x86.dll" Link="minkowski_x86.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\assets\freecad\unfold_macro.py" Link="unfold_macro.py">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\SparrowEngine\sparrow.exe" Link="sparrow.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -73,13 +70,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dirkster.AvalonDock" Version="4.70.1" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="5.0.103" />
     <PackageReference Include="GitVersion.CommandLine" Version="5.10.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Light.GuardClauses" Version="10.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -96,12 +91,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Text.Json" Version="6.0.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DeepNestLib.Core\DeepNestLib.Core.csproj" />

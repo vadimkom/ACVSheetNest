@@ -1,12 +1,10 @@
-﻿namespace DeepNestSharp.Domain.Docking
+namespace DeepNestSharp.Domain.Docking
 {
   using System.ComponentModel;
   using System.Windows.Input;
 
   public interface IFileViewModel : INotifyPropertyChanged
   {
-    ICommand CloseCommand { get; }
-
     string FileDialogFilter { get; }
 
     string FileName { get; }

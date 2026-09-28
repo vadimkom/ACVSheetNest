@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib
+namespace DeepNestLib
 {
   using DeepNestLib.NestProject;
   using DeepNestLib.Placement;
@@ -30,6 +30,12 @@
     /// Differentiate children when exporting.
     /// </summary>
     bool DifferentiateChildren { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether and to which layer part names are exported as text in DXF layouts
+    /// (None, Layer 9 for engraving, or Background layer for display/identification).
+    /// </summary>
+    DxfPartNameExport DxfPartNameExport { get; set; }
 
     bool DrawSimplification { get; set; }
 

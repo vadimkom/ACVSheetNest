@@ -8,6 +8,7 @@
   using System.Windows.Media;
   using System.Windows.Shapes;
   using DeepNestLib.NestProject;
+  using Localization = DeepNestSharp.Ui.Localization;
 
   /// <summary>
   /// Single visual rotation picker (replaces the separate Rotations + grain controls). Each option
@@ -50,18 +51,18 @@
 
     private static readonly (string Label, int Rotations, IconKind Icon, AnglesEnum Strict, string Tip)[] Options = new[]
     {
-      ("Job default", InheritsJob, IconKind.Inherit, AnglesEnum.None, "Whatever the job is set to, under Settings > Advanced Settings. Change it there and this part follows."),
-      ("As drawn", 1, IconKind.ArrowUp, AnglesEnum.None, "Only 0°, so the part stays exactly as drawn (respects grain)."),
-      ("90° only", RasterNest.RotationCodes.RotOnly90, IconKind.ArrowRight, AnglesEnum.None, "Only 90°, so the part is always turned once."),
-      ("0°+90°", RasterNest.RotationCodes.RotZeroAnd90, IconKind.QuarterTurn, AnglesEnum.None, "0° and 90° permitted."),
-      ("0°+180°", 2, IconKind.ArrowH, AnglesEnum.AsPreviewed, "0° and 180°: respects material grain but can flip."),
-      ("90°+270°", RasterNest.RotationCodes.Rot90And270, IconKind.ArrowV, AnglesEnum.None, "90° and 270°: always turned, either way."),
-      ("4-way", 4, IconKind.FourArrows, AnglesEnum.None, "All four square orientations (0 / 90 / 180 / 270°). The safe first choice on square and L shaped parts: it usually beats free rotation on those, and always costs less to search."),
-      ("45° steps", 8, IconKind.FourArrows, AnglesEnum.None, "Eight orientations, 45° apart. The job setting offers this too, and without it here a part could not be shown what it was really set to."),
-      ("Free", 36, IconKind.AnyCircle, AnglesEnum.None, "Any angle, and NOT automatically the tightest. It wins on parts with slanted or curved edges, and loses on square or L shaped ones, which interlock exactly at right angles and gain nothing from being tilted. Measured on two real jobs: 84.3% of the block filled against 4-way's 81.6% on one, and 69.6% against 73.2% on the other. Costs about twice the search. Ignores grain."),
+      ("Rot_Job", InheritsJob, IconKind.Inherit, AnglesEnum.None, "Rot_JobTip"),
+      ("Rot_AsDrawn", 1, IconKind.ArrowUp, AnglesEnum.None, "Rot_AsDrawnTip"),
+      ("Rot_90Only", RasterNest.RotationCodes.RotOnly90, IconKind.ArrowRight, AnglesEnum.None, "Rot_90OnlyTip"),
+      ("0°+90°", RasterNest.RotationCodes.RotZeroAnd90, IconKind.QuarterTurn, AnglesEnum.None, "Rot_0And90Tip"),
+      ("0°+180°", 2, IconKind.ArrowH, AnglesEnum.AsPreviewed, "Rot_0And180Tip"),
+      ("90°+270°", RasterNest.RotationCodes.Rot90And270, IconKind.ArrowV, AnglesEnum.None, "Rot_90And270Tip"),
+      ("Rot_4Way", 4, IconKind.FourArrows, AnglesEnum.None, "Rot_4WayTip"),
+      ("Rot_45", 8, IconKind.FourArrows, AnglesEnum.None, "Rot_45Tip"),
+      ("Rot_Free", 36, IconKind.AnyCircle, AnglesEnum.None, "Rot_FreeTip"),
     };
 
-    private static readonly Brush IconFill = new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0x80)); // classic navy
+    private static readonly Brush IconFill = new SolidColorBrush(Color.FromRgb(0x00, 0x67, 0xC0)); // the theme accent
 
     private readonly List<ToggleButton> buttons = new List<ToggleButton>();
 
@@ -80,9 +81,9 @@
         var btn = new ToggleButton
         {
           Style = (Style)this.Resources["RotationOptionStyle"],
-          ToolTip = BuildTip(opt.Tip),
+          ToolTip = BuildTip(Localization.Get(opt.Tip)),
           Tag = i,
-          Content = BuildContent(opt.Label, opt.Icon),
+          Content = BuildContent(Localization.Get(opt.Label), opt.Icon),
         };
         ToolTipService.SetShowDuration(btn, 30000);
         ToolTipService.SetInitialShowDelay(btn, 300);
@@ -160,10 +161,13 @@
     {
       var panel = new StackPanel { Orientation = Orientation.Vertical };
       panel.Children.Add(BuildIcon(icon));
+      // Two lines when it needs them: "Как в задании" or "Както е начертано" does not fit a tile on one.
       panel.Children.Add(new TextBlock
       {
         Text = label,
         FontSize = 9.5,
+        TextWrapping = TextWrapping.Wrap,
+        TextAlignment = TextAlignment.Center,
         HorizontalAlignment = HorizontalAlignment.Center,
         Margin = new Thickness(0, 2, 0, 0),
       });

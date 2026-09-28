@@ -308,5 +308,26 @@
 
       actual.DetailLoadInfos[0].CommonCutting.Should().Be(CommonCuttingMode.Unrestricted);
     }
+
+    [Fact]
+    public void ProjectSavedWithTheRetired3DUnfoldFieldsStillOpensWithItsParts()
+    {
+      // Builds that had STEP/IGES import wrote these on every part. FromJson swallows any failure and
+      // hands back an EMPTY project, so a field that no longer exists must be skipped, not fatal.
+      var config = new SvgNestConfig();
+      var sut = new ProjectInfo(config);
+      sut.DetailLoadInfos.Add(new DetailLoadInfo { Path = "flat.dxf", Quantity = 3 });
+      string json = sut.ToJson().Replace(
+        "\"Path\": \"flat.dxf\"",
+        "\"Path\": \"flat.dxf\",\"SourceStepPath\":\"part.step\",\"UnfoldIndex\":1,\"KFactor\":0.33,"
+          + "\"KFactorStandard\":\"din\",\"UnfoldUnitInch\":false,\"ThicknessMm\":1.5");
+      json.Should().Contain("SourceStepPath", "the test must actually feed the old fields in");
+
+      ProjectInfo actual = ProjectInfo.FromJson(config, json);
+
+      actual.DetailLoadInfos.Should().ContainSingle();
+      actual.DetailLoadInfos[0].Path.Should().Be("flat.dxf");
+      actual.DetailLoadInfos[0].Quantity.Should().Be(3);
+    }
   }
 }

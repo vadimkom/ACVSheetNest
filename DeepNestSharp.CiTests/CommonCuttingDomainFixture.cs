@@ -12,7 +12,7 @@ namespace DeepNestSharp.CiTests
   public class CommonCuttingDomainFixture
   {
     [Fact]
-    public void ConfirmedDirectDxfAndUnfoldedPartShareTheDirectContract()
+    public void ConfirmedDirectDxfSharesTheDirectContract()
     {
       var dxf = new DetailLoadInfo
       {
@@ -20,16 +20,15 @@ namespace DeepNestSharp.CiTests
         CommonCutting = CommonCuttingMode.Unrestricted,
         DirectCommonCuttingEnabled = true,
       };
-      var unfolded = new DetailLoadInfo
+      var samePart = new DetailLoadInfo
       {
-        Path = "flat.dxf",
-        SourceStepPath = "part.step",
+        Path = "other.dxf",
         CommonCutting = CommonCuttingMode.SamePart,
         DirectCommonCuttingEnabled = true,
       };
 
       MainWindow.CommonCuttingDomainOf(dxf).Should().Be("direct");
-      MainWindow.CommonCuttingDomainOf(unfolded).Should().Be("direct");
+      MainWindow.CommonCuttingDomainOf(samePart).Should().Be("direct");
     }
 
     [Fact]

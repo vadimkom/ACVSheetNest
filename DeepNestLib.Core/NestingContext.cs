@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib
+namespace DeepNestLib
 {
   using System;
   using System.Collections.Generic;
@@ -274,10 +274,6 @@
         else if (path.ToLower().EndsWith("dxf"))
         {
           r = DxfParser.LoadDxfFile(path).Result;
-        }
-        else if (StepUnfoldService.IsStepFile(path))
-        {
-          r = StepUnfoldService.LoadAsRawDetail(path);
         }
         else
         {

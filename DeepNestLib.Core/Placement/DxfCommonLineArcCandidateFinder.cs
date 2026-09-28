@@ -382,7 +382,7 @@ namespace DeepNestLib.Placement
       catalog = null;
       string sourceName = placement?.Part?.Name;
       if (string.IsNullOrWhiteSpace(sourceName)
-        || !sourceName.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase))
+        || !DxfFileExtensions.IsDxf(sourceName))
       {
         return false;
       }

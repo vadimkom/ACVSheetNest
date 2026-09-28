@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.IO
+namespace DeepNestLib.IO
 {
   using System;
   using System.Collections.Generic;
@@ -16,6 +16,10 @@
     public const string CommonLineLayer = "02_COMMON_LINE";
     public const string CutOuterLayer = "03_CUT_OUTER";
     public const string OffcutLayer = "04_OFFCUT";
+    public const string PartNameLayer9 = "9";
+    public const string PartNameLayerBackground = "Background";
+
+    public DxfPartNameExport PartNameExport { get; set; } = DxfPartNameExport.None;
 
     public override string SaveFileDialogFilter => "Dxf files (*.dxf)|*.dxf";
 
@@ -32,7 +36,7 @@
         return;
       }
 
-      DxfFile dxf = GenerateCommonLineDxfFile(sheetPlacement, differentiateChildren, offcutLines);
+      DxfFile dxf = GenerateCommonLineDxfFile(sheetPlacement, differentiateChildren, offcutLines, this.PartNameExport);
       if (dxf.Entities.Count == 0)
       {
         return;
@@ -45,7 +49,7 @@
     {
       if (sheetPlacement.CommonEdges != null && sheetPlacement.CommonEdges.Count > 0)
       {
-        DxfFile dxf = GenerateCommonLineDxfFile(sheetPlacement, differentiateChildren);
+        DxfFile dxf = GenerateCommonLineDxfFile(sheetPlacement, differentiateChildren, null, this.PartNameExport);
         if (dxf.Entities.Count > 0)
         {
           await Task.Run(() => dxf.Save(stream, true)).ConfigureAwait(false);
@@ -59,7 +63,7 @@
 
     public async Task Export(Stream stream, IEnumerable<INfp> polygons, ISheet sheet, bool doMergeLines, bool differentiateChildren)
     {
-      DxfFile sheetdxf = GenerateDxfFile(polygons, sheet, sheet.Id, doMergeLines, differentiateChildren);
+      DxfFile sheetdxf = GenerateDxfFile(polygons, sheet, sheet.Id, doMergeLines, differentiateChildren, null, this.PartNameExport);
       var dxf = sheetdxf;
       var id = sheet.Id;
 
@@ -83,7 +87,7 @@
         for (var i = 0; i < sheets.Count(); i++)
         {
           var sheet = sheetList[i];
-          DxfFile sheetdxf = GenerateDxfFile(polygons, sheet, i, doMergeLines, differentiateChildren, offcutLines);
+          DxfFile sheetdxf = GenerateDxfFile(polygons, sheet, i, doMergeLines, differentiateChildren, offcutLines, this.PartNameExport);
           dxfexports.Add(sheetdxf, sheet.Id);
         }
 
@@ -508,7 +512,8 @@
     private static DxfFile GenerateCommonLineDxfFile(
       ISheetPlacement sheetPlacement,
       bool differentiateChildren,
-      IReadOnlyCollection<OffcutLine> offcutLines = null)
+      IReadOnlyCollection<OffcutLine> offcutLines = null,
+      DxfPartNameExport partNameExport = DxfPartNameExport.None)
     {
       IReadOnlyDictionary<string, DxfSourceSnapshot> sourceSnapshots
         = CaptureSourceSnapshots(
@@ -688,6 +693,16 @@
       EnsureSourceSnapshotsAreCurrent(sourceSnapshots, sheetPlacement.GeometryTolerance);
       ValidateCommonLineDxf(dxf, sheetPlacement.GeometryTolerance);
 
+      var bendPlacements = sheetPlacement.PartPlacements
+        .Where(p => p?.Part?.Name != null && DxfFileExtensions.IsDxf(p.Part.Name))
+        .Select(p => (p.Part.Name, new DxfPoint(p.X, p.Y, 0D), p.Rotation, p.IsMirrored));
+      AppendTransformedBendEntities(dxf, bendPlacements, sourceSnapshots);
+
+      if (partNameExport != DxfPartNameExport.None)
+      {
+        AppendPartNameEntities(dxf, sheetPlacement.PartPlacements, partNameExport);
+      }
+
       return dxf;
     }
 
@@ -729,7 +744,7 @@
         }
 #endif
         if (string.IsNullOrWhiteSpace(source)
-          || !source.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase))
+          || !DxfFileExtensions.IsDxf(source))
         {
           throw new FileNotFoundException(
             $"The file {source} could not be loaded for validated common-line export.");
@@ -802,7 +817,7 @@
         else
 #endif
         {
-          if (string.IsNullOrWhiteSpace(source) || !source.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase))
+          if (string.IsNullOrWhiteSpace(source) || !DxfFileExtensions.IsDxf(source))
           {
             throw new FileNotFoundException();
           }
@@ -1409,7 +1424,14 @@
       }
     }
 
-    private DxfFile GenerateDxfFile(IEnumerable<INfp> polygons, ISheet sheet, int i, bool doMergeLines, bool differentiateChildren, IReadOnlyCollection<OffcutLine> offcutLines = null)
+    private DxfFile GenerateDxfFile(
+      IEnumerable<INfp> polygons,
+      ISheet sheet,
+      int i,
+      bool doMergeLines,
+      bool differentiateChildren,
+      IReadOnlyCollection<OffcutLine> offcutLines = null,
+      DxfPartNameExport partNameExport = DxfPartNameExport.None)
     {
       try
       {
@@ -1470,11 +1492,690 @@
           }
         }
 
+        var sheetXoffset = -sheet.WidthCalculated * i;
+        var bendPlacements = polygons
+          .Where(o => o.Fitted != false && o.Sheet.Id == sheet.Id && o.Name != null && DxfFileExtensions.IsDxf(o.Name))
+          .Select(p => (p.Name, new DxfPoint(p.X + sheetXoffset, p.Y, 0D), p.Rotation, p.IsMirrored));
+        AppendTransformedBendEntities(sheetdxf, bendPlacements);
+
+        if (partNameExport != DxfPartNameExport.None)
+        {
+          AppendPartNameEntities(sheetdxf, polygons, sheet.Id, sheetXoffset, partNameExport);
+        }
+
         return sheetdxf;
       }
       catch (Exception ex)
       {
         throw;
+      }
+    }
+
+    private sealed class PartBendInfo
+    {
+      public List<DxfEntity> TemplateEntities { get; set; } = new List<DxfEntity>();
+      public string LayerName { get; set; }
+      public DxfLayer LayerDef { get; set; }
+      public List<DxfLineType> LineTypes { get; set; } = new List<DxfLineType>();
+    }
+
+    private static bool IsBendEntity(DxfEntity entity)
+    {
+      return entity is DxfLine
+        || entity is DxfLwPolyline
+        || entity is DxfPolyline
+        || entity is DxfArc
+        || entity is DxfCircle
+        || entity is DxfSpline
+        || entity is DxfEllipse;
+    }
+
+    private static (string Name, DxfLayer LayerDef) ResolveBendLayer(
+      DxfFile sourceDxf,
+      IReadOnlyList<DxfEntity> bendEntities)
+    {
+      if (sourceDxf == null)
+      {
+        return ("BEND", null);
+      }
+
+      if (bendEntities != null)
+      {
+        foreach (var e in bendEntities)
+        {
+          if (!string.IsNullOrWhiteSpace(e.Layer) && !string.Equals(e.Layer, "0", StringComparison.OrdinalIgnoreCase))
+          {
+            var matchedLayer = sourceDxf.Layers.FirstOrDefault(l => string.Equals(l.Name, e.Layer, StringComparison.OrdinalIgnoreCase));
+            return (e.Layer, matchedLayer);
+          }
+        }
+      }
+
+      var namedBendLayer = sourceDxf.Layers.FirstOrDefault(l =>
+        l.Name != null && (
+          l.Name.IndexOf("BEND", StringComparison.OrdinalIgnoreCase) >= 0 ||
+          l.Name.IndexOf("СГИБ", StringComparison.OrdinalIgnoreCase) >= 0 ||
+          l.Name.IndexOf("FOLD", StringComparison.OrdinalIgnoreCase) >= 0 ||
+          l.Name.IndexOf("PHANTOM", StringComparison.OrdinalIgnoreCase) >= 0 ||
+          l.Name.IndexOf("MARK", StringComparison.OrdinalIgnoreCase) >= 0 ||
+          l.Name.IndexOf("ETCH", StringComparison.OrdinalIgnoreCase) >= 0 ||
+          string.Equals(l.Name, "9", StringComparison.OrdinalIgnoreCase)));
+
+      if (namedBendLayer != null)
+      {
+        return (namedBendLayer.Name, namedBendLayer);
+      }
+
+      var secondLayer = sourceDxf.Layers.FirstOrDefault(l => !string.Equals(l.Name, "0", StringComparison.OrdinalIgnoreCase));
+      if (secondLayer != null)
+      {
+        return (secondLayer.Name, secondLayer);
+      }
+
+      return ("BEND", null);
+    }
+
+    private static void EnsureBendLayer(DxfFile destination, string layerName, DxfLayer sourceLayerDef)
+    {
+      if (string.IsNullOrWhiteSpace(layerName))
+      {
+        return;
+      }
+
+      if (destination.Layers.Any(l => string.Equals(l.Name, layerName, StringComparison.OrdinalIgnoreCase)))
+      {
+        return;
+      }
+
+      var layer = new DxfLayer(layerName, sourceLayerDef?.Color ?? DxfColorHelpers.GetClosestDefaultIndexColor(255, 0, 0))
+      {
+        LineTypeName = sourceLayerDef?.LineTypeName ?? "Continuous",
+        IsLayerOn = sourceLayerDef?.IsLayerOn ?? true,
+      };
+
+      destination.Layers.Add(layer);
+    }
+
+    private static void EnsureLineType(DxfFile destination, DxfLineType sourceLineType)
+    {
+      if (sourceLineType == null || string.IsNullOrWhiteSpace(sourceLineType.Name))
+      {
+        return;
+      }
+
+      if (destination.LineTypes.Any(lt => string.Equals(lt.Name, sourceLineType.Name, StringComparison.OrdinalIgnoreCase)))
+      {
+        return;
+      }
+
+      var copy = new DxfLineType(sourceLineType.Name)
+      {
+        Description = sourceLineType.Description,
+        TotalPatternLength = sourceLineType.TotalPatternLength,
+      };
+      if (sourceLineType.Elements != null)
+      {
+        foreach (var elem in sourceLineType.Elements)
+        {
+          copy.Elements.Add(new DxfLineTypeElement
+          {
+            DashDotSpaceLength = elem.DashDotSpaceLength,
+            ComplexFlags = elem.ComplexFlags,
+            ShapeNumber = elem.ShapeNumber,
+            RotationAngle = elem.RotationAngle,
+            TextString = elem.TextString,
+            Style = elem.Style,
+            IsRotationAbsolute = elem.IsRotationAbsolute,
+            IsEmbeddedElementAString = elem.IsEmbeddedElementAString,
+            IsEmbeddedElementAShape = elem.IsEmbeddedElementAShape,
+          });
+        }
+      }
+
+      destination.LineTypes.Add(copy);
+    }
+
+    private static DxfFile LoadSourceDxf(
+      string sourcePath,
+      IReadOnlyDictionary<string, DxfSourceSnapshot> sourceSnapshots)
+    {
+      if (string.IsNullOrWhiteSpace(sourcePath))
+      {
+        return null;
+      }
+
+      if (sourceSnapshots != null)
+      {
+        try
+        {
+          string fullPath = Path.GetFullPath(sourcePath);
+          if (sourceSnapshots.TryGetValue(fullPath, out var snapshot))
+          {
+            return snapshot.OpenFile();
+          }
+        }
+        catch
+        {
+        }
+      }
+
+      try
+      {
+        if (File.Exists(sourcePath))
+        {
+          return DxfFile.Load(sourcePath);
+        }
+      }
+      catch
+      {
+      }
+
+      return null;
+    }
+
+    private static PartBendInfo ExtractPartBendInfo(
+      string sourcePath,
+      IReadOnlyDictionary<string, DxfSourceSnapshot> sourceSnapshots)
+    {
+      try
+      {
+        DxfFile sourceDxf = LoadSourceDxf(sourcePath, sourceSnapshots);
+        if (sourceDxf == null)
+        {
+          return null;
+        }
+
+        RawDetail<DxfEntity> detail = DxfParser.ConvertDxfToRawDetail(sourcePath, sourceDxf.Entities.ToArray());
+        var cutEntities = new HashSet<DxfEntity>(
+          detail.Outers.OfType<LocalContour<DxfEntity>>().SelectMany(c => c.Entities));
+
+        var bendEntities = sourceDxf.Entities
+          .Where(e => !cutEntities.Contains(e) && !DxfParser.IsAnnotation(e) && IsBendEntity(e))
+          .ToList();
+
+        if (bendEntities.Count == 0)
+        {
+          return new PartBendInfo();
+        }
+
+        var (layerName, layerDef) = ResolveBendLayer(sourceDxf, bendEntities);
+
+        var lineTypes = new List<DxfLineType>();
+        if (layerDef != null && !string.IsNullOrWhiteSpace(layerDef.LineTypeName))
+        {
+          var lt = sourceDxf.LineTypes.FirstOrDefault(l => string.Equals(l.Name, layerDef.LineTypeName, StringComparison.OrdinalIgnoreCase));
+          if (lt != null)
+          {
+            lineTypes.Add(lt);
+          }
+        }
+
+        foreach (var ent in bendEntities)
+        {
+          if (!string.IsNullOrWhiteSpace(ent.LineTypeName) &&
+              !string.Equals(ent.LineTypeName, "BYLAYER", StringComparison.OrdinalIgnoreCase) &&
+              !string.Equals(ent.LineTypeName, "CONTINUOUS", StringComparison.OrdinalIgnoreCase))
+          {
+            var lt = sourceDxf.LineTypes.FirstOrDefault(l => string.Equals(l.Name, ent.LineTypeName, StringComparison.OrdinalIgnoreCase));
+            if (lt != null && !lineTypes.Any(x => string.Equals(x.Name, lt.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+              lineTypes.Add(lt);
+            }
+          }
+        }
+
+        return new PartBendInfo
+        {
+          TemplateEntities = bendEntities,
+          LayerName = layerName,
+          LayerDef = layerDef,
+          LineTypes = lineTypes,
+        };
+      }
+      catch
+      {
+        return null;
+      }
+    }
+
+    private static DxfEntity CloneBendEntity(DxfEntity entity, string defaultLayerName)
+    {
+      string targetLayer = !string.IsNullOrWhiteSpace(entity.Layer) && !string.Equals(entity.Layer, "0", StringComparison.OrdinalIgnoreCase)
+        ? entity.Layer
+        : defaultLayerName;
+
+      DxfColor color = entity.Color != null && !entity.Color.IsByLayer && entity.Color.Index != 8 && entity.Color.Index != 7 && entity.Color.Index != 0
+        ? entity.Color
+        : DxfColor.ByLayer;
+
+      string lineType = !string.IsNullOrWhiteSpace(entity.LineTypeName) &&
+                        !string.Equals(entity.LineTypeName, "BYLAYER", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(entity.LineTypeName, "CONTINUOUS", StringComparison.OrdinalIgnoreCase)
+        ? entity.LineTypeName
+        : "BYLAYER";
+
+      switch (entity)
+      {
+        case DxfLine line:
+          return new DxfLine(new DxfPoint(line.P1.X, line.P1.Y, line.P1.Z), new DxfPoint(line.P2.X, line.P2.Y, line.P2.Z))
+          {
+            Layer = targetLayer,
+            Color = color,
+            LineTypeName = lineType,
+            LineTypeScale = line.LineTypeScale,
+          };
+
+        case DxfLwPolyline lw:
+          var newLw = new DxfLwPolyline(lw.Vertices.Select(v => new DxfLwPolylineVertex
+          {
+            X = v.X,
+            Y = v.Y,
+            Bulge = v.Bulge,
+            StartingWidth = v.StartingWidth,
+            EndingWidth = v.EndingWidth,
+          }))
+          {
+            IsClosed = lw.IsClosed,
+            Layer = targetLayer,
+            Color = color,
+            LineTypeName = lineType,
+            LineTypeScale = lw.LineTypeScale,
+          };
+          return newLw;
+
+        case DxfPolyline poly:
+          var newPoly = new DxfPolyline(poly.Vertices.Select(v => new DxfVertex(new DxfPoint(v.Location.X, v.Location.Y, v.Location.Z))
+          {
+            Bulge = v.Bulge,
+          }))
+          {
+            IsClosed = poly.IsClosed,
+            Location = new DxfPoint(poly.Location.X, poly.Location.Y, poly.Location.Z),
+            Layer = targetLayer,
+            Color = color,
+            LineTypeName = lineType,
+            LineTypeScale = poly.LineTypeScale,
+          };
+          return newPoly;
+
+        case DxfArc arc:
+          return new DxfArc(new DxfPoint(arc.Center.X, arc.Center.Y, arc.Center.Z), arc.Radius, arc.StartAngle, arc.EndAngle)
+          {
+            Layer = targetLayer,
+            Color = color,
+            LineTypeName = lineType,
+            LineTypeScale = arc.LineTypeScale,
+          };
+
+        case DxfCircle circle:
+          return new DxfCircle(new DxfPoint(circle.Center.X, circle.Center.Y, circle.Center.Z), circle.Radius)
+          {
+            Layer = targetLayer,
+            Color = color,
+            LineTypeName = lineType,
+            LineTypeScale = circle.LineTypeScale,
+          };
+
+        case DxfSpline spline:
+          var newSpline = new DxfSpline
+          {
+            DegreeOfCurve = spline.DegreeOfCurve,
+            Layer = targetLayer,
+            Color = color,
+            LineTypeName = lineType,
+            LineTypeScale = spline.LineTypeScale,
+          };
+          foreach (var cp in spline.ControlPoints)
+          {
+            newSpline.ControlPoints.Add(new DxfControlPoint(new DxfPoint(cp.Point.X, cp.Point.Y, cp.Point.Z), cp.Weight));
+          }
+          foreach (var fp in spline.FitPoints)
+          {
+            newSpline.FitPoints.Add(new DxfPoint(fp.X, fp.Y, fp.Z));
+          }
+          foreach (var k in spline.KnotValues)
+          {
+            newSpline.KnotValues.Add(k);
+          }
+          return newSpline;
+
+        case DxfEllipse ellipse:
+          return new DxfEllipse(new DxfPoint(ellipse.Center.X, ellipse.Center.Y, ellipse.Center.Z), new DxfVector(ellipse.MajorAxis.X, ellipse.MajorAxis.Y, ellipse.MajorAxis.Z), ellipse.MinorAxisRatio)
+          {
+            StartParameter = ellipse.StartParameter,
+            EndParameter = ellipse.EndParameter,
+            Layer = targetLayer,
+            Color = color,
+            LineTypeName = lineType,
+            LineTypeScale = ellipse.LineTypeScale,
+          };
+
+        default:
+          return null;
+      }
+    }
+
+    private static void AppendTransformedBendEntities(
+      DxfFile targetDxf,
+      IEnumerable<(string SourcePath, DxfPoint Offset, double Rotation, bool IsMirrored)> placements,
+      IReadOnlyDictionary<string, DxfSourceSnapshot> sourceSnapshots = null)
+    {
+      var bendCache = new Dictionary<string, PartBendInfo>(StringComparer.OrdinalIgnoreCase);
+
+      foreach (var (sourcePath, offset, rotation, isMirrored) in placements)
+      {
+        if (string.IsNullOrWhiteSpace(sourcePath) || !DxfFileExtensions.IsDxf(sourcePath))
+        {
+          continue;
+        }
+
+        string cacheKey = sourcePath;
+        try
+        {
+          cacheKey = Path.GetFullPath(sourcePath);
+        }
+        catch
+        {
+        }
+
+        if (!bendCache.TryGetValue(cacheKey, out PartBendInfo info))
+        {
+          info = ExtractPartBendInfo(sourcePath, sourceSnapshots);
+          bendCache[cacheKey] = info;
+        }
+
+        if (info == null || info.TemplateEntities == null || info.TemplateEntities.Count == 0)
+        {
+          continue;
+        }
+
+        EnsureBendLayer(targetDxf, info.LayerName, info.LayerDef);
+        if (info.LineTypes != null)
+        {
+          foreach (var lt in info.LineTypes)
+          {
+            EnsureLineType(targetDxf, lt);
+          }
+        }
+
+        var clones = info.TemplateEntities
+          .Select(e => CloneBendEntity(e, info.LayerName))
+          .Where(e => e != null)
+          .ToList();
+
+        if (clones.Count == 0)
+        {
+          continue;
+        }
+
+        foreach (var clone in clones)
+        {
+          EnsureBendLayer(targetDxf, clone.Layer, info.LayerDef);
+        }
+
+        var transformed = OffsetToNest(clones, offset, rotation, isMirrored);
+        var snapped = SnapToGrid(transformed);
+
+        foreach (var ent in snapped)
+        {
+          targetDxf.Entities.Add(ent);
+        }
+      }
+    }
+
+    private static readonly System.Text.RegularExpressions.Regex FlatPatternPrefix = new System.Text.RegularExpressions.Regex(
+      @"^\s*Flat[\s_-]*Pattern\s*-\s*", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
+    internal static string GetPartNameLabel(string source)
+    {
+      if (string.IsNullOrWhiteSpace(source))
+      {
+        return string.Empty;
+      }
+
+      try
+      {
+        string name = Path.GetFileNameWithoutExtension(source);
+        if (string.IsNullOrWhiteSpace(name))
+        {
+          name = Path.GetFileName(source);
+        }
+
+        // Sheet-metal CAD names every unfolded part "Flat-Pattern - <model>"; on the sheet only <model> tells
+        // one part from another.
+        string stripped = FlatPatternPrefix.Replace(name ?? string.Empty, string.Empty);
+        return string.IsNullOrWhiteSpace(stripped) ? name ?? string.Empty : stripped;
+      }
+      catch
+      {
+        return Path.GetFileName(source) ?? source;
+      }
+    }
+
+    private static void EnsurePartNameLayer(DxfFile targetDxf, string layerName, byte colorIndex)
+    {
+      if (string.IsNullOrWhiteSpace(layerName))
+      {
+        return;
+      }
+
+      if (targetDxf.Layers.Any(l => string.Equals(l.Name, layerName, StringComparison.OrdinalIgnoreCase)))
+      {
+        return;
+      }
+
+      var layer = new DxfLayer(layerName, DxfColor.FromIndex(colorIndex))
+      {
+        LineTypeName = "Continuous",
+        IsLayerOn = true,
+      };
+
+      targetDxf.Layers.Add(layer);
+    }
+
+    internal static (double X, double Y) ComputePartCentroid(INfp poly)
+    {
+      if (poly?.Points == null || poly.Points.Length < 3)
+      {
+        return (poly?.MinX ?? 0, poly?.MinY ?? 0);
+      }
+
+      var pts = poly.Points;
+      double twiceArea = 0, cx = 0, cy = 0;
+      for (int i = 0; i < pts.Length; i++)
+      {
+        var p = pts[i];
+        var q = pts[(i + 1) % pts.Length];
+        double cross = (p.X * q.Y) - (q.X * p.Y);
+        twiceArea += cross;
+        cx += (p.X + q.X) * cross;
+        cy += (p.Y + q.Y) * cross;
+      }
+
+      if (Math.Abs(twiceArea) < 1e-12)
+      {
+        return ((poly.MinX + poly.MaxX) / 2.0, (poly.MinY + poly.MaxY) / 2.0);
+      }
+
+      double x = cx / (3.0 * twiceArea);
+      double y = cy / (3.0 * twiceArea);
+
+      if (GeometryUtil.PointInPolygon(new SvgPoint(x, y), poly) == true)
+      {
+        bool inHole = false;
+        if (poly.Children != null)
+        {
+          foreach (var hole in poly.Children)
+          {
+            if (hole.Points != null && hole.Points.Length >= 3 && GeometryUtil.PointInPolygon(new SvgPoint(x, y), hole) == true)
+            {
+              inHole = true;
+              break;
+            }
+          }
+        }
+
+        if (!inHole)
+        {
+          return (x, y);
+        }
+      }
+
+      double midY = (poly.MinY + poly.MaxY) / 2.0;
+      var intersections = new List<double>();
+      for (int i = 0; i < pts.Length; i++)
+      {
+        var p1 = pts[i];
+        var p2 = pts[(i + 1) % pts.Length];
+        if ((p1.Y <= midY && p2.Y > midY) || (p2.Y <= midY && p1.Y > midY))
+        {
+          double t = (midY - p1.Y) / (p2.Y - p1.Y);
+          intersections.Add(p1.X + (t * (p2.X - p1.X)));
+        }
+      }
+
+      intersections.Sort();
+      for (int i = 0; i + 1 < intersections.Count; i += 2)
+      {
+        double testX = (intersections[i] + intersections[i + 1]) / 2.0;
+        if (GeometryUtil.PointInPolygon(new SvgPoint(testX, midY), poly) == true)
+        {
+          return (testX, midY);
+        }
+      }
+
+      return ((poly.MinX + poly.MaxX) / 2.0, (poly.MinY + poly.MaxY) / 2.0);
+    }
+
+    internal static (double TargetHeight, bool IsVertical) ComputeTextProperties(INfp poly, string text)
+    {
+      double w = poly.MaxX - poly.MinX;
+      double h = poly.MaxY - poly.MinY;
+      bool isVertical = h > w * 1.4;
+
+      double dimAlongText = isVertical ? h : w;
+      double dimAcrossText = isVertical ? w : h;
+      int textLen = Math.Max(1, text?.Length ?? 1);
+
+      double maxHeightByLength = (dimAlongText * 0.75) / (0.6 * textLen);
+      double maxHeightByThickness = dimAcrossText * 0.35;
+      double computed = Math.Min(maxHeightByLength, maxHeightByThickness);
+
+      double targetHeight;
+      if (Math.Max(w, h) > 25.0)
+      {
+        targetHeight = Math.Clamp(computed, 1.5, 10.0);
+      }
+      else
+      {
+        targetHeight = Math.Clamp(computed, 0.06, 0.4);
+      }
+
+      return (targetHeight, isVertical);
+    }
+
+    private static void AppendPartNameEntities(
+      DxfFile targetDxf,
+      IEnumerable<IPartPlacement> placements,
+      DxfPartNameExport exportMode)
+    {
+      if (exportMode == DxfPartNameExport.None || placements == null)
+      {
+        return;
+      }
+
+      string layerName = exportMode == DxfPartNameExport.Layer9 ? PartNameLayer9 : PartNameLayerBackground;
+      byte colorIndex = exportMode == DxfPartNameExport.Layer9 ? (byte)9 : (byte)8;
+      EnsurePartNameLayer(targetDxf, layerName, colorIndex);
+
+      foreach (var placement in placements)
+      {
+        string text = GetPartNameLabel(placement.Part?.Name);
+        if (string.IsNullOrWhiteSpace(text))
+        {
+          continue;
+        }
+
+        var poly = placement.PlacedPart;
+        if (poly?.Points == null || poly.Points.Length < 3)
+        {
+          continue;
+        }
+
+        var (cx, cy) = ComputePartCentroid(poly);
+        var (height, isVertical) = ComputeTextProperties(poly, text);
+
+        var textEntity = new DxfText
+        {
+          Value = text,
+          Location = new DxfPoint(Snap(cx), Snap(cy), 0),
+          SecondAlignmentPoint = new DxfPoint(Snap(cx), Snap(cy), 0),
+          HorizontalTextJustification = DxfHorizontalTextJustification.Center,
+          VerticalTextJustification = DxfVerticalTextJustification.Middle,
+          TextHeight = Snap(height),
+          Rotation = isVertical ? 90.0 : 0.0,
+          Layer = layerName,
+          Color = DxfColor.ByLayer,
+        };
+
+        targetDxf.Entities.Add(textEntity);
+      }
+    }
+
+    private static void AppendPartNameEntities(
+      DxfFile targetDxf,
+      IEnumerable<INfp> polygons,
+      int sheetId,
+      double sheetXoffset,
+      DxfPartNameExport exportMode)
+    {
+      if (exportMode == DxfPartNameExport.None || polygons == null)
+      {
+        return;
+      }
+
+      string layerName = exportMode == DxfPartNameExport.Layer9 ? PartNameLayer9 : PartNameLayerBackground;
+      byte colorIndex = exportMode == DxfPartNameExport.Layer9 ? (byte)9 : (byte)8;
+      EnsurePartNameLayer(targetDxf, layerName, colorIndex);
+
+      foreach (var polygon in polygons)
+      {
+        if (polygon.Fitted == false || polygon.Sheet?.Id != sheetId)
+        {
+          continue;
+        }
+
+        string text = GetPartNameLabel(polygon.Name);
+        if (string.IsNullOrWhiteSpace(text))
+        {
+          continue;
+        }
+
+        double px = polygon.X + sheetXoffset;
+        double py = polygon.Y;
+        var placedPoly = polygon.Shift(px, py);
+        if (placedPoly?.Points == null || placedPoly.Points.Length < 3)
+        {
+          continue;
+        }
+
+        var (cx, cy) = ComputePartCentroid(placedPoly);
+        var (height, isVertical) = ComputeTextProperties(placedPoly, text);
+
+        var textEntity = new DxfText
+        {
+          Value = text,
+          Location = new DxfPoint(Snap(cx), Snap(cy), 0),
+          SecondAlignmentPoint = new DxfPoint(Snap(cx), Snap(cy), 0),
+          HorizontalTextJustification = DxfHorizontalTextJustification.Center,
+          VerticalTextJustification = DxfVerticalTextJustification.Middle,
+          TextHeight = Snap(height),
+          Rotation = isVertical ? 90.0 : 0.0,
+          Layer = layerName,
+          Color = DxfColor.ByLayer,
+        };
+
+        targetDxf.Entities.Add(textEntity);
       }
     }
   }

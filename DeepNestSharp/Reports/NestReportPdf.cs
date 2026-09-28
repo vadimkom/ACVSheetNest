@@ -17,8 +17,8 @@ namespace DeepNestSharp.Reports
   /// </summary>
   public static class NestReportPdf
   {
-    private const double PageW = 612; // US Letter portrait, points
-    private const double PageH = 792;
+    private const double PageW = 842; // A4 landscape, points (297 x 210 mm)
+    private const double PageH = 595;
 
     /// <summary>
     /// <paramref name="partColours"/> comes from the window, not from the placements: the colours follow
@@ -32,10 +32,126 @@ namespace DeepNestSharp.Reports
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
     {
+      var pdf = new MiniPdf();
+      GenerateReport(
+        () =>
+        {
+          return pdf.NewPage();
+        },
+        layouts,
+        unplacedCount,
+        units,
+        partColours);
+
+      File.WriteAllBytes(path, pdf.Build());
+    }
+
+    public static byte[] BuildPdfBytes(
+      IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
+      int unplacedCount,
+      string units = "in",
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+    {
+      var pdf = new MiniPdf();
+      GenerateReport(
+        () =>
+        {
+          return pdf.NewPage();
+        },
+        layouts,
+        unplacedCount,
+        units,
+        partColours);
+
+      return pdf.Build();
+    }
+
+    public static System.Windows.Documents.FixedDocument BuildFixedDocument(
+      IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
+      int unplacedCount,
+      string units = "in",
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+    {
+      var doc = new System.Windows.Documents.FixedDocument();
+      GenerateReport(
+        () =>
+        {
+          var wpf = new WpfPageCanvas();
+          var fp = new System.Windows.Documents.FixedPage
+          {
+            Width = PageW,
+            Height = PageH,
+          };
+          fp.Children.Add(wpf.Canvas);
+          var pc = new System.Windows.Documents.PageContent();
+          ((System.Windows.Markup.IAddChild)pc).AddChild(fp);
+          doc.Pages.Add(pc);
+          return wpf;
+        },
+        layouts,
+        unplacedCount,
+        units,
+        partColours);
+
+      return doc;
+    }
+
+    public static List<System.Windows.FrameworkElement> BuildWpfPages(
+      IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
+      int unplacedCount,
+      string units = "in",
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+    {
+      var pages = new List<System.Windows.FrameworkElement>();
+      GenerateReport(
+        () =>
+        {
+          var wpf = new WpfPageCanvas();
+          pages.Add(wpf.GetPageView());
+          return wpf;
+        },
+        layouts,
+        unplacedCount,
+        units,
+        partColours);
+
+      return pages;
+    }
+
+    public static void GenerateReport(
+      Func<IReportCanvas> newPage,
+      IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
+      int unplacedCount,
+      string units = "in",
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+    {
       if (layouts == null || layouts.Count == 0)
       {
-        throw new InvalidOperationException("Nothing to report. Run a nest first.");
+        throw new InvalidOperationException(L("Rep_NothingToReport"));
       }
+
+      // A parts list that does not fit carries on over extra pages, so neither the page count in the footers
+      // nor the page a layout starts on (the cutting plan's Page column) is known until the list is laid out.
+      // A dry run on blank canvases finds both; the real run then prints them.
+      var dry = Render(() => new NullCanvas(), layouts, unplacedCount, units, partColours, null, 0);
+      Render(newPage, layouts, unplacedCount, units, partColours, dry.LayoutPages, dry.Pages);
+    }
+
+    private static (int Pages, List<int> LayoutPages) Render(
+      Func<IReportCanvas> newPage,
+      IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
+      int unplacedCount,
+      string units,
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours,
+      IReadOnlyList<int> layoutPages,
+      int pageCount)
+    {
+      int page = 0;
+      var layoutStarts = new List<int>();
+
+      // Everything below computes with "mm" or "in". The on-screen preview and printing used to pass the
+      // TRANSLATED word, "мм", which matched neither, so a Russian report came out in square inches.
+      units = IsMillimetres(units) ? "mm" : "in";
 
       // Mixed stock: every layout carries ITS OWN sheet size — never assume the first one's.
       int totalSheets = layouts.Sum(l => l.Count);
@@ -54,25 +170,41 @@ namespace DeepNestSharp.Reports
       // The number is what ties a shape on the drawing back to a row here, so both tables and the
       // drawing read it out of the same place.
       var partNumbers = partTotals.ToDictionary(t => t.File, t => t.Number, StringComparer.OrdinalIgnoreCase);
+      var partInfo = partTotals.ToDictionary(t => t.File, StringComparer.OrdinalIgnoreCase);
 
       var colours = partColours
         ?? PartColors.Build(layouts.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
 
       // Every part in the job is coloured, a single-type job included — the paper has to match the screen.
       bool colourCoded = colours.Count > 0;
-      const double numX = 48;
-      double swatchX = 76;
-      double nameX = colourCoded ? 88 : 76;
 
-      var pdf = new MiniPdf();
       string stamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
-      int pageCount = 1 + layouts.Count;
+
+      IReportCanvas NextPage()
+      {
+        page++;
+        var pc = newPage();
+        Header(pc, stamp);
+        Footer(pc, page, pageCount);
+        return pc;
+      }
+
+      // One column, whole names: the rows the parts list could not fit go on as many pages as it takes,
+      // under a title that says whose list it is.
+      void ContinueOnNewPages(IReadOnlyList<PartRow> rows, int next, string title)
+      {
+        while (next < rows.Count)
+        {
+          var pc = NextPage();
+          pc.Text(40, 544, 13, bold: true, LF("Rep_Continued", title));
+          next = PartTable(pc, 520, rows, next, colours, colourCoded, units);
+        }
+      }
 
       // ── Page 1: written for TWO readers — the material buyer (big unambiguous "what to buy"
       // box, nothing to interpret) and the operator (cutting plan + part totals tables below). ──
       {
-        var c = new PageContent();
-        Header(c, stamp);
+        var c = NextPage();
 
         // MATERIAL REQUIRED — one line per sheet size with a big count. This is the purchase order.
         var stockLines = layouts
@@ -80,131 +212,101 @@ namespace DeepNestSharp.Reports
           .Select(g => (g.Key.W, g.Key.H, Count: g.Sum(x => x.Count)))
           .OrderByDescending(t => t.W * t.H)
           .ToList();
-        double totalSqFt = stockLines.Sum(s => s.W * s.H * s.Count) / 144.0;
+        double totalStockArea = stockLines.Sum(s => s.W * s.H * s.Count);
+        string totalStockAreaStr = FormatStockArea(totalStockArea, units);
 
-        // Portrait: page 1 is a single stacked column (40..572 wide), section after section.
-        c.Text(40, 716, 13, bold: true, "MATERIAL REQUIRED");
-        double rowH = 34;
-        double boxH = (stockLines.Count * rowH) + 32;
-        double boxTop = 706;
-        c.FillRect(40, boxTop - boxH, 532, boxH, 0.94, 0.94, 0.94);
-        c.Rect(40, boxTop - boxH, 532, boxH, 0.9);
-        double ry = boxTop - 27;
+        // Landscape Page 1: MATERIAL REQUIRED (left) and JOB SUMMARY (right) side by side
+        double boxTop = 544;
+        int jRows = unplacedCount > 0 ? 4 : 3;
+        double stockBoxH = (stockLines.Count * 22) + 28;
+        double sumBoxH = (jRows * 15) + 16;
+        double topH = Math.Max(stockBoxH, sumBoxH);
+
+        // Left box: MATERIAL REQUIRED
+        c.Text(40, 550, 10.5, bold: true, L("Rep_Material"));
+        c.FillRect(40, boxTop - topH, 370, topH, 0.94, 0.94, 0.94);
+        c.Rect(40, boxTop - topH, 370, topH, 0.8);
+        double ry = boxTop - 18;
         foreach (var (w, h, count) in stockLines)
         {
-          c.Text(56, ry, 21, bold: true, count.ToString("#,0", CultureInfo.InvariantCulture));
-          c.Text(120, ry, 13, bold: false, $"sheet{(count == 1 ? string.Empty : "s")} of  {Num(w)} x {Num(h)} {units}");
+          c.Text(52, ry, 14, bold: true, count.ToString("#,0", CultureInfo.InvariantCulture));
+          c.Text(96, ry, 9, bold: false, LF("Rep_SheetsOf", SheetWord(count), Num(w), Num(h), UnitWord(units)));
           c.SetFill(0.35, 0.35, 0.35);
-          c.Text(430, ry, 10, bold: false, $"{(w * h * count / 144.0).ToString("#,0", CultureInfo.InvariantCulture)} sq ft");
+          c.Text(305, ry, 8, bold: false, FormatStockArea(w * h * count, units));
           c.SetFill(0, 0, 0);
-          ry -= rowH;
+          ry -= 22;
         }
 
-        c.Line(52, ry + 22, 560, ry + 22, 0.6);
-        c.Text(56, ry + 6, 11, bold: true,
-          $"Total:  {totalSheets.ToString("#,0", CultureInfo.InvariantCulture)} sheet{(totalSheets == 1 ? string.Empty : "s")}   -   {totalSqFt.ToString("#,0", CultureInfo.InvariantCulture)} sq ft");
+        c.Line(48, boxTop - topH + 20, 402, boxTop - topH + 20, 0.5);
+        c.Text(52, boxTop - topH + 6, 8.5, bold: true,
+          LF("Rep_Total", totalSheets.ToString("#,0", CultureInfo.InvariantCulture), SheetWord(totalSheets), totalStockAreaStr));
 
-        // Job summary panel (stacked below the material box).
-        double sumTop = boxTop - boxH - 34;
-        int jRows = unplacedCount > 0 ? 4 : 3;
-        double sumBoxH = (jRows * 19) + 14;
-        c.Text(40, sumTop, 13, bold: true, "JOB SUMMARY");
-        c.FillRect(40, sumTop - 10 - sumBoxH, 532, sumBoxH, 0.965, 0.965, 0.965);
-        c.Rect(40, sumTop - 10 - sumBoxH, 532, sumBoxH, 0.9);
-        double jy = sumTop - 27;
+        // Right box: JOB SUMMARY
+        c.Text(432, 550, 10.5, bold: true, L("Rep_Summary"));
+        c.FillRect(432, boxTop - topH, 370, topH, 0.965, 0.965, 0.965);
+        c.Rect(432, boxTop - topH, 370, topH, 0.8);
+        double jy = boxTop - 18;
         void JRow(string label, string value, bool warn = false)
         {
-          c.Text(56, jy, 10.5, bold: false, label);
+          c.Text(446, jy, 8.5, bold: false, label);
           if (warn)
           {
             c.SetFill(0.75, 0, 0);
           }
 
-          c.Text(400, jy, 10.5, bold: true, value);
+          c.Text(690, jy, 8.5, bold: true, value);
           c.SetFill(0, 0, 0);
-          jy -= 19;
+          jy -= 15;
         }
 
-        JRow("Parts to cut", totalParts.ToString("#,0", CultureInfo.InvariantCulture));
-        JRow("Material used", $"{overallUtil.ToString("0.0", CultureInfo.InvariantCulture)} %");
-        JRow("Different layouts", layouts.Count.ToString(CultureInfo.InvariantCulture));
+        JRow(L("Rep_PartsToCut"), totalParts.ToString("#,0", CultureInfo.InvariantCulture));
+        JRow(L("Rep_MaterialUsed"), $"{overallUtil.ToString("0.0", CultureInfo.InvariantCulture)} %");
+        JRow(L("Rep_DifferentLayouts"), layouts.Count.ToString(CultureInfo.InvariantCulture));
         if (unplacedCount > 0)
         {
-          JRow("Parts NOT placed", unplacedCount.ToString(CultureInfo.InvariantCulture), warn: true);
+          JRow(L("Rep_NotPlaced"), unplacedCount.ToString(CultureInfo.InvariantCulture), warn: true);
         }
 
         // CUTTING PLAN — one row per layout, table form: what to cut, on what, how many times.
-        // Runs down to a floor that reserves room for the PART TOTALS section below it.
-        double tableTop = sumTop - 10 - sumBoxH - 34;
-        c.Text(40, tableTop, 13, bold: true, "CUTTING PLAN");
-        double ty = tableTop - 20;
-        c.FillRect(40, ty - 5, 532, 19, 0.92, 0.92, 0.92);
-        c.Text(48, ty, 10, bold: true, "Layout");
-        c.Text(110, ty, 10, bold: true, "Page");
-        c.Text(160, ty, 10, bold: true, "Sheet size");
-        c.Text(280, ty, 10, bold: true, "Parts");
-        c.Text(360, ty, 10, bold: true, "Cut");
-        c.Text(460, ty, 10, bold: true, "Used");
-        ty -= 19;
+        double planTop = boxTop - topH - 16;
+        c.Text(40, planTop, 10.5, bold: true, L("Rep_CuttingPlan"));
+        double ty = planTop - 15;
+        c.FillRect(40, ty - 4, 762, 15, 0.92, 0.92, 0.92);
+        c.Text(48, ty, 8, bold: true, L("Rep_Layout"));
+        c.Text(130, ty, 8, bold: true, L("Rep_PageCol"));
+        c.Text(210, ty, 8, bold: true, L("Rep_SheetSize"));
+        c.Text(430, ty, 8, bold: true, L("Rep_Parts"));
+        c.Text(560, ty, 8, bold: true, L("Rep_Cut"));
+        c.Text(690, ty, 8, bold: true, L("Rep_Used"));
+        ty -= 15;
         int planShown = 0;
-        for (int i = 0; i < layouts.Count && ty >= 190; i++)
+        for (int i = 0; i < layouts.Count && ty >= 220; i++)
         {
           var l = layouts[i];
-          c.Text(48, ty, 10, bold: false, $"Layout {i + 1}");
-          c.Text(110, ty, 10, bold: false, (i + 2).ToString(CultureInfo.InvariantCulture));
-          c.Text(160, ty, 10, bold: false, $"{Num(l.Sheet.Sheet.WidthCalculated)} x {Num(l.Sheet.Sheet.HeightCalculated)}");
-          c.Text(280, ty, 10, bold: false, l.Sheet.PartPlacements.Count.ToString(CultureInfo.InvariantCulture));
-          c.Text(360, ty, 10, bold: true, $"x {l.Count}");
-          c.Text(460, ty, 10, bold: false, $"{Util(l.Sheet).ToString("0.0", CultureInfo.InvariantCulture)} %");
-          c.Line(40, ty - 5, 572, ty - 5, 0.3);
-          ty -= 17;
+          c.Text(48, ty, 8, bold: false, LF("Rep_LayoutN", i + 1));
+          c.Text(130, ty, 8, bold: false, (layoutPages != null && i < layoutPages.Count ? layoutPages[i] : i + 2).ToString(CultureInfo.InvariantCulture));
+          c.Text(210, ty, 8, bold: false, $"{Num(l.Sheet.Sheet.WidthCalculated)} x {Num(l.Sheet.Sheet.HeightCalculated)}");
+          c.Text(430, ty, 8, bold: false, l.Sheet.PartPlacements.Count.ToString(CultureInfo.InvariantCulture));
+          c.Text(560, ty, 8, bold: true, $"x {l.Count}");
+          c.Text(690, ty, 8, bold: false, $"{Util(l.Sheet).ToString("0.0", CultureInfo.InvariantCulture)} %");
+          c.Line(40, ty - 4, 802, ty - 4, 0.25);
+          ty -= 13.5;
           planShown++;
         }
 
         if (planShown < layouts.Count)
         {
-          c.Text(48, ty, 10, bold: false, $"... and {layouts.Count - planShown} more layouts (see their pages)");
-          ty -= 17;
+          c.Text(48, ty, 8, bold: false, LF("Rep_MoreLayouts", layouts.Count - planShown));
+          ty -= 13.5;
         }
 
-        // PART TOTALS — what the job produces, for checking against the order (below the plan).
-        double py = ty - 24;
-        c.Text(40, py, 13, bold: true, "PART TOTALS");
-        py -= 20;
-        c.FillRect(40, py - 5, 532, 19, 0.92, 0.92, 0.92);
-        c.Text(numX, py, 10, bold: true, "No.");
-        c.Text(nameX, py, 10, bold: true, "Part");
-        c.Text(520, py, 10, bold: true, "Qty");
-        py -= 19;
-        int totalsShown = 0;
-        foreach (var (file, colourKey, qty, number) in partTotals)
-        {
-          if (py < 40)
-          {
-            break;
-          }
-
-          // The number the operator reads off the drawing, so it leads the row.
-          c.Text(numX, py, 10, bold: true, number.ToString(CultureInfo.InvariantCulture));
-          if (colourCoded && colours.TryGetValue(colourKey, out var swatch))
-          {
-            c.FillRect(swatchX, py, 8, 8, swatch.R / 255.0, swatch.G / 255.0, swatch.B / 255.0);
-          }
-
-          c.Text(nameX, py, 10, bold: false, Trunc(file, 58));
-          c.Text(520, py, 10, bold: false, qty.ToString("#,0", CultureInfo.InvariantCulture));
-          c.Line(40, py - 5, 572, py - 5, 0.3);
-          py -= 17;
-          totalsShown++;
-        }
-
-        if (totalsShown < partTotals.Count)
-        {
-          c.Text(48, System.Math.Max(py, 32), 10, bold: false, $"... and {partTotals.Count - totalsShown} more");
-        }
-
-        Footer(c, 1, pageCount);
-        pdf.AddPage(c);
+        // PART TOTALS — what the job produces, for checking against the order
+        double py = ty - 16;
+        c.Text(40, py, 10.5, bold: true, L("Rep_PartTotals"));
+        py -= 15;
+        var totalRows = partTotals.Select(t => new PartRow(t.Number, t.Colour, t.File, t.BoxArea, t.CutLength, t.Qty)).ToList();
+        int next = PartTable(c, py, totalRows, 0, colours, colourCoded, units);
+        ContinueOnNewPages(totalRows, next, L("Rep_PartTotals"));
       }
 
       // ── One page per distinct layout ────────────────────────────────────────────────────────
@@ -213,21 +315,46 @@ namespace DeepNestSharp.Reports
         var (sp, count, _) = layouts[i];
         double sheetW = sp.Sheet.WidthCalculated;
         double sheetH = sp.Sheet.HeightCalculated;
-        var c = new PageContent();
-        Header(c, stamp);
+        var c = NextPage();
+        layoutStarts.Add(page);
 
-        c.Text(40, 700, 16, bold: true, $"Layout {i + 1} of {layouts.Count}   -   cut x {count}");
-        c.Text(40, 680, 11, bold: false,
-          $"{sp.PartPlacements.Count} parts   |   {Util(sp).ToString("0.0", CultureInfo.InvariantCulture)}% utilization   |   sheet {Num(sheetW)} x {Num(sheetH)} {units}");
+        // Below the header rule at 560: a 13 pt title set at 556 ran straight through it.
+        c.Text(40, 544, 13, bold: true, LF("Rep_LayoutTitle", i + 1, layouts.Count, count));
+        c.Text(40, 531, 9, bold: false, LF(
+          "Rep_LayoutSub",
+          sp.PartPlacements.Count,
+          Util(sp).ToString("0.0", CultureInfo.InvariantCulture),
+          Num(sheetW),
+          Num(sheetH),
+          UnitWord(units)));
 
-        // Drawing area (top, full portrait width) — sheet border + every part outline with its
-        // holes, Y up like the shop; centered both ways inside the box.
-        const double boxX = 40, boxY = 250, boxW = 532, boxH = 410;
+        var onSheet = sp.PartPlacements
+          .GroupBy(p => Label(p), StringComparer.OrdinalIgnoreCase)
+          .Select(g => (File: g.Key, Colour: PartColors.ColourKeyFor(g.First()), Qty: g.Count()))
+          .OrderByDescending(t => t.Qty)
+          .ToList();
+
+        var layoutRows = onSheet
+          .Select(t => new PartRow(
+            partNumbers.TryGetValue(t.File, out int n) ? n : (int?)null,
+            t.Colour,
+            t.File,
+            partInfo.TryGetValue(t.File, out var pi) ? pi.BoxArea : (double?)null,
+            partInfo.TryGetValue(t.File, out var pc) ? pc.CutLength : (double?)null,
+            t.Qty))
+          .ToList();
+
+        // Up to LayoutListRows rows share the page with the drawing; the rest carry on overleaf.
+        int listRows = Math.Min(onSheet.Count, LayoutListRows);
+        double partsListH = (listRows * RowPitch) + 32;
+        double boxX = 40, boxW = 762;
+        double boxY = 28 + partsListH;
+        double boxH = 522 - boxY; // clear of the layout title and its subtitle above
         double scale = Math.Min(boxW / sheetW, boxH / sheetH);
         double ox = boxX + ((boxW - (sheetW * scale)) / 2.0);
         double oy = boxY + ((boxH - (sheetH * scale)) / 2.0);
 
-        c.Rect(ox, oy, sheetW * scale, sheetH * scale, 0.9);
+        c.Rect(ox, oy, sheetW * scale, sheetH * scale, 0.8);
         foreach (var pp in sp.PartPlacements)
         {
           var poly = pp.PlacedPart;
@@ -280,62 +407,115 @@ namespace DeepNestSharp.Reports
           }
         }
 
-        // Parts on this layout (below the drawing, portrait flow). Mirrored copies list separately.
-        var onSheet = sp.PartPlacements
-          .GroupBy(p => Label(p), StringComparer.OrdinalIgnoreCase)
-          .Select(g => (File: g.Key, Colour: PartColors.ColourKeyFor(g.First()), Qty: g.Count()))
-          .OrderByDescending(t => t.Qty)
-          .ToList();
-
-        double py = 204;
-        c.Text(40, 222, 12, bold: true, "Parts on this layout");
-        int listShown = 0;
-        foreach (var (file, colourKey, qty) in onSheet)
-        {
-          if (py < 40)
-          {
-            break;
-          }
-
-          // Same number as page 1 and as the drawing above it: this is the legend the operator reads
-          // while the sheet is in front of them.
-          if (partNumbers.TryGetValue(file, out int number))
-          {
-            c.Text(40, py, 10, bold: true, number.ToString(CultureInfo.InvariantCulture));
-          }
-
-          if (colourCoded && colours.TryGetValue(colourKey, out var swatch))
-          {
-            c.FillRect(62, py, 8, 8, swatch.R / 255.0, swatch.G / 255.0, swatch.B / 255.0);
-          }
-
-          c.Text(colourCoded ? 74 : 62, py, 10, bold: false, $"{qty} x  {Trunc(file, 58)}");
-          py -= 15;
-          listShown++;
-        }
-
-        if (listShown < onSheet.Count)
-        {
-          c.Text(40, System.Math.Max(py, 32), 10, bold: false, $"... and {onSheet.Count - listShown} more");
-        }
-
-        Footer(c, i + 2, pageCount);
-        pdf.AddPage(c);
+        // Parts on this layout (below the drawing)
+        double py = boxY - 12;
+        c.Text(40, py, 10, bold: true, L("Rep_PartsOnLayout"));
+        py -= 14;
+        int next = PartTable(c, py, layoutRows, 0, colours, colourCoded, units);
+        ContinueOnNewPages(layoutRows, next, $"{LF("Rep_LayoutN", i + 1)}: {L("Rep_PartsOnLayout")}");
       }
 
-      File.WriteAllBytes(path, pdf.Build());
+      return (page, layoutStarts);
     }
 
-    private static void Header(PageContent c, string stamp)
+    private const int LayoutListRows = 12;
+    private const double RowPitch = 13;
+
+    private readonly record struct PartRow(int? Number, string Colour, string File, double? BoxArea, double? CutLength, int Qty);
+
+    /// <summary>The parts table in ONE column across the page: header at <paramref name="py"/>, then rows from
+    /// <paramref name="from"/> for as long as they clear the footer. Returns the first row it had no room for.</summary>
+    private static int PartTable(
+      IReportCanvas c,
+      double py,
+      IReadOnlyList<PartRow> rows,
+      int from,
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> colours,
+      bool colourCoded,
+      string units)
     {
-      c.Text(40, 752, 18, bold: true, "SheetNest - Nest Report");
-      c.Text(478, 755, 10, bold: false, stamp);
-      c.Line(40, 742, 572, 742, 1.0);
+      const double numX = 48, swatchX = 72, areaX = 470, cutX = 610, qtyX = 740;
+      double nameX = colourCoded ? 86 : 72;
+
+      c.FillRect(40, py - 4, 762, 15, 0.92, 0.92, 0.92);
+      c.Text(numX, py, 8, bold: true, L("Rep_No"));
+      c.Text(nameX, py, 8, bold: true, L("Rep_Part"));
+      c.Text(areaX, py, 8, bold: true, L("Rep_BoxArea"));
+      c.Text(cutX, py, 8, bold: true, L("Rep_CutLength"));
+      c.Text(qtyX, py, 8, bold: true, L("Rep_Qty"));
+      py -= 14;
+
+      int i = from;
+      for (; i < rows.Count && py >= 28; i++)
+      {
+        var row = rows[i];
+        if (row.Number.HasValue)
+        {
+          c.Text(numX, py, 8, bold: true, row.Number.Value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        if (colourCoded && colours.TryGetValue(row.Colour, out var swatch))
+        {
+          c.FillRect(swatchX, py, 6.5, 6.5, swatch.R / 255.0, swatch.G / 255.0, swatch.B / 255.0);
+        }
+
+        c.Text(nameX, py, 8, bold: false, Trunc(row.File, colourCoded ? 65 : 70));
+        if (row.BoxArea.HasValue)
+        {
+          c.Text(areaX, py, 8, bold: false, FormatArea(row.BoxArea.Value, units));
+        }
+
+        if (row.CutLength.HasValue)
+        {
+          c.Text(cutX, py, 8, bold: false, FormatLength(row.CutLength.Value, units));
+        }
+
+        c.Text(qtyX, py, 8, bold: false, row.Qty.ToString("#,0", CultureInfo.InvariantCulture));
+        c.Line(40, py - 4, 802, py - 4, 0.25);
+        py -= RowPitch;
+      }
+
+      return i;
     }
 
-    private static void Footer(PageContent c, int page, int of)
+    /// <summary>Draws nothing: the dry run only needs to know where the pages break.</summary>
+    private sealed class NullCanvas : IReportCanvas
     {
-      c.Text(280, 24, 9, bold: false, $"Page {page} of {of}");
+      public void SetFill(double r, double g, double b)
+      {
+      }
+
+      public void FillRect(double x, double y, double w, double h, double r, double g, double b)
+      {
+      }
+
+      public void Text(double x, double y, double size, bool bold, string text)
+      {
+      }
+
+      public void Line(double x1, double y1, double x2, double y2, double width)
+      {
+      }
+
+      public void Rect(double x, double y, double w, double h, double lineWidth)
+      {
+      }
+
+      public void Polygon(IEnumerable<(double X, double Y)> pts, bool fill, bool holeFill = false, (byte R, byte G, byte B)? fillColour = null)
+      {
+      }
+    }
+
+    private static void Header(IReportCanvas c, string stamp)
+    {
+      c.Text(40, 568, 13, bold: true, L("Rep_Header"));
+      c.Text(710, 570, 8.5, bold: false, stamp);
+      c.Line(40, 560, 802, 560, 0.8);
+    }
+
+    private static void Footer(IReportCanvas c, int page, int of)
+    {
+      c.Text(395, 16, 8, bold: false, LF("Rep_Page", page, of));
     }
 
     private static double Util(ISheetPlacement sp)
@@ -348,11 +528,11 @@ namespace DeepNestSharp.Reports
     {
       try
       {
-        return string.IsNullOrWhiteSpace(path) ? "(part)" : Path.GetFileName(path);
+        return string.IsNullOrWhiteSpace(path) ? L("Rep_PartFallback") : Path.GetFileName(path);
       }
       catch (ArgumentException)
       {
-        return path ?? "(part)";
+        return path ?? L("Rep_PartFallback");
       }
     }
 
@@ -369,21 +549,234 @@ namespace DeepNestSharp.Reports
     /// different mark.
     /// </para>
     /// </summary>
-    internal static List<(string File, string Colour, int Qty, int Number)> NumberedPartTotals(
+    internal static List<(string File, string Colour, int Qty, int Number, double BoxArea, double CutLength)> NumberedPartTotals(
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts)
     {
       if (layouts == null || layouts.Count == 0)
       {
-        return new List<(string, string, int, int)>();
+        return new List<(string, string, int, int, double, double)>();
       }
 
       return layouts
-        .SelectMany(l => l.Sheet.PartPlacements.Select(p => (File: Label(p), Colour: PartColors.ColourKeyFor(p), l.Count)))
+        .SelectMany(l => l.Sheet.PartPlacements.Select(p => (File: Label(p), Colour: PartColors.ColourKeyFor(p), l.Count, Placement: p)))
         .GroupBy(t => t.File, StringComparer.OrdinalIgnoreCase)
-        .Select(g => (File: g.Key, Colour: g.First().Colour, Qty: g.Sum(t => t.Count)))
+        .Select(g =>
+        {
+          var first = g.First();
+          var p = first.Placement;
+          INfp part = p?.Part;
+          if (part != null && Math.Abs(p.Rotation % 360) > 1e-6)
+          {
+            part = part.Rotate(-p.Rotation);
+          }
+
+          var (_, _, boxArea) = ComputeBoundingBox(part);
+          double cutLength = LaserCutLength(part);
+
+          return (
+            File: g.Key,
+            Colour: first.Colour,
+            Qty: g.Sum(t => t.Count),
+            BoxArea: boxArea,
+            CutLength: cutLength);
+        })
         .OrderByDescending(t => t.Qty)
-        .Select((t, i) => (t.File, t.Colour, t.Qty, Number: i + 1))
+        .Select((t, i) => (t.File, t.Colour, t.Qty, Number: i + 1, t.BoxArea, t.CutLength))
         .ToList();
+    }
+
+    /// <summary>
+    /// Computes the area and dimensions of the minimum rectangle enclosing the part polygon.
+    /// Evaluates both the coordinate-aligned box and oriented boxes along all polygon edges.
+    /// </summary>
+    internal static (double Width, double Height, double Area) ComputeBoundingBox(INfp part)
+    {
+      if (part?.Points == null || part.Points.Length < 2)
+      {
+        return (0, 0, 0);
+      }
+
+      var pts = part.Points;
+      double minX = pts[0].X, maxX = pts[0].X;
+      double minY = pts[0].Y, maxY = pts[0].Y;
+      for (int i = 1; i < pts.Length; i++)
+      {
+        var p = pts[i];
+        if (p.X < minX) minX = p.X;
+        if (p.X > maxX) maxX = p.X;
+        if (p.Y < minY) minY = p.Y;
+        if (p.Y > maxY) maxY = p.Y;
+      }
+
+      double bestW = maxX - minX;
+      double bestH = maxY - minY;
+      double bestArea = bestW * bestH;
+
+      for (int i = 0; i < pts.Length; i++)
+      {
+        var p1 = pts[i];
+        var p2 = pts[(i + 1) % pts.Length];
+        double dx = p2.X - p1.X;
+        double dy = p2.Y - p1.Y;
+        double len = Math.Sqrt((dx * dx) + (dy * dy));
+        if (len < 1e-7)
+        {
+          continue;
+        }
+
+        double cos = dx / len;
+        double sin = dy / len;
+
+        double uMin = double.MaxValue, uMax = double.MinValue;
+        double vMin = double.MaxValue, vMax = double.MinValue;
+
+        for (int j = 0; j < pts.Length; j++)
+        {
+          var pt = pts[j];
+          double u = (pt.X * cos) + (pt.Y * sin);
+          double v = (-pt.X * sin) + (pt.Y * cos);
+
+          if (u < uMin) uMin = u;
+          if (u > uMax) uMax = u;
+          if (v < vMin) vMin = v;
+          if (v > vMax) vMax = v;
+        }
+
+        double w = uMax - uMin;
+        double h = vMax - vMin;
+        double area = w * h;
+
+        if (area < bestArea - 1e-7)
+        {
+          bestArea = area;
+          bestW = Math.Max(w, h);
+          bestH = Math.Min(w, h);
+        }
+      }
+
+      return (Math.Max(bestW, bestH), Math.Min(bestW, bestH), bestArea);
+    }
+
+    /// <summary>
+    /// Total laser cut length for a part: outer perimeter plus perimeter of all internal holes.
+    /// </summary>
+    internal static double LaserCutLength(INfp part)
+    {
+      if (part == null)
+      {
+        return 0;
+      }
+
+      double total = Perimeter(part);
+      if (part.Children != null)
+      {
+        foreach (var child in part.Children)
+        {
+          total += LaserCutLength(child);
+        }
+      }
+
+      return total;
+    }
+
+    /// <summary>
+    /// Perimeter of a closed ring, adding the closing segment if start and end points differ.
+    /// </summary>
+    internal static double Perimeter(INfp poly)
+    {
+      if (poly?.Points == null || poly.Points.Length < 2)
+      {
+        return 0;
+      }
+
+      var pts = poly.Points;
+      double length = 0;
+      for (int i = 0; i < pts.Length - 1; i++)
+      {
+        double dx = pts[i + 1].X - pts[i].X;
+        double dy = pts[i + 1].Y - pts[i].Y;
+        length += Math.Sqrt((dx * dx) + (dy * dy));
+      }
+
+      double closeDx = pts[0].X - pts[pts.Length - 1].X;
+      double closeDy = pts[0].Y - pts[pts.Length - 1].Y;
+      if (Math.Abs(closeDx) > 1e-6 || Math.Abs(closeDy) > 1e-6)
+      {
+        length += Math.Sqrt((closeDx * closeDx) + (closeDy * closeDy));
+      }
+
+      return length;
+    }
+
+    internal static string FormatArea(double area, string units)
+    {
+      if (area <= 0)
+      {
+        return "-";
+      }
+
+      if (IsMillimetres(units))
+      {
+        double sqM = area / 1_000_000.0;
+        if (sqM >= 10.0)
+        {
+          return FormattableString.Invariant($"{sqM:#,0.0} ") + L("Rep_M2");
+        }
+
+        if (sqM >= 0.01)
+        {
+          return FormattableString.Invariant($"{sqM:0.000} ") + L("Rep_M2");
+        }
+
+        if (sqM >= 0.001)
+        {
+          return FormattableString.Invariant($"{sqM:0.000#} ") + L("Rep_M2");
+        }
+
+        return FormattableString.Invariant($"{sqM:0.0000#} ") + L("Rep_M2");
+      }
+
+      string u = UnitWord(units);
+      return area >= 1000
+        ? FormattableString.Invariant($"{area:#,0} ") + LF("Rep_Sq", u)
+        : FormattableString.Invariant($"{area:0.##} ") + LF("Rep_Sq", u);
+    }
+
+    internal static string FormatLength(double length, string units)
+    {
+      if (length <= 0)
+      {
+        return "-";
+      }
+
+      string u = UnitWord(units);
+      return length >= 1000
+        ? FormattableString.Invariant($"{length:#,0} {u}")
+        : FormattableString.Invariant($"{length:0.##} {u}");
+    }
+
+    internal static string FormatStockArea(double areaSquareUnits, string units)
+    {
+      if (areaSquareUnits <= 0)
+      {
+        return "-";
+      }
+
+      if (IsMillimetres(units))
+      {
+        double sqM = areaSquareUnits / 1_000_000.0;
+        if (sqM < 0.01)
+        {
+          return FormattableString.Invariant($"{sqM:0.###} ") + L("Rep_M2");
+        }
+
+        return sqM >= 10
+          ? FormattableString.Invariant($"{sqM:#,0.0} m²")
+          : FormattableString.Invariant($"{sqM:0.##} ") + L("Rep_M2");
+      }
+
+      double sqFt = areaSquareUnits / 144.0;
+      return FormattableString.Invariant($"{sqFt:#,0} ") + L("Rep_SqFt");
     }
 
     /// <summary>
@@ -450,10 +843,35 @@ namespace DeepNestSharp.Reports
 
     private static string Num(double v) => v.ToString("0.##", CultureInfo.InvariantCulture);
 
+    private static string L(string key) => DeepNestSharp.Ui.Localization.Get(key);
+
+    private static string LF(string key, params object[] args)
+      => string.Format(CultureInfo.InvariantCulture, DeepNestSharp.Ui.Localization.Get(key), args);
+
+    /// <summary>The drawing unit as the report prints it ("mm" / "мм", "in").</summary>
+    private static string UnitWord(string units)
+      => L(IsMillimetres(units) ? "Unit_Mm" : "Unit_In");
+
+    internal static bool IsMillimetres(string units)
+    {
+      string u = units?.Trim();
+      return string.Equals(u, "mm", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(u, "мм", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string SheetWord(long count)
+      => DeepNestSharp.Ui.Localization.Plural(count, "Rep_SheetOne", "Rep_SheetFew", "Rep_SheetMany");
+
     /// <summary>One page's content stream: text, lines, rectangles and filled polygons.</summary>
-    private sealed class PageContent
+    private sealed class PageContent : IReportCanvas
     {
       private readonly StringBuilder sb = new StringBuilder();
+      private readonly MiniPdf pdf;
+
+      public PageContent(MiniPdf pdf)
+      {
+        this.pdf = pdf;
+      }
 
       public void SetFill(double r, double g, double b)
       {
@@ -469,7 +887,7 @@ namespace DeepNestSharp.Reports
       public void Text(double x, double y, double size, bool bold, string text)
       {
         this.sb.AppendLine(FormattableString.Invariant(
-          $"BT /{(bold ? "F2" : "F1")} {size:0.#} Tf {x:0.##} {y:0.##} Td ({Escape(text)}) Tj ET"));
+          $"BT /{(bold ? "F2" : "F1")} {size:0.#} Tf {x:0.##} {y:0.##} Td {this.pdf.TextOperand(text ?? string.Empty, bold)} Tj ET"));
       }
 
       public void Line(double x1, double y1, double x2, double y2, double width)
@@ -515,39 +933,65 @@ namespace DeepNestSharp.Reports
         // Reset colors at stream start so pages are independent.
         return Latin1("0 0 0 rg 0 0 0 RG\n" + this.sb.ToString());
       }
-
-      private static string Escape(string s)
-      {
-        return s.Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)");
-      }
     }
 
     /// <summary>
-    /// Minimal PDF assembler: fixed Letter-portrait pages, Helvetica + Helvetica-Bold (standard-14
-    /// fonts every viewer ships — nothing embedded), uncompressed content streams, exact xref.
+    /// Minimal PDF assembler: fixed A4-landscape pages (842 x 595 pt), uncompressed content streams, exact
+    /// xref. Text is set in Arial embedded as a Unicode font, so Cyrillic labels and part names print; on a
+    /// machine without a usable Arial it falls back to the standard Helvetica, which only covers Latin-1.
     /// </summary>
     private sealed class MiniPdf
     {
-      private readonly List<byte[]> pageStreams = new List<byte[]>();
+      private static readonly Lazy<(PdfTrueTypeFont Regular, PdfTrueTypeFont Bold)> SystemFonts =
+        new Lazy<(PdfTrueTypeFont, PdfTrueTypeFont)>(PdfTrueTypeFont.LoadSystemArial);
 
-      public void AddPage(PageContent content)
+      private readonly List<PageContent> pages = new List<PageContent>();
+      private readonly PdfTrueTypeFont regular;
+      private readonly PdfTrueTypeFont bold;
+
+      public MiniPdf()
       {
-        this.pageStreams.Add(content.ToBytes());
+        var (r, b) = SystemFonts.Value;
+        if (r != null && b != null)
+        {
+          this.regular = r.ForDocument();
+          this.bold = b.ForDocument();
+        }
+      }
+
+      /// <summary>A new page, already added to the document.</summary>
+      public PageContent NewPage()
+      {
+        var page = new PageContent(this);
+        this.pages.Add(page);
+        return page;
+      }
+
+      /// <summary>The string as a text-showing operand: glyph ids in hex with the embedded font, a literal
+      /// Latin-1 string with the Helvetica fallback.</summary>
+      public string TextOperand(string text, bool isBold)
+      {
+        var font = isBold ? this.bold : this.regular;
+        return font != null
+          ? "<" + font.Encode(text) + ">"
+          : "(" + text.Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)") + ")";
       }
 
       public byte[] Build()
       {
-        // Object layout: 1 Catalog, 2 Pages, 3 F1, 4 F2, then per page i: 5+2i = content, 6+2i = page.
-        int n = this.pageStreams.Count;
+        var pageStreams = this.pages.Select(p => p.ToBytes()).ToList();
+
+        // Object layout: 1 Catalog, 2 Pages, then per page i: 3+2i = content, 4+2i = page, then the fonts.
+        int n = pageStreams.Count;
+        int f1 = 3 + (2 * n);
+        int f2 = this.regular != null ? f1 + 5 : f1 + 1;
         var objects = new List<byte[]>
         {
           Latin1("<< /Type /Catalog /Pages 2 0 R >>"),
-          Latin1($"<< /Type /Pages /Count {n} /Kids [{string.Join(" ", Enumerable.Range(0, n).Select(i => $"{6 + (2 * i)} 0 R"))}] >>"),
-          Latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"),
-          Latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"),
+          Latin1($"<< /Type /Pages /Count {n} /Kids [{string.Join(" ", Enumerable.Range(0, n).Select(i => $"{4 + (2 * i)} 0 R"))}] >>"),
         };
 
-        foreach (var stream in this.pageStreams)
+        foreach (var stream in pageStreams)
         {
           var obj = new MemoryStream();
           WriteBytes(obj, Latin1($"<< /Length {stream.Length} >>\nstream\n"));
@@ -555,7 +999,18 @@ namespace DeepNestSharp.Reports
           WriteBytes(obj, Latin1("\nendstream"));
           objects.Add(obj.ToArray());
           objects.Add(Latin1(FormattableString.Invariant(
-            $"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {PageW} {PageH}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents {objects.Count} 0 R >>")));
+            $"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {PageW} {PageH}] /Resources << /Font << /F1 {f1} 0 R /F2 {f2} 0 R >> >> /Contents {objects.Count} 0 R >>")));
+        }
+
+        if (this.regular != null)
+        {
+          objects.AddRange(this.regular.BuildObjects(f1));
+          objects.AddRange(this.bold.BuildObjects(f2));
+        }
+        else
+        {
+          objects.Add(Latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"));
+          objects.Add(Latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"));
         }
 
         var outStream = new MemoryStream();

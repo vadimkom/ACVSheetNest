@@ -1,12 +1,17 @@
 namespace DeepNestSharp.Ui.Views
 {
+  using System;
+  using System.Linq;
   using System.Windows;
+  using Localization = DeepNestSharp.Ui.Localization;
 
   /// <summary>Small dialog for a custom stock sheet size (the Add Sheet menu's "Custom size…").</summary>
   public partial class AddSheetWindow : Window
   {
+    private readonly bool isUnitsMm;
+
     public AddSheetWindow()
-      : this(false)
+      : this(true)
     {
     }
 
@@ -14,34 +19,60 @@ namespace DeepNestSharp.Ui.Views
     public AddSheetWindow(bool unitsMm)
     {
       InitializeComponent();
+      this.isUnitsMm = unitsMm;
       if (unitsMm)
       {
-        this.headerText.Text = "Sheet size in millimeters (width = the long side).";
-        this.widthLabel.Text = "Width (mm)";
-        this.heightLabel.Text = "Height (mm)";
         this.widthUpDown.Maximum = 25000;
         this.heightUpDown.Maximum = 25000;
         this.widthUpDown.Value = 3000;
         this.heightUpDown.Value = 1500;
       }
+      else
+      {
+        this.widthUpDown.Maximum = 1000;
+        this.heightUpDown.Maximum = 1000;
+        this.widthUpDown.Value = 120;
+        this.heightUpDown.Value = 60;
+      }
+
+      this.priorityCombo.SelectedValue = 5;
+      ApplyLocalization();
+    }
+
+    private void ApplyLocalization()
+    {
+      string unit = this.isUnitsMm ? "мм" : "in";
+      this.Title = Localization.Get("Sheet_Dlg_Title");
+      this.headerText.Text = string.Format(Localization.Get("Sheet_Dlg_Header"), this.isUnitsMm ? (Localization.CurrentLanguage == Localization.LangEnglish ? "millimeters" : "миллиметрах") : (Localization.CurrentLanguage == Localization.LangEnglish ? "inches" : "дюймах"));
+      this.widthLabel.Text = string.Format(Localization.Get("Sheet_Dlg_Width"), unit);
+      this.heightLabel.Text = string.Format(Localization.Get("Sheet_Dlg_Height"), unit);
+      this.qtyLabel.Text = Localization.Get("Sheet_Dlg_Qty");
+      this.priorityLabel.Text = Localization.Get("Sheet_Dlg_Priority");
+      this.unlimitedCheck.Content = Localization.Get("Sheet_Dlg_Unlimited");
+      this.rememberCheck.Content = Localization.Get("Sheet_Dlg_Remember");
+      this.okButton.Content = Localization.Get("Sheet_Dlg_Add");
+      this.cancelButton.Content = Localization.Get("Btn_Cancel");
     }
 
     /// <summary>Reuses the dialog to EDIT an existing stock row: pre-filled values, edit wording.</summary>
-    public void PrefillForEdit(int width, int height, int quantity, bool unlimited = false)
+    public void PrefillForEdit(int width, int height, int quantity, bool unlimited = false, int priority = 5)
     {
-      this.Title = "Edit sheet";
-      this.okButton.Content = "OK";
+      this.Title = Localization.Get("Sheet_Dlg_Title_Edit");
+      this.okButton.Content = Localization.Get("Btn_OK");
       this.widthUpDown.Value = width;
       this.heightUpDown.Value = height;
       this.qtyUpDown.Value = quantity;
       this.unlimitedCheck.IsChecked = unlimited;
+      this.priorityCombo.SelectedValue = priority;
     }
 
-    public int SheetWidth { get; private set; } = 120;
+    public int SheetWidth { get; private set; } = 3000;
 
-    public int SheetHeight { get; private set; } = 60;
+    public int SheetHeight { get; private set; } = 1500;
 
     public int SheetQuantity { get; private set; } = 1;
+
+    public int SheetPriority { get; private set; } = 5;
 
     /// <summary>The job may take as many of this size as it needs.</summary>
     public bool SheetUnlimited { get; private set; }
@@ -62,10 +93,11 @@ namespace DeepNestSharp.Ui.Views
       this.heightUpDown.CommitInput();
       this.qtyUpDown.CommitInput();
 
-      this.SheetWidth = this.widthUpDown.Value ?? 120;
-      this.SheetHeight = this.heightUpDown.Value ?? 60;
+      this.SheetWidth = this.widthUpDown.Value ?? (this.isUnitsMm ? 3000 : 120);
+      this.SheetHeight = this.heightUpDown.Value ?? (this.isUnitsMm ? 1500 : 60);
       this.SheetQuantity = this.qtyUpDown.Value ?? 1;
       this.SheetUnlimited = this.unlimitedCheck.IsChecked == true;
+      this.SheetPriority = (this.priorityCombo.SelectedValue as int?) ?? 5;
       this.DialogResult = true;
     }
   }

@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.Placement
+namespace DeepNestLib.Placement
 {
   using System.Collections.Generic;
   using System.IO;
@@ -55,7 +55,7 @@
     /// </summary>
     double GeometryTolerance { get; }
 
-    Task ExportDxf(Stream stream, bool mergeLines, bool differentiateChildren);
+    Task ExportDxf(Stream stream, bool mergeLines, bool differentiateChildren, DxfPartNameExport partNameExport = DxfPartNameExport.None);
 
     string ToJson(bool writeIndented = false);
 

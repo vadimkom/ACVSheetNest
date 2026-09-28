@@ -1,9 +1,10 @@
-﻿namespace DeepNestSharp.Ui.Views
+namespace DeepNestSharp.Ui.Views
 {
   using System.Windows;
   using System.Windows.Media;
   using DeepNestLib.NestProject;
   using DeepNestSharp.Ui.Converters;
+  using Localization = DeepNestSharp.Ui.Localization;
 
   /// <summary>
   /// "Edit Part" dialog: part file + preview, required/extra quantity, per-part permitted
@@ -38,16 +39,16 @@
       if (ShowsCommonCuttingSelector(part))
       {
         this.commonCuttingGroup.Visibility = Visibility.Visible;
-        this.commonCuttingCombo.Items.Add("None");
-        this.commonCuttingCombo.Items.Add("Unrestricted (compatible parts)");
-        this.commonCuttingCombo.Items.Add("Same part");
+        this.commonCuttingCombo.Items.Add(Localization.Get("Part_Cc_None"));
+        this.commonCuttingCombo.Items.Add(Localization.Get("Part_Cc_Unrestricted"));
+        this.commonCuttingCombo.Items.Add(Localization.Get("Part_Cc_SamePart"));
         this.commonCuttingCombo.SelectedIndex = (int)part.EffectiveCommonCutting;
         this.commonCuttingCombo.SelectionChanged += (_, __) => this.commonCuttingSelectionChanged = true;
 
         if (!part.DirectCommonCuttingEnabled
             && part.CommonCutting != CommonCuttingMode.None)
         {
-          this.commonCuttingHint.Text = "A saved legacy common-cutting mode is inactive. Choose a mode to confirm it for this direct DXF/STEP part.";
+          this.commonCuttingHint.Text = Localization.Get("Part_LegacyCcHint");
           this.commonCuttingHint.Visibility = Visibility.Visible;
         }
       }
@@ -72,7 +73,7 @@
         this.rotationSelector.Rotations = UserControls.RotationSelector.InheritsJob;
         if (poly != null && IsRotationSymmetric(poly))
         {
-          this.geoHint.Text = "Detected rotation-symmetric shape (circle/square): turning it can't improve the nest, so \"As drawn\" saves the search.";
+          this.geoHint.Text = Localization.Get("Part_SymmetricHint");
           this.geoHint.Visibility = Visibility.Visible;
         }
       }
@@ -82,29 +83,18 @@
       // spacing setting can change them. Warn loudly instead of nesting garbage silently.
       if (poly != null && LooksLikeNestedSheet(poly))
       {
-        this.warnHint.Text = $"⚠ This DXF looks like a FULL NESTED SHEET ({(poly.Children?.Count ?? 0)} shapes inside a "
-          + $"{poly.MaxX - poly.MinX:0.#}×{poly.MaxY - poly.MinY:0.#} frame), not a single part. SheetNest imports each DXF "
-          + "as ONE part, and the gaps between the inner shapes come from the original drawing. Export each part as its own DXF instead.";
+        this.warnHint.Text = Localization.Format(
+          "Part_FullSheetWarn",
+          poly.Children?.Count ?? 0,
+          (poly.MaxX - poly.MinX).ToString("0.#", System.Globalization.CultureInfo.CurrentCulture),
+          (poly.MaxY - poly.MinY).ToString("0.#", System.Globalization.CultureInfo.CurrentCulture));
         this.warnHint.Visibility = Visibility.Visible;
       }
 
-      for (int p = 1; p <= 10; p++)
-      {
-        this.priorityCombo.Items.Add($"{p} ({LabelFor(p)})");
-      }
-
-      // 1 = highest → combo index 0. Clamp legacy/out-of-range values into 1..10.
-      this.priorityCombo.SelectedIndex = System.Math.Max(1, System.Math.Min(10, part.Priority)) - 1;
-
-      // 3D-unfolded parts get an editable K-factor + a read-only detected thickness. Changing K
-      // re-unfolds the part (handled by the caller after OK). Hidden for plain 2D (DXF) parts.
-      if (!string.IsNullOrEmpty(part.SourceStepPath))
-      {
-        this.unfold3DGroup.Visibility = Visibility.Visible;
-        this.kFactor3DUpDown.Value = part.KFactor;
-        this.std3DCombo.SelectedIndex = string.Equals(part.KFactorStandard, "din", System.StringComparison.OrdinalIgnoreCase) ? 1 : 0;
-        this.thickness3DText.Text = FormatThickness(part.ThicknessMm, part.UnfoldUnitInch);
-      }
+      this.priorityCombo.ItemsSource = PriorityHelper.CurrentOptions;
+      this.priorityCombo.SelectedValuePath = "Value";
+      this.priorityCombo.DisplayMemberPath = "Display";
+      this.priorityCombo.SelectedValue = PriorityHelper.NormalizePriority(part.Priority);
     }
 
     /// <summary>The mode named by the combo, or the existing raw mode when it has no selection.</summary>
@@ -141,18 +131,6 @@
 
       var chosen = ChosenMode(selectedIndex, current);
       return (chosen, chosen != CommonCuttingMode.None);
-    }
-
-    private static string FormatThickness(double thicknessMm, bool inch)
-    {
-      if (thicknessMm <= 0)
-      {
-        return "n/a";
-      }
-
-      return inch
-        ? (thicknessMm / 25.4).ToString("0.0000", System.Globalization.CultureInfo.InvariantCulture) + " in"
-        : thicknessMm.ToString("0.000", System.Globalization.CultureInfo.InvariantCulture) + " mm";
     }
 
     private static DeepNestLib.INfp LoadPolygon(string path)
@@ -234,31 +212,6 @@
       }
     }
 
-    private static string LabelFor(int priority)
-    {
-      // 1 = highest priority (nested first), 10 = lowest.
-      if (priority <= 1)
-      {
-        return "Highest";
-      }
-
-      if (priority <= 3)
-      {
-        return "High";
-      }
-
-      if (priority <= 6)
-      {
-        return "Normal";
-      }
-
-      if (priority <= 9)
-      {
-        return "Low";
-      }
-
-      return "Lowest";
-    }
 
     private void OnOk(object sender, RoutedEventArgs e)
     {
@@ -292,18 +245,9 @@
         : rotations <= 4 ? AnglesEnum.Rotate90
         : AnglesEnum.None;
 
-      int priority = this.priorityCombo.SelectedIndex < 0 ? 5 : this.priorityCombo.SelectedIndex + 1; // combo 1..10
+      int priority = this.priorityCombo.SelectedValue is int pr ? pr : 5;
       this.part.Priority = priority;
       this.part.IsPriority = priority < 5; // legacy NFP flag "nest these first" — now 1 = highest
-
-      // 3D parts: write the chosen K-factor/standard. The caller (OpenEditPart) compares against the
-      // pre-dialog values and re-unfolds if they changed.
-      if (!string.IsNullOrEmpty(this.part.SourceStepPath))
-      {
-        this.kFactor3DUpDown.CommitInput();
-        this.part.KFactor = this.kFactor3DUpDown.Value ?? this.part.KFactor;
-        this.part.KFactorStandard = this.std3DCombo.SelectedIndex == 1 ? "din" : "ansi";
-      }
 
       this.DialogResult = true;
     }

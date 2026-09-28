@@ -91,32 +91,10 @@
 
     bool IsExists { get; }
 
-    /// <summary>
-    /// Gets or sets the original STEP/IGES file this part was unfolded from. Empty = a plain 2D part
-    /// (never 3D-unfolded). When set, the part can be re-unfolded (e.g. on a K-factor change).
-    /// </summary>
-    string SourceStepPath { get; set; }
-
-    /// <summary>Gets or sets this part's index into the unfolded flats produced from the source STEP.</summary>
-    int UnfoldIndex { get; set; }
-
     /// <summary>The drawing this part was split out of, or empty when it was imported as its own file.</summary>
     string SourceDxfPath { get; set; }
 
     /// <summary>Which part of <see cref="SourceDxfPath"/> this is.</summary>
     int PartIndex { get; set; }
-
-    /// <summary>Gets or sets the bend-allowance K-factor used to unfold this 3D part.</summary>
-    double KFactor { get; set; }
-
-    /// <summary>Gets or sets the bend-table standard ("ansi" / "din") used to unfold this 3D part.</summary>
-    string KFactorStandard { get; set; }
-
-    /// <summary>Gets or sets whether this 3D part was unfolded into inches (true) or millimetres (false).</summary>
-    bool UnfoldUnitInch { get; set; }
-
-    /// <summary>Gets or sets the detected sheet thickness (mm) of this 3D part; 0 = unknown.</summary>
-    double ThicknessMm { get; set; }
-
   }
 }

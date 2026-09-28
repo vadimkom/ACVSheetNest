@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.Ui.Views
+namespace DeepNestSharp.Ui.Views
 {
   using System;
   using System.Collections.Generic;
@@ -13,13 +13,56 @@
   using DeepNestSharp.Domain.Models;
   using DeepNestSharp.Domain.ViewModels;
   using DeepNestSharp.RasterNest;
+  using Localization = DeepNestSharp.Ui.Localization;
 
   public partial class MainWindow : Window
   {
+    public enum WorkflowMode
+    {
+      Parts = 0,
+      Sheets = 1,
+      Nesting = 2,
+      Layout = 3
+    }
+
+    public class NestRunHistoryItem
+    {
+      public int RunNumber { get; set; }
+      public INestResult Result { get; set; }
+      public string UtilizationText { get; set; }
+      public string PlacedText { get; set; }
+      public string SheetsText { get; set; }
+      public string TimeText { get; set; }
+    }
+
+    public class ReportSheetRow
+    {
+      public int SheetNumber { get; set; }
+      public string SizeText { get; set; }
+      public int RepeatCount { get; set; }
+      public int PlacedCount { get; set; }
+      public string UtilizationText { get; set; }
+    }
+
+    public class ReportPartRow
+    {
+      public int PositionNumber { get; set; }
+      public System.Windows.Media.Brush ColorBrush { get; set; }
+      public string Name { get; set; }
+      public string SizeText { get; set; }
+      public int QtyTotal { get; set; }
+      public string AreaText { get; set; }
+    }
+
+    private WorkflowMode currentMode = WorkflowMode.Parts;
+    private bool settingMode; // SetCurrentMode is checking the step buttons itself
+    private readonly System.Collections.ObjectModel.ObservableCollection<NestRunHistoryItem> nestRuns = new();
+    private int runSeedOffset = 0;
+
     // Sheets the LAST nest deducted from the stock, by size — Clear Result gives them back.
     private Dictionary<(int W, int H), int>? lastNestConsumed;
 
-    // Set once the window is closed, so an async op that finishes afterwards (e.g. a slow 3D unfold)
+    // Set once the window is closed, so an async op that finishes afterwards
     // doesn't touch a dead window (would throw "set Owner on a closed Window").
     private bool isClosed;
     private string updateUrl;
@@ -27,7 +70,7 @@
     private System.Threading.CancellationTokenSource nestCts;
     private System.Diagnostics.Stopwatch nestStopwatch;   // elapsed time while a nest runs (drives the live clock)
     private System.Windows.Threading.DispatcherTimer nestTimer; // ticks the elapsed clock ~2×/s during a nest
-    private bool unitsMm; // drawing units are millimeters (SessionState.UnitsMm); inches by default
+    private bool unitsMm = true; // drawing units are millimeters (SessionState.UnitsMm); millimeters by default in Europe
     private List<(int W, int H)> userSheetPresets = new List<(int W, int H)>(); // "My sheets" (SessionState.SheetPresets)
     private bool autosaveEnabled = true;
     private int autosaveMinutes = 5;
@@ -51,6 +94,7 @@
     {
       InitializeComponent();
       this.DataContext = viewModel;
+      this.runsListView.ItemsSource = this.nestRuns;
       viewModel.AboutDialogService = new AboutDialogService(() => new AboutDialog());
       this.Loaded += MainWindow_Loaded;
       this.Closing += MainWindow_Closing;
@@ -121,6 +165,15 @@
 
       // Part spacing default is 10 (legacy SVG-scale units) — that's TEN INCHES between parts on inch DXFs,
       // which blows up the raster spacing-halo so large it dissolves interlockable concavities (triangles
+      // Restore the previous session's sheet edge margin. Sheets are NOT restored: the app starts
+      // with an empty Sheets tab because each launch is usually a different job — sheet stock
+      // belongs to (and travels with) each saved .dnest project.
+      var session = SessionState.Load();
+      this.unitsMm = session?.UnitsMm ?? true;
+      Localization.CurrentLanguage = Localization.NormalizeLanguage(session?.Language);
+      Localization.LanguageChanged -= this.ApplyLocalization;
+      Localization.LanguageChanged += this.ApplyLocalization;
+
       // stop rotating) and leaves huge gaps in every nest. Replace only the EXACT legacy default with a
       // sane 0.25"; any other persisted value is a deliberate user setting and must not be clobbered.
       // A persisted 0 is ALSO normalized to 0.25" (the shop rule: spacing ≥ 2× material thickness, so
@@ -128,13 +181,13 @@
       // job wants — true common-line cutting is a deliberate per-part choice in Edit Part.
       if (cfg.Spacing == 10.0 || cfg.Spacing <= 0.0)
       {
-        cfg.Spacing = 0.25;
+        cfg.Spacing = this.unitsMm ? 6.35 : 0.25;
+      }
+      else if (this.unitsMm && cfg.Spacing == 0.25)
+      {
+        cfg.Spacing = 6.35;
       }
 
-      // Restore the previous session's sheet edge margin. Sheets are NOT restored: the app starts
-      // with an empty Sheets tab because each launch is usually a different job — sheet stock
-      // belongs to (and travels with) each saved .dnest project.
-      var session = SessionState.Load();
       (this.sessionCommonLineGapInches, this.sessionCommonLineMaxClusterParts) =
         CommonLinePreferencesFrom(session);
       cfg.CommonLineGapInches = this.sessionCommonLineGapInches;
@@ -145,21 +198,9 @@
         {
           cfg.SheetSpacing = session.SheetEdgeMargin;
         }
-
-        // Restore the 3D-unfold (FreeCAD) settings.
-        if (session.UnfoldKFactor >= 0)
+        else if (this.unitsMm && cfg.SheetSpacing == 0.25)
         {
-          DeepNestLib.IO.StepUnfoldService.KFactor = session.UnfoldKFactor;
-        }
-
-        if (!string.IsNullOrWhiteSpace(session.UnfoldKFactorStandard))
-        {
-          DeepNestLib.IO.StepUnfoldService.KFactorStandard = session.UnfoldKFactorStandard;
-        }
-
-        if (!string.IsNullOrWhiteSpace(session.FreeCadCmdPath))
-        {
-          DeepNestLib.IO.StepUnfoldService.FreeCadCmdPathOverride = session.FreeCadCmdPath;
+          cfg.SheetSpacing = 6.35;
         }
 
         if (session.UnitsMm.HasValue)
@@ -173,11 +214,6 @@
             .Where(sp => sp.Width > 0 && sp.Height > 0)
             .Select(sp => (sp.Width, sp.Height))
             .ToList();
-        }
-
-        if (session.UnfoldUnitInch.HasValue)
-        {
-          DeepNestLib.IO.StepUnfoldService.UnfoldUnitInch = session.UnfoldUnitInch.Value;
         }
 
         this.ApplyUnits();
@@ -199,6 +235,7 @@
 
         this.nestEffort = DeepNestSharp.RasterNest.NestEffortDefaults.FromPersisted(session.NestEffort);
         this.RefreshNestEffortMenu();
+        SparrowNestService.ConcurrencyLimit = System.Math.Clamp(session.NestConcurrency, 0, SparrowNestService.MaxConcurrencyLimit);
 
         // Global default rotations (plain in-memory config property — resets to 4 without this).
         if (session.DefaultRotations > 0)
@@ -260,6 +297,12 @@
         }
       }));
 
+      // Initialize workflow mode to Models/Parts and update counts
+      this.SetCurrentMode(WorkflowMode.Parts);
+      this.ApplyUnits();
+      this.ApplyLocalization();
+      this.UpdateSummaryBadges();
+
       // Crash recovery LAST (after the config/session churn, so the recovered doc's deliberate
       // dirty flag survives): an autosave snapshot only exists after an unclean exit.
       this.OfferAutosaveRecovery();
@@ -275,11 +318,11 @@
           return;
         }
 
-        string name = string.IsNullOrWhiteSpace(originalPath) ? "an unsaved project" : System.IO.Path.GetFileName(originalPath);
-        string when = string.IsNullOrWhiteSpace(savedAt) ? string.Empty : $" (autosaved {savedAt})";
+        string name = string.IsNullOrWhiteSpace(originalPath) ? Localization.Get("Msg_RecoverUnsaved") : System.IO.Path.GetFileName(originalPath);
+        string when = string.IsNullOrWhiteSpace(savedAt) ? string.Empty : Localization.Format("Msg_RecoverWhen", savedAt);
         var answer = ViewModel.MessageService.DisplayOkCancel(
-          $"SheetNest closed unexpectedly with unsaved changes in {name}{when}.\n\nRecover the autosaved project?",
-          "Recovery",
+          Localization.Format("Msg_Recover", name, when),
+          Localization.Get("Title_Recovery"),
           DeepNestLib.MessageBoxIcon.Information);
         if (answer == DeepNestLib.MessageBoxResult.OK)
         {
@@ -345,8 +388,8 @@
       catch
       {
         ViewModel.MessageService.DisplayMessageBox(
-          "Could not open the browser. You can send feedback at:\nhttps://github.com/ManuelMRosa/SheetNest/issues",
-          "Send Feedback",
+          Localization.Get("Msg_NoBrowserFeedback"),
+          Localization.Get("Title_Feedback"),
           DeepNestLib.MessageBoxIcon.Information);
       }
     }
@@ -367,8 +410,8 @@
         if (result == null)
         {
           ViewModel.MessageService.DisplayMessageBox(
-            "Could not check for updates. Check your internet connection.",
-            "Check for Updates",
+            Localization.Get("Msg_UpdateFailed"),
+            Localization.Get("Title_Updates"),
             DeepNestLib.MessageBoxIcon.Information);
           return;
         }
@@ -376,16 +419,16 @@
         if (!UpdateChecker.IsNewer(result.Value.Latest, current))
         {
           ViewModel.MessageService.DisplayMessageBox(
-            $"You are up to date (SheetNest {current.ToString(3)}).",
-            "Check for Updates",
+            Localization.Format("Msg_UpToDate", current.ToString(3)),
+            Localization.Get("Title_Updates"),
             DeepNestLib.MessageBoxIcon.Information);
           return;
         }
 
         this.ShowUpdateNotice(result.Value.Latest, result.Value.Url);
         var answer = ViewModel.MessageService.DisplayOkCancel(
-          $"SheetNest {result.Value.Latest.ToString(3)} is available (you have {current.ToString(3)}).\n\nOpen the download page?",
-          "Check for Updates",
+          Localization.Format("Msg_UpdateAvailable", result.Value.Latest.ToString(3), current.ToString(3)),
+          Localization.Get("Title_Updates"),
           DeepNestLib.MessageBoxIcon.Information);
         if (answer == DeepNestLib.MessageBoxResult.OK)
         {
@@ -395,7 +438,7 @@
       catch (Exception ex)
       {
         Mouse.OverrideCursor = null;
-        ViewModel.MessageService.DisplayMessageBox(ex.Message, "Check for Updates", DeepNestLib.MessageBoxIcon.Stop);
+        ViewModel.MessageService.DisplayMessageBox(ex.Message, Localization.Get("Title_Updates"), DeepNestLib.MessageBoxIcon.Stop);
       }
     }
 
@@ -485,6 +528,7 @@
     private void OnAdvancedSettings(object sender, RoutedEventArgs e)
     {
       var cfg = ViewModel.SvgNestConfigViewModel.SvgNestConfig;
+      var session = SessionState.Load() ?? new SessionState();
       double previousCommonLineGapInches = cfg.CommonLineGapInches;
       int previousCommonLineMaxClusterParts = cfg.CommonLineMaxClusterParts;
       var dialog = new AdvancedSettingsWindow(
@@ -494,7 +538,8 @@
         this.unitsMm,
         commonLineGapInches: cfg.CommonLineGapInches,
         effort: this.nestEffort,
-        commonLineMaxClusterParts: cfg.CommonLineMaxClusterParts)
+        commonLineMaxClusterParts: cfg.CommonLineMaxClusterParts,
+        concurrencyLimit: SparrowNestService.ConcurrencyLimit)
       {
         Owner = this,
       };
@@ -526,7 +571,6 @@
 
       // The settings-backed config values persisted in their setters; the rest goes to the session
       // immediately (load-modify-save keeps the MRU and the other session fields intact).
-      var session = SessionState.Load() ?? new SessionState();
       session.AutosaveEnabled = this.autosaveEnabled;
       session.AutosaveMinutes = this.autosaveMinutes;
       session.DefaultRotations = cfg.Rotations;
@@ -536,6 +580,8 @@
       session.CommonLineMaxClusterParts = cfg.CommonLineMaxClusterParts;
       this.nestEffort = dialog.Effort;
       session.NestEffort = (int)this.nestEffort;
+      SparrowNestService.ConcurrencyLimit = dialog.ConcurrencyLimit;
+      session.NestConcurrency = dialog.ConcurrencyLimit;
       session.Save();
 
       // Two places set the same preference, so the toolbar is rebuilt from the field rather than left
@@ -583,6 +629,10 @@
         return; // called before the toolbar exists
       }
 
+      this.effortFastItem.Header = Localization.Get("Effort_Fast");
+      this.effortNormalItem.Header = Localization.Get("Effort_Normal");
+      this.effortBestItem.Header = Localization.Get("Effort_Best");
+
       this.effortFastItem.IsChecked = this.nestEffort == DeepNestSharp.RasterNest.NestEffort.Fast;
       this.effortNormalItem.IsChecked = this.nestEffort == DeepNestSharp.RasterNest.NestEffort.Normal;
       this.effortBestItem.IsChecked = this.nestEffort == DeepNestSharp.RasterNest.NestEffort.Best;
@@ -621,7 +671,7 @@
       this.offcutMaxY = dialog.Limits.MaxY;
       this.offcutEdgeOverlap = dialog.EdgeOverlap;
 
-      var session = SessionState.Load();
+      var session = SessionState.Load() ?? new SessionState();
       session.PreferRectangularOffcut = this.preferRectOffcut;
       session.OffcutDirection = this.offcutDirection;
       session.OffcutSpacing = this.offcutSpacing;
@@ -642,9 +692,9 @@
     }
 
     /// <summary>Discards the displayed nest result and returns the sheets it consumed to the stock.</summary>
-    private void OnClearResult(object sender, RoutedEventArgs e)
+    private void ClearNestResult()
     {
-      bool hadResult = ViewModel.NestMonitorViewModel.SelectedItem != null;
+      bool hadResult = ViewModel.NestMonitorViewModel.SelectedItem != null || !ViewModel.NestMonitorViewModel.TopNestResults.IsEmpty;
       ViewModel.NestMonitorViewModel.Reset();
 
       // The project no longer carries this result (a save from here on writes it without one, and
@@ -659,7 +709,7 @@
       if (hadResult && lastNestConsumed != null && ViewModel.ActiveDocument is NestProjectViewModel doc)
       {
         ReturnStock(doc.ProjectInfo.SheetLoadInfos, lastNestConsumed);
-        this.sheetsListView.Items.Refresh();
+        this.sheetsListView?.Items.Refresh();
       }
 
       lastNestConsumed = null; // a result can only be given back once
@@ -675,6 +725,10 @@
       {
         return;
       }
+
+      this.nestRuns.Clear();
+      this.runSeedOffset = 0;
+      this.UpdateSummaryBadges();
 
       if (IsFreshUnsavedProject(doc))
       {
@@ -708,6 +762,7 @@
       {
         monitor.Reset();
         lastNestConsumed = null;
+        if (this.nestDxfViewer != null) this.nestDxfViewer.Result = null;
         this.UpdateNestedInfo(null);
         return;
       }
@@ -719,6 +774,7 @@
         {
           monitor.Reset();
           lastNestConsumed = null;
+          if (this.nestDxfViewer != null) this.nestDxfViewer.Result = null;
           this.UpdateNestedInfo(null);
           return;
         }
@@ -743,6 +799,26 @@
         monitor.TopNestResults.SetSingleResult(result);
         monitor.SelectedItem = result;
 
+        if (this.nestDxfViewer != null)
+        {
+          this.nestDxfViewer.DefaultPartSpacing = this.dxfViewer?.DefaultPartSpacing ?? 0;
+          this.nestDxfViewer.SheetEdgeMargin = this.dxfViewer?.SheetEdgeMargin ?? 0;
+          this.nestDxfViewer.PartSpacings = this.dxfViewer?.PartSpacings;
+          this.nestDxfViewer.Result = result;
+        }
+
+        var runItem = new NestRunHistoryItem
+        {
+          RunNumber = 1,
+          Result = result,
+          UtilizationText = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%"),
+          PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
+          SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
+          TimeText = Localization.Get("Run_Saved")
+        };
+        this.nestRuns.Add(runItem);
+        this.runsListView.SelectedItem = runItem;
+
         // The project file stores the stock AS DEDUCTED by this nest, so Clear Result must be able
         // to give those sheets back — rebuild the consumed-by-size record from the result itself.
         var restoredConsumed = new Dictionary<(int W, int H), int>();
@@ -760,7 +836,12 @@
         // A corrupt/incompatible embedded result must never block opening the project itself.
         monitor.Reset();
         lastNestConsumed = null;
+        if (this.nestDxfViewer != null) this.nestDxfViewer.Result = null;
         this.UpdateNestedInfo(null);
+      }
+      finally
+      {
+        this.UpdateSummaryBadges();
       }
     }
 
@@ -864,7 +945,7 @@
       {
         var answer = MessageBox.Show(
           this,
-          "You have a nest result. Save the project before closing?",
+          Localization.Get("Msg_SaveBeforeClosing"),
           "SheetNest",
           MessageBoxButton.YesNoCancel,
           MessageBoxImage.Question);
@@ -897,10 +978,6 @@
       var session = SessionState.Load() ?? new SessionState();
       session.CaptureApplicationClose(
         System.Math.Max(0, ViewModel.SvgNestConfigViewModel.SvgNestConfig.SheetSpacing),
-        DeepNestLib.IO.StepUnfoldService.KFactor,
-        DeepNestLib.IO.StepUnfoldService.KFactorStandard,
-        DeepNestLib.IO.StepUnfoldService.FreeCadCmdPathOverride,
-        DeepNestLib.IO.StepUnfoldService.UnfoldUnitInch,
         this.unitsMm,
         this.userSheetPresets.Select(p => new SessionSheet { Width = p.W, Height = p.H }),
         this.autosaveEnabled,
@@ -941,10 +1018,32 @@
     /// <summary>Reflects the drawing units (in/mm) in every unit-labelled UI element.</summary>
     private void ApplyUnits()
     {
-      string u = this.unitsMm ? "mm" : "in";
-      if (this.sheetSizeColumn != null)
+      string u = this.unitsMm ? (Localization.CurrentLanguage == Localization.LangEnglish ? "mm" : "мм") : "in";
+      string uArea = this.unitsMm ? (Localization.CurrentLanguage == Localization.LangEnglish ? "mm²" : "мм²") : "in²";
+      if (this.marginUnitsLabel != null)
       {
-        this.sheetSizeColumn.Header = $"Sheet ({u})";
+        this.marginUnitsLabel.Text = u;
+      }
+
+      if (this.sheetEdgeMarginBox != null)
+      {
+        this.sheetEdgeMarginBox.Increment = this.unitsMm ? 0.5 : 0.05;
+        this.sheetEdgeMarginBox.FormatString = this.unitsMm ? "0.##" : "0.###";
+      }
+
+      if (this.colHeaderDimensions != null)
+      {
+        this.colHeaderDimensions.Header = $"{Localization.Get("Col_Dimensions")}, {u}";
+      }
+
+      if (this.colHeaderArea != null)
+      {
+        this.colHeaderArea.Header = $"{Localization.Get("Col_NetArea")}, {uArea}";
+      }
+
+      if (this.colHeaderSheetDimensions != null)
+      {
+        this.colHeaderSheetDimensions.Header = $"{Localization.Get("Col_SheetSize")}, {u}";
       }
 
       if (this.dxfViewer != null)
@@ -953,6 +1052,166 @@
         this.dxfViewer.CommonLineGap = ViewModel.SvgNestConfigViewModel.SvgNestConfig.CommonLineGapInches
           * (this.unitsMm ? CommonLineDefaults.InchesToMillimeters : 1.0);
       }
+
+      if (this.nestDxfViewer != null)
+      {
+        this.nestDxfViewer.UnitsMm = this.unitsMm;
+        this.nestDxfViewer.CommonLineGap = ViewModel.SvgNestConfigViewModel.SvgNestConfig.CommonLineGapInches
+          * (this.unitsMm ? CommonLineDefaults.InchesToMillimeters : 1.0);
+      }
+
+      if (this.reportPreviewGrid?.Visibility == Visibility.Visible)
+      {
+        this.UpdateReportPreview();
+      }
+    }
+
+    /// <summary>Applies current localization (ru/bg/en) to all UI texts in the window.</summary>
+    private void ApplyLocalization()
+    {
+      // Menu items
+      if (this.menuFile != null) this.menuFile.Header = Localization.Get("Menu_File");
+      if (this.menuNewProject != null) this.menuNewProject.Header = Localization.Get("Menu_NewProject");
+      if (this.menuOpenProject != null) this.menuOpenProject.Header = Localization.Get("Menu_OpenProject");
+      if (this.recentProjectsMenu != null) this.recentProjectsMenu.Header = Localization.Get("Menu_RecentProjects");
+      if (this.recentEmptyItem != null) this.recentEmptyItem.Header = Localization.Get("Menu_RecentEmpty");
+      if (this.menuSave != null) this.menuSave.Header = Localization.Get("Menu_Save");
+      if (this.menuSaveAs != null) this.menuSaveAs.Header = Localization.Get("Menu_SaveAs");
+      if (this.menuExit != null) this.menuExit.Header = Localization.Get("Menu_Exit");
+      if (this.menuSettings != null) this.menuSettings.Header = Localization.Get("Menu_Settings");
+      if (this.menuOffcut != null) this.menuOffcut.Header = Localization.Get("Menu_Offcut");
+      if (this.menuAdvancedSettings != null) this.menuAdvancedSettings.Header = Localization.Get("Menu_AdvancedSettings");
+      if (this.menuLanguage != null) this.menuLanguage.Header = Localization.Get("Menu_Language");
+      if (this.menuHelp != null) this.menuHelp.Header = Localization.Get("Menu_Help");
+      if (this.menuCheckUpdates != null) this.menuCheckUpdates.Header = Localization.Get("Menu_CheckUpdates");
+      if (this.menuSendFeedback != null) this.menuSendFeedback.Header = Localization.Get("Menu_SendFeedback");
+      if (this.menuAbout != null) this.menuAbout.Header = Localization.Get("Menu_About");
+
+      // Language checkmarks
+      if (this.langRuItem != null) this.langRuItem.IsChecked = Localization.CurrentLanguage == Localization.LangRussian;
+      if (this.langBgItem != null) this.langBgItem.IsChecked = Localization.CurrentLanguage == Localization.LangBulgarian;
+      if (this.langEnItem != null) this.langEnItem.IsChecked = Localization.CurrentLanguage == Localization.LangEnglish;
+
+      // Toolbar Buttons
+      if (this.btnNew != null) this.btnNew.Content = Localization.Get("Btn_New");
+      if (this.btnOpen != null) this.btnOpen.Content = Localization.Get("Btn_Open");
+      if (this.btnSave != null) this.btnSave.Content = Localization.Get("Btn_Save");
+
+      // Workflow Mode Tabs
+      if (this.navPartsBtn != null) this.navPartsBtn.Content = Localization.Get("Tab_Parts");
+      if (this.navSheetsBtn != null) this.navSheetsBtn.Content = Localization.Get("Tab_Sheets");
+      if (this.navNestingBtn != null) this.navNestingBtn.Content = Localization.Get("Tab_Nesting");
+      if (this.navLayoutBtn != null) this.navLayoutBtn.Content = Localization.Get("Tab_Layout");
+
+      // Screen 1: Parts
+      if (this.btnAddPart != null) this.btnAddPart.Content = Localization.Get("Btn_AddDxf");
+      if (this.btnDeletePart != null) this.btnDeletePart.Content = Localization.Get("Btn_DeletePart");
+      if (this.btnClearAllParts != null) this.btnClearAllParts.Content = Localization.Get("Btn_ClearAll");
+      if (this.btnGoToSheets != null) this.btnGoToSheets.Content = Localization.Get("Btn_NextSheets");
+      if (this.partsHintText != null) this.partsHintText.Text = Localization.Get("Hint_DragDrop");
+      if (this.partsEmptyTitle != null) this.partsEmptyTitle.Text = Localization.CurrentLanguage == Localization.LangBulgarian
+        ? "В проекта все още няма детайли"
+        : (Localization.CurrentLanguage == Localization.LangEnglish ? "No parts in project yet" : "В проекте пока нет ни одной детали");
+      if (this.partsEmptySub != null) this.partsEmptySub.Text = Localization.Get("Hint_DragDrop");
+      if (this.btnAddPartEmpty != null) this.btnAddPartEmpty.Content = Localization.Get("Btn_AddDxf");
+      if (this.colHeaderPartPreview != null) this.colHeaderPartPreview.Header = Localization.Get("Col_Preview");
+      if (this.colHeaderPartName != null) this.colHeaderPartName.Header = Localization.Get("Col_PartName");
+      if (this.colHeaderPartQty != null) this.colHeaderPartQty.Header = Localization.Get("Col_Quantity");
+      if (this.colHeaderColor != null) this.colHeaderColor.Header = Localization.Get("Col_Color");
+      if (this.colHeaderPriority != null) this.colHeaderPriority.Header = Localization.Get("Col_Priority");
+      if (this.colHeaderPartStatus != null) this.colHeaderPartStatus.Header = Localization.Get("Col_Status");
+      if (this.colHeaderPartActions != null) this.colHeaderPartActions.Header = Localization.Get("Col_Actions");
+      if (this.lblMultiplier != null) this.lblMultiplier.Text = Localization.Get("Lbl_Multiplier");
+      if (this.btnApplyMultiplier != null)
+      {
+        this.btnApplyMultiplier.Content = Localization.Get("Btn_Multiply");
+        this.btnApplyMultiplier.ToolTip = Localization.Get("Tip_Multiply");
+      }
+      if (this.partsMultiplierUpDown != null) this.partsMultiplierUpDown.ToolTip = Localization.Get("Tip_Multiplier");
+      if (this.btnClearRuns != null)
+      {
+        this.btnClearRuns.Content = Localization.Get("Btn_ClearRuns");
+        this.btnClearRuns.ToolTip = Localization.Get("Tip_ClearRuns");
+      }
+
+      // Screen 2: Sheets
+      if (this.btnBackToParts != null) this.btnBackToParts.Content = Localization.Get("Btn_BackToParts");
+      if (this.btnGoToNesting != null) this.btnGoToNesting.Content = Localization.Get("Btn_NextNesting");
+      if (this.btnAddSheet != null) this.btnAddSheet.Content = Localization.Get("Btn_AddSheet");
+      if (this.btnDeleteSheet != null) this.btnDeleteSheet.Content = Localization.Get("Btn_DeleteSheet");
+      if (this.lblSheetEdgeMargin != null) this.lblSheetEdgeMargin.Text = Localization.Get("Lbl_SheetEdgeMargin");
+      if (this.sheetsEmptyTitle != null) this.sheetsEmptyTitle.Text = Localization.CurrentLanguage == Localization.LangBulgarian
+        ? "Няма добавени листове"
+        : (Localization.CurrentLanguage == Localization.LangEnglish ? "No sheets added" : "Листы материала не добавлены");
+      if (this.btnAddSheetEmpty != null) this.btnAddSheetEmpty.Content = Localization.Get("Btn_AddSheet");
+      if (this.colHeaderSheetQty != null) this.colHeaderSheetQty.Header = Localization.Get("Col_Quantity");
+      if (this.colHeaderSheetUnlimited != null) this.colHeaderSheetUnlimited.Header = Localization.Get("Col_Unlimited");
+      if (this.colHeaderSheetPriority != null) this.colHeaderSheetPriority.Header = Localization.Get("Col_SheetPriority");
+      if (this.colHeaderSheetStatus != null) this.colHeaderSheetStatus.Header = Localization.Get("Col_AvailableUsed");
+      if (this.colHeaderSheetActions != null) this.colHeaderSheetActions.Header = Localization.Get("Col_Actions");
+
+      // Screen 3: Nesting
+      if (this.btnStartNest != null) this.btnStartNest.Content = Localization.Get("Btn_StartNest");
+      if (this.cancelNestButton != null) this.cancelNestButton.Content = Localization.Get("Btn_StopNest");
+      if (this.btnOpenLayoutFromNesting != null) this.btnOpenLayoutFromNesting.Content = Localization.Get("Btn_GoToLayout");
+      if (this.runsListTitle != null) this.runsListTitle.Text = Localization.Get("Lbl_RunsList");
+      if (this.runsListHint != null) this.runsListHint.Text = Localization.CurrentLanguage == Localization.LangBulgarian
+        ? "💡 Щракнете върху вариант за предварителен преглед; щракнете два пъти за разкрой."
+        : (Localization.CurrentLanguage == Localization.LangEnglish ? "💡 Click a run to preview; double-click to view layout." : "💡 Кликните по варианту для предпросмотра; дважды кликните для перехода к раскладке.");
+      if (this.colHeaderRunNum != null) this.colHeaderRunNum.Header = Localization.Get("Col_RunNum");
+      if (this.colHeaderRunUtil != null) this.colHeaderRunUtil.Header = Localization.Get("Col_RunUtil");
+      if (this.colHeaderRunPlaced != null) this.colHeaderRunPlaced.Header = Localization.Get("Col_RunPlaced");
+      if (this.colHeaderRunSheets != null) this.colHeaderRunSheets.Header = Localization.Get("Col_RunSheets");
+      if (this.colHeaderRunTime != null) this.colHeaderRunTime.Header = Localization.Get("Col_RunTime");
+      this.RefreshNestEffortMenu();
+
+      // Screen 4: Layout & Report
+      if (this.btnBackToNesting != null) this.btnBackToNesting.Content = Localization.Get("Btn_BackToNesting");
+      if (this.viewTypeDxfRadio != null) this.viewTypeDxfRadio.Content = Localization.Get("Radio_DxfView");
+      if (this.viewTypeReportRadio != null) this.viewTypeReportRadio.Content = Localization.Get("Radio_ReportView");
+      if (this.btnExportDxf != null) this.btnExportDxf.Content = Localization.Get("Btn_ExportDxf");
+      if (this.btnExportPdf != null) this.btnExportPdf.Content = Localization.Get("Btn_ExportPdf");
+      if (this.btnPrintReport != null) this.btnPrintReport.Content = Localization.Get("Btn_PrintReport");
+      if (this.btnReportSavePdf != null) this.btnReportSavePdf.Content = Localization.Get("Report_PreviewToolbar_SavePdf");
+      if (this.btnReportPrint != null) this.btnReportPrint.Content = Localization.Get("Report_PreviewToolbar_Print");
+      if (this.btnReportZoomFit != null) this.btnReportZoomFit.Content = Localization.Get("Report_PreviewToolbar_ZoomFit");
+      if (this.reportEmptyTitle != null) this.reportEmptyTitle.Text = Localization.Get("Report_EmptyTitle");
+      if (this.reportEmptySub != null) this.reportEmptySub.Text = Localization.Get("Report_EmptySub");
+      this.UpdateReportPageIndicator();
+
+      // Status Bar
+      if (this.statusLabelUtilization != null) this.statusLabelUtilization.Text = Localization.Get("Status_Utilization");
+      if (this.statusLabelSheets != null) this.statusLabelSheets.Text = Localization.Get("Status_Sheets");
+      if (this.statusLabelPlaced != null) this.statusLabelPlaced.Text = Localization.Get("Status_Placed");
+      if (this.statusLabelUnplaced != null) this.statusLabelUnplaced.Text = Localization.Get("Status_Unplaced");
+
+      // Update unit labels on columns and summaries
+      this.ApplyUnits();
+      this.UpdateSummaryBadges();
+    }
+
+    private void OnLanguageRuClicked(object sender, RoutedEventArgs e)
+    {
+      this.SetLanguage(Localization.LangRussian);
+    }
+
+    private void OnLanguageBgClicked(object sender, RoutedEventArgs e)
+    {
+      this.SetLanguage(Localization.LangBulgarian);
+    }
+
+    private void OnLanguageEnClicked(object sender, RoutedEventArgs e)
+    {
+      this.SetLanguage(Localization.LangEnglish);
+    }
+
+    private void SetLanguage(string lang)
+    {
+      Localization.CurrentLanguage = lang;
+      var session = SessionState.Load() ?? new SessionState();
+      session.Language = lang;
+      session.Save();
+      this.ApplyLocalization();
     }
 
     /// <summary>Persists the user's sheet presets right away (load-modify-save, like the MRU).</summary>
@@ -971,7 +1230,7 @@
 
       if (this.userSheetPresets.Count > 0)
       {
-        menu.Items.Add(new MenuItem { Header = "My sheets", IsEnabled = false, FontWeight = FontWeights.Bold });
+        menu.Items.Add(new MenuItem { Header = Localization.Get("Menu_MySheets"), IsEnabled = false, FontWeight = FontWeights.Bold });
         foreach (var preset in this.userSheetPresets.OrderBy(p => p.H).ThenBy(p => p.W))
         {
           var size = preset;
@@ -980,7 +1239,7 @@
           menu.Items.Add(item);
         }
 
-        var removeMenu = new MenuItem { Header = "Remove from my sheets" };
+        var removeMenu = new MenuItem { Header = Localization.Get("Menu_RemoveMySheets") };
         foreach (var preset in this.userSheetPresets.OrderBy(p => p.H).ThenBy(p => p.W))
         {
           var size = preset;
@@ -1013,13 +1272,13 @@
       }
 
       menu.Items.Add(new Separator());
-      var custom = new MenuItem { Header = "Custom size…" };
+      var custom = new MenuItem { Header = Localization.Get("Menu_CustomSize") };
       custom.Click += (_, __) =>
       {
         var dialog = new AddSheetWindow(this.unitsMm) { Owner = this };
         if (dialog.ShowDialog() == true)
         {
-          this.AddSheetOfSize(dialog.SheetWidth, dialog.SheetHeight, dialog.SheetQuantity, dialog.SheetUnlimited);
+          this.AddSheetOfSize(dialog.SheetWidth, dialog.SheetHeight, dialog.SheetQuantity, dialog.SheetUnlimited, dialog.SheetPriority);
           if (dialog.RememberAsPreset && !this.userSheetPresets.Contains((dialog.SheetWidth, dialog.SheetHeight)))
           {
             this.userSheetPresets.Add((dialog.SheetWidth, dialog.SheetHeight));
@@ -1068,20 +1327,31 @@
 
     private void OpenEditSheet(ISheetLoadInfo row)
     {
+      if (lastNestConsumed != null)
+      {
+        ClearNestResult();
+      }
+
       var dialog = new AddSheetWindow(this.unitsMm) { Owner = this };
-      dialog.PrefillForEdit(row.Width, row.Height, row.Quantity, row.Unlimited);
+      dialog.PrefillForEdit(row.Width, row.Height, row.Quantity, row.Unlimited, row.Priority);
       if (dialog.ShowDialog() == true)
       {
         row.Width = dialog.SheetWidth;
         row.Height = dialog.SheetHeight;
         row.Quantity = dialog.SheetQuantity;
         row.Unlimited = dialog.SheetUnlimited;
-        this.sheetsListView.Items.Refresh();
+        row.Priority = dialog.SheetPriority;
+        this.sheetsListView?.Items.Refresh();
       }
     }
 
-    private void AddSheetOfSize(int width, int height, int quantity, bool unlimited = false)
+    private void AddSheetOfSize(int width, int height, int quantity, bool unlimited = false, int priority = 5)
     {
+      if (lastNestConsumed != null)
+      {
+        ClearNestResult();
+      }
+
       if (ViewModel.ActiveDocument is NestProjectViewModel doc && doc.AddSheetCommand.CanExecute(null))
       {
         doc.AddSheetCommand.Execute(null);
@@ -1092,6 +1362,7 @@
           sheet.Height = height;
           sheet.Quantity = quantity;
           sheet.Unlimited = unlimited;
+          sheet.Priority = priority;
         }
 
         this.sheetsListView.Items.Refresh();
@@ -1115,133 +1386,9 @@
     }
 
     private async void OnAddPartClicked(object sender, RoutedEventArgs e)
-      => await AddPartsToActiveProject(d => d.AddPartCommand, autoEditSingle: true);
-
-    /// <summary>
-    /// Import 3D (STEP/IGES): pick file(s) → probe thickness → show the K-factor dialog → unfold every
-    /// sheet-metal solid → add the flats. Off-UI unfolds with a busy cursor; guarded against a closed window.
-    /// </summary>
-    private async void OnImport3DClicked(object sender, RoutedEventArgs e)
     {
-      var doc = ViewModel.ActiveDocument as NestProjectViewModel;
-      if (doc == null)
-      {
-        return;
-      }
-
-      var picker = new Microsoft.Win32.OpenFileDialog
-      {
-        Filter = DeepNestLib.IO.StepUnfoldService.FileDialogFilter3D,
-        Multiselect = true,
-        Title = "Import 3D (STEP / IGES)",
-      };
-      if (picker.ShowDialog(this) != true)
-      {
-        return;
-      }
-
-      foreach (var file in picker.FileNames)
-      {
-        try
-        {
-          // 1. Probe: detect thickness + solid count (off the UI thread).
-          System.Windows.Input.Mouse.OverrideCursor = System.Windows.Input.Cursors.AppStarting;
-          (int SolidCount, double[] ThicknessMm) probe;
-          try
-          {
-            probe = await System.Threading.Tasks.Task.Run(() => DeepNestLib.IO.StepUnfoldService.ProbeThickness(file));
-          }
-          finally
-          {
-            System.Windows.Input.Mouse.OverrideCursor = null;
-          }
-
-          if (this.isClosed || !this.IsLoaded)
-          {
-            return;
-          }
-
-          // 2. Ask for K-factor / standard / unit (pre-filled with the detected thickness).
-          var opts = new Import3DWindow(System.IO.Path.GetFileName(file), probe.SolidCount, probe.ThicknessMm) { Owner = this };
-          if (opts.ShowDialog() != true)
-          {
-            continue;
-          }
-
-          // 3. Unfold with the chosen options (off the UI thread) and add the flats.
-          System.Windows.Input.Mouse.OverrideCursor = System.Windows.Input.Cursors.AppStarting;
-          (System.Collections.Generic.IReadOnlyList<string> Paths, int Skipped) result;
-          try
-          {
-            result = await System.Threading.Tasks.Task.Run(() => DeepNestLib.IO.StepUnfoldService.GetUnfoldedParts(file));
-          }
-          finally
-          {
-            System.Windows.Input.Mouse.OverrideCursor = null;
-          }
-
-          if (this.isClosed || !this.IsLoaded)
-          {
-            return;
-          }
-
-          // Map each produced flat to its metadata. Thickness: if no solid was skipped, index-align it to
-          // the probe result (exact for the common single-solid case); otherwise use the sheet's single
-          // thickness if uniform, else 0 (unknown — display only). The dialog wrote the chosen K/std/unit
-          // to the StepUnfoldService statics on OK.
-          double uniformThickness = 0;
-          bool thicknessVaries = false;
-          foreach (var t in probe.ThicknessMm)
-          {
-            if (t > 0)
-            {
-              if (uniformThickness == 0)
-              {
-                uniformThickness = t;
-              }
-              else if (System.Math.Abs(uniformThickness - t) > 1e-9)
-              {
-                thicknessVaries = true;
-              }
-            }
-          }
-
-          double fallbackThickness = thicknessVaries ? 0 : uniformThickness;
-          var infos = new System.Collections.Generic.List<NestProjectViewModel.UnfoldedPartInfo>();
-          for (int i = 0; i < result.Paths.Count; i++)
-          {
-            double thick = (result.Paths.Count == probe.SolidCount && i < probe.ThicknessMm.Length)
-              ? probe.ThicknessMm[i]
-              : fallbackThickness;
-            infos.Add(new NestProjectViewModel.UnfoldedPartInfo(
-              result.Paths[i], file, i,
-              DeepNestLib.IO.StepUnfoldService.KFactor,
-              DeepNestLib.IO.StepUnfoldService.KFactorStandard,
-              DeepNestLib.IO.StepUnfoldService.UnfoldUnitInch,
-              thick));
-          }
-
-          doc.AddUnfoldedParts(infos);
-
-          if (result.Skipped > 0)
-          {
-            ViewModel.MessageService.DisplayMessageBox(
-              $"Imported {result.Paths.Count} part(s). {result.Skipped} solid(s) were skipped (not recognized as sheet metal).",
-              "Import 3D",
-              DeepNestLib.MessageBoxIcon.Information);
-          }
-        }
-        catch (DeepNestLib.IO.StepUnfoldException ex)
-        {
-          System.Windows.Input.Mouse.OverrideCursor = null;
-          ViewModel.MessageService.DisplayMessageBox(ex.Message, "Import 3D", DeepNestLib.MessageBoxIcon.Stop);
-        }
-        catch (System.Exception ex)
-        {
-          System.Windows.Input.Mouse.OverrideCursor = null;
-          CrashReporter.Show(ex, "import-3d", this);
-        }
-      }
+      await AddPartsToActiveProject(d => d.AddPartCommand);
+      UpdateSummaryBadges();
     }
 
     /// <summary>
@@ -1362,8 +1509,7 @@
       => PartColors.ToRgb(PartColors.For(this.dxfViewer?.PartColours, part.Path));
 
     private async System.Threading.Tasks.Task AddPartsToActiveProject(
-      System.Func<NestProjectViewModel, Microsoft.Toolkit.Mvvm.Input.IAsyncRelayCommand> commandSelector,
-      bool autoEditSingle)
+      System.Func<NestProjectViewModel, Microsoft.Toolkit.Mvvm.Input.IAsyncRelayCommand> commandSelector)
     {
       var doc = ViewModel.ActiveDocument as NestProjectViewModel;
       if (doc == null)
@@ -1374,7 +1520,7 @@
       int before = doc.ProjectInfo.DetailLoadInfos.Count;
       await commandSelector(doc).ExecuteAsync(null);
 
-      // The user may have closed the window while a slow 3D unfold ran — don't touch a dead window.
+      // The user may have closed the window while the parts loaded — don't touch a dead window.
       if (this.isClosed || !this.IsLoaded)
       {
         return;
@@ -1383,14 +1529,13 @@
       // A new part changes the set of colours, and the thumbnails have to follow.
       this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
 
-      // Insert flow: adding a single part opens Edit Part right away. Skipped for 3D
-      // imports (autoEditSingle=false) — their unfold is slow, so the part loads async in the grid.
+      // Insert flow: adding a single part opens Edit Part right away.
       //
       // A drawing that held several parts adds several rows, so this deliberately does not fire: there
       // is no single part to edit, and picking one of them would be a guess. The operator sees the rows
       // and opens whichever they meant.
       var infos = doc.ProjectInfo.DetailLoadInfos;
-      if (autoEditSingle && infos.Count == before + 1 && infos[infos.Count - 1] is IDetailLoadInfo added)
+      if (infos.Count == before + 1 && infos[infos.Count - 1] is IDetailLoadInfo added)
       {
         OpenEditPart(added);
       }
@@ -1427,16 +1572,12 @@
       }
     }
 
-    private async void OpenEditPart(IDetailLoadInfo part)
+    private void OpenEditPart(IDetailLoadInfo part)
     {
       if (this.isClosed || !this.IsLoaded)
       {
         return;
       }
-
-      bool is3D = !string.IsNullOrEmpty(part.SourceStepPath);
-      double oldK = part.KFactor;
-      string oldStd = part.KFactorStandard;
 
       var cfg = ViewModel.SvgNestConfigViewModel.SvgNestConfig;
       var dialog = new EditPartWindow(part, cfg.Rotations, System.Math.Max(0, cfg.Spacing))
@@ -1449,79 +1590,27 @@
       }
 
       this.partsListView.Items.Refresh(); // plain (non-observable) fields may have changed
-
-      bool kChanged = is3D
-        && (System.Math.Abs(part.KFactor - oldK) > 1e-9
-            || !string.Equals(part.KFactorStandard, oldStd, System.StringComparison.OrdinalIgnoreCase));
-      if (kChanged)
-      {
-        await ReunfoldPart(part, oldK, oldStd);
-      }
-    }
-
-    /// <summary>Re-runs the FreeCAD unfold for a 3D part with its new K-factor and swaps in the new flat,
-    /// refreshing the thumbnail / size / area. Off the UI thread with a busy cursor. Reverts K on failure.</summary>
-    private async System.Threading.Tasks.Task ReunfoldPart(IDetailLoadInfo part, double oldK, string oldStd)
-    {
-      var obs = part as DeepNestSharp.Domain.Models.ObservableDetailLoadInfo;
-      string oldPath = part.Path;
-      System.Windows.Input.Mouse.OverrideCursor = System.Windows.Input.Cursors.AppStarting;
-      try
-      {
-        var result = await System.Threading.Tasks.Task.Run(() => DeepNestLib.IO.StepUnfoldService.GetUnfoldedParts(
-          part.SourceStepPath, part.KFactor, part.KFactorStandard, part.UnfoldUnitInch));
-
-        if (this.isClosed || !this.IsLoaded || result.Paths.Count == 0)
-        {
-          return;
-        }
-
-        int idx = (part.UnfoldIndex >= 0 && part.UnfoldIndex < result.Paths.Count) ? part.UnfoldIndex : 0;
-        string newFlat = result.Paths[idx];
-
-        part.Path = newFlat;
-        DeepNestSharp.Ui.Converters.PartPreviewConverter.Invalidate(oldPath);
-        DeepNestSharp.Ui.Converters.PartPreviewConverter.Invalidate(newFlat);
-        obs?.InvalidateGeometry();
-
-        // The flat's path changed, and the path is what names the colour.
-        this.ApplyPartColours((ViewModel.ActiveDocument as NestProjectViewModel)?.ProjectInfo?.DetailLoadInfos);
-        this.partsListView.Items.Refresh();
-      }
-      catch (DeepNestLib.IO.StepUnfoldException ex)
-      {
-        part.KFactor = oldK; // revert so Edit Part shows the value that actually produced the current flat
-        part.KFactorStandard = oldStd;
-        ViewModel.MessageService.DisplayMessageBox(ex.Message, "Re-unfold", DeepNestLib.MessageBoxIcon.Stop);
-      }
-      catch (System.Exception ex)
-      {
-        CrashReporter.Show(ex, "reunfold-3d", this);
-      }
-      finally
-      {
-        System.Windows.Input.Mouse.OverrideCursor = null;
-      }
     }
 
     private async void OnNest(object sender, RoutedEventArgs e)
     {
+      if (this.nestCts != null)
+      {
+        return;
+      }
+
+      // If there is already a nest result, discard it and return the sheets it used to the stock
+      // before recalculating from scratch.
+      if (!ViewModel.NestMonitorViewModel.TopNestResults.IsEmpty || lastNestConsumed != null)
+      {
+        ClearNestResult();
+      }
+
       // SheetNest has ONE engine: sparrow, run as a bundled native subprocess.
       var project = (ViewModel.ActiveDocument as NestProjectViewModel)?.ProjectInfo;
       if (project == null || project.DetailLoadInfos.Count == 0)
       {
-        ViewModel.MessageService.DisplayMessageBox("Open a project and add parts first.", "Nest", DeepNestLib.MessageBoxIcon.Information);
-        return;
-      }
-
-      // One result at a time: its sheets are already deducted from the stock, so nesting again
-      // would consume more sheets on top of it. Clear Result gives them back and unlocks NEST.
-      if (!ViewModel.NestMonitorViewModel.TopNestResults.IsEmpty)
-      {
-        ViewModel.MessageService.DisplayMessageBox(
-          "There is already a nest result. Press Clear Result first; it returns the sheets that nest used to the stock.",
-          "Nest",
-          DeepNestLib.MessageBoxIcon.Information);
+        ViewModel.MessageService.DisplayMessageBox(Localization.Get("Msg_AddPartsFirst"), Localization.Get("Title_Nest"), DeepNestLib.MessageBoxIcon.Information);
         return;
       }
 
@@ -1575,11 +1664,11 @@
       // size marked Unlimited never runs down, and its Quantity is carried along only to be ignored.
       var sheetStock = project.SheetLoadInfos
         .Where(s => s.Width > 0 && s.Height > 0 && (s.Unlimited || s.Quantity > 0))
-        .Select(s => (s.Width, s.Height, s.Quantity, s.Unlimited))
+        .Select(s => (s.Width, s.Height, s.Quantity, s.Unlimited, s.Priority))
         .ToList();
       if (sheetStock.Count == 0)
       {
-        ViewModel.MessageService.DisplayMessageBox("Add at least one sheet in the Sheets tab first.", "Nest", DeepNestLib.MessageBoxIcon.Information);
+        ViewModel.MessageService.DisplayMessageBox(Localization.Get("Msg_AddSheetsFirst"), Localization.Get("Title_Nest"), DeepNestLib.MessageBoxIcon.Information);
         return;
       }
 
@@ -1596,7 +1685,7 @@
       if (sparrowExe == null)
       {
         ViewModel.MessageService.DisplayMessageBox(
-          "The nesting engine (sparrow.exe) was not found. It ships next to the app; reinstall, or set the SHEETNEST_SPARROW environment variable to its path.",
+          Localization.Get("Msg_NoEngine"),
           "Nest",
           DeepNestLib.MessageBoxIcon.Warning);
         return;
@@ -1612,7 +1701,7 @@
       this.cancelNestButton.Content = "■  Cancel";
       this.cancelNestButton.IsEnabled = true;
       this.cancelNestButton.Visibility = Visibility.Visible;
-      this.nestPhaseText.Text = "Nesting…  0:00";
+      this.nestPhaseText.Text = Localization.Format("Nest_Running", "0:00");
       this.nestPhaseText.Visibility = Visibility.Visible;
 
       // A stopwatch + timer keep the elapsed clock ticking between engine reports (the engine only reports
@@ -1639,6 +1728,51 @@
         }
 
         var token = nestCts.Token;
+
+        // Hand the per-part spacings to the viewer BEFORE showing the result, so manual nesting
+        // and intermediate candidates enforce the same clearances and part colors.
+        this.ApplyPartColours(project.DetailLoadInfos);
+
+        if (this.dxfViewer != null)
+        {
+          this.dxfViewer.DefaultPartSpacing = System.Math.Max(0, spacing);
+          this.dxfViewer.SheetEdgeMargin = System.Math.Max(0, margin);
+          this.dxfViewer.OffcutOptions = this.CurrentOffcutOptions();
+          this.dxfViewer.PartSpacings = parts
+            .GroupBy(p => p.Path, System.StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(
+              g => g.Key,
+              g => g.Min(p => p.Spacing >= 0 ? p.Spacing : System.Math.Max(0, spacing)),
+              System.StringComparer.OrdinalIgnoreCase);
+        }
+
+        if (this.nestDxfViewer != null)
+        {
+          this.nestDxfViewer.DefaultPartSpacing = System.Math.Max(0, spacing);
+          this.nestDxfViewer.SheetEdgeMargin = System.Math.Max(0, margin);
+          this.nestDxfViewer.OffcutOptions = this.CurrentOffcutOptions();
+          this.nestDxfViewer.PartSpacings = this.dxfViewer?.PartSpacings;
+        }
+
+        Action<INestResult> candidateCallback = candidateResult =>
+        {
+          this.Dispatcher.BeginInvoke(new Action(() =>
+          {
+            if (this.nestRuns == null || candidateResult == null) return;
+            var runItem = new NestRunHistoryItem
+            {
+              RunNumber = this.nestRuns.Count + 1,
+              Result = candidateResult,
+              UtilizationText = FormattableString.Invariant($"{candidateResult.MaterialUtilization * 100:0.#}%"),
+              PlacedText = FormattableString.Invariant($"{candidateResult.TotalPlacedCount} / {candidateResult.TotalPartsCount}"),
+              SheetsText = FormattableString.Invariant($"{candidateResult.UsedSheets.Count}"),
+              TimeText = NestElapsed()
+            };
+            this.nestRuns.Insert(0, runItem);
+            this.runsListView.SelectedItem = runItem;
+          }));
+        };
+
         var (result, error) = await Task.Run(() =>
         {
           // The sparrow engine: dense collision-separation nesting, per-sheet, corner-compacted, with
@@ -1662,43 +1796,21 @@
             geometryTolerance: CommonLineDefaults.DefaultGeometryToleranceInches * unitScale,
             commonLineGap: config.CommonLineGapInches * unitScale,
             effort: this.nestEffort,
-            commonLineMaxClusterParts: config.CommonLineMaxClusterParts);
+            commonLineMaxClusterParts: config.CommonLineMaxClusterParts,
+            candidateCallback: candidateCallback,
+            seedOffset: this.runSeedOffset);
           return (r, err);
         });
 
+        this.runSeedOffset += 50;
+
         if (result == null)
         {
-          ViewModel.MessageService.DisplayMessageBox(error ?? "Nest produced no result.", "Nest", DeepNestLib.MessageBoxIcon.Information);
+          ViewModel.MessageService.DisplayMessageBox(error ?? Localization.Get("Msg_NoResult"), Localization.Get("Title_Nest"), DeepNestLib.MessageBoxIcon.Information);
           return;
         }
 
         nestSucceeded = true;
-
-        // Hand the per-part spacings to the viewer BEFORE showing the result, so manual nesting
-        // (drag/rotate/nudge) enforces the same clearances the nester used — common-line parts may
-        // touch, spaced parts keep (spacingA + spacingB) / 2.
-        this.ApplyPartColours(project.DetailLoadInfos);
-
-        if (this.dxfViewer != null)
-        {
-          this.dxfViewer.DefaultPartSpacing = System.Math.Max(0, spacing);
-
-          // The same edge margin the engine packed to, so hand-editing keeps the parts off the sheet edge.
-          this.dxfViewer.SheetEdgeMargin = System.Math.Max(0, margin);
-          this.dxfViewer.OffcutOptions = this.CurrentOffcutOptions();
-
-          // Group by path — the same DXF may legitimately be listed twice (e.g. once common-line,
-          // once spaced); a plain ToDictionary would throw and crash the app AFTER the nest ran.
-          // Keep the SMALLEST effective spacing so manual editing never blocks a clearance the
-          // nester itself allowed.
-          this.dxfViewer.PartSpacings = parts
-            .GroupBy(p => p.Path, System.StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(
-              g => g.Key,
-              g => g.Min(p => p.Spacing >= 0 ? p.Spacing : System.Math.Max(0, spacing)),
-              System.StringComparer.OrdinalIgnoreCase);
-
-        }
 
         // Show it in the results list + viewer + status bar so utilization / placed / sheets / fitness /
         // time all appear. The result must be IN TopNestResults first, otherwise the list's two-way
@@ -1706,6 +1818,23 @@
         var vm = ViewModel.NestMonitorViewModel;
         vm.TopNestResults.SetSingleResult(result);
         vm.SelectedItem = result;
+
+        if (this.nestDxfViewer != null)
+        {
+          this.nestDxfViewer.Result = result;
+        }
+
+        var finalRunItem = new NestRunHistoryItem
+        {
+          RunNumber = this.nestRuns.Count + 1,
+          Result = result,
+          UtilizationText = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%"),
+          PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
+          SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
+          TimeText = NestElapsed()
+        };
+        this.nestRuns.Insert(0, finalRunItem);
+        this.runsListView.SelectedItem = finalRunItem;
 
         // Consume the stock this nest used, right in the Sheets tab — the count visibly drops
         // (35 in stock, nest used 31 → the tab now shows 4) and closing the app persists what
@@ -1731,12 +1860,9 @@
           bool anyUnlimited = project.SheetLoadInfos.Any(s => s.Unlimited);
           ViewModel.MessageService.DisplayMessageBox(
             anyUnlimited
-              ? $"{unplacedCount} part(s) do not fit on any of the sheet sizes in the Sheets tab.\n\n" +
-                "Sheets were not the limit — one of the sizes is unlimited. The part is bigger than every " +
-                "sheet it could go on, so add a bigger sheet size (or check the part's spacing and margin)."
-              : $"{unplacedCount} part(s) did not fit on the {sheetQty} available sheet(s).\n\n" +
-                "Increase the sheet Qty in the Sheets tab, tick Unlimited on a size, or add another sheet, and nest again.",
-            anyUnlimited ? "Parts do not fit" : "Not enough sheets",
+              ? Localization.Format("Msg_PartsDoNotFit", unplacedCount)
+              : Localization.Format("Msg_NotEnoughSheets", unplacedCount, sheetQty),
+            anyUnlimited ? Localization.Get("Title_PartsDoNotFit") : Localization.Get("Title_NotEnoughSheets"),
             DeepNestLib.MessageBoxIcon.Warning);
         }
       }
@@ -1746,7 +1872,11 @@
         // can also arrive WRAPPED: a Parallel.For without the token in its options bundles the
         // workers' OperationCanceledExceptions into an AggregateException (user-reported crash
         // dialog on Cancel during the tail sweep).
-        this.nestPhaseText.Text = "Nest cancelled";
+        this.nestPhaseText.Text = Localization.Get("Nest_Cancelled");
+        if (this.nestRuns.Count > 0 && this.runsListView.SelectedItem == null)
+        {
+          this.runsListView.SelectedItem = this.nestRuns[0];
+        }
       }
       catch (System.Exception ex)
       {
@@ -1781,27 +1911,27 @@
           string seams = SparrowNestService.DiagSeamsSnapped > 0
               || SparrowNestService.DiagSeamsGivenUp > 0
               || commonLineFallbacks.Length > 0
-            ? FormattableString.Invariant($"  ·  {SparrowNestService.DiagSeamsSnapped} shared cuts")
+            ? Localization.Format("Nest_SharedCuts", SparrowNestService.DiagSeamsSnapped)
               + (SparrowNestService.DiagSeamsGivenUp > 0
-                ? FormattableString.Invariant($", {SparrowNestService.DiagSeamsGivenUp} given up")
+                ? Localization.Format("Nest_GivenUp", SparrowNestService.DiagSeamsGivenUp)
                 : string.Empty)
               + (commonLineFallbacks.Length > 0
-                ? FormattableString.Invariant($", {commonLineFallbacks.Select(notice => notice.Drawing).Distinct(StringComparer.OrdinalIgnoreCase).Count()} drawing(s) kept at normal gap")
+                ? Localization.Format("Nest_KeptNormal", commonLineFallbacks.Select(notice => notice.Drawing).Distinct(StringComparer.OrdinalIgnoreCase).Count())
                 : string.Empty)
             : string.Empty;
 
-          this.nestPhaseText.Text = FormattableString.Invariant($"Nested in {elapsed}{seams}");
+          this.nestPhaseText.Text = Localization.Format("Nest_Done", elapsed, seams);
 
           if (commonLineFallbacks.Length > 0)
           {
             ViewModel.MessageService.DisplayMessageBox(
               CommonLineFallbackMessage(commonLineFallbacks),
-              "Common line",
+              Localization.Get("Title_CommonLine"),
               DeepNestLib.MessageBoxIcon.Warning);
           }
 
         }
-        else if (this.nestPhaseText.Text != "Nest cancelled")
+        else if (this.nestPhaseText.Text != Localization.Get("Nest_Cancelled"))
         {
           this.nestPhaseText.Visibility = Visibility.Collapsed;
         }
@@ -1819,7 +1949,7 @@
     /// known accurately). The final time is kept on screen when the nest ends.</summary>
     private void RenderNestProgress()
     {
-      this.nestPhaseText.Text = FormattableString.Invariant($"Nesting…  {NestElapsed()}");
+      this.nestPhaseText.Text = Localization.Format("Nest_Running", NestElapsed());
     }
 
     /// <summary>Elapsed nest time as m:ss (0:00 if the stopwatch isn't running).</summary>
@@ -1875,10 +2005,9 @@
       // Say WHICH fault, per layout. The two are not the same job: an overlap is moved apart by hand, while
       // a part inside the edge margin usually means the margin wants lowering and the nest re-running.
       int parts = unfit.Sum(u => u.Parts);
-      var where = string.Join("\n", unfit.Select(u => $"    {u.Layout}: {u.Parts} part(s){Why(u)}"));
+      var where = string.Join("\n", unfit.Select(u => Localization.Format("Msg_UnfitRow", u.Layout, u.Parts, Why(u))));
       ViewModel.MessageService.DisplayMessageBox(
-        $"{parts} part(s) are not ready to cut:\n\n{where}\n\n" +
-        "They are drawn in red. Move them clear in Edit nest and try again.",
+        Localization.Format("Msg_NotReadyToCut", parts, where),
         title,
         DeepNestLib.MessageBoxIcon.Stop);
       return true;
@@ -1887,10 +2016,10 @@
       {
         if (u.Overlapping > 0 && u.InMargin > 0)
         {
-          return $", {u.Overlapping} overlapping a neighbour and {u.InMargin} inside the sheet edge margin";
+          return Localization.Format("Why_Both", u.Overlapping, u.InMargin);
         }
 
-        return u.InMargin > 0 ? ", inside the sheet edge margin" : ", overlapping a neighbour";
+        return u.InMargin > 0 ? Localization.Get("Why_Margin") : Localization.Get("Why_Overlap");
       }
     }
 
@@ -1900,13 +2029,13 @@
       if (selected == null || selected.UsedSheets == null || selected.UsedSheets.Count == 0)
       {
         ViewModel.MessageService.DisplayMessageBox(
-          "Run a nest and select a result first, then save the report.",
-          "Nest report",
+          Localization.Get("Msg_NestFirstReport"),
+          Localization.Get("Title_Report"),
           DeepNestLib.MessageBoxIcon.Information);
         return;
       }
 
-      if (this.RefuseWhileAnythingOverlaps("Nest report"))
+      if (this.RefuseWhileAnythingOverlaps(Localization.Get("Title_Report")))
       {
         return;
       }
@@ -1941,8 +2070,8 @@
       catch (System.Exception ex)
       {
         ViewModel.MessageService.DisplayMessageBox(
-          $"Could not write the report: {ex.Message}",
-          "Nest report",
+          Localization.Format("Msg_ReportWriteFailed", ex.Message),
+          Localization.Get("Title_Report"),
           DeepNestLib.MessageBoxIcon.Error);
       }
     }
@@ -1953,30 +2082,31 @@
       if (selected == null || selected.UsedSheets == null || selected.UsedSheets.Count == 0)
       {
         ViewModel.MessageService.DisplayMessageBox(
-          "Run a nest and select a result first, then export.",
-          "Export DXF",
+          Localization.Get("Msg_NestFirstExport"),
+          Localization.Get("Title_ExportDxf"),
           DeepNestLib.MessageBoxIcon.Information);
         return;
       }
 
-      if (this.RefuseWhileAnythingOverlaps("Export DXF"))
+      if (this.RefuseWhileAnythingOverlaps(Localization.Get("Title_ExportDxf")))
       {
         return;
       }
 
-      // Export one DXF per DISTINCT layout (the production plan tells how many of each to cut), so two
+      // One DXF per DISTINCT layout, named with its number, sheet size and how many times it is cut, so two
       // identical sheets don't each produce a duplicate DXF. Fall back to every sheet if no grouping.
-      var layouts = this.dxfViewer.GetDistinctLayoutSheets();
-      if (layouts != null && layouts.Count > 0)
+      var export = new List<(DeepNestLib.Placement.ISheetPlacement Sheet, int Count, IReadOnlyCollection<DeepNestLib.IO.OffcutLine> Offcut)>();
+      var plan = this.dxfViewer.GetProductionPlan();
+      if (plan != null && plan.Count > 0)
       {
         var offcutSheet = this.dxfViewer.OffcutSheet;
-        for (int li = 0; li < layouts.Count; li++)
+        foreach (var (sheet, count, _) in plan)
         {
           // The offcut separation cut(s) travel only with the genuine remainder sheet the engine
           // shaped (same rule as the viewer overlay) — never a replicated pattern or a synthetic
           // production-plan representative — so the cut matches the packed remainder exactly.
-          var offcut = ReferenceEquals(layouts[li], offcutSheet) ? OffcutGeometry.BuildLines(layouts[li], this.CurrentOffcutOptions()) : null;
-          await ViewModel.ExportSheetPlacementAsync(layouts[li], offcut);
+          var offcut = ReferenceEquals(sheet, offcutSheet) ? OffcutGeometry.BuildLines(sheet, this.CurrentOffcutOptions()) : null;
+          export.Add((sheet, count, offcut));
         }
       }
       else
@@ -1985,9 +2115,11 @@
         for (int si = 0; si < used.Count; si++)
         {
           var offcut = si == used.Count - 1 ? OffcutGeometry.BuildLines(used[si], this.CurrentOffcutOptions()) : null;
-          await ViewModel.ExportSheetPlacementAsync(used[si], offcut);
+          export.Add((used[si], 1, offcut));
         }
       }
+
+      await ViewModel.ExportLayoutsAsync(export);
     }
 
     /// <summary>
@@ -2108,9 +2240,7 @@
         return string.Empty;
       }
 
-      return "Common-line cutting was skipped for:\n\n"
-        + string.Join("\n", rows)
-        + "\n\nThose parts kept the normal part gap.";
+      return Localization.Format("Msg_CommonLineSkipped", string.Join("\n", rows));
     }
 
     /// <summary>
@@ -2154,5 +2284,698 @@
         EdgeOverlap = System.Math.Max(0, edgeOverlap),
       };
     }
+
+    #region Workflow Modes & Navigation
+
+    private void SetCurrentMode(WorkflowMode mode)
+    {
+      this.currentMode = mode;
+
+      if (this.gridModeParts != null)
+      {
+        this.gridModeParts.Visibility = mode == WorkflowMode.Parts ? Visibility.Visible : Visibility.Collapsed;
+      }
+      if (this.gridModeSheets != null)
+      {
+        this.gridModeSheets.Visibility = mode == WorkflowMode.Sheets ? Visibility.Visible : Visibility.Collapsed;
+      }
+      if (this.gridModeNesting != null)
+      {
+        this.gridModeNesting.Visibility = mode == WorkflowMode.Nesting ? Visibility.Visible : Visibility.Collapsed;
+      }
+      if (this.gridModeLayout != null)
+      {
+        this.gridModeLayout.Visibility = mode == WorkflowMode.Layout ? Visibility.Visible : Visibility.Collapsed;
+      }
+
+      this.settingMode = true;
+      try
+      {
+        if (this.navPartsBtn != null) this.navPartsBtn.IsChecked = mode == WorkflowMode.Parts;
+        if (this.navSheetsBtn != null) this.navSheetsBtn.IsChecked = mode == WorkflowMode.Sheets;
+        if (this.navNestingBtn != null) this.navNestingBtn.IsChecked = mode == WorkflowMode.Nesting;
+        if (this.navLayoutBtn != null) this.navLayoutBtn.IsChecked = mode == WorkflowMode.Layout;
+      }
+      finally
+      {
+        this.settingMode = false;
+      }
+
+      this.UpdateSummaryBadges();
+
+      if (mode == WorkflowMode.Layout && this.viewTypeReportRadio?.IsChecked == true)
+      {
+        this.UpdateReportPreview();
+      }
+    }
+
+    /// <summary>
+    /// On Checked rather than Click, so a step chosen from the keyboard (arrows within the group) or by a
+    /// screen reader switches the screen too, not just the highlight. SetCurrentMode checks the buttons
+    /// itself, and the XAML checks step 1 while the window is still being built; both are ignored here.
+    /// </summary>
+    private void OnNavModeChecked(object sender, RoutedEventArgs e)
+    {
+      if (!this.IsLoaded || this.settingMode || !(sender is FrameworkElement fe) || fe.Tag == null)
+      {
+        return;
+      }
+
+      SetCurrentMode((WorkflowMode)Convert.ToInt32(fe.Tag));
+    }
+
+    private void OnGoToParts(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Parts);
+    private void OnGoToSheets(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Sheets);
+    private void OnGoToNesting(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Nesting);
+    private void OnGoToLayout(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Layout);
+
+    private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (Keyboard.Modifiers == ModifierKeys.Control)
+      {
+        if (e.Key == Key.D1 || e.Key == Key.NumPad1)
+        {
+          SetCurrentMode(WorkflowMode.Parts);
+          e.Handled = true;
+        }
+        else if (e.Key == Key.D2 || e.Key == Key.NumPad2)
+        {
+          SetCurrentMode(WorkflowMode.Sheets);
+          e.Handled = true;
+        }
+        else if (e.Key == Key.D3 || e.Key == Key.NumPad3)
+        {
+          SetCurrentMode(WorkflowMode.Nesting);
+          e.Handled = true;
+        }
+        else if (e.Key == Key.D4 || e.Key == Key.NumPad4)
+        {
+          SetCurrentMode(WorkflowMode.Layout);
+          e.Handled = true;
+        }
+      }
+    }
+
+    private void UpdateSummaryBadges()
+    {
+      if (this.partsCountSummary == null || this.sheetsCountSummary == null)
+      {
+        return;
+      }
+
+      if (ViewModel?.ActiveDocument is NestProjectViewModel doc && doc.ProjectInfo != null)
+      {
+        var parts = doc.ProjectInfo.DetailLoadInfos;
+        int partTypes = parts.Count;
+        int totalPartQty = parts.Sum(p => p.Quantity + p.Extra + p.MirrorQuantity);
+        this.partsCountSummary.Text = string.Format(
+          Localization.Get("Parts_CountSummary"),
+          partTypes,
+          totalPartQty);
+
+        var sheets = doc.ProjectInfo.SheetLoadInfos;
+        int sheetTypes = sheets.Count;
+        int totalSheetQty = sheets.Where(s => !s.Unlimited).Sum(s => s.Quantity);
+        bool hasUnlimited = sheets.Any(s => s.Unlimited);
+        string sheetQtyStr = hasUnlimited
+          ? $"{totalSheetQty}+ ({Localization.Get("Sheets_UnlimitedNote")})"
+          : $"{totalSheetQty} {Localization.Get("Unit_Pcs")}";
+        this.sheetsCountSummary.Text = string.Format(
+          Localization.Get("Sheets_CountSummary"),
+          sheetTypes,
+          sheetQtyStr);
+      }
+      else
+      {
+        this.partsCountSummary.Text = string.Format(Localization.Get("Parts_CountSummary"), 0, 0);
+        this.sheetsCountSummary.Text = string.Format(Localization.Get("Sheets_CountSummary"), 0, "0");
+      }
+    }
+
+    #endregion
+
+    #region Part & Sheet Table Actions
+
+    private void OnRemoveSelectedPart(object sender, RoutedEventArgs e)
+    {
+      if (ViewModel?.ActiveDocument is NestProjectViewModel doc && this.partsListView.SelectedItem is IDetailLoadInfo selected)
+      {
+        doc.RemovePartCommand.Execute(selected);
+        this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+        UpdateSummaryBadges();
+      }
+    }
+
+    private void OnClearAllParts(object sender, RoutedEventArgs e)
+    {
+      if (ViewModel?.ActiveDocument is NestProjectViewModel doc && doc.ProjectInfo.DetailLoadInfos.Count > 0)
+      {
+        if (MessageBox.Show(Localization.Get("Msg_ClearPartsConfirm"), "SheetNest", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+        {
+          doc.ClearPartsCommand.Execute(null);
+          this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+          UpdateSummaryBadges();
+        }
+      }
+    }
+
+    private void OnRemoveSelectedSheet(object sender, RoutedEventArgs e)
+    {
+      if (ViewModel?.ActiveDocument is NestProjectViewModel doc && this.sheetsListView.SelectedItem is ISheetLoadInfo selected)
+      {
+        doc.RemoveSheetCommand.Execute(selected);
+        UpdateSummaryBadges();
+      }
+    }
+
+    private void OnPartQuantityChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    {
+      if (ViewModel?.ActiveDocument is NestProjectViewModel doc)
+      {
+        doc.IsDirty = true;
+        UpdateSummaryBadges();
+      }
+    }
+
+    private void OnApplyPartsMultiplier(object sender, RoutedEventArgs e)
+    {
+      if (ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      int factor = this.partsMultiplierUpDown?.Value ?? 1;
+      if (factor <= 1)
+      {
+        return;
+      }
+
+      var selectedList = this.partsListView.SelectedItems.OfType<ObservableDetailLoadInfo>().ToList();
+      var targetParts = (selectedList.Count > 0 && selectedList.Count < doc.ProjectInfo.DetailLoadInfos.Count)
+        ? selectedList
+        : doc.ProjectInfo.DetailLoadInfos.OfType<ObservableDetailLoadInfo>().ToList();
+
+      if (targetParts.Count == 0)
+      {
+        return;
+      }
+
+      foreach (var part in targetParts)
+      {
+        part.Quantity = Math.Max(1, part.Quantity * factor);
+        if (part.MirrorQuantity > 0)
+        {
+          part.MirrorQuantity = Math.Max(1, part.MirrorQuantity * factor);
+        }
+      }
+
+      doc.IsDirty = true;
+      UpdateSummaryBadges();
+      this.partsListView?.Items.Refresh();
+    }
+
+    private void OnClearRunsClicked(object sender, RoutedEventArgs e)
+    {
+      this.nestRuns.Clear();
+      if (this.nestDxfViewer != null)
+      {
+        this.nestDxfViewer.Result = null;
+      }
+
+      if (this.nestPreviewMetricsText != null)
+      {
+        this.nestPreviewMetricsText.Text = Localization.CurrentLanguage == Localization.LangBulgarian
+          ? "Преглед на разкроя: изберете вариант от списъка с варианти"
+          : (Localization.CurrentLanguage == Localization.LangEnglish
+            ? "Nesting preview: select a variant from the list of variants"
+            : "Предпросмотр раскладки: выберите вариант в списке вариантов");
+      }
+    }
+
+    #endregion
+
+    #region Drag & Drop
+
+    private void OnWindowDragOver(object sender, DragEventArgs e)
+    {
+      if (e.Data.GetDataPresent(DataFormats.FileDrop))
+      {
+        e.Effects = DragDropEffects.Copy;
+        e.Handled = true;
+      }
+      else
+      {
+        e.Effects = DragDropEffects.None;
+      }
+    }
+
+    private void OnPartsDragOver(object sender, DragEventArgs e)
+    {
+      OnWindowDragOver(sender, e);
+    }
+
+    private async void OnWindowDrop(object sender, DragEventArgs e)
+    {
+      if (!(e.Data.GetData(DataFormats.FileDrop) is string[] files) || files.Length == 0)
+      {
+        return;
+      }
+
+      // The parts grid routes here too; without this the Drop bubbles on to the window and every
+      // file is added twice.
+      e.Handled = true;
+      try
+      {
+        await ProcessDroppedFilesAsync(files);
+      }
+      catch (Exception ex)
+      {
+        CrashReporter.Show(ex, "drop-files", this);
+      }
+    }
+
+    private void OnPartsDrop(object sender, DragEventArgs e) => OnWindowDrop(sender, e);
+
+    /// <summary>Files named on the command line: the same handling as files dropped on the window.</summary>
+    internal async void OpenFiles(string[] files)
+    {
+      try
+      {
+        await ProcessDroppedFilesAsync(files);
+      }
+      catch (Exception ex)
+      {
+        CrashReporter.Show(ex, "open-files", this);
+      }
+    }
+
+    private async Task ProcessDroppedFilesAsync(string[] files)
+    {
+      if (files == null || files.Length == 0)
+      {
+        return;
+      }
+
+      // If user dropped a project file (.dnest), open it
+      var projectFile = files.FirstOrDefault(f => string.Equals(System.IO.Path.GetExtension(f), ".dnest", StringComparison.OrdinalIgnoreCase));
+      if (projectFile != null)
+      {
+        ViewModel.LoadNestProjectInteractive(projectFile);
+        return;
+      }
+
+      // Ensure active document exists
+      if (ViewModel.ActiveDocument == null && ViewModel.CreateNestProjectCommand.CanExecute(null))
+      {
+        ViewModel.CreateNestProjectCommand.Execute(null);
+      }
+
+      var doc = ViewModel.ActiveDocument as NestProjectViewModel;
+      if (doc == null)
+      {
+        return;
+      }
+
+      int before = doc.ProjectInfo.DetailLoadInfos.Count;
+
+      await doc.AddPartFilesAsync(files.Where(DeepNestLib.IO.DxfFileExtensions.IsDxf));
+
+      if (doc.ProjectInfo.DetailLoadInfos.Count > before)
+      {
+        this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+        UpdateSummaryBadges();
+
+        SetCurrentMode(WorkflowMode.Parts);
+
+        var infos = doc.ProjectInfo.DetailLoadInfos;
+        if (infos.Count == before + 1 && infos[infos.Count - 1] is IDetailLoadInfo added)
+        {
+          OpenEditPart(added);
+        }
+      }
+    }
+
+    #endregion
+
+    #region Narrow and portrait windows
+
+    // At the laser the monitor stands on end (1080 x 1920). The part columns were sized for a landscape screen and
+    // ran off its right edge; the name now takes what the others leave, and a narrow window drops the area
+    // column, which the size column beside it already tells.
+    private void OnPartsListSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+      if (!e.WidthChanged)
+      {
+        return;
+      }
+
+      double available = this.partsListView.ActualWidth - SystemParameters.VerticalScrollBarWidth - 10;
+      this.colHeaderArea.Width = available < 1150 ? 0 : 105;
+      double others = this.colHeaderPartPreview.Width + this.colHeaderPartQty.Width + this.colHeaderDimensions.Width
+        + this.colHeaderArea.Width + this.colHeaderColor.Width + this.colHeaderPriority.Width
+        + this.colHeaderPartStatus.Width + this.colHeaderPartActions.Width;
+      this.colHeaderPartName.Width = Math.Max(220, available - others);
+    }
+
+    private bool? nestAreaStacked;
+
+    // Side by side on a landscape screen; on one standing on end the variants go above the preview, which then
+    // gets the whole width for the sheet.
+    private void OnNestWorkAreaSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+      bool stacked = e.NewSize.Width < 1000 || e.NewSize.Height > e.NewSize.Width;
+      if (this.nestAreaStacked == stacked)
+      {
+        return;
+      }
+
+      this.nestAreaStacked = stacked;
+      var grid = this.nestWorkArea;
+      grid.ColumnDefinitions.Clear();
+      grid.RowDefinitions.Clear();
+      if (stacked)
+      {
+        grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(260), MinHeight = 120 });
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star), MinHeight = 300 });
+      }
+      else
+      {
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(380), MinWidth = 260 });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star), MinWidth = 360 });
+      }
+
+      for (int i = 0; i < 3; i++)
+      {
+        UIElement pane = i == 0 ? this.runsPane : (i == 1 ? this.runsSplitter : this.previewPane);
+        Grid.SetRow(pane, stacked ? i : 0);
+        Grid.SetColumn(pane, stacked ? 0 : i);
+      }
+
+      this.runsPane.BorderThickness = stacked ? new Thickness(0, 0, 0, 1) : new Thickness(0, 0, 1, 0);
+      this.runsSplitter.Width = stacked ? double.NaN : 5;
+      this.runsSplitter.Height = stacked ? 5 : double.NaN;
+      this.runsSplitter.HorizontalAlignment = stacked ? HorizontalAlignment.Stretch : HorizontalAlignment.Center;
+      this.runsSplitter.VerticalAlignment = stacked ? VerticalAlignment.Center : VerticalAlignment.Stretch;
+      this.runsSplitter.ResizeDirection = stacked ? GridResizeDirection.Rows : GridResizeDirection.Columns;
+    }
+
+    #endregion
+
+    #region Runs History & Layout Selection
+
+    private void OnRunsListSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      if (this.runsListView.SelectedItem is NestRunHistoryItem item && item.Result != null)
+      {
+        if (this.nestDxfViewer != null)
+        {
+          this.nestDxfViewer.Result = item.Result;
+        }
+        if (this.nestPreviewMetricsText != null)
+        {
+          string variantWord = Localization.CurrentLanguage == Localization.LangBulgarian
+            ? "Вариант"
+            : (Localization.CurrentLanguage == Localization.LangEnglish ? "Variant" : "Вариант");
+          string utilWord = Localization.CurrentLanguage == Localization.LangBulgarian
+            ? "Утилизация"
+            : (Localization.CurrentLanguage == Localization.LangEnglish ? "Utilization" : "Утилизация");
+          string placedWord = Localization.CurrentLanguage == Localization.LangBulgarian
+            ? "Поставени"
+            : (Localization.CurrentLanguage == Localization.LangEnglish ? "Placed" : "Размещено");
+          string sheetsWord = Localization.CurrentLanguage == Localization.LangBulgarian
+            ? "Листа"
+            : (Localization.CurrentLanguage == Localization.LangEnglish ? "Sheets" : "Листов");
+          string timeWord = Localization.CurrentLanguage == Localization.LangBulgarian
+            ? "време"
+            : (Localization.CurrentLanguage == Localization.LangEnglish ? "time" : "время");
+
+          this.nestPreviewMetricsText.Text = $"{variantWord} #{item.RunNumber}: {utilWord} {item.UtilizationText} | {placedWord} {item.PlacedText} | {sheetsWord}: {item.SheetsText} ({timeWord}: {item.TimeText})";
+        }
+        ViewModel.NestMonitorViewModel.SelectedItem = item.Result;
+        this.UpdateNestedInfo(item.Result);
+      }
+    }
+
+    private void OnRunsListDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+      if (this.runsListView.SelectedItem is NestRunHistoryItem item && item.Result != null)
+      {
+        ViewModel.NestMonitorViewModel.SelectedItem = item.Result;
+        SetCurrentMode(WorkflowMode.Layout);
+      }
+    }
+
+    #endregion
+
+    #region Screen 4: Layout & Report Preview
+
+    private double reportZoom = 1.0;
+    private int currentReportPageIndex = 0;
+
+    private void OnLayoutViewTypeChanged(object sender, RoutedEventArgs e)
+    {
+      bool showReport = this.viewTypeReportRadio?.IsChecked == true;
+      if (this.dxfViewerBorder != null)
+      {
+        this.dxfViewerBorder.Visibility = showReport ? Visibility.Collapsed : Visibility.Visible;
+      }
+      if (this.reportPreviewGrid != null)
+      {
+        this.reportPreviewGrid.Visibility = showReport ? Visibility.Visible : Visibility.Collapsed;
+      }
+      if (showReport)
+      {
+        UpdateReportPreview();
+      }
+    }
+
+    private void UpdateReportPreview()
+    {
+      var selected = ViewModel.NestMonitorViewModel?.SelectedItem;
+      if (selected == null || selected.UsedSheets == null || selected.UsedSheets.Count == 0)
+      {
+        if (this.reportEmptyNotice != null) this.reportEmptyNotice.Visibility = Visibility.Visible;
+        if (this.reportPagesStackPanel != null) this.reportPagesStackPanel.Children.Clear();
+        this.currentReportPageIndex = 0;
+        UpdateReportPageIndicator();
+        return;
+      }
+
+      if (this.reportEmptyNotice != null) this.reportEmptyNotice.Visibility = Visibility.Collapsed;
+
+      var plan = this.dxfViewer?.GetProductionPlan();
+      if (plan == null || plan.Count == 0)
+      {
+        plan = selected.UsedSheets.Select(s => ((DeepNestLib.Placement.ISheetPlacement)s, 1, "Sheet")).ToList();
+      }
+
+      string units = this.unitsMm ? "mm" : "in"; // the report translates the word itself; it computes with this one
+      var colours = this.dxfViewer?.PartColours ?? PartColors.Build(plan.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
+      int unplacedCount = selected.UnplacedParts?.Count ?? 0;
+
+      var pages = Reports.NestReportPdf.BuildWpfPages(plan, unplacedCount, units, colours);
+      if (this.reportPagesStackPanel != null)
+      {
+        this.reportPagesStackPanel.Children.Clear();
+        foreach (var page in pages)
+        {
+          this.reportPagesStackPanel.Children.Add(page);
+        }
+      }
+
+      this.currentReportPageIndex = 0;
+      UpdateReportPageIndicator();
+
+      int totalSheets = plan.Sum(l => l.Count);
+      int totalParts = plan.Sum(l => l.Count * l.Sheet.PartPlacements.Count);
+      double placedArea = plan.Sum(l => l.Count * l.Sheet.PartPlacements.Sum(p => System.Math.Abs(p.Part.NetArea)));
+      double stockArea = plan.Sum(l => l.Count * l.Sheet.Sheet.WidthCalculated * l.Sheet.Sheet.HeightCalculated);
+      double overallUtil = stockArea <= 0 ? 0 : placedArea / stockArea * 100.0;
+      if (this.reportSummaryText != null)
+      {
+        this.reportSummaryText.Text = FormattableString.Invariant(
+          $"{Localization.Get("Kpi_Utilization")} {overallUtil:0.#}% | {Localization.Get("Kpi_SheetsUsed")} {totalSheets} | {Localization.Get("Kpi_PartsPlaced")} {totalParts}");
+      }
+
+      if (this.reportPagesScroll != null && this.reportPagesScroll.ActualWidth > 300)
+      {
+        double avail = this.reportPagesScroll.ActualWidth - 60;
+        if (avail > 300 && avail < 842)
+        {
+          SetReportZoom(avail / 842.0);
+        }
+      }
+    }
+
+    private void UpdateReportPageIndicator()
+    {
+      int total = this.reportPagesStackPanel?.Children.Count ?? 0;
+      if (total == 0)
+      {
+        if (this.reportPageIndicatorText != null) this.reportPageIndicatorText.Text = "—";
+        return;
+      }
+      int cur = Math.Clamp(this.currentReportPageIndex + 1, 1, total);
+      if (this.reportPageIndicatorText != null)
+      {
+        string fmt = Localization.Get("Report_PageXofY");
+        this.reportPageIndicatorText.Text = string.Format(fmt, cur, total);
+      }
+    }
+
+    private void SetReportZoom(double zoom)
+    {
+      this.reportZoom = Math.Clamp(zoom, 0.35, 2.5);
+      if (this.reportScaleTransform != null)
+      {
+        this.reportScaleTransform.ScaleX = this.reportZoom;
+        this.reportScaleTransform.ScaleY = this.reportZoom;
+      }
+      if (this.reportZoomText != null)
+      {
+        this.reportZoomText.Text = $"{Math.Round(this.reportZoom * 100)}%";
+      }
+    }
+
+    private void OnReportZoomIn(object sender, RoutedEventArgs e)
+    {
+      SetReportZoom(this.reportZoom + 0.15);
+    }
+
+    private void OnReportZoomOut(object sender, RoutedEventArgs e)
+    {
+      SetReportZoom(this.reportZoom - 0.15);
+    }
+
+    private void OnReportZoom100(object sender, RoutedEventArgs e)
+    {
+      SetReportZoom(1.0);
+    }
+
+    private void OnReportZoomFit(object sender, RoutedEventArgs e)
+    {
+      double availableWidth = (this.reportPagesScroll?.ActualWidth ?? 0) - 60;
+      if (availableWidth > 200)
+      {
+        SetReportZoom(availableWidth / 842.0);
+      }
+      else
+      {
+        SetReportZoom(1.0);
+      }
+    }
+
+    private void OnReportScrollPreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+    {
+      if ((System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Control) == System.Windows.Input.ModifierKeys.Control)
+      {
+        e.Handled = true;
+        double delta = e.Delta > 0 ? 0.1 : -0.1;
+        SetReportZoom(this.reportZoom + delta);
+      }
+    }
+
+    private void OnReportPagesScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+      if (this.reportPagesStackPanel == null || this.reportPagesStackPanel.Children.Count == 0) return;
+      double scrollY = this.reportPagesScroll.VerticalOffset;
+      double pageHeightWithMargin = (595.0 + 28.0) * this.reportZoom;
+      if (pageHeightWithMargin > 0)
+      {
+        int page = (int)Math.Round(scrollY / pageHeightWithMargin);
+        page = Math.Clamp(page, 0, this.reportPagesStackPanel.Children.Count - 1);
+        if (page != this.currentReportPageIndex)
+        {
+          this.currentReportPageIndex = page;
+          UpdateReportPageIndicator();
+        }
+      }
+    }
+
+    private void OnReportPrevPage(object sender, RoutedEventArgs e)
+    {
+      int total = this.reportPagesStackPanel?.Children.Count ?? 0;
+      if (total <= 1) return;
+      if (this.currentReportPageIndex > 0)
+      {
+        this.currentReportPageIndex--;
+        ScrollToReportPage(this.currentReportPageIndex);
+      }
+    }
+
+    private void OnReportNextPage(object sender, RoutedEventArgs e)
+    {
+      int total = this.reportPagesStackPanel?.Children.Count ?? 0;
+      if (total <= 1) return;
+      if (this.currentReportPageIndex < total - 1)
+      {
+        this.currentReportPageIndex++;
+        ScrollToReportPage(this.currentReportPageIndex);
+      }
+    }
+
+    private void ScrollToReportPage(int index)
+    {
+      if (this.reportPagesStackPanel != null && index >= 0 && index < this.reportPagesStackPanel.Children.Count)
+      {
+        var el = this.reportPagesStackPanel.Children[index] as FrameworkElement;
+        el?.BringIntoView();
+        UpdateReportPageIndicator();
+      }
+    }
+
+    private void OnPrintReport(object sender, RoutedEventArgs e)
+    {
+      var selected = ViewModel.NestMonitorViewModel?.SelectedItem;
+      if (selected == null || selected.UsedSheets == null || selected.UsedSheets.Count == 0)
+      {
+        ViewModel.MessageService.DisplayMessageBox(
+          Localization.Get("Msg_NestFirstToPrint"),
+          Localization.Get("Btn_PrintReport"),
+          DeepNestLib.MessageBoxIcon.Information);
+        return;
+      }
+
+      if (this.RefuseWhileAnythingOverlaps(Localization.Get("Title_PrintReport")))
+      {
+        return;
+      }
+
+      var plan = this.dxfViewer?.GetProductionPlan();
+      if (plan == null || plan.Count == 0)
+      {
+        plan = selected.UsedSheets.Select(s => ((DeepNestLib.Placement.ISheetPlacement)s, 1, "Sheet")).ToList();
+      }
+
+      string units = this.unitsMm ? "mm" : "in"; // the report translates the word itself; it computes with this one
+      var colours = this.dxfViewer?.PartColours ?? PartColors.Build(plan.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
+      int unplacedCount = selected.UnplacedParts?.Count ?? 0;
+
+      var doc = Reports.NestReportPdf.BuildFixedDocument(plan, unplacedCount, units, colours);
+
+      var printDlg = new System.Windows.Controls.PrintDialog();
+      if (printDlg.ShowDialog() == true)
+      {
+        try
+        {
+          if (printDlg.PrintTicket != null)
+          {
+            printDlg.PrintTicket.PageOrientation = System.Printing.PageOrientation.Landscape;
+          }
+          printDlg.PrintDocument(((System.Windows.Documents.IDocumentPaginatorSource)doc).DocumentPaginator, "SheetNest Production Report");
+        }
+        catch (System.Exception ex)
+        {
+          ViewModel.MessageService.DisplayMessageBox(
+            $"{Localization.Get("Msg_PrintError")}: {ex.Message}",
+            Localization.Get("Btn_PrintReport"),
+            DeepNestLib.MessageBoxIcon.Error);
+        }
+      }
+    }
+
+    #endregion
   }
 }

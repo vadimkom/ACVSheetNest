@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.Ui.Docking
+namespace DeepNestSharp.Ui.Docking
 {
   using System.IO;
   using System.Windows.Input;
@@ -15,7 +15,6 @@
     private bool isDirty = false;
     private RelayCommand? saveCommand;
     private RelayCommand? saveAsCommand;
-    private RelayCommand? closeCommand;
 
     public FileViewModel()
     {
@@ -153,19 +152,6 @@
       }
     }
 
-    public ICommand CloseCommand
-    {
-      get
-      {
-        if (closeCommand == null)
-        {
-          closeCommand = new RelayCommand(OnClose, CanClose);
-        }
-
-        return closeCommand;
-      }
-    }
-
     protected IMainViewModel MainViewModel { get; }
 
     protected abstract void NotifyContentUpdated();
@@ -174,11 +160,6 @@
 
     protected abstract void LoadContent();
 
-    private bool CanClose()
-    {
-      return true;
-    }
-
     private void LoadFile(string filePath)
     {
       if (File.Exists(filePath))
@@ -186,23 +167,8 @@
         LoadContent();
         ContentId = filePath;
         NotifyContentUpdated();
-        if (this is NestProjectViewModel ||
-            this is NestResultViewModel ||
-            this is PartEditorViewModel)
-        {
-          this.MainViewModel.SvgNestConfigViewModel.SvgNestConfig.LastNestFilePath = this.DirectoryName;
-        }
-        else if (this is NfpCandidateListViewModel ||
-                 this is SheetPlacementViewModel)
-        {
-          this.MainViewModel.SvgNestConfigViewModel.SvgNestConfig.LastDebugFilePath = this.DirectoryName;
-        }
+        this.MainViewModel.SvgNestConfigViewModel.SvgNestConfig.LastNestFilePath = this.DirectoryName;
       }
-    }
-
-    private void OnClose()
-    {
-      MainViewModel.Close(this);
     }
 
     private bool CanSave()

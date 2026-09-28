@@ -97,7 +97,7 @@ namespace DeepNestSharp.RasterNest
       double geometryTolerance,
       IDictionary<string, DxfContourCatalog> sourceCatalogs = null)
     {
-      if (a?.PlacedPart == null || b?.PlacedPart == null)
+      if (a?.Part == null || b?.Part == null)
       {
         return false;
       }
@@ -173,7 +173,7 @@ namespace DeepNestSharp.RasterNest
       /// <summary>The same verdict <see cref="TooClose"/> gives, on the shared resolution.</summary>
       internal bool TooClose(IPartPlacement a, IPartPlacement b, double normalClearance, double sliver)
       {
-        if (a?.PlacedPart == null || b?.PlacedPart == null)
+        if (a?.Part == null || b?.Part == null)
         {
           return false;
         }
@@ -440,7 +440,7 @@ namespace DeepNestSharp.RasterNest
       {
         cancel.ThrowIfCancellationRequested();
         IPartPlacement a = placements[i];
-        if (a?.PlacedPart == null)
+        if (a?.Part == null)
         {
           continue;
         }
@@ -458,10 +458,14 @@ namespace DeepNestSharp.RasterNest
         for (int j = i + 1; j < placements.Count; j++)
         {
           IPartPlacement b = placements[j];
-          double clearance = b?.PlacedPart == null ? 0 : Math.Max(0, normalClearanceBetween(a, b));
-          double sliver = b?.PlacedPart == null ? 0 : sliverBetween(a, b);
-          if (b?.PlacedPart != null
-            && (clearance <= 0 || valid.Count == 0
+          if (b?.Part == null)
+          {
+            continue;
+          }
+
+          double clearance = Math.Max(0, normalClearanceBetween(a, b));
+          double sliver = sliverBetween(a, b);
+          if (clearance <= 0 || valid.Count == 0
               ? PlacementCollision.TooClose(a.PlacedPart, b.PlacedPart, clearance, sliver)
               : TooCloseWithValidEdges(
                 a,
@@ -475,7 +479,7 @@ namespace DeepNestSharp.RasterNest
                 boundaryCache,
                 cancel,
                 verdictCache,
-                sourceCatalogs)))
+                sourceCatalogs))
           {
             unfit.Overlapping.Add(a);
             unfit.Overlapping.Add(b);
@@ -659,7 +663,7 @@ namespace DeepNestSharp.RasterNest
       sourceCatalog = null;
       string sourceName = placement?.Part?.Name;
       if (string.IsNullOrWhiteSpace(sourceName)
-        || !sourceName.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase))
+        || !DxfFileExtensions.IsDxf(sourceName))
       {
         return false;
       }
@@ -1090,7 +1094,7 @@ namespace DeepNestSharp.RasterNest
       }
 
       if (string.IsNullOrWhiteSpace(part?.Part?.Name)
-        || !part.Part.Name.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase)
+        || !DxfFileExtensions.IsDxf(part.Part.Name)
         || sourceCatalogs == null)
       {
         return Array.Empty<DxfContourCatalog>();

@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.RasterNest
+namespace DeepNestSharp.RasterNest
 {
   using System;
   using System.Collections.Generic;
@@ -163,6 +163,8 @@
       // common-line item had spacing 0, making both shells the same outline. Now that such an item keeps
       // its real spacing, taking the CC box let a spaced neighbour slide to half its clearance unchecked.
       var bounds = items.Select((it, i) => BoundsOf(pathsHalf[i])).ToArray();
+      var boundsRaw = items.Select((it, i) => BoundsOf(pathsRaw[i])).ToArray();
+      var boundsCC = items.Select((it, i) => pathsCC[i] != null ? BoundsOf(pathsCC[i]) : default).ToArray();
 
       // HARD INVARIANT: no move may ever create a REAL overlap. The engine hands us an overlap-free
       // layout; every push/slide below is additionally checked against the raw outlines of ALL parts.
@@ -175,8 +177,10 @@
         for (int s = 0; s < n; s++)
         {
           int mm = set != null ? set[s] : m;
-          var moved = tx == 0 && ty == 0 ? pathsRaw[mm] : Translate(pathsRaw[mm], tx, ty);
-          var mb = BoundsOf(moved);
+          var mb = tx == 0 && ty == 0
+            ? boundsRaw[mm]
+            : new IntRect(boundsRaw[mm].left + tx, boundsRaw[mm].top + ty, boundsRaw[mm].right + tx, boundsRaw[mm].bottom + ty);
+          List<List<IntPoint>> moved = null;
           for (int k = 0; k < items.Count; k++)
           {
             if (k == mm || (set != null && memberSets[k] == set) || !BoxesTouch(mb, bounds[k]))
@@ -184,6 +188,7 @@
               continue;
             }
 
+            moved ??= (tx == 0 && ty == 0 ? pathsRaw[mm] : Translate(pathsRaw[mm], tx, ty));
             if (Intersects(moved, pathsRaw[k]))
             {
               return false;
@@ -205,13 +210,15 @@
         for (int s = 0; s < n; s++)
         {
           int mm = set != null ? set[s] : i;
-          var movedHalf = tx == 0 && ty == 0 ? pathsHalf[mm] : Translate(pathsHalf[mm], tx, ty);
-          var movedCC = pathsCC[mm] == null ? null : tx == 0 && ty == 0 ? pathsCC[mm] : Translate(pathsCC[mm], tx, ty);
           // The OUTER shell, like the bounds array it is matched against. Taking the CC box here skipped
           // the pair before it was ever measured whenever the MOVER was common-cut and the neighbour was
           // not, and a common-cut part then slid to half its neighbour's clearance. That combination only
           // became reachable with Same part, where one part shares with its own kind and with nobody else.
-          var mb = BoundsOf(movedHalf);
+          var mb = tx == 0 && ty == 0
+            ? bounds[mm]
+            : new IntRect(bounds[mm].left + tx, bounds[mm].top + ty, bounds[mm].right + tx, bounds[mm].bottom + ty);
+          List<List<IntPoint>> movedHalf = null;
+          List<List<IntPoint>> movedCC = null;
           for (int j = 0; j < items.Count; j++)
           {
             if (j == mm || (set != null && memberSets[j] == set) || !BoxesTouch(mb, bounds[j]))
@@ -219,9 +226,18 @@
               continue;
             }
 
-            bool hit = BothCC(mm, j)
-              ? Intersects(movedCC, pathsCC[j])
-              : Intersects(movedHalf, pathsHalf[j]);
+            bool hit;
+            if (BothCC(mm, j))
+            {
+              movedCC ??= (pathsCC[mm] == null ? null : (tx == 0 && ty == 0 ? pathsCC[mm] : Translate(pathsCC[mm], tx, ty)));
+              hit = Intersects(movedCC, pathsCC[j]);
+            }
+            else
+            {
+              movedHalf ??= (tx == 0 && ty == 0 ? pathsHalf[mm] : Translate(pathsHalf[mm], tx, ty));
+              hit = Intersects(movedHalf, pathsHalf[j]);
+            }
+
             if (hit)
             {
               return false;
@@ -245,12 +261,13 @@
           items[mm].Y += oy;
           pathsRaw[mm] = Translate(pathsRaw[mm], tx, ty);
           pathsHalf[mm] = Translate(pathsHalf[mm], tx, ty);
+          bounds[mm] = new IntRect(bounds[mm].left + tx, bounds[mm].top + ty, bounds[mm].right + tx, bounds[mm].bottom + ty);
+          boundsRaw[mm] = new IntRect(boundsRaw[mm].left + tx, boundsRaw[mm].top + ty, boundsRaw[mm].right + tx, boundsRaw[mm].bottom + ty);
           if (pathsCC[mm] != null)
           {
             pathsCC[mm] = Translate(pathsCC[mm], tx, ty);
+            boundsCC[mm] = new IntRect(boundsCC[mm].left + tx, boundsCC[mm].top + ty, boundsCC[mm].right + tx, boundsCC[mm].bottom + ty);
           }
-
-          bounds[mm] = BoundsOf(pathsHalf[mm]); // the OUTER shell, same reason as where bounds is built
         }
       }
 
@@ -279,10 +296,22 @@
       bool PairClear(int a, int b, double ox, double oy)
       {
         bool cc = BothCC(a, b);
+        var ba = cc ? boundsCC[a] : bounds[a];
+        var bb = cc ? boundsCC[b] : bounds[b];
+        long tx = (long)Math.Round(ox * Scale);
+        long ty = (long)Math.Round(oy * Scale);
+        var mba = tx == 0 && ty == 0
+          ? ba
+          : new IntRect(ba.left + tx, ba.top + ty, ba.right + tx, ba.bottom + ty);
+        if (!BoxesTouch(mba, bb))
+        {
+          return true;
+        }
+
         var pa = cc ? pathsCC[a] : pathsHalf[a];
         var pb = cc ? pathsCC[b] : pathsHalf[b];
-        var moved = ox == 0 && oy == 0 ? pa : Translate(pa, (long)Math.Round(ox * Scale), (long)Math.Round(oy * Scale));
-        return !BoxesTouch(BoundsOf(moved), BoundsOf(pb)) || !Intersects(moved, pb);
+        var moved = tx == 0 && ty == 0 ? pa : Translate(pa, tx, ty);
+        return !Intersects(moved, pb);
       }
 
       // A chain of touching parts frees ONE link per iteration (a part capped at raw contact must wait
@@ -588,7 +617,7 @@
           for (int pass = 0; pass < 2; pass++)
           {
             bool alongX = growX == (pass == 0);
-            long gap = DirectionalGapExact(i, alongX, weldMaxInt, marginInt, items, pathsRaw, pathsHalf, pathsCC, memberSets);
+            long gap = DirectionalGapExact(i, alongX, weldMaxInt, marginInt, items, pathsRaw, pathsHalf, pathsCC, bounds, boundsCC, memberSets);
             if (gap > 0 && gap <= weldMaxInt)
             {
               double g = gap / Scale;
@@ -631,6 +660,8 @@
       List<List<IntPoint>>[] pathsRaw,
       List<List<IntPoint>>[] pathsHalf,
       List<List<IntPoint>>[] pathsCC,
+      IntRect[] boundsHalf,
+      IntRect[] boundsCC,
       int[][] memberSets = null)
     {
       // Work in a rotated frame where the slide is always -X: U = slide axis, V = the other.
@@ -685,6 +716,7 @@
 
       var rawBox = FrameBounds(mineRaw);
       var halfBox = FrameBounds(mineHalf);
+      var commonBox = mineCommon != null ? FrameBounds(mineCommon) : default;
 
       long best = long.MaxValue;
 
@@ -731,25 +763,16 @@
         bool share = SharesCommonEdge(items[i], items[j]);
         var theirs = share ? pathsCC[j] : pathsHalf[j];
         var mine = share ? mineCommon : mineHalf;
-        var commonBox = share ? FrameBounds(mineCommon) : default;
         var (myMinU, myMaxU, myMinV, myMaxV) = share ? commonBox : halfBox;
 
         // BBox pre-filter (essential: without it an 800-part common-line job timed out — this scan
         // is O(vertsA x vertsB) per pair). The constraint can only bite if it overlaps my V-range
         // and sits within [myMinU - cap, myMaxU] along the slide axis.
-        long thMinU = long.MaxValue, thMaxU = long.MinValue, thMinV = long.MaxValue, thMaxV = long.MinValue;
-        foreach (var path in theirs)
-        {
-          foreach (var p in path)
-          {
-            long u = U(p);
-            long v = V(p);
-            if (u < thMinU) { thMinU = u; }
-            if (u > thMaxU) { thMaxU = u; }
-            if (v < thMinV) { thMinV = v; }
-            if (v > thMaxV) { thMaxV = v; }
-          }
-        }
+        IntRect tb = share ? boundsCC[j] : boundsHalf[j];
+        long thMinU = alongX ? tb.left : tb.top;
+        long thMaxU = alongX ? tb.right : tb.bottom;
+        long thMinV = alongX ? tb.top : tb.left;
+        long thMaxV = alongX ? tb.bottom : tb.right;
 
         // Three of these four bounds are CLOSED (>=, <=), and that is load-bearing rather than
         // cosmetic: a neighbour that only touches cannot block, but measured as if it could it

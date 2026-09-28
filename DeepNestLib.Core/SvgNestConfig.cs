@@ -1,4 +1,4 @@
-﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("DeepNestLib.CiTests")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("DeepNestLib.CiTests")]
 
 namespace DeepNestLib
 {
@@ -231,6 +231,31 @@ namespace DeepNestLib
       set
       {
         this.Write("DifferentiateChildren", value);
+      }
+    }
+
+    /// <inheritdoc />
+    public DxfPartNameExport DxfPartNameExport
+    {
+      get
+      {
+        var raw = this.Read("DxfPartNameExport");
+        if (raw is int intVal)
+        {
+          return (DxfPartNameExport)intVal;
+        }
+
+        if (raw is DxfPartNameExport enumVal)
+        {
+          return enumVal;
+        }
+
+        return DxfPartNameExport.Background;
+      }
+
+      set
+      {
+        this.Write("DxfPartNameExport", (int)value);
       }
     }
 

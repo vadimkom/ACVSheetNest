@@ -10,7 +10,7 @@ namespace DeepNestLib.CiTests.IO
   using Xunit;
 
   /// <summary>
-  /// FlatDxfJoiner must turn the exploded LINE/ARC soup a FreeCAD unfold produces into a single
+  /// FlatDxfJoiner must turn exploded LINE/ARC soup into a single
   /// CLOSED LWPOLYLINE per contour (arcs as bulges), leave circles alone, and never degrade a
   /// chain it cannot prove closed.
   /// </summary>

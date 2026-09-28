@@ -2,6 +2,7 @@ namespace DeepNestSharp.RasterNest
 {
   using System;
   using System.Collections.Generic;
+  using DeepNestLib;
   using DeepNestLib.Placement;
 
   /// <summary>
@@ -25,8 +26,7 @@ namespace DeepNestSharp.RasterNest
     /// </summary>
     internal static bool IsOutsideUsableArea(IPartPlacement pp, double sheetWidth, double sheetHeight, double margin)
     {
-      var placed = pp.PlacedPart;
-      return IsOutsideUsableArea(placed.MinX, placed.MinY, placed.MaxX, placed.MaxY, sheetWidth, sheetHeight, margin);
+      return pp != null && IsOutsideUsableArea(pp.MinX, pp.MinY, pp.MaxX, pp.MaxY, sheetWidth, sheetHeight, margin);
     }
 
     /// <summary>The same rule over plain numbers, so the drag's cached bounds are judged by it too. It was
@@ -78,8 +78,7 @@ namespace DeepNestSharp.RasterNest
       for (int i = 0; i < placements.Count; i++)
       {
         var a = placements[i];
-        var placedA = a?.PlacedPart;
-        if (placedA == null)
+        if (a?.Part == null)
         {
           continue;
         }
@@ -90,10 +89,24 @@ namespace DeepNestSharp.RasterNest
           unfit.All.Add(a);
         }
 
+        INfp placedA = null;
         for (int j = i + 1; j < placements.Count; j++)
         {
           var b = placements[j];
-          if (b?.PlacedPart != null && PlacementCollision.TooClose(placedA, b.PlacedPart, clearanceBetween(a, b), sliverBetween(a, b)))
+          if (b?.Part == null)
+          {
+            continue;
+          }
+
+          double clearance = clearanceBetween(a, b);
+          if (PlacementCollision.BoxesApart(a.MinX, a.MinY, a.MaxX, a.MaxY, b.MinX, b.MinY, b.MaxX, b.MaxY, clearance))
+          {
+            continue;
+          }
+
+          placedA ??= a.PlacedPart;
+          var placedB = b.PlacedPart;
+          if (PlacementCollision.TooClose(placedA, placedB, clearance, sliverBetween(a, b)))
           {
             unfit.Overlapping.Add(a);
             unfit.Overlapping.Add(b);

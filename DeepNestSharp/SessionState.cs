@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp
+namespace DeepNestSharp
 {
   using System;
   using System.Collections.Generic;
@@ -26,18 +26,6 @@
 
     public List<SessionSheet> Sheets { get; set; } = new List<SessionSheet>();
 
-    /// <summary>Bend-allowance K-factor for 3D (STEP/IGES) unfold; -1 = never saved (keep default).</summary>
-    public double UnfoldKFactor { get; set; } = -1;
-
-    /// <summary>K-factor standard for 3D unfold ("ansi"/"din"); null/empty = keep default.</summary>
-    public string? UnfoldKFactorStandard { get; set; }
-
-    /// <summary>Optional override path to freecadcmd.exe (debug); null/empty = use the bundled copy.</summary>
-    public string? FreeCadCmdPath { get; set; }
-
-    /// <summary>Interpret unfolded 3D parts in inches (true) vs millimeters (false); null = keep default.</summary>
-    public bool? UnfoldUnitInch { get; set; }
-
     /// <summary>Most-recently-used project files, newest first (File > Recent Projects).</summary>
     public List<string> RecentProjects { get; set; } = new List<string>();
 
@@ -50,8 +38,15 @@
     /// <summary>Global default rotation code for unedited parts (1/2/4/8/36); -1 = default (4).</summary>
     public int DefaultRotations { get; set; } = -1;
 
-    /// <summary>Drawing units are millimeters (true) vs inches (false); null = default (inches).</summary>
+    /// <summary>Drawing units are millimeters (true) vs inches (false); null = default (millimeters in Europe).</summary>
     public bool? UnitsMm { get; set; }
+
+    /// <summary>UI language: "ru" (Russian), "bg" (Bulgarian), "en" (English); null = default ("ru").</summary>
+    public string? Language { get; set; }
+
+    /// <summary>Effective units: millimeters by default unless explicitly configured otherwise.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool EffectiveUnitsMm => this.UnitsMm ?? true;
 
     /// <summary>
     /// Physical gap requested between common-line parts, always stored in inches regardless of the
@@ -94,6 +89,10 @@
     /// earlier build did that and turned "never chosen" into a choice nobody made.</summary>
     public int NestEffort { get; set; } = -1;
 
+    /// <summary>The most nesting searches run at once; 0 = automatic (fitted to this machine's cores). Per
+    /// machine, not per project: it trades speed against how hard THIS computer works, never the nest.</summary>
+    public int NestConcurrency { get; set; } = 0;
+
     /// <summary>Cut the last sheet's leftover off as a rectangular offcut; null = default (off).</summary>
     public bool? PreferRectangularOffcut { get; set; }
 
@@ -126,10 +125,6 @@
     /// </summary>
     internal void CaptureApplicationClose(
       double sheetEdgeMargin,
-      double unfoldKFactor,
-      string? unfoldKFactorStandard,
-      string? freeCadCmdPath,
-      bool unfoldUnitInch,
       bool unitsMm,
       IEnumerable<SessionSheet> sheetPresets,
       bool autosaveEnabled,
@@ -140,15 +135,12 @@
     {
       this.SheetEdgeMargin = sheetEdgeMargin;
       this.Sheets = new List<SessionSheet>();
-      this.UnfoldKFactor = unfoldKFactor;
-      this.UnfoldKFactorStandard = unfoldKFactorStandard;
-      this.FreeCadCmdPath = freeCadCmdPath;
-      this.UnfoldUnitInch = unfoldUnitInch;
       this.UnitsMm = unitsMm;
       this.SheetPresets = new List<SessionSheet>(sheetPresets ?? Array.Empty<SessionSheet>());
       this.AutosaveEnabled = autosaveEnabled;
       this.AutosaveMinutes = autosaveMinutes;
       this.DefaultRotations = defaultRotations;
+      this.Language = DeepNestSharp.Ui.Localization.CurrentLanguage;
 
       // NestEffort is deliberately NOT written here. Both places that change it save it the moment it
       // is chosen, so all this did was overwrite the "never chosen" marker with whatever the running

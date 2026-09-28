@@ -44,7 +44,7 @@ number**, so a beta never consumes a number the stable might need.
   which fails on a suffix and would silently stop the update check working.
 - **Never rebuild an already-published stable number.** Windows Installer skips files whose
   FileVersion is not newer, so reinstalling the same x.y.z leaves stale DLLs behind (workaround
-  exists, `REINSTALL=ALL REINSTALLMODE=amus`, but takes >10 min on the ~2 GB FreeCAD payload;
+  exists, `REINSTALL=ALL REINSTALLMODE=amus`, but it is slow;
   just bump instead).
 
 Example timeline:
@@ -71,9 +71,7 @@ Example timeline:
    ```
    .\installer\build-beta-zip.ps1 -Version 1.2.0-beta1
    ```
-   Self-contained publish + FreeCAD payload + zip. It kills a running SheetNest itself (it
-   locks the exe). Measured on the 1.1.7 payload: **745 MB out of 2.3 GB, and the zip step
-   alone takes ~11 minutes**, so run it in the background and do something else.
+   Self-contained publish + zip. It kills a running SheetNest itself (it locks the exe).
 4. **Publish the pre-release**:
    ```
    gh release create v1.2.0-beta1 SheetNest-1.2.0-beta1-win-x64.zip `
@@ -92,12 +90,11 @@ Example timeline:
    number the betas were named after (`1.2.0`). Nothing else changes.
 3. **Build script**: copy `installer\build-msi-<prev>.ps1` to `build-msi-<ver>.ps1` and update
    its five version references (publish dir ×3, `-d Version=`, output MSI name).
-4. **Build the MSI** from the repo root: `.\installer\build-msi-<ver>.ps1` (~600 MB, several
-   minutes, so run it in the background).
+4. **Build the MSI** from the repo root: `.\installer\build-msi-<ver>.ps1` (~65 MB).
 5. **Verify the MSI without installing it**: read ProductVersion from the MSI database via
    COM (`WindowsInstaller.Installer`).
 6. **Install it and actually use it.** A beta tester exercises the app, never the installer, so
-   anything that only breaks once installed (paths, permissions, the FreeCAD payload) gets
+   anything that only breaks once installed (paths, permissions) gets
    its first real test here. Uninstall the previous version first if the installer refuses it.
 7. `gh release create vX.Y.Z <msi> --title "SheetNest X.Y.Z" --notes ...`, a normal release,
    which becomes **Latest** automatically. `--target` needs the **full 40-character SHA**;

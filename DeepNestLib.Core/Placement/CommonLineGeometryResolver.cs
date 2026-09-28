@@ -554,7 +554,7 @@ namespace DeepNestLib.Placement
     {
       string sourceName = placement?.Part?.Name;
       if (string.IsNullOrWhiteSpace(sourceName)
-        || !sourceName.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase))
+        || !DxfFileExtensions.IsDxf(sourceName))
       {
         return PlacedRings(placement, tolerance);
       }
@@ -1239,7 +1239,7 @@ namespace DeepNestLib.Placement
     {
       string sourceName = placement?.Part?.Name;
       if (string.IsNullOrWhiteSpace(sourceName)
-        || !sourceName.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase))
+        || !DxfFileExtensions.IsDxf(sourceName))
       {
         return SourceOuterDefinition.NotAvailable;
       }
@@ -1314,7 +1314,7 @@ namespace DeepNestLib.Placement
     {
       string sourceName = placement?.Part?.Name;
       if (string.IsNullOrWhiteSpace(sourceName)
-        || !sourceName.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase))
+        || !DxfFileExtensions.IsDxf(sourceName))
       {
         throw Invalid("An exact common boundary span requires its source DXF.");
       }
@@ -2452,7 +2452,7 @@ namespace DeepNestLib.Placement
       // fingerprints make a saved nest fail closed if that drawing is later edited in place.
       string sourceName = placement?.Part?.Name;
       if (!string.IsNullOrWhiteSpace(sourceName)
-        && sourceName.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase))
+        && DxfFileExtensions.IsDxf(sourceName))
       {
         DxfContourCatalog catalog = sourceCatalogs == null
           ? LoadPlacementCatalog(placement, tolerance)

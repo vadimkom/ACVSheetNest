@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.Domain.Models
+namespace DeepNestSharp.Domain.Models
 {
   using DeepNestLib.NestProject;
 
@@ -44,6 +44,12 @@
     {
       get => sheetLoadInfo.Width;
       set => SetProperty(nameof(Width), () => sheetLoadInfo.Width, v => sheetLoadInfo.Width = v, value);
+    }
+
+    public int Priority
+    {
+      get => sheetLoadInfo.Priority;
+      set => SetProperty(nameof(Priority), () => sheetLoadInfo.Priority, v => sheetLoadInfo.Priority = v, value);
     }
 
     private int nestedCount;

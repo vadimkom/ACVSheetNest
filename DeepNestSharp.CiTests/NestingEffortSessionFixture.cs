@@ -114,7 +114,7 @@ namespace DeepNestSharp.CiTests
         .Where(parameter => parameter.Name == "effort" && parameter.IsOptional)
         .ToList();
 
-      effortParameters.Should().HaveCount(7);
+      effortParameters.Should().HaveCount(8);
       effortParameters.Should().OnlyContain(parameter =>
         object.Equals(parameter.DefaultValue, NestEffortDefaults.Default));
     }
@@ -122,10 +122,6 @@ namespace DeepNestSharp.CiTests
     private static void CaptureClose(SessionState session)
       => session.CaptureApplicationClose(
         0.5,
-        0.42,
-        "ansi",
-        null,
-        true,
         false,
         new[] { new SessionSheet { Width = 120, Height = 60 } },
         true,

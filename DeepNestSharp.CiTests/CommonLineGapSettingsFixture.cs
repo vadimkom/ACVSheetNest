@@ -40,6 +40,18 @@ namespace DeepNestSharp.CiTests
     }
 
     [Theory]
+    [InlineData(0.25, false, true, 6.35)]
+    [InlineData(6.35, true, false, 0.25)]
+    [InlineData(0.5, false, true, 12.7)]
+    [InlineData(5.0, true, false, 0.197)]
+    [InlineData(0.0, false, true, 0.0)]
+    [InlineData(0.0, true, false, 0.0)]
+    public void ConvertDistanceConvertsBetweenInchesAndMillimeters(double input, bool fromMm, bool toMm, double expected)
+    {
+      AdvancedSettingsWindow.ConvertDistance(input, fromMm, toMm).Should().Be(expected);
+    }
+
+    [Theory]
     [InlineData(0.010)]
     [InlineData(0.015)]
     [InlineData(0.020)]
@@ -162,10 +174,6 @@ namespace DeepNestSharp.CiTests
       var closedSession = new SessionState();
       closedSession.CaptureApplicationClose(
         0D,
-        0D,
-        null,
-        null,
-        false,
         false,
         Array.Empty<SessionSheet>(),
         true,

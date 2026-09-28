@@ -1,8 +1,7 @@
-﻿namespace DeepNestSharp.Domain.ViewModels
+namespace DeepNestSharp.Domain.ViewModels
 {
   using System;
   using System.Collections.Generic;
-  using System.Collections.ObjectModel;
   using System.IO;
   using System.Linq;
   using System.Threading.Tasks;
@@ -19,41 +18,24 @@
   public abstract class MainViewModel : ObservableRecipient, IMainViewModel
   {
     private readonly IFileIoService fileIoService;
-    private readonly IMouseCursorService mouseCursorService;
     private readonly IMessageService messageService;
-    private readonly ObservableCollection<IFileViewModel> files;
-    private RelayCommand loadLayoutCommand;
-    private RelayCommand saveLayoutCommand;
     private RelayCommand exitCommand;
     private AsyncRelayCommand loadNestProjectCommand;
-    private AsyncRelayCommand loadPartCommand;
-    private AsyncRelayCommand loadSheetNfpCommand;
-    private AsyncRelayCommand loadNfpCandidatesCommand;
-    private AsyncRelayCommand loadSheetPlacementCommand;
-    private AsyncRelayCommand loadNestResultCommand;
     private RelayCommand activeDocumentSaveCommand;
     private RelayCommand activeDocumentSaveAsCommand;
     private RelayCommand createNestProjectCommand;
     private RelayCommand aboutDialogCommand;
 
-    private IToolViewModel[] tools;
-
-    private PreviewViewModel previewViewModel;
     private IFileViewModel activeDocument;
-    private IPropertiesViewModel propertiesViewModel;
     private INestMonitorViewModel nestMonitorViewModel;
 
-    public MainViewModel(IMessageService messageService, IDispatcherService dispatcherService, ISvgNestConfig config, IFileIoService fileIoService, IMouseCursorService mouseCursorService)
+    public MainViewModel(IMessageService messageService, IDispatcherService dispatcherService, ISvgNestConfig config, IFileIoService fileIoService)
     {
       SvgNestConfigViewModel = new SvgNestConfigViewModel(config);
-
-      files = new ObservableCollection<IFileViewModel>();
-      Files = new ReadOnlyObservableCollection<IFileViewModel>(files);
 
       this.messageService = messageService;
       this.DispatcherService = dispatcherService;
       this.fileIoService = fileIoService;
-      this.mouseCursorService = mouseCursorService;
       this.ActiveDocumentChanged += this.MainViewModel_ActiveDocumentChanged;
     }
 
@@ -67,84 +49,31 @@
 
     public ICommand ActiveDocumentSaveAsCommand => activeDocumentSaveAsCommand ?? (activeDocumentSaveAsCommand = new RelayCommand(() => Save(this.ActiveDocument, true), () => true));
 
-    public IEnumerable<IToolViewModel> Tools
-    {
-      get
-      {
-        if (tools == null)
-        {
-          tools = new IToolViewModel[] { PreviewViewModel, SvgNestConfigViewModel, PropertiesViewModel, NestMonitorViewModel };
-        }
-
-        return tools;
-      }
-    }
-
-    public ReadOnlyObservableCollection<IFileViewModel> Files { get; }
-
     public INestMonitorViewModel NestMonitorViewModel
     {
       get
       {
         if (nestMonitorViewModel == null)
         {
-          nestMonitorViewModel = new NestMonitorViewModel(this, this.messageService, mouseCursorService);
+          nestMonitorViewModel = new NestMonitorViewModel(this);
         }
 
         return nestMonitorViewModel;
       }
     }
 
-    public IPreviewViewModel PreviewViewModel
-    {
-      get
-      {
-        if (previewViewModel == null)
-        {
-          previewViewModel = new PreviewViewModel(this);
-        }
-
-        return previewViewModel;
-      }
-    }
-
-    public IPropertiesViewModel PropertiesViewModel
-    {
-      get
-      {
-        if (propertiesViewModel == null)
-        {
-          propertiesViewModel = new PropertiesViewModel(this);
-        }
-
-        return propertiesViewModel;
-      }
-    }
-
     public ISvgNestConfigViewModel SvgNestConfigViewModel { get; }
-
-    public ICommand LoadSheetPlacementCommand => loadSheetPlacementCommand ?? (loadSheetPlacementCommand = new AsyncRelayCommand(OnLoadSheetPlacementAsync));
-
-    public ICommand LoadPartCommand => loadPartCommand ?? (loadPartCommand = new AsyncRelayCommand(OnLoadPartAsync));
-
-    public ICommand LoadSheetNfpCommand => loadSheetNfpCommand ?? (loadSheetNfpCommand = new AsyncRelayCommand(OnLoadSheetNfpAsync));
-
-    public ICommand LoadNfpCandidatesCommand => loadNfpCandidatesCommand ?? (loadNfpCandidatesCommand = new AsyncRelayCommand(OnLoadNfpCandidatesAsync));
-
-    public ICommand LoadNestResultCommand => loadNestResultCommand ?? (loadNestResultCommand = new AsyncRelayCommand(OnLoadNestResultAsync));
 
     public ICommand CreateNestProjectCommand => createNestProjectCommand ?? (createNestProjectCommand = new RelayCommand(OnCreateNestProject));
 
     public ICommand LoadNestProjectCommand => loadNestProjectCommand ?? (loadNestProjectCommand = new AsyncRelayCommand(OnLoadNestProjectAsync));
 
-    public ICommand ExitCommand => exitCommand ?? (exitCommand = new RelayCommand(OnExit, CanExit));
+    public ICommand ExitCommand => exitCommand ?? (exitCommand = new RelayCommand(OnExit));
 
     protected abstract void OnExit();
 
-    public ICommand LoadLayoutCommand => loadLayoutCommand ?? (loadLayoutCommand = new RelayCommand(OnLoadLayout, CanLoadLayout));
-
-    public ICommand SaveLayoutCommand => saveLayoutCommand ?? (saveLayoutCommand = new RelayCommand(OnSaveLayout, CanSaveLayout));
-
+    /// <summary>The one project on screen. Replacing it lets the previous one go: there are no tabs to
+    /// keep it in.</summary>
     public IFileViewModel ActiveDocument
     {
       get => activeDocument;
@@ -152,16 +81,23 @@
       {
         if (activeDocument != value)
         {
+          if (activeDocument is NestProjectViewModel previous)
+          {
+            previous.PropertyChanged -= this.NestProjectViewModel_PropertyChanged;
+          }
+
           activeDocument = value;
+          if (activeDocument is NestProjectViewModel current)
+          {
+            current.PropertyChanged += this.NestProjectViewModel_PropertyChanged;
+          }
+
           OnPropertyChanged(nameof(ActiveDocument));
           OnPropertyChanged(nameof(Title));
           ActiveDocumentChanged?.Invoke(this, EventArgs.Empty);
-          SetSelectedToolView(value);
         }
       }
     }
-
-    public IDockingManagerFacade DockManager { get; set; }
 
     public IDispatcherService DispatcherService { get; }
 
@@ -169,18 +105,6 @@
 
     // 3-field version (1.1.2, not 1.1.2.0).
     public string Title => $"SheetNest {this.GetType().Assembly.GetName().Version?.ToString(3)}";
-
-    public void SetSelectedToolView(IFileViewModel fileViewModel)
-    {
-      if (fileViewModel is NestProjectViewModel)
-      {
-        NestMonitorViewModel.IsSelected = true;
-      }
-      else
-      {
-        PreviewViewModel.IsSelected = true;
-      }
-    }
 
     private void OnAboutDialog()
     {
@@ -220,153 +144,91 @@
         string locatedFilePath;
         if (TryLocateFile(filePath, out locatedFilePath))
         {
-          var loaded = new NestProjectViewModel(this, locatedFilePath, fileIoService);
-          loaded.PropertyChanged += this.NestProjectViewModel_PropertyChanged;
-          this.files.Add(loaded);
-          this.ActiveDocument = loaded;
+          this.ActiveDocument = new NestProjectViewModel(this, locatedFilePath, fileIoService);
         }
       }
     }
 
-    public async Task OnLoadNestResultAsync()
-    {
-      var filePath = await fileIoService.GetOpenFilePathAsync(NestResult.FileDialogFilter, SvgNestConfigViewModel.SvgNestConfig.LastNestFilePath).ConfigureAwait(false);
-      LoadNestResult(filePath);
-    }
-
-    public void OnLoadNestResult(INestResult nestResult)
-    {
-      var loaded = new NestResultViewModel(this, nestResult);
-      this.files.Add(loaded);
-      this.ActiveDocument = loaded;
-    }
-
-    public void LoadNestResult(string filePath)
-    {
-      string locatedFilePath;
-      if (TryLocateFile(filePath, out locatedFilePath))
-      {
-        var loaded = new NestResultViewModel(this, locatedFilePath);
-        this.files.Add(loaded);
-        this.ActiveDocument = loaded;
-      }
-    }
-
-    public async Task OnLoadPartAsync()
-    {
-      var filePath = await fileIoService.GetOpenFilePathAsync(NoFitPolygon.FileDialogFilter, SvgNestConfigViewModel.SvgNestConfig.LastNestFilePath).ConfigureAwait(false);
-      LoadPart(filePath);
-    }
-
-    public void LoadPart(string filePath)
-    {
-      string locatedFilePath;
-      if (TryLocateFile(filePath, out locatedFilePath))
-      {
-        var loaded = new PartEditorViewModel(this, locatedFilePath);
-        this.files.Add(loaded);
-        this.ActiveDocument = loaded;
-      }
-    }
-
-    public void LoadNfpCandidates(string filePath)
-    {
-      string locatedFilePath;
-      if (TryLocateFile(filePath, out locatedFilePath))
-      {
-        var loaded = new NfpCandidateListViewModel(this, locatedFilePath);
-        this.files.Add(loaded);
-        this.ActiveDocument = loaded;
-      }
-    }
-
-    public void LoadSheetNfp(string filePath)
-    {
-      string locatedFilePath;
-      if (TryLocateFile(filePath, out locatedFilePath))
-      {
-        var loaded = new NfpCandidateListViewModel(this, locatedFilePath);
-        this.files.Add(loaded);
-        this.ActiveDocument = loaded;
-      }
-    }
-
-    public async Task OnLoadSheetPlacementAsync()
-    {
-      var filePath = await fileIoService.GetOpenFilePathAsync(SheetPlacement.FileDialogFilter, SvgNestConfigViewModel.SvgNestConfig.LastDebugFilePath).ConfigureAwait(false);
-      LoadSheetPlacement(filePath);
-    }
-
-    public void LoadSheetPlacement(string filePath)
-    {
-      string locatedFilePath;
-      if (TryLocateFile(filePath, out locatedFilePath))
-      {
-        var loaded = new SheetPlacementViewModel(this, locatedFilePath);
-        this.files.Add(loaded);
-        this.ActiveDocument = loaded;
-      }
-    }
-
-    public void LoadSheetPlacement(ISheetPlacement sheetPlacement)
-    {
-      var loaded = new SheetPlacementViewModel(this, sheetPlacement, mouseCursorService);
-      this.files.Add(loaded);
-      this.ActiveDocument = loaded;
-    }
-
-    public void Close(IFileViewModel fileToClose)
-    {
-      if (fileToClose.IsDirty)
-      {
-        var res = messageService.DisplayYesNoCancel(string.Format("Save changes for file '{0}'?", fileToClose.FileName), "DeepNestSharp", MessageBoxIcon.Question);
-        if (res == MessageBoxResult.Cancel)
-        {
-          return;
-        }
-
-        if (res == MessageBoxResult.Yes)
-        {
-          Save(fileToClose);
-        }
-      }
-
-      files.Remove(fileToClose);
-    }
-
-    public async Task ExportSheetPlacementAsync(ISheetPlacement sheetPlacement, IReadOnlyCollection<OffcutLine> offcutLines = null)
+    /// <summary>
+    /// Exports every distinct layout to its own file after ONE save dialog. The name typed there is the base
+    /// ("test"), and each layout becomes <c>test_1_1250x2500_x3.dxf</c>: its number in the report, the sheet
+    /// size, and how many times it is cut. It used to ask for a file name once per layout, with nothing on
+    /// the files to say which layout or how many to cut.
+    /// </summary>
+    public async Task ExportLayoutsAsync(IReadOnlyList<(ISheetPlacement Sheet, int Count, IReadOnlyCollection<OffcutLine> Offcut)> layouts)
     {
       try
       {
-        if (sheetPlacement == null)
+        var sheets = (layouts ?? Array.Empty<(ISheetPlacement, int, IReadOnlyCollection<OffcutLine>)>())
+          .Where(l => l.Sheet != null)
+          .ToList();
+        if (sheets.Count == 0)
         {
           return;
         }
 
-        var parts = sheetPlacement.PartPlacements.Select(o => o.Part).ToList();
+        var parts = sheets.SelectMany(l => l.Sheet.PartPlacements).Select(o => o.Part).ToList();
         if (parts.ContainsDxfs() && parts.ContainsSvgs())
         {
-          MessageService.DisplayMessageBox("It's not possible to export when your parts were a mix of Svg's and Dxf's.", "DeepNestPort: Not Implemented", MessageBoxIcon.Information);
+          MessageService.DisplayMessageBox(UiText.Get("Msg_MixedSvgDxf"), UiText.Get("Title_Export"), MessageBoxIcon.Information);
+          return;
         }
-        else
+
+        IExport probe = ExporterFactory.GetExporter(parts);
+        string extension = probe is DxfExporter ? ".dxf" : ".svg";
+        string suggested = this.ActiveDocument?.FilePath is string project && !string.IsNullOrWhiteSpace(project)
+          ? Path.GetFileNameWithoutExtension(project)
+          : null;
+        var chosen = fileIoService.GetSaveFilePath(probe.SaveFileDialogFilter, suggested);
+        if (string.IsNullOrWhiteSpace(chosen))
         {
-          IExport exporter = ExporterFactory.GetExporter(sheetPlacement.PartPlacements.Select(o => o.Part).ToList());
-          var filePath = fileIoService.GetSaveFilePath(exporter.SaveFileDialogFilter);
-          if (!string.IsNullOrWhiteSpace(filePath))
+          return;
+        }
+
+        string folder = Path.GetDirectoryName(chosen);
+        string baseName = Path.GetFileNameWithoutExtension(chosen);
+        var paths = sheets
+          .Select((l, i) => Path.Combine(folder, LayoutFileName(baseName, i + 1, l.Sheet.Sheet.WidthCalculated, l.Sheet.Sheet.HeightCalculated, l.Count, extension)))
+          .ToList();
+
+        var existing = paths.Where(File.Exists).Select(Path.GetFileName).ToList();
+        if (existing.Count > 0
+            && MessageService.DisplayOkCancel(
+              UiText.Format("Msg_ExportOverwrite", string.Join("\n", existing)),
+              UiText.Get("Title_Export"),
+              MessageBoxIcon.Question) != MessageBoxResult.OK)
+        {
+          return;
+        }
+
+        for (int i = 0; i < sheets.Count; i++)
+        {
+          IExport exporter = ExporterFactory.GetExporter(sheets[i].Sheet.PartPlacements.Select(o => o.Part).ToList());
+          if (exporter is DxfExporter dxfExporter)
           {
-            await exporter.Export(
-              filePath,
-              sheetPlacement,
-              MergeLinesForExport(SvgNest.Config.MergeLines, sheetPlacement),
-              SvgNest.Config.DifferentiateChildren,
-              offcutLines);
+            dxfExporter.PartNameExport = SvgNest.Config.DxfPartNameExport;
           }
+
+          await exporter.Export(
+            paths[i],
+            sheets[i].Sheet,
+            MergeLinesForExport(SvgNest.Config.MergeLines, sheets[i].Sheet),
+            SvgNest.Config.DifferentiateChildren,
+            sheets[i].Offcut);
         }
       }
       catch (Exception ex)
       {
-        MessageService.DisplayMessageBox(ex.Message, "Error Saving", MessageBoxIcon.Exclamation);
+        MessageService.DisplayMessageBox(ex.Message, UiText.Get("Title_SaveError"), MessageBoxIcon.Exclamation);
       }
+    }
+
+    /// <summary><c>base_N_WxH_xCount.ext</c>, sizes without trailing zeros ("1250x2500", "1250.5x2500").</summary>
+    internal static string LayoutFileName(string baseName, int index, double sheetWidth, double sheetHeight, int count, string extension)
+    {
+      string Size(double v) => v.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+      string name = string.IsNullOrWhiteSpace(baseName) ? "layout" : baseName.Trim();
+      return $"{name}_{index}_{Size(sheetWidth)}x{Size(sheetHeight)}_x{Math.Max(1, count)}{extension}";
     }
 
     /// <summary>
@@ -425,24 +287,9 @@
       }
 
       File.WriteAllText(fileToSave.FilePath, fileToSave.TextContent);
-      // Save can be invoked while closing a background tab. Clearing ActiveDocument here marked an
-      // entirely different project clean (and disabled its autosave) while leaving the file just written
-      // dirty. The saved document is the only state this operation may acknowledge.
       fileToSave.IsDirty = false;
 
       return true;
-    }
-
-    private async Task OnLoadNfpCandidatesAsync()
-    {
-      var filePath = await fileIoService.GetOpenFilePathAsync(NfpCandidateList.FileDialogFilter, SvgNestConfigViewModel.SvgNestConfig.LastDebugFilePath).ConfigureAwait(false);
-      LoadNfpCandidates(filePath);
-    }
-
-    private async Task OnLoadSheetNfpAsync()
-    {
-      var filePath = await fileIoService.GetOpenFilePathAsync(SheetNfp.FileDialogFilter, SvgNestConfigViewModel.SvgNestConfig.LastDebugFilePath).ConfigureAwait(false);
-      LoadSheetNfp(filePath);
     }
 
     private bool TryLocateFile(string filePath, out string locatedFilePath)
@@ -459,7 +306,7 @@
         return false;
       }
 
-      this.MessageService.DisplayMessageBox($"Unable to locate {filePath}.", "File Missing", MessageBoxIcon.Information);
+      this.MessageService.DisplayMessageBox(UiText.Format("Msg_FileMissing", filePath), UiText.Get("Title_FileMissing"), MessageBoxIcon.Information);
       locatedFilePath = string.Empty;
       return false;
     }
@@ -476,7 +323,7 @@
       }
 
       var answer = MessageService.DisplayYesNoCancel(
-        "You have a nest result. Save the project first?",
+        UiText.Get("Msg_SaveFirst"),
         "SheetNest",
         MessageBoxIcon.Question);
       if (answer == MessageBoxResult.Yes)
@@ -494,39 +341,8 @@
         return;
       }
 
-      var newFile = new NestProjectViewModel(this, fileIoService);
-      this.files.Add(newFile);
-      this.ActiveDocument = newFile;
-      // Stop any in-flight nest BEFORE clearing: a running NestWorker would otherwise repopulate
-      // TopNestResults right after the Reset and the old project's nest would reappear (and could be
-      // exported) on the brand-new project. Only stop when running — Stop() sets IsStopping, which is
-      // only reset by a worker's finally, so calling it idle would break the next run.
-      if (this.NestMonitorViewModel.IsRunning)
-      {
-        this.NestMonitorViewModel.Stop();
-      }
-
+      this.ActiveDocument = new NestProjectViewModel(this, fileIoService);
       this.NestMonitorViewModel.Reset(); // clear the previous nest result + preview so it doesn't linger
-    }
-
-    private bool CanExit()
-    {
-      return true;
-    }
-
-    private bool CanLoadLayout()
-    {
-      return File.Exists(@".\AvalonDock.Layout.config");
-    }
-
-    private bool CanSaveLayout()
-    {
-      return true;
-    }
-
-    private void OnLoadLayout()
-    {
-      this.DockManager?.LoadLayout();
     }
 
     private void MainViewModel_ActiveDocumentChanged(object sender, EventArgs e)
@@ -543,11 +359,6 @@
         activeDocumentSaveAsCommand?.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(Title)); // the title's unsaved-changes asterisk tracks IsDirty
       }
-    }
-
-    private void OnSaveLayout()
-    {
-      this.DockManager?.SaveLayout();
     }
   }
 }

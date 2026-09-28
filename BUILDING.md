@@ -42,7 +42,7 @@ To build it:
 ## Installer (MSI)
 
 The Windows installer is built with WiX; see `installer/` and the
-`installer/build-msi-*.ps1` script. The MSI bundles the offline 3D-unfolding engine.
+`installer/build-msi-*.ps1` script.
 
 ## License & credits
 

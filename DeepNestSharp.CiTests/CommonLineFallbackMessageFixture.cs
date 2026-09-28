@@ -1,10 +1,12 @@
 namespace DeepNestSharp.CiTests
 {
   using DeepNestSharp.RasterNest;
+  using DeepNestSharp.Ui;
   using DeepNestSharp.Ui.Views;
   using FluentAssertions;
   using Xunit;
 
+  [Collection(UiLanguageCollection.Name)]
   public class CommonLineFallbackMessageFixture
   {
     [Theory]
@@ -19,6 +21,7 @@ namespace DeepNestSharp.CiTests
     [Fact]
     public void MessageIsConciseDeduplicatedByDrawingAndStatesNormalGapWasKept()
     {
+      using var english = new UiLanguageScope(Localization.LangEnglish);
       string message = MainWindow.CommonLineFallbackMessage(new[]
       {
         new CommonLineFallbackNotice("curved-part", CommonLineFallbackNotice.ContourFormatReason),

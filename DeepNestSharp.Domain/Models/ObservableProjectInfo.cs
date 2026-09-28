@@ -135,7 +135,6 @@
       this.sheetLoadInfos = null;
       OnPropertyChanged(nameof(DetailLoadInfos));
       OnPropertyChanged(nameof(SheetLoadInfos));
-      mainViewModel.SvgNestConfigViewModel.RaiseNotifyUpdatePropertyGrid();
     }
 
     public void Load(ProjectInfo source)

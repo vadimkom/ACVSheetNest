@@ -1,8 +1,6 @@
-﻿namespace DeepNestSharp.Domain.ViewModels
+namespace DeepNestSharp.Domain.ViewModels
 {
   using System;
-  using System.Collections.Generic;
-  using System.Collections.ObjectModel;
   using System.Threading.Tasks;
   using System.Windows.Input;
   using DeepNestLib;
@@ -26,57 +24,19 @@
 
     IDispatcherService DispatcherService { get; }
 
-    IDockingManagerFacade DockManager { get; set; }
-
     ICommand ExitCommand { get; }
 
-    ReadOnlyObservableCollection<IFileViewModel> Files { get; }
-
-    ICommand LoadLayoutCommand { get; }
-
     ICommand LoadNestProjectCommand { get; }
-
-    ICommand LoadNestResultCommand { get; }
-
-    ICommand LoadNfpCandidatesCommand { get; }
-
-    ICommand LoadPartCommand { get; }
-
-    ICommand LoadSheetNfpCommand { get; }
-
-    ICommand LoadSheetPlacementCommand { get; }
 
     IMessageService MessageService { get; }
 
     INestMonitorViewModel NestMonitorViewModel { get; }
 
-    IPreviewViewModel PreviewViewModel { get; }
-
-    IPropertiesViewModel PropertiesViewModel { get; }
-
-    ICommand SaveLayoutCommand { get; }
-
     ISvgNestConfigViewModel SvgNestConfigViewModel { get; }
 
     string Title { get; }
 
-    IEnumerable<IToolViewModel> Tools { get; }
-
-    Task ExportSheetPlacementAsync(ISheetPlacement sheetPlacement, System.Collections.Generic.IReadOnlyCollection<DeepNestLib.IO.OffcutLine> offcutLines = null);
-
-    void Close(IFileViewModel fileViewModel);
-
-    void LoadNestResult(string filePath);
-
-    void LoadNfpCandidates(string filePath);
-
-    void LoadPart(string filePath);
-
-    void LoadSheetNfp(string filePath);
-
-    void LoadSheetPlacement(ISheetPlacement sheetPlacement);
-
-    void LoadSheetPlacement(string filePath);
+    Task ExportLayoutsAsync(System.Collections.Generic.IReadOnlyList<(ISheetPlacement Sheet, int Count, System.Collections.Generic.IReadOnlyCollection<DeepNestLib.IO.OffcutLine> Offcut)> layouts);
 
     void OnLoadNestProject(string filePath);
 
@@ -85,17 +45,7 @@
 
     Task OnLoadNestProjectAsync();
 
-    void OnLoadNestResult(INestResult nestResult);
-
-    Task OnLoadNestResultAsync();
-
-    Task OnLoadPartAsync();
-
-    Task OnLoadSheetPlacementAsync();
-
     /// <summary>Saves the document; returns false when the user cancels the Save As dialog.</summary>
     bool Save(IFileViewModel fileViewModel, bool v);
-
-    void SetSelectedToolView(IFileViewModel fileViewModel);
   }
 }

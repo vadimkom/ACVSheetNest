@@ -27,16 +27,6 @@ namespace DeepNestSharp.Ui.Converters
     /// </summary>
     private static IReadOnlyDictionary<string, (byte R, byte G, byte B)> colours;
 
-    /// <summary>Drops the cached thumbnail for a path so it rebuilds — used after a 3D part is
-    /// re-unfolded (new K-factor) and its flat DXF changes.</summary>
-    public static void Invalidate(string path)
-    {
-      if (!string.IsNullOrEmpty(path))
-      {
-        Cache.Remove(path);
-      }
-    }
-
     /// <summary>Hands the thumbnails the job's part colours. The whole cache goes: it is keyed by path, and
     /// the image now depends on the colour too.</summary>
     public static void SetColours(IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours)
@@ -53,24 +43,12 @@ namespace DeepNestSharp.Ui.Converters
         return null;
       }
 
-      // 3D parts preview the ALREADY-unfolded flat (FreeCAD is far too slow to run per thumbnail);
-      // if it isn't unfolded yet, show nothing — PreviewSource refreshes this once loading completes.
-      string dxfPath;
-      if (StepUnfoldService.IsStepFile(path))
-      {
-        if (!StepUnfoldService.TryGetCachedDxf(path, out dxfPath))
-        {
-          return null;
-        }
-      }
-      else if (path.ToLowerInvariant().EndsWith(".dxf"))
-      {
-        dxfPath = path;
-      }
-      else
+      if (!DxfFileExtensions.IsDxf(path))
       {
         return null;
       }
+
+      string dxfPath = path;
 
       if (Cache.TryGetValue(path, out ImageSource cached))
       {

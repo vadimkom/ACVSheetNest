@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.RasterNest
+namespace DeepNestSharp.RasterNest
 {
   using System;
   using System.Collections.Generic;
@@ -79,21 +79,17 @@
       // Taking either as disqualifying makes it symmetric, and errs toward calling a borderline pair unfit,
       // which is the safe direction: a part handed back can be nested elsewhere, a sheet that will not
       // export cannot be cut at all.
-      return TooCloseOneWay(placedA, placedB, clearance, sliver)
-        || TooCloseOneWay(placedB, placedA, clearance, sliver);
-    }
+      var pathsA = ToPaths(placedA);
+      var pathsB = ToPaths(placedB);
 
-    /// <summary>One direction of <see cref="TooClose"/>: grow the first outline by the clearance and see
-    /// whether the second bites into it. Asymmetric by construction, which is why nobody may call it alone.</summary>
-    private static bool TooCloseOneWay(INfp grown, INfp other, double clearance, double sliver)
-    {
-      var paths = ToPaths(grown);
-      if (clearance > 0)
+      var grownA = clearance > 0 ? InflateOuter(pathsA, clearance) : pathsA;
+      if (Overlaps(grownA, pathsB, sliver))
       {
-        paths = InflateOuter(paths, clearance);
+        return true;
       }
 
-      return Overlaps(paths, ToPaths(other), sliver);
+      var grownB = clearance > 0 ? InflateOuter(pathsB, clearance) : pathsB;
+      return Overlaps(grownB, pathsA, sliver);
     }
 
     /// <summary>Cheap reject: the two bounding boxes are already further apart than the clearance.</summary>

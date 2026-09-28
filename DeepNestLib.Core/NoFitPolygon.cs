@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib
+namespace DeepNestLib
 {
   using System;
   using System.Collections.Generic;
@@ -16,15 +16,62 @@
 
   public class NoFitPolygon : PolygonBase, INfp, IHiddenNfp, IStringify
   {
-    // 2D only on purpose: 3D (STEP/IGES) imports go through File > Import 3D, which probes the
-    // sheet thickness and asks for the K-factor before unfolding.
-    public const string FileDialogFilter = "AutoCad Drawing Exchange Format (*.dxf)|*.dxf|DeepNest Polygon (*.dnpoly)|*.dnpoly|All files (*.*)|*.*";
+    public const string FileDialogFilter = "AutoCad Drawing Exchange Format (*.dxf;*.dfx)|*.dxf;*.dfx;*.DXF;*.DFX|DeepNest Polygon (*.dnpoly)|*.dnpoly|All files (*.*)|*.*";
     private double rotation;
 
     // Per segment, whether it is a chord the parser cut a curve into rather than an edge the drawing
     // has. Entry i is the segment from point i to point i + 1, the last wrapping to the start. Null
     // means nobody recorded it, which is every polygon that did not come from the DXF parser.
     private bool[] curvedSegments;
+
+    private bool boundsCalculated;
+    private double minX;
+    private double maxX;
+    private double minY;
+    private double maxY;
+
+    /// <summary>Drops the cached MinX/MaxX/MinY/MaxY. Setting or replacing the points does this already;
+    /// code that moves an existing SvgPoint in place must call it itself.</summary>
+    internal void InvalidateBounds()
+    {
+      this.boundsCalculated = false;
+    }
+
+    private void EnsureBoundsCalculated()
+    {
+      if (!this.boundsCalculated)
+      {
+        var pts = this.points;
+        if (pts == null || pts.Length == 0)
+        {
+          this.minX = 0;
+          this.maxX = 0;
+          this.minY = 0;
+          this.maxY = 0;
+        }
+        else
+        {
+          double mnX = pts[0].X;
+          double mxX = pts[0].X;
+          double mnY = pts[0].Y;
+          double mxY = pts[0].Y;
+          for (int i = 1; i < pts.Length; i++)
+          {
+            double px = pts[i].X;
+            double py = pts[i].Y;
+            if (px < mnX) mnX = px;
+            if (px > mxX) mxX = px;
+            if (py < mnY) mnY = py;
+            if (py > mxY) mxY = py;
+          }
+          this.minX = mnX;
+          this.maxX = mxX;
+          this.minY = mnY;
+          this.maxY = mxY;
+        }
+        this.boundsCalculated = true;
+      }
+    }
 
     public NoFitPolygon(IList<INfp> children)
         : this()
@@ -93,11 +140,25 @@
 
     [JsonIgnore]
     /// <inheritdoc />
-    public double MaxX => points.Length == 0 ? 0 : points.Max(p => p.X);
+    public double MaxX
+    {
+      get
+      {
+        EnsureBoundsCalculated();
+        return this.maxX;
+      }
+    }
 
     [JsonIgnore]
     /// <inheritdoc />
-    public double MinX => points.Length == 0 ? 0 : points.Min(p => p.X);
+    public double MinX
+    {
+      get
+      {
+        EnsureBoundsCalculated();
+        return this.minX;
+      }
+    }
 
     [JsonConverter(typeof(DoublePrecisionConverter))]
     /// <inheritdoc />
@@ -105,11 +166,25 @@
 
     [JsonIgnore]
     /// <inheritdoc />
-    public double MaxY => points.Length == 0 ? 0 : points.Max(p => p.Y);
+    public double MaxY
+    {
+      get
+      {
+        EnsureBoundsCalculated();
+        return this.maxY;
+      }
+    }
 
     [JsonIgnore]
     /// <inheritdoc />
-    public double MinY => points.Length == 0 ? 0 : points.Min(p => p.Y);
+    public double MinY
+    {
+      get
+      {
+        EnsureBoundsCalculated();
+        return this.minY;
+      }
+    }
 
     [JsonIgnore]
     /// <inheritdoc />
@@ -117,15 +192,8 @@
     {
       get
       {
-        if (this.points.Length == 0)
-        {
-          return 0;
-        }
-
-        var maxx = this.points.Max(z => z.X);
-        var minx = this.points.Min(z => z.X);
-
-        return maxx - minx;
+        EnsureBoundsCalculated();
+        return this.maxX - this.minX;
       }
     }
 
@@ -135,14 +203,8 @@
     {
       get
       {
-        if (this.points.Length == 0)
-        {
-          return 0;
-        }
-
-        var maxy = this.points.Max(z => z.Y);
-        var miny = this.points.Min(z => z.Y);
-        return maxy - miny;
+        EnsureBoundsCalculated();
+        return this.maxY - this.minY;
       }
     }
 
@@ -202,6 +264,7 @@
       set
       {
         this.points = value;
+        this.InvalidateBounds();
       }
     }
 
@@ -345,6 +408,7 @@
       Array.Resize(ref this.points, i + 1);
       this.points[i] = point;
       this.ForgetCurvedSegments();
+      this.InvalidateBounds();
     }
 
     /// <summary>
@@ -417,6 +481,7 @@
     {
       this.points = this.points.Append(svgPoint).ToArray();
       this.ForgetCurvedSegments();
+      this.InvalidateBounds();
     }
 
     /// <inheritdoc />
@@ -424,6 +489,7 @@
     {
       int was = this.points.Length;
       this.points = points.ToArray();
+      this.InvalidateBounds();
 
       // Same count means the ring was transformed, not rebuilt: rotate, mirror and the like keep every
       // segment where it was, so the provenance still describes it. A different count means it was
@@ -439,6 +505,7 @@
     {
       int wasLength = this.points.Length;
       this.points = replacementNfp.Points.ToArray();
+      this.InvalidateBounds();
       if (this.points.Length != wasLength)
       {
         this.ForgetCurvedSegments();
@@ -725,6 +792,15 @@
       // here: a translation moves every segment and reorders nothing, so the same flags still describe
       // it. Restored after the loop rather than before it, which is the order that actually works.
       shifted.curvedSegments = this.curvedSegments;
+
+      if (this.boundsCalculated)
+      {
+        shifted.minX = this.minX + x;
+        shifted.maxX = this.maxX + x;
+        shifted.minY = this.minY + y;
+        shifted.maxY = this.maxY + y;
+        shifted.boundsCalculated = true;
+      }
 
       if (this.Children != null /*&& p.Children.Count*/)
       {

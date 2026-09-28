@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.Placement
+namespace DeepNestLib.Placement
 {
   using System;
   using System.Collections.Generic;
@@ -202,9 +202,14 @@
       }
     }
 
-    public async Task ExportDxf(Stream stream, bool mergeLines, bool differentiateChildren)
+    public Task ExportDxf(Stream stream, bool mergeLines, bool differentiateChildren)
     {
-      await new DxfExporter().Export(stream, this, mergeLines || this.RequiresMergedLines, differentiateChildren);
+      return ExportDxf(stream, mergeLines, differentiateChildren, DxfPartNameExport.None);
+    }
+
+    public async Task ExportDxf(Stream stream, bool mergeLines, bool differentiateChildren, DxfPartNameExport partNameExport)
+    {
+      await new DxfExporter { PartNameExport = partNameExport }.Export(stream, this, mergeLines || this.RequiresMergedLines, differentiateChildren);
     }
 
     public static SheetPlacement LoadFromFile(string fileName)

@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib
+namespace DeepNestLib
 {
   using System.Collections.Generic;
   using System.IO;
@@ -72,14 +72,9 @@
         det = SvgParser.LoadSvg(f.FullName);
       }
 
-      if (f.Extension.Equals(".dxf", System.StringComparison.OrdinalIgnoreCase))
+      if (DxfFileExtensions.IsDxf(f.FullName))
       {
         det = DxfParser.LoadDxfFile(f.FullName).Result;
-      }
-
-      if (StepUnfoldService.IsStepFile(f.FullName))
-      {
-        det = StepUnfoldService.LoadAsRawDetail(f.FullName);
       }
 
       return det;

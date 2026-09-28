@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.Ui.UserControls
+namespace DeepNestSharp.Ui.UserControls
 {
   using System;
   using System.Collections.Generic;
@@ -12,6 +12,7 @@
   using DeepNestLib;
   using DeepNestLib.NestProject;
   using DeepNestLib.Placement;
+  using Localization = DeepNestSharp.Ui.Localization;
 
   /// <summary>
   /// Faithful nest viewer. Renders each placement's actual nested geometry (PlacedPart — already rotated
@@ -65,6 +66,11 @@
 
     private double fittedW = -1;
     private double fittedH = -1;
+
+    // The view still shows the whole sheet as fitted: nobody has zoomed or panned since. A hidden viewer (the
+    // layout step before it is opened) has no size to fit to, and a window stood on end or maximised changes
+    // the size; either way a view nobody has moved is fitted again when the room arrives or changes.
+    private bool viewIsFitted;
     private bool isPanning;
     private Point panStart;
     private double panTranslateX;
@@ -93,6 +99,8 @@
     private Point? measureA;
     private bool measureDone;
     private System.Windows.Shapes.Line measureLine;
+    private System.Windows.Shapes.Line measureLineX;
+    private System.Windows.Shapes.Line measureLineY;
     private System.Windows.Shapes.Ellipse measureDotA;
     private System.Windows.Shapes.Ellipse measureDotB;
     private System.Windows.Shapes.Ellipse measureSnapMarker; // hollow ring shown over the snapped vertex
@@ -246,14 +254,56 @@
         OffcutStroke.Freeze();
       }
 
-      this.Loaded += (s, e) => this.FitToView();
+      this.Loaded += (s, e) =>
+      {
+        this.ApplyLocalization();
+        this.FitToView();
+      };
+      Localization.LanguageChanged += this.ApplyLocalization;
       this.host.SizeChanged += (s, e) =>
       {
-        if (this.fittedW < 0)
+        if (this.fittedW < 0 || this.viewIsFitted || this.scale.ScaleX <= 0)
         {
           this.FitToView();
         }
       };
+    }
+
+    public void ApplyLocalization()
+    {
+      if (this.emptyHint != null)
+      {
+        this.emptyHint.Text = Localization.Get("Dxf_EmptyHint");
+      }
+
+      if (this.editToggle != null)
+      {
+        this.editToggle.Content = Localization.Get("Dxf_EditNest");
+        this.editToggle.ToolTip = Localization.Get("Dxf_EditNestTip");
+      }
+
+      if (this.measureToggle != null)
+      {
+        this.measureToggle.Content = Localization.Get("Dxf_Measure");
+        this.measureToggle.ToolTip = Localization.Get("Dxf_MeasureTip");
+      }
+
+      if (this.btnMirror != null)
+      {
+        this.btnMirror.Content = Localization.Get("Dxf_Mirror");
+        this.btnMirror.ToolTip = Localization.Get("Dxf_MirrorTip");
+      }
+
+      if (this.undoBtn != null) this.undoBtn.ToolTip = Localization.Get("Dxf_UndoTip");
+      if (this.redoBtn != null) this.redoBtn.ToolTip = Localization.Get("Dxf_RedoTip");
+      if (this.btnRotateCw90 != null) this.btnRotateCw90.ToolTip = Localization.Get("Dxf_RotateCw90Tip");
+      if (this.btnRotateCcw90 != null) this.btnRotateCcw90.ToolTip = Localization.Get("Dxf_RotateCcw90Tip");
+      if (this.btnRotateCw5 != null) this.btnRotateCw5.ToolTip = Localization.Get("Dxf_RotateCw5Tip");
+      if (this.btnRotateCcw5 != null) this.btnRotateCcw5.ToolTip = Localization.Get("Dxf_RotateCcw5Tip");
+      if (this.btnPrevSheet != null) this.btnPrevSheet.ToolTip = Localization.Get("Dxf_PrevLayout");
+      if (this.btnNextSheet != null) this.btnNextSheet.ToolTip = Localization.Get("Dxf_NextLayout");
+
+      this.UpdateHint();
     }
 
     public INestResult Result
@@ -311,7 +361,7 @@
         string sig = Signature(sp);
         if (!bySignature.TryGetValue(sig, out var g))
         {
-          g = new SheetGroup { Representative = sp, Count = 0, Name = $"Layout {byLayout.Count + 1}", Members = new List<ISheetPlacement>() };
+          g = new SheetGroup { Representative = sp, Count = 0, Name = Localization.Format("Dxf_Layout", byLayout.Count + 1), Members = new List<ISheetPlacement>() };
           bySignature[sig] = g;
           byLayout.Add(g);
         }
@@ -410,7 +460,7 @@
 
           if (fullSheets > 0)
           {
-            this.groups.Add(new SheetGroup { Representative = densest.Sheet, Count = fullSheets, Name = "Full sheet" });
+            this.groups.Add(new SheetGroup { Representative = densest.Sheet, Count = fullSheets, Name = Localization.Get("Dxf_FullSheet") });
           }
 
           if (rem > 0)
@@ -423,7 +473,7 @@
             }
 
             var remSheet = CreateSyntheticSheet(densest.Sheet, selected);
-            this.groups.Add(new SheetGroup { Representative = remSheet, Count = 1, Name = "Remainder sheet" });
+            this.groups.Add(new SheetGroup { Representative = remSheet, Count = 1, Name = Localization.Get("Dxf_RemainderSheet") });
           }
 
           return this.groups.Count > 0;
@@ -456,7 +506,7 @@
 
         if (bestCopies >= 1)
         {
-          this.groups.Add(new SheetGroup { Representative = best.Sheet, Count = bestCopies, Name = "Full sheet" });
+          this.groups.Add(new SheetGroup { Representative = best.Sheet, Count = bestCopies, Name = Localization.Get("Dxf_FullSheet") });
           foreach (var kv in best.Comp)
           {
             remaining[kv.Key] -= kv.Value * bestCopies;
@@ -491,7 +541,7 @@
           }
 
           var sheet = CreateSyntheticSheet(fit.Sheet, selected);
-          g = new SheetGroup { Representative = sheet, Count = 0, Name = "Remainder sheet" };
+          g = new SheetGroup { Representative = sheet, Count = 0, Name = Localization.Get("Dxf_RemainderSheet") };
           remGroups[key] = g;
           this.groups.Add(g);
         }
@@ -905,8 +955,8 @@
       // next to the name): "Nest 1/2 (30)" = layout 1 of 2, cut it 30 times. Job totals stay in the
       // status bar and results grid — nothing verbose over the drawing.
       this.sheetLabel.Text = group.Count > 1
-        ? $"Nest {idx + 1}/{this.groups.Count}  ({group.Count})"
-        : $"Nest {idx + 1}/{this.groups.Count}";
+        ? Localization.Format("Dxf_NestN", idx + 1, this.groups.Count) + $"  ({group.Count})"
+        : Localization.Format("Dxf_NestN", idx + 1, this.groups.Count);
       this.sheetNav.Visibility = this.groups.Count > 1 || group.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
 
       double w = sheet.WidthCalculated;
@@ -1156,7 +1206,7 @@
       {
         Text = $"{rect.Width:0.##} × {rect.Height:0.##} {unit}",
         Foreground = OffcutStroke,
-        FontFamily = new FontFamily("Tahoma"),
+        FontFamily = new FontFamily("Segoe UI"),
         FontSize = Math.Max(0.001, Math.Min(w, h) * 0.045),
         IsHitTestVisible = false,
       };
@@ -1276,6 +1326,7 @@
       double availH = this.host.ActualHeight;
       if (availW <= 0 || availH <= 0)
       {
+        this.viewIsFitted = true; // not yet, but it is to be as soon as the host has a size
         return;
       }
 
@@ -1290,6 +1341,7 @@
       this.translate.X = (availW - (this.canvas.Width * s)) / 2.0;
       this.translate.Y = (availH - (this.canvas.Height * s)) / 2.0;
       this.UpdateStrokeWidths();
+      this.viewIsFitted = true;
     }
 
     /// <summary>One device pixel expressed in drawing units at the current zoom. Stroke widths are in
@@ -1328,6 +1380,7 @@
       this.translate.Y = p.Y - ((p.Y - this.translate.Y) * factor);
       this.scale.ScaleX = newScale;
       this.scale.ScaleY = newScale;
+      this.viewIsFitted = false;
       this.UpdateStrokeWidths();
       this.UpdateMeasureScale();
       e.Handled = true;
@@ -1385,10 +1438,10 @@
       }
 
       this.hintText.Text = !this.EditMode
-        ? "scroll = zoom  ·  wheel-drag = pan  ·  right-click = fit"
+        ? Localization.Get("Dxf_NavHint")
         : this.CurrentSheetIsEditable()
-          ? "click = select part  ·  drag = move  ·  arrows = nudge  ·  type a coordinate to place it exactly  ·  overlaps show red"
-          : "this layout is a production-plan proposal, not one of the nested sheets, so it cannot be edited  ·  the sheets it stands for are the ones that get cut";
+          ? Localization.Get("Dxf_EditNavHint")
+          : Localization.Get("Dxf_CommonLineLocked");
     }
 
     private bool MeasureMode => this.measureToggle != null && this.measureToggle.IsChecked == true;
@@ -1422,7 +1475,7 @@
       {
         if (this.hintText != null)
         {
-          this.hintText.Text = "measure: click two points (snaps to corners)";
+          this.hintText.Text = Localization.Get("Dxf_MeasureHint1");
         }
       }
       else
@@ -1436,6 +1489,8 @@
       this.measureA = null;
       this.measureDone = false;
       if (this.measureLine != null) { this.canvas.Children.Remove(this.measureLine); this.measureLine = null; }
+      if (this.measureLineX != null) { this.canvas.Children.Remove(this.measureLineX); this.measureLineX = null; }
+      if (this.measureLineY != null) { this.canvas.Children.Remove(this.measureLineY); this.measureLineY = null; }
       if (this.measureDotA != null) { this.canvas.Children.Remove(this.measureDotA); this.measureDotA = null; }
       if (this.measureDotB != null) { this.canvas.Children.Remove(this.measureDotB); this.measureDotB = null; }
       if (this.measureSnapMarker != null) { this.canvas.Children.Remove(this.measureSnapMarker); this.measureSnapMarker = null; }
@@ -1450,10 +1505,18 @@
 
       var brush = new SolidColorBrush(Color.FromRgb(0xC0, 0x00, 0x00)); // measure red
       brush.Freeze();
+      var dashBrush = new SolidColorBrush(Color.FromArgb(0x99, 0xC0, 0x00, 0x00));
+      dashBrush.Freeze();
+
+      this.measureLineX = new System.Windows.Shapes.Line { Stroke = dashBrush, StrokeDashArray = new DoubleCollection { 3, 3 }, IsHitTestVisible = false, Visibility = Visibility.Collapsed };
+      this.measureLineY = new System.Windows.Shapes.Line { Stroke = dashBrush, StrokeDashArray = new DoubleCollection { 3, 3 }, IsHitTestVisible = false, Visibility = Visibility.Collapsed };
       this.measureLine = new System.Windows.Shapes.Line { Stroke = brush, IsHitTestVisible = false, Visibility = Visibility.Collapsed };
       this.measureDotA = new System.Windows.Shapes.Ellipse { Fill = brush, IsHitTestVisible = false, Visibility = Visibility.Collapsed };
       this.measureDotB = new System.Windows.Shapes.Ellipse { Fill = brush, IsHitTestVisible = false, Visibility = Visibility.Collapsed };
       this.measureSnapMarker = new System.Windows.Shapes.Ellipse { Stroke = brush, Fill = null, IsHitTestVisible = false, Visibility = Visibility.Collapsed };
+
+      this.canvas.Children.Add(this.measureLineX);
+      this.canvas.Children.Add(this.measureLineY);
       this.canvas.Children.Add(this.measureLine);
       this.canvas.Children.Add(this.measureDotA);
       this.canvas.Children.Add(this.measureDotB);
@@ -1471,6 +1534,16 @@
 
       double f = 1.0 / Math.Max(0.0001, this.scale.ScaleX);
       this.measureLine.StrokeThickness = 1.5 * f;
+      if (this.measureLineX != null)
+      {
+        this.measureLineX.StrokeThickness = 1.0 * f;
+      }
+
+      if (this.measureLineY != null)
+      {
+        this.measureLineY.StrokeThickness = 1.0 * f;
+      }
+
       double r = 3.0 * f;
 
       if (this.measureDotA != null && this.measureA != null)
@@ -1494,6 +1567,38 @@
         this.measureSnapMarker.Width = this.measureSnapMarker.Height = sr * 2;
         System.Windows.Controls.Canvas.SetLeft(this.measureSnapMarker, this.measureSnapAt.X - sr);
         System.Windows.Controls.Canvas.SetTop(this.measureSnapMarker, this.measureSnapAt.Y - sr);
+      }
+    }
+
+    private void UpdateMeasureComponents(Point p)
+    {
+      if (this.measureA == null || this.measureLineX == null || this.measureLineY == null)
+      {
+        return;
+      }
+
+      Point a = this.measureA.Value;
+      double dx = Math.Abs(p.X - a.X);
+      double dy = Math.Abs(p.Y - a.Y);
+
+      if (dx > 1e-4 && dy > 1e-4)
+      {
+        this.measureLineX.X1 = a.X;
+        this.measureLineX.Y1 = a.Y;
+        this.measureLineX.X2 = p.X;
+        this.measureLineX.Y2 = a.Y;
+        this.measureLineX.Visibility = Visibility.Visible;
+
+        this.measureLineY.X1 = p.X;
+        this.measureLineY.Y1 = a.Y;
+        this.measureLineY.X2 = p.X;
+        this.measureLineY.Y2 = p.Y;
+        this.measureLineY.Visibility = Visibility.Visible;
+      }
+      else
+      {
+        this.measureLineX.Visibility = Visibility.Collapsed;
+        this.measureLineY.Visibility = Visibility.Collapsed;
       }
     }
 
@@ -1671,7 +1776,7 @@
 
       this.partInfo.Visibility = Visibility.Visible;
       this.partInfoName.Text = string.IsNullOrEmpty(pp.Part?.Name)
-        ? "part"
+        ? Localization.Get("Rep_PartFallback")
         : System.IO.Path.GetFileName(pp.Part.Name);
 
       // Don't fight the operator for a field they are typing in, unless they just cancelled.
@@ -1716,10 +1821,10 @@
         cap,
         (a, b, d) => RasterNest.PlacementCollision.TooClose(a.PlacedPart, b.PlacedPart, d, 0));
 
-      string unit = this.UnitsMm ? "mm" : "in";
+      string unit = Localization.Get(this.UnitsMm ? "Unit_Mm" : "Unit_In");
       return gap >= cap
         ? string.Empty
-        : $"gap {gap.ToString("0.###", CultureInfo.CurrentCulture)} {unit}";
+        : Localization.Format("Dxf_Gap", $"{gap.ToString("0.###", CultureInfo.CurrentCulture)} {unit}");
     }
 
     /// <summary>
@@ -1928,7 +2033,7 @@
 
       if (unreadable && this.hintText != null)
       {
-        this.hintText.Text = "that is not a number I can read  ·  the part has been left where it was";
+        this.hintText.Text = Localization.Get("Dxf_NotANumber");
       }
     }
 
@@ -1961,12 +2066,14 @@
           this.measureLine.X1 = this.measureLine.X2 = p.X;
           this.measureLine.Y1 = this.measureLine.Y2 = p.Y;
           this.measureLine.Visibility = Visibility.Visible;
+          if (this.measureLineX != null) this.measureLineX.Visibility = Visibility.Collapsed;
+          if (this.measureLineY != null) this.measureLineY.Visibility = Visibility.Collapsed;
           this.measureDotA.Visibility = Visibility.Visible;
           this.measureDotB.Visibility = Visibility.Collapsed;
           this.UpdateMeasureScale();
           if (this.hintText != null)
           {
-            this.hintText.Text = "measure: click the second point";
+            this.hintText.Text = Localization.Get("Dxf_MeasureHint2");
           }
         }
         else
@@ -1975,11 +2082,15 @@
           this.measureLine.Y2 = p.Y;
           this.measureDotB.Visibility = Visibility.Visible;
           this.measureDone = true;
+          this.UpdateMeasureComponents(p);
           this.UpdateMeasureScale();
           double d = (p - this.measureA.Value).Length; // Y-flip invariant → drawing units
+          double dx = Math.Abs(p.X - this.measureA.Value.X);
+          double dy = Math.Abs(p.Y - this.measureA.Value.Y);
+          string u = Localization.Get(this.UnitsMm ? "Unit_Mm" : "Unit_In");
           if (this.hintText != null)
           {
-            this.hintText.Text = $"distance: {d:0.000} {(this.UnitsMm ? "mm" : "in")}  ·  click to measure again";
+            this.hintText.Text = Localization.Format("Dxf_Distance", $"{d:0.000} {u}", $"{dx:0.000} {u}", $"{dy:0.000} {u}") + Localization.Get("Dxf_MeasureAgain");
           }
         }
 
@@ -2027,6 +2138,7 @@
         Point panPos = e.GetPosition(this.host);
         this.translate.X = this.panTranslateX + (panPos.X - this.panStart.X);
         this.translate.Y = this.panTranslateY + (panPos.Y - this.panStart.Y);
+        this.viewIsFitted = false;
         return;
       }
 
@@ -2041,10 +2153,14 @@
         {
           this.measureLine.X2 = mp.X;
           this.measureLine.Y2 = mp.Y;
+          this.UpdateMeasureComponents(mp);
           double d = (mp - this.measureA.Value).Length;
+          double dx = Math.Abs(mp.X - this.measureA.Value.X);
+          double dy = Math.Abs(mp.Y - this.measureA.Value.Y);
+          string u = Localization.Get(this.UnitsMm ? "Unit_Mm" : "Unit_In");
           if (this.hintText != null)
           {
-            this.hintText.Text = $"distance: {d:0.000} {(this.UnitsMm ? "mm" : "in")}";
+            this.hintText.Text = Localization.Format("Dxf_Distance", $"{d:0.000} {u}", $"{dx:0.000} {u}", $"{dy:0.000} {u}");
           }
         }
 
@@ -2905,7 +3021,7 @@
     {
       if (this.hintText != null)
       {
-        this.hintText.Text = "common-line cluster parts are locked  ·  re-nest to change their position";
+        this.hintText.Text = Localization.Get("Dxf_CommonLineLocked");
       }
     }
 
@@ -3659,10 +3775,9 @@
       bool anythingToUndo = this.undoStack.Count > this.editEntryDepth;
       var answer = System.Windows.MessageBox.Show(
         Window.GetWindow(this),
-        $"{unfit.All.Count} part(s) on this layout are not fit to cut{Why()}.\n\n" +
-        "They are drawn in red. Move them clear before leaving the editor.\n\n" +
-        (anythingToUndo ? "Undo your changes and leave anyway?" : "Leave anyway?"),
-        "Edit nest",
+        Localization.Format("Msg_EditUnfit", unfit.All.Count, Why()) +
+        Localization.Get(anythingToUndo ? "Msg_EditUndoLeave" : "Msg_EditLeave"),
+        Localization.Get("Title_EditNest"),
         MessageBoxButton.YesNo,
         MessageBoxImage.Warning,
         System.Windows.MessageBoxResult.No);
@@ -3681,10 +3796,10 @@
       {
         if (unfit.Overlapping.Count > 0 && unfit.OutsideMargin.Count > 0)
         {
-          return $": {unfit.Overlapping.Count} overlapping a neighbour and {unfit.OutsideMargin.Count} inside the sheet edge margin";
+          return Localization.Format("Why_Both", unfit.Overlapping.Count, unfit.OutsideMargin.Count);
         }
 
-        return unfit.OutsideMargin.Count > 0 ? ", inside the sheet edge margin" : ", overlapping a neighbour";
+        return unfit.OutsideMargin.Count > 0 ? Localization.Get("Why_Margin") : Localization.Get("Why_Overlap");
       }
     }
 

@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.Placement
+namespace DeepNestLib.Placement
 {
   using System;
   using System.Linq;
@@ -62,19 +62,19 @@
 
     /// <inheritdoc />
     [JsonIgnore]
-    public double MaxX => this.X + this.Part.Points.Max(p => p.X);
+    public double MaxX => this.X + this.Part.MaxX;
 
     /// <inheritdoc />
     [JsonIgnore]
-    public double MaxY => this.Y + this.Part.Points.Max(p => p.Y);
+    public double MaxY => this.Y + this.Part.MaxY;
 
     /// <inheritdoc />
     [JsonIgnore]
-    public double MinX => this.X + this.Part.Points.Min(p => p.X);
+    public double MinX => this.X + this.Part.MinX;
 
     /// <inheritdoc />
     [JsonIgnore]
-    public double MinY => this.Y + this.Part.Points.Min(p => p.Y);
+    public double MinY => this.Y + this.Part.MinY;
 
     /// <inheritdoc />
     [JsonConverter(typeof(DoublePrecisionConverter))]

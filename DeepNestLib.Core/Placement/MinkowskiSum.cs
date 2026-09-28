@@ -355,9 +355,12 @@
             nFP.Points[j].X += pattern.First().X;
             nFP.Points[j].Y += pattern.First().Y;
           }
+
+          (nFP as NoFitPolygon)?.InvalidateBounds();
         }
       }
 
+      clipperNfp.InvalidateBounds(); // every point was moved in place above
       clipperNfp.EnsureIsClosed();
       var res = new[] { clipperNfp };
       return res;

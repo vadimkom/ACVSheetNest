@@ -149,7 +149,7 @@
     /// so the caller keeps the operator's own path and nothing is written or renamed.
     /// </summary>
     /// <remarks>
-    /// The files go to a temp folder keyed on the source, the same way 3D unfolding caches its flats.
+    /// The files go to a temp folder keyed on the source.
     /// Nothing is written next to the operator's drawing. A saved project therefore points at temp, so
     /// <see cref="Rebuild"/> exists to put a part back when the temp folder has been cleaned.
     /// </remarks>

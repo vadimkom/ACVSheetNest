@@ -208,6 +208,8 @@
             o.Y = target.Y;
           }
         }
+
+        (offset as NoFitPolygon)?.InvalidateBounds(); // points were moved in place
       }
 
       if (straighten)
@@ -257,6 +259,8 @@
 
         if (straightened)
         {
+          (offset as NoFitPolygon)?.InvalidateBounds(); // points were moved in place
+
           var Ac = DeepNestClipper.ScaleUpPath(offset.Points, 10000000);
           var Bc = DeepNestClipper.ScaleUpPath(polygon.Points, 10000000);
 

@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.RasterNest
+namespace DeepNestSharp.RasterNest
 {
   using System;
   using System.Collections.Generic;
@@ -285,6 +285,40 @@
       double commonLineGap = CommonLineDefaults.DefaultGapInches,
       double geometryTolerance = CommonLineDefaults.DefaultGeometryToleranceInches,
       int commonLineMaxClusterParts = CommonLineDefaults.AutoMaxClusterParts)
+      => Nest(
+        parts,
+        stock?.Select(s => (s.Win, s.Hin, s.Qty, s.Unlimited, 5)).ToList(),
+        rotations,
+        spacing,
+        margin,
+        perSheetBudgetSec,
+        sparrowExePath,
+        out error,
+        cancel,
+        progress,
+        effort,
+        commonLineGap,
+        geometryTolerance,
+        commonLineMaxClusterParts);
+
+    /// <summary>Full nest with sheet stock carrying size, quantity, unlimited flag and priority.</summary>
+    internal static INestResult Nest(
+      IReadOnlyList<RasterPartInfo> parts,
+      IReadOnlyList<(int Win, int Hin, int Qty, bool Unlimited, int Priority)> stock,
+      int rotations,
+      double spacing,
+      double margin,
+      int perSheetBudgetSec,
+      string sparrowExePath,
+      out string error,
+      CancellationToken cancel = default,
+      System.IProgress<(int Placed, int Total, int Sheet, double Density)> progress = null,
+      NestEffort effort = NestEffortDefaults.Default,
+      double commonLineGap = CommonLineDefaults.DefaultGapInches,
+      double geometryTolerance = CommonLineDefaults.DefaultGeometryToleranceInches,
+      int commonLineMaxClusterParts = CommonLineDefaults.AutoMaxClusterParts,
+      Action<INestResult>? candidateCallback = null,
+      int seedOffset = 0)
     {
       error = null;
       // These values are already expressed in the caller's active drawing units. Substituting inch
@@ -321,7 +355,7 @@
         {
           if (s.Win > 0 && s.Hin > 0 && (s.Unlimited || s.Qty > 0))
           {
-            sizes.Add(new StockSize { W = s.Win, H = s.Hin, Remaining = s.Qty, Unlimited = s.Unlimited });
+            sizes.Add(new StockSize { W = s.Win, H = s.Hin, Remaining = s.Qty, Unlimited = s.Unlimited, Priority = s.Priority });
           }
         }
       }
@@ -367,7 +401,9 @@
         commonLineGap,
         geometryTolerance,
         commonLineMaxClusterParts,
-        out error);
+        out error,
+        candidateCallback,
+        seedOffset);
     }
 
     /// <summary>One size of stock and how much of it is left. An unlimited size never runs down, so its
@@ -381,6 +417,8 @@
       public int Remaining { get; set; }
 
       public bool Unlimited { get; set; }
+
+      public int Priority { get; set; } = 5;
 
       public bool HasStock => this.Unlimited || this.Remaining > 0;
 
@@ -407,7 +445,9 @@
       double commonLineGap,
       double geometryTolerance,
       int commonLineMaxClusterParts,
-      out string error)
+      out string error,
+      Action<INestResult>? candidateCallback = null,
+      int seedOffset = 0)
     {
       error = null;
       var loadedById = loaded.ToDictionary(l => l.Source);
@@ -445,11 +485,19 @@
         List<CommonEdgeIntent> bestCommonEdges = null;
         IReadOnlyList<CommonLineFallbackNotice> bestCommonLineFallbacks = Array.Empty<CommonLineFallbackNotice>();
 
-        foreach (var size in sizes)
+        // Priority outranks utilization (see isBetter below), so once a size has packed, a size of lower
+        // priority can never win and packing it would only burn a full engine run. OrderBy is stable:
+        // with every priority equal the order, and so the answer, is exactly what it was.
+        foreach (var size in sizes.OrderBy(s => s.Priority))
         {
           if (!size.HasStock)
           {
             continue;
+          }
+
+          if (bestSize != null && size.Priority > bestSize.Priority)
+          {
+            break;
           }
 
           int w = size.W;
@@ -481,6 +529,66 @@
           // gets a longer leash, but far above any healthy run — it exists to catch a hung process.
           int hardTimeoutSec = WatchdogSeconds(perSheetBudgetSec, effort);
 
+          Action<List<IPartPlacement>, Dictionary<int, int>, List<CommonEdgeIntent>> onSheetCandidate =
+            candidateCallback == null ? null : (candPl, candBy, candEdges) =>
+          {
+            try
+            {
+              if (candPl == null || candPl.Count == 0) return;
+              var collection = new SheetPlacementCollection();
+              for (int prev = 0; prev < sheetLayouts.Count; prev++)
+              {
+                var prevSheet = Sheet.NewSheet(prev + 1, sheetSizes[prev].W, sheetSizes[prev].H);
+                var prevPlacement = new SheetPlacement(
+                  PlacementTypeEnum.BoundingBox,
+                  prevSheet,
+                  sheetLayouts[prev],
+                  0,
+                  SvgNest.Config.ClipperScale,
+                  requiresMergedLines: false);
+                collection.Add(prevPlacement);
+              }
+
+              // A copy, not the search's own list: the winner goes on to DeferUnfit, which removes and moves
+              // placements on this thread while the UI is drawing the preview.
+              var candSheet = Sheet.NewSheet(sheetLayouts.Count + 1, w, h);
+              var candPlacement = new SheetPlacement(
+                PlacementTypeEnum.BoundingBox,
+                candSheet,
+                ClonePlacements(candPl, null).Placements,
+                0,
+                SvgNest.Config.ClipperScale,
+                requiresMergedLines: false);
+              collection.Add(candPlacement);
+
+              var candUnplaced = new List<INfp>();
+              foreach (var kv in pool)
+              {
+                int placedInCandidate = candBy != null && candBy.TryGetValue(kv.Key, out int cp) ? cp : 0;
+                int rem = kv.Value - placedInCandidate;
+                for (int q = 0; q < rem; q++)
+                {
+                  candUnplaced.Add(loadedById[kv.Key].Nfp);
+                }
+              }
+
+              int placedTotal = collection.Sum(sp => sp.PartPlacements.Count);
+              var candResult = new NestResult(
+                placedTotal + candUnplaced.Count,
+                collection,
+                candUnplaced,
+                PlacementTypeEnum.BoundingBox,
+                0,
+                0);
+
+              candidateCallback(candResult);
+            }
+            catch
+            {
+              // Candidate creation failure must never interrupt nesting
+            }
+          };
+
           var (placements, placedBySrc, packW, packH, seamsSnapped, seamsGivenUp, commonEdges, commonLineFallbacks) = PackOneSheet(
             loaded,
             batchQty,
@@ -498,7 +606,9 @@
             geometryTolerance,
             effort,
             commonLineMaxClusterParts,
-            out string perr);
+            out string perr,
+            onCandidate: onSheetCandidate,
+            seedOffset: seedOffset);
           firstPackError ??= perr;
           if (cancel.IsCancellationRequested)
           {
@@ -551,7 +661,9 @@
               geometryTolerance,
               effort,
               commonLineMaxClusterParts,
-              out _);
+              out _,
+              onCandidate: onSheetCandidate,
+              seedOffset: seedOffset + 50);
 
             if (!cancel.IsCancellationRequested && retryPl != null && retryBy != null
                 && retryBy.Values.Sum() > placedBySrc.Values.Sum())
@@ -577,7 +689,25 @@
           double sheetArea = Math.Max(1e-9, (double)packW * packH);
           double placedArea = placedBySrc.Sum(kv => kv.Value * Math.Abs(loadedById[kv.Key].Nfp.Area));
           double utilization = placedArea / sheetArea;
-          if (utilization > bestUtilization)
+          bool isBetter;
+          if (bestSize == null)
+          {
+            isBetter = true;
+          }
+          else if (size.Priority < bestSize.Priority)
+          {
+            isBetter = true;
+          }
+          else if (size.Priority == bestSize.Priority)
+          {
+            isBetter = utilization > bestUtilization;
+          }
+          else
+          {
+            isBetter = false;
+          }
+
+          if (isBetter)
           {
             bestUtilization = utilization;
             bestSize = size;
@@ -1059,7 +1189,9 @@
     /// add it either.
     /// </summary>
     private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySource, int PackW, int PackH, int SeamsSnapped, int SeamsGivenUp, List<CommonEdgeIntent> CommonEdges, IReadOnlyList<CommonLineFallbackNotice> CommonLineFallbacks) PackOneSheet(
-      List<Loaded> loaded, Dictionary<int, int> batchQty, int sheetW, int sheetH, double margin, int budget, int workers, int hardTimeoutSec, int tries, string exe, CancellationToken cancel, Action<double> onDensity, double commonLineGap, double geometryTolerance, NestEffort effort, int commonLineMaxClusterParts, out string error)
+      List<Loaded> loaded, Dictionary<int, int> batchQty, int sheetW, int sheetH, double margin, int budget, int workers, int hardTimeoutSec, int tries, string exe, CancellationToken cancel, Action<double> onDensity, double commonLineGap, double geometryTolerance, NestEffort effort, int commonLineMaxClusterParts, out string error,
+      Action<List<IPartPlacement>, Dictionary<int, int>, List<CommonEdgeIntent>>? onCandidate = null,
+      int seedOffset = 0)
     {
       error = null;
       var batch = loaded.Where(l => batchQty.TryGetValue(l.Source, out int q) && q > 0).ToList();
@@ -1073,7 +1205,7 @@
       var capturedSources = new Dictionary<string, DxfContourCatalog>(StringComparer.OrdinalIgnoreCase);
       foreach (string source in batch.Where(part => part.RequiresMergedLines)
         .Select(part => part.Nfp.Name).Where(path => !string.IsNullOrWhiteSpace(path)
-          && path.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase)).Distinct(StringComparer.OrdinalIgnoreCase))
+          && DxfFileExtensions.IsDxf(path)).Distinct(StringComparer.OrdinalIgnoreCase))
       {
         cancel.ThrowIfCancellationRequested();
         try
@@ -1142,7 +1274,7 @@
         // used to be the whole story) meant a 4-core laptop and a 20-core desktop nested the same job
         // differently.
         int waveTries = Math.Min(tries, WaveSize);
-        int maxConc = Math.Max(1, Math.Min(waveTries, Concurrency()));
+        int maxConc = Math.Max(1, Math.Min(waveTries, Concurrency(effort)));
 
         // The pack is gravity-compacted along the sheet's LONG axis, so that extent is what decides how
         // much of the sheet is left in one piece. It is the metric the operator sees; sparrow's density
@@ -1161,7 +1293,7 @@
           var wEdges = new List<CommonEdgeIntent>[waveSize];
           var wFallbacks = new IReadOnlyList<CommonLineFallbackNotice>[waveSize];
           var wSt = new (int Count, double Density, int Seed, int SeamsSnapped, int SeamsGivenUp)?[waveSize];
-          int startSeed = launched + 1;
+          int startSeed = seedOffset + launched + 1;
           var options = new ParallelOptions { MaxDegreeOfParallelism = maxConc, CancellationToken = cancel };
           Parallel.For(0, waveSize, options, j =>
           {
@@ -1221,6 +1353,8 @@
                 DiagCandidates.Add(FormattableString.Invariant(
                   $"{packIndex},{wSt[j].Value.Seed},{wSt[j].Value.Count},{wSt[j].Value.Density:F5},{ex:F3},{ey:F3}"));
               }
+
+              onCandidate?.Invoke(wPl[j], wBy[j], wEdges[j]);
             }
           }
 
@@ -1316,8 +1450,8 @@
       }
 
       // Pre-anchor min → margin so compaction starts on-sheet, then gravity-compact to the corner.
-      double minX = all.Min(p => p.PlacedPart.MinX);
-      double minY = all.Min(p => p.PlacedPart.MinY);
+      double minX = all.Min(p => p.MinX);
+      double minY = all.Min(p => p.MinY);
       foreach (var pp in all)
       {
         pp.X += margin - minX;
@@ -4509,7 +4643,7 @@
         // were therefore picked as the victim almost every time. A job of five plus two mirrored lost a
         // mirrored one over and over. Area is blind to which hand a part is.
         var victim = unfit.All
-          .OrderBy(p => Math.Abs(p.PlacedPart?.Area ?? 0))
+          .OrderBy(p => Math.Abs(p.Part?.Area ?? 0))
           .ThenByDescending(p => p.Source)
           .FirstOrDefault(p => placements.Contains(p));
         if (victim == null)
@@ -4641,7 +4775,7 @@
 
       foreach (var other in placements)
       {
-        if (ReferenceEquals(other, victim) || other?.PlacedPart == null)
+        if (ReferenceEquals(other, victim) || other?.Part == null)
         {
           continue;
         }
@@ -5131,23 +5265,48 @@
       _ => 600,
     };
 
+    /// <summary>The most searches the operator lets run at once (Advanced Settings); 0 = automatic. Only
+    /// scheduling, like everything in <see cref="Concurrency"/>: it changes how long a nest takes and how
+    /// hard the machine works, never the nest.</summary>
+    internal static int ConcurrencyLimit { get; set; }
+
+    /// <summary>The most a setting can usefully ask for: a wave never holds more searches than this.</summary>
+    internal const int MaxConcurrencyLimit = WaveSize;
 
     /// <summary>How many searches run at the same instant. This is the ONLY place the machine is allowed
     /// to influence a nest, and it influences only how long it takes — a slower machine finishes the same
     /// wave later, it does not compute a different one. SHEETNEST_MAX_CONC overrides it, which is how the
     /// "any machine, same nest" claim is actually tested rather than asserted.</summary>
-    private static int Concurrency()
+    private static int Concurrency(NestEffort effort) => ResolveConcurrency(
+      Environment.GetEnvironmentVariable("SHEETNEST_MAX_CONC"),
+      ConcurrencyLimit,
+      Environment.ProcessorCount,
+      effort);
+
+    /// <summary>The environment variable wins, then the operator's setting, then <see cref="AutoConcurrency"/>.</summary>
+    internal static int ResolveConcurrency(string? env, int setting, int logicalCores, NestEffort effort)
     {
-      var env = Environment.GetEnvironmentVariable("SHEETNEST_MAX_CONC");
       if (int.TryParse(env, NumberStyles.Integer, CultureInfo.InvariantCulture, out int n) && n >= 1)
       {
         return n;
       }
 
-      // One thread per race now (see SearchWorkers), so the machine can afford one race per core rather
-      // than the half it was given back when each race brought eight threads of its own.
-      return Math.Max(1, Environment.ProcessorCount);
+      return setting >= 1 ? Math.Min(setting, MaxConcurrencyLimit) : AutoConcurrency(logicalCores, effort);
     }
+
+    /// <summary>
+    /// How many searches fit the machine: one logical core is left for the window and for mapping each
+    /// finished search, and the rest are shared out by how many threads one search brings
+    /// (<see cref="SearchWorkers"/>).
+    /// </summary>
+    /// <remarks>
+    /// It used to be one search per logical core, written when every search ran on one thread. Normal and
+    /// Best since run two, so a 4-thread Celeron was asked for eight busy threads plus the app's own work,
+    /// and a 12-thread laptop for sixteen. Four cores now get one Normal search (two threads) or three
+    /// Fast ones; twelve get five Normal or eight Fast.
+    /// </remarks>
+    internal static int AutoConcurrency(int logicalCores, NestEffort effort)
+      => Math.Max(1, Math.Min(MaxConcurrencyLimit, (logicalCores - 1) / SearchWorkers(effort)));
 
     /// <summary>How long a sheet's search runs, in sparrow iterations. Deliberately NOT a function of the
     /// clock or of the machine: this is the number that has to match for two computers to agree on a
@@ -5246,10 +5405,10 @@
       double minX = double.MaxValue, minY = double.MaxValue, maxX = double.MinValue, maxY = double.MinValue;
       foreach (var p in placements)
       {
-        minX = Math.Min(minX, p.PlacedPart.MinX);
-        minY = Math.Min(minY, p.PlacedPart.MinY);
-        maxX = Math.Max(maxX, p.PlacedPart.MaxX);
-        maxY = Math.Max(maxY, p.PlacedPart.MaxY);
+        minX = Math.Min(minX, p.MinX);
+        minY = Math.Min(minY, p.MinY);
+        maxX = Math.Max(maxX, p.MaxX);
+        maxY = Math.Max(maxY, p.MaxY);
       }
 
       return (maxX - minX, maxY - minY);
@@ -5407,6 +5566,18 @@
       {
         error = "Could not start the nesting engine: " + ex.Message;
         return null;
+      }
+
+      // Below normal, so a small machine running every core flat out still repaints the window and
+      // answers Stop. The search ends on an iteration count, not the clock, so this changes only how
+      // long it takes, never the nest.
+      try
+      {
+        proc.PriorityClass = ProcessPriorityClass.BelowNormal;
+      }
+      catch (Exception ex) when (ex is InvalidOperationException || ex is System.ComponentModel.Win32Exception)
+      {
+        // Already exited, or not ours to change: it runs at normal priority, as it always did.
       }
 
       // Stream both streams line by line and pull the live density ("... dens: 88.9% ...") out so the

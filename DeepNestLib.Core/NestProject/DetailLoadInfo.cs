@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.NestProject
+namespace DeepNestLib.NestProject
 {
   using System.IO;
   using System.Text.Json;
@@ -44,7 +44,7 @@
     }
 
     /// <summary>
-    /// A direct DXF/STEP part has had common cutting explicitly confirmed by the operator. Missing/false
+    /// A direct DXF part has had common cutting explicitly confirmed by the operator. Missing/false
     /// keeps modes left behind by older builds inactive.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -53,7 +53,7 @@
     /// <summary>
     /// Gets whether this part has an output contract that can represent one shared cut.
     /// its already-toolpathed contract; a direct part is supported only when its effective geometry is a
-    /// DXF. STEP/IGES imports qualify through the unfolded DXF stored in <see cref="Path"/>.
+    /// DXF.
     /// </summary>
     [JsonIgnore]
     public bool SupportsCommonCutting
@@ -62,7 +62,7 @@
       {
         try
         {
-          return string.Equals(System.IO.Path.GetExtension(this.Path), ".dxf", System.StringComparison.OrdinalIgnoreCase);
+          return DeepNestLib.IO.DxfFileExtensions.IsDxf(this.Path);
         }
         catch (System.ArgumentException)
         {
@@ -75,10 +75,10 @@
     /// Gets who this part may share a cut edge with, once where it came from is taken into account.
     /// </summary>
     /// <remarks>
-    /// <para>A DXF/STEP part carries no tooling: its nominal full edges stay at the configured Common
+    /// <para>A DXF part carries no tooling: its nominal full edges stay at the configured Common
     /// Line Gap and export as a resolved cluster perimeter plus one midpoint common cut. Common cutting
     /// is never inferred merely from a stored mode.</para>
-    /// <para>Direct DXF/STEP parts may opt in through <see cref="DirectCommonCuttingEnabled"/>. Answering
+    /// <para>Direct DXF parts may opt in through <see cref="DirectCommonCuttingEnabled"/>. Answering
     /// None here rather than clearing <see cref="CommonCutting"/> is deliberate: a project saved by a build
     /// that exposed common cutting globally can carry an unconfirmed mode on a plain part. Opening that
     /// project must not silently reactivate or erase it; Edit Part lets the operator confirm it.</para>
@@ -94,7 +94,7 @@
     /// Gets or sets common cutting as the plain on/off it used to be, so every existing caller still
     /// compiles and reads the same answer. <see cref="CommonCutting"/> is the real setting: turning this
     /// on means Unrestricted, and it reads true for SamePart too. Assigning this compatibility property
-    /// is an explicit caller choice, so on a direct DXF/STEP it also confirms (or withdraws) the direct
+    /// is an explicit caller choice, so on a direct DXF it also confirms (or withdraws) the direct
     /// common-cutting opt-in. Legacy JSON is handled separately by <see cref="LegacyCommonLine"/> and
     /// never confirms it.
     /// </summary>
@@ -146,28 +146,12 @@
 
     public AnglesEnum StrictAngle { get; set; } = AnglesEnum.None;
 
-    // 3D-unfold provenance: when a part comes from a STEP/IGES import, these let SheetNest re-unfold it
-    // (e.g. after the user changes the K-factor in Edit Part) and rebuild the flat if the temp DXF is
-    // gone. Empty SourceStepPath = a plain 2D part (never 3D-unfolded). All persist to the .dnest.
-    public string SourceStepPath { get; set; } = string.Empty;
-
-    public int UnfoldIndex { get; set; } = 0; // index into StepUnfoldService.GetUnfoldedParts(...).Paths for THIS part
-
     // Split-drawing provenance: when a DXF held several parts, each part became its own file and these
     // say which drawing it came out of and which part of it this is, so the file can be rebuilt if the
     // temp folder is cleaned. Empty SourceDxfPath = a part imported as its own file. Both persist.
     public string SourceDxfPath { get; set; } = string.Empty;
 
     public int PartIndex { get; set; } = 0;
-
-    public double KFactor { get; set; } = 0.40;
-
-    public string KFactorStandard { get; set; } = "ansi";
-
-    public bool UnfoldUnitInch { get; set; } = true;
-
-    public double ThicknessMm { get; set; } = 0; // detected sheet thickness (mm); 0 = unknown (display only)
-
 
     public override string ToJson(bool writeIndented = false)
     {

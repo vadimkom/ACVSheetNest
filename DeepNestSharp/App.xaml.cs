@@ -1,8 +1,8 @@
-﻿namespace DeepNestSharp
+namespace DeepNestSharp
 {
   using System;
   using System.IO;
-  using System.Text;
+  using System.Linq;
   using System.Windows;
   using DeepNestLib;
   using DeepNestSharp.Domain.Services;
@@ -22,6 +22,15 @@
 
     public App()
     {
+      // The generated Main calls InitializeComponent only AFTER this constructor, and this constructor opens
+      // the main window. Until then the theme (App.xaml) is not loaded, so a window reaching a theme style
+      // with StaticResource could fail to find it ("PrimaryButton" on the About dialog). Loaded here, first;
+      // the generated call afterwards sees it done and returns.
+      this.InitializeComponent();
+
+      // The domain's messages come from the same dictionaries as the window's.
+      UiText.Resolve = DeepNestSharp.Ui.Localization.Get;
+
       // Consent-based crash reporting: log locally, offer a pre-filled GitHub issue, never send
       // anything by itself. The nest path has its own non-fatal catch in MainWindow.OnNest; these
       // are the last-resort nets for everything else.
@@ -53,14 +62,11 @@
       host = new HostBuilder()
            .ConfigureServices((hostContext, services) =>
            {
-             services.AddScoped<ISettingsService, SettingsService>();
-             services.AddScoped<IMouseCursorService, MouseCursorService>();
              services.AddScoped<IFileIoService, FileIoService>();
              services.AddScoped<IMessageService, MessageBoxService>();
-             services.AddTransient<INestProjectViewModel, NestProjectViewModel>();
              services.AddSingleton(SvgNest.Config);
              services.AddSingleton<IDispatcherService>(new DispatcherService(this.Dispatcher));
-             services.AddSingleton<IMainViewModel, DockingMainViewModel>();
+             services.AddSingleton<IMainViewModel, DesktopMainViewModel>();
              services.AddSingleton<MainWindow>();
            }).Build();
 
@@ -72,62 +78,34 @@
           var mainWindow = services.GetRequiredService<MainWindow>();
           mainWindow?.Show();
 
-          var args = Environment.GetCommandLineArgs();
-          if (args != null && args.Length > 0)
+          // Files named on the command line (a double-clicked .dnest, DXFs dropped on the icon) take the
+          // same path as files dropped on the window. [0] is the program itself.
+          var files = Environment.GetCommandLineArgs()
+            .Skip(1)
+            .Where(arg => !arg.StartsWith("--", StringComparison.Ordinal) && File.Exists(arg))
+            .ToArray();
+          var unsupported = files
+            .Where(f => !f.EndsWith(".dnest", StringComparison.OrdinalIgnoreCase) && !DeepNestLib.IO.DxfFileExtensions.IsDxf(f))
+            .ToArray();
+          if (unsupported.Length > 0)
           {
-            var mainViewModel = services.GetRequiredService<IMainViewModel>();
+            MessageBox.Show(
+              DeepNestSharp.Ui.Localization.Format("Msg_UnsupportedFiles", string.Join(", ", unsupported.Select(Path.GetFileName))),
+              "SheetNest",
+              MessageBoxButton.OK,
+              MessageBoxImage.Information);
+          }
 
-            foreach (var arg in args)
-            {
-              if (arg.StartsWith("--", StringComparison.Ordinal))
-              {
-                continue; // a switch, not a file
-              }
-
-              var fileInfo = new FileInfo(arg);
-              if (fileInfo.Exists)
-              {
-                if (fileInfo.Extension == ".dll" ||
-                    fileInfo.Extension == ".exe")
-                {
-                  //NOP
-                }
-                else if (fileInfo.Extension == ".dnr")
-                {
-                  mainViewModel.LoadNestResult(fileInfo.FullName);
-                }
-                else if (fileInfo.Extension == ".dnest")
-                {
-                  mainViewModel.OnLoadNestProject(fileInfo.FullName);
-                }
-                else if (fileInfo.Extension == ".dnsp")
-                {
-                  mainViewModel.LoadSheetPlacement(fileInfo.FullName);
-                }
-                else if (fileInfo.Extension == ".dxf" ||
-                         fileInfo.Extension == ".dnpoly" ||
-                         DeepNestLib.IO.StepUnfoldService.IsStepFile(fileInfo.FullName))
-                {
-                  mainViewModel.LoadPart(fileInfo.FullName);
-                }
-                else
-                {
-                  var message = new StringBuilder();
-                  message.AppendLine($"Unable to load {fileInfo.Name}");
-                  message.AppendLine("Files supported include: ");
-                  message.AppendLine("  DeepNest Project (*.dnest)");
-                  message.AppendLine("  DeepNest Result (*.dnr)");
-                  message.AppendLine("  DeepNest Sheet Placement (*.dnsp)");
-                  message.AppendLine("  AutoCad Drawing Exchange Format (*.dxf) and ");
-                  message.AppendLine("  DeepNest Polygon (*.dnpoly).");
-                  message.AppendLine("  3D sheet metal (*.step, *.stp, *.iges, *.igs)");
-                  if (MessageBox.Show(message.ToString(), "DeepNest", MessageBoxButton.OKCancel) == System.Windows.MessageBoxResult.Cancel)
-                  {
-                    Application.Current.MainWindow.Close();
-                  }
-                }
-              }
-            }
+          if (files.Length > unsupported.Length)
+          {
+            // Not now: this constructor runs before the dispatcher does, so there is no UI context yet and
+            // every await in the add would resume on a pool thread and touch the parts list from there.
+            // Queued at idle it runs on the UI thread once the window has loaded, restored the session and
+            // made the project the parts belong in.
+            var supported = files.Except(unsupported).ToArray();
+            mainWindow.Dispatcher.BeginInvoke(
+              System.Windows.Threading.DispatcherPriority.ApplicationIdle,
+              new Action(() => mainWindow.OpenFiles(supported)));
           }
         }
         catch (Exception ex)

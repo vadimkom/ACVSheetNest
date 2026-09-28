@@ -15,6 +15,11 @@
     public bool? ShowDialog()
     {
       var dialog = aboutDialogFactory();
+      if (dialog is System.Windows.Window window)
+      {
+        window.Owner = System.Windows.Application.Current?.MainWindow;
+      }
+
       return dialog.ShowDialog();
     }
   }

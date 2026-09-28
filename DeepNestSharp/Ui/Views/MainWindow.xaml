@@ -5,21 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:userControls="clr-namespace:DeepNestSharp.Ui.UserControls"
         xmlns:converters="clr-namespace:DeepNestSharp.Ui.Converters"
+        xmlns:ui="clr-namespace:DeepNestSharp.Ui"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:placement="clr-namespace:DeepNestLib.Placement;assembly=DeepNestLib.Core"
         xmlns:nestproject="clr-namespace:DeepNestLib.NestProject;assembly=DeepNestLib.Core"
         mc:Ignorable="d"
         Title="{Binding Title}" Icon="/Branding/sheetnest-icon.png"
-        FontFamily="Tahoma" FontSize="11"
-        Height="850" Width="1340" WindowStartupLocation="CenterScreen">
+        Height="850" Width="1340" WindowStartupLocation="CenterScreen"
+        AllowDrop="True" Drop="OnWindowDrop" DragOver="OnWindowDragOver" KeyDown="MainWindow_KeyDown">
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
     <converters:PartPreviewConverter x:Key="PartPreview" />
     <converters:RgbToBrushConverter x:Key="RgbToBrush" />
+    <converters:InverseBooleanConverter x:Key="InvertBool" />
+    <converters:PriorityToOptionConverter x:Key="PriorityToOption" />
 
-    <!-- A colour swatch is the colour and nothing else. The default button template paints a background,
-         a raised border and padding around its content, which framed every colour in a white box. -->
     <Style x:Key="ColourSwatchButton" TargetType="Button">
       <Setter Property="Padding" Value="0" />
       <Setter Property="Cursor" Value="Hand" />
@@ -30,7 +31,6 @@
           <ControlTemplate TargetType="Button">
             <ContentPresenter x:Name="content" />
             <ControlTemplate.Triggers>
-              <!-- Nothing is raised any more, so the hover cue has to come from the colour itself. -->
               <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="content" Property="Opacity" Value="0.75" />
               </Trigger>
@@ -39,6 +39,18 @@
         </Setter.Value>
       </Setter>
     </Style>
+
+    <Style x:Key="FlatGridViewColumnHeader" TargetType="GridViewColumnHeader">
+      <Setter Property="Background" Value="#E0E0E0" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border}" />
+      <Setter Property="BorderThickness" Value="0,0,1,1" />
+      <Setter Property="Foreground" Value="{DynamicResource Brush.TextPrimary}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Padding" Value="8,5" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+    </Style>
+
     <ObjectDataProvider x:Key="PlacementTypeValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
       <ObjectDataProvider.MethodParameters>
         <x:Type TypeName="placement:PlacementTypeEnum" />
@@ -59,320 +71,665 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
-    <!-- Menu bar (branding lives in the title-bar icon only). -->
+    <!-- Row 0: Menu Bar -->
     <DockPanel Grid.Row="0" Background="{DynamicResource Brush.Window}">
       <Menu Background="Transparent" VerticalAlignment="Center">
-      <MenuItem Header="_File">
-        <MenuItem Header="New Project" Command="{Binding CreateNestProjectCommand}" />
-        <MenuItem Header="Open Project..." Command="{Binding LoadNestProjectCommand}" />
-        <MenuItem x:Name="recentProjectsMenu" Header="Recent Projects" SubmenuOpened="OnRecentProjectsOpened">
-          <MenuItem Header="(empty)" IsEnabled="False" />
+        <MenuItem x:Name="menuFile" Header="_Файл">
+          <MenuItem x:Name="menuNewProject" Header="Новый проект" Command="{Binding CreateNestProjectCommand}" />
+          <MenuItem x:Name="menuOpenProject" Header="Открыть проект..." Command="{Binding LoadNestProjectCommand}" />
+          <MenuItem x:Name="recentProjectsMenu" Header="Последние проекты" SubmenuOpened="OnRecentProjectsOpened">
+            <MenuItem x:Name="recentEmptyItem" Header="(пусто)" IsEnabled="False" />
+          </MenuItem>
+          <Separator />
+          <MenuItem x:Name="menuSave" Header="Сохранить" Command="{Binding ActiveDocumentSaveCommand}" />
+          <MenuItem x:Name="menuSaveAs" Header="Сохранить как..." Command="{Binding ActiveDocumentSaveAsCommand}" />
+          <Separator />
+          <MenuItem x:Name="menuExit" Header="Выход" Command="{Binding ExitCommand}" />
         </MenuItem>
-        <MenuItem Header="Import 3D (STEP / IGES)..." Click="OnImport3DClicked" />
-        <Separator />
-        <MenuItem Header="Save" Command="{Binding ActiveDocumentSaveCommand}" />
-        <MenuItem Header="Save As..." Command="{Binding ActiveDocumentSaveAsCommand}" />
-        <Separator />
-        <MenuItem Header="Exit" Command="{Binding ExitCommand}" />
-      </MenuItem>
-      <MenuItem Header="_Settings">
-        <MenuItem Header="Offcut..." Click="OnOffcutSettings" />
-        <MenuItem Header="Advanced Settings..." Click="OnAdvancedSettings" />
-      </MenuItem>
-      <MenuItem Header="_Help">
-        <MenuItem Header="Check for Updates..." Click="OnCheckUpdates" />
-        <MenuItem Header="Send Feedback..." Click="OnSendFeedback" ToolTip="Open a pre-filled GitHub issue to suggest ideas or report problems" />
-        <MenuItem Header="About" Command="{Binding AboutDialogCommand}" />
-      </MenuItem>
-    </Menu>
+        <MenuItem x:Name="menuSettings" Header="_Настройки">
+          <MenuItem x:Name="menuOffcut" Header="Деловые отходы..." Click="OnOffcutSettings" />
+          <MenuItem x:Name="menuAdvancedSettings" Header="Расширенные настройки..." Click="OnAdvancedSettings" />
+          <Separator />
+          <MenuItem x:Name="menuLanguage" Header="Язык (Language)">
+            <MenuItem x:Name="langRuItem" Header="🇷🇺 Русский" Click="OnLanguageRuClicked" IsCheckable="True" />
+            <MenuItem x:Name="langBgItem" Header="🇧🇬 Български" Click="OnLanguageBgClicked" IsCheckable="True" />
+            <MenuItem x:Name="langEnItem" Header="🇬🇧 English" Click="OnLanguageEnClicked" IsCheckable="True" />
+          </MenuItem>
+        </MenuItem>
+        <MenuItem x:Name="menuHelp" Header="_Справка">
+          <MenuItem x:Name="menuCheckUpdates" Header="Проверить обновления..." Click="OnCheckUpdates" />
+          <MenuItem x:Name="menuSendFeedback" Header="Обратная связь..." Click="OnSendFeedback" ToolTip="{ui:Tr Tip_Feedback}" />
+          <MenuItem x:Name="menuAbout" Header="О программе" Command="{Binding AboutDialogCommand}" />
+        </MenuItem>
+      </Menu>
     </DockPanel>
 
-    <!-- Single toolbar: everything one click away — no tab switching for the primary flow. -->
-    <Border Grid.Row="1" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,6">
+    <!-- Row 1: Main Toolbar + Workflow Mode Switcher -->
+    <Border Grid.Row="1" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,5">
       <DockPanel>
-        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-          <Button Style="{DynamicResource ModernButton}" Margin="3,0" Content="Export DXF" Click="OnExportDxf" ToolTip="Export the selected nest result to DXF" />
-          <Button Style="{DynamicResource ModernButton}" Margin="3,0" Content="Report PDF" Click="OnNestReportPdf" ToolTip="Save a PDF nest report: cutting plan, layouts, quantities and utilization" />
+        <!-- Project Actions on Left -->
+        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+          <Button x:Name="btnNew" Style="{DynamicResource ModernButton}" Margin="2,0" Content="Новый" Command="{Binding CreateNestProjectCommand}" ToolTip="{ui:Tr Tip_New}" />
+          <Button x:Name="btnOpen" Style="{DynamicResource ModernButton}" Margin="2,0" Content="Открыть..." Command="{Binding LoadNestProjectCommand}" ToolTip="{ui:Tr Tip_Open}" />
+          <Button x:Name="btnSave" Style="{DynamicResource ModernButton}" Margin="2,0" Content="Сохранить" Command="{Binding ActiveDocumentSaveCommand}" ToolTip="{ui:Tr Tip_Save}" />
+          <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-          <Button Style="{DynamicResource ModernButton}" Margin="3,0" Content="New" Command="{Binding CreateNestProjectCommand}" ToolTip="Start a new nesting project" />
-          <Button Style="{DynamicResource ModernButton}" Margin="3,0" Content="Open" Command="{Binding LoadNestProjectCommand}" ToolTip="Open an existing project" />
-          <Rectangle Style="{DynamicResource ToolbarSeparator}" />
-          <!-- Split button: NEST runs the job, the arrow beside it picks how hard to search. Effort is a
-               per-job decision (it decides whether the last part of a row gets to share its cut), so it
-               belongs next to the button that starts the job, not only inside Advanced Settings. -->
-          <Button Style="{DynamicResource PrimaryButton}" Margin="3,0,0,0" MinWidth="130" Content="&#9654;  NEST" Click="OnNest" ToolTip="Run the nest." />
-          <Button x:Name="nestEffortButton" Style="{DynamicResource PrimaryButton}" Margin="0,0,3,0"
-                  MinWidth="22" Padding="6,4" Content="&#9662;" Click="OnNestEffortMenu">
-            <Button.ContextMenu>
-              <ContextMenu>
-                <MenuItem x:Name="effortFastItem" Header="Fast" IsCheckable="True" Tag="0" Click="OnNestEffortChosen" />
-                <MenuItem x:Name="effortNormalItem" Header="Normal (default)" IsCheckable="True" Tag="1" Click="OnNestEffortChosen" />
-                <MenuItem x:Name="effortBestItem" Header="Best (slowest)" IsCheckable="True" Tag="2" Click="OnNestEffortChosen" />
-              </ContextMenu>
-            </Button.ContextMenu>
-          </Button>
-          <Button x:Name="cancelNestButton" Style="{DynamicResource DangerButton}" Margin="3,0" MinWidth="130" Content="&#9632;  Cancel" Click="OnCancelNest" Visibility="Collapsed" ToolTip="Stop the running nest" />
-          <Button Style="{DynamicResource DangerButton}" Margin="3,0" MinWidth="130" Content="Clear Result" Click="OnClearResult" ToolTip="Discard the nest result and return the sheets it used to the stock" />
+
+        <!-- Mode Navigation Buttons in Center: 1. Модели | 2. Листы | 3. Нестинг | 4. Раскладка и отчёт -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+          <RadioButton x:Name="navPartsBtn" GroupName="NavWorkflowModes" Style="{DynamicResource NavModeRadioStyle}"
+                       Content="1. Модели (Детали)" IsChecked="True" Checked="OnNavModeChecked" Tag="0"
+                       ToolTip="{ui:Tr Tip_NavParts}" />
+          <RadioButton x:Name="navSheetsBtn" GroupName="NavWorkflowModes" Style="{DynamicResource NavModeRadioStyle}"
+                       Content="2. Листы" Checked="OnNavModeChecked" Tag="1" Margin="4,0,0,0"
+                       ToolTip="{ui:Tr Tip_NavSheets}" />
+          <RadioButton x:Name="navNestingBtn" GroupName="NavWorkflowModes" Style="{DynamicResource NavModeRadioStyle}"
+                       Content="3. Нестинг" Checked="OnNavModeChecked" Tag="2" Margin="4,0,0,0"
+                       ToolTip="{ui:Tr Tip_NavNesting}" />
+          <RadioButton x:Name="navLayoutBtn" GroupName="NavWorkflowModes" Style="{DynamicResource NavModeRadioStyle}"
+                       Content="4. Раскладка и отчёт" Checked="OnNavModeChecked" Tag="3" Margin="4,0,0,0"
+                       ToolTip="{ui:Tr Tip_NavLayout}" />
         </StackPanel>
       </DockPanel>
     </Border>
 
-    <!-- Main work area -->
+    <!-- Row 2: Main Work Area (Dedicated View for each Mode) -->
     <Grid Grid.Row="2">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" MinWidth="320" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="360" MinWidth="280" />
-      </Grid.ColumnDefinitions>
 
-      <!-- Center: faithful DXF nest viewer. (The old results grid below it was removed: the raster
-           engine returns a single result, so the row only duplicated the status bar readouts.) -->
-      <Border Grid.Column="0" Margin="4" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1">
-        <userControls:DxfViewer x:Name="dxfViewer" Result="{Binding NestMonitorViewModel.SelectedItem}"
-                                SheetIndex="0" />
-      </Border>
+      <!-- ═══════════════════ SCREEN 1: PARTS (МОДЕЛИ) ═══════════════════ -->
+      <Grid x:Name="gridModeParts" Visibility="Visible" AllowDrop="True" Drop="OnPartsDrop" DragOver="OnPartsDragOver">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-      <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{DynamicResource Brush.BorderSubtle}" />
-
-      <!-- Right: Parts / Sheets / Settings -->
-      <TabControl Grid.Column="2" Margin="0,4,4,4">
-        <TabItem Header="Parts">
-          <!-- A nest result owns the current stock/part counts: lock editing until Clear Result. -->
+        <!-- Parts Top Action Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,6">
           <DockPanel>
-            <DockPanel.Style>
-              <Style TargetType="DockPanel">
-                <Setter Property="IsEnabled" Value="False" />
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding NestMonitorViewModel.SelectedItem}" Value="{x:Null}">
-                    <Setter Property="IsEnabled" Value="True" />
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </DockPanel.Style>
-            <StackPanel DockPanel.Dock="Bottom">
-              <!-- 3D import lives in File > Import 3D (STEP / IGES)... — not frequent enough for a permanent button. -->
-              <Button Style="{DynamicResource ModernButton}" Content="+ Add Part" Click="OnAddPartClicked" Margin="4" HorizontalAlignment="Stretch"
-                      ToolTip="Add a part to nest (DXF)." />
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock x:Name="partsCountSummary" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold" Text="Деталей: 0 (запрошено: 0 шт.)" />
+              <Button x:Name="btnGoToSheets" Style="{DynamicResource PrimaryButton}" Content="Далее: Листы ➔" Click="OnGoToSheets" Margin="4,0" ToolTip="{ui:Tr Tip_GoToSheets}" />
             </StackPanel>
-            <ListView x:Name="partsListView" ItemsSource="{Binding ActiveDocument.ProjectInfo.DetailLoadInfos}"
-                      SelectedItem="{Binding ActiveDocument.SelectedDetailLoadInfo}"
-                      MouseDoubleClick="OnPartsListDoubleClick"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-              <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                  <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-              </ListView.ItemContainerStyle>
-              <ListView.ItemTemplate>
-                <DataTemplate>
-                  <!-- Industrial part row: preview · name + settings caption · Available badge · actions.
-                       Quantity itself lives in the Edit Part dialog (✎ / double-click). -->
-                  <Border Margin="4,3" Padding="6" CornerRadius="0"
-                          Background="{DynamicResource Brush.Card}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1">
-                    <Border.ToolTip>
-                      <TextBlock>
-                        <Run Text="{Binding Path, Mode=OneWay}" /><LineBreak />
-                        <Run Text="{Binding SizeLabel, Mode=OneWay, StringFormat='size {0} in'}" /><LineBreak />
-                        <Run Text="{Binding NetArea, Mode=OneWay, StringFormat='net area {0:0.0} in²'}" />
-                      </TextBlock>
-                    </Border.ToolTip>
-                    <Grid>
-                      <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                      </Grid.ColumnDefinitions>
-                      <Border Grid.Column="0" Width="48" Height="48" Background="{DynamicResource Brush.Card}"
-                              BorderBrush="{DynamicResource Brush.BorderStrong}" BorderThickness="1" Margin="0,0,8,0">
-                        <Image Source="{Binding PreviewSource, Converter={StaticResource PartPreview}}" Stretch="Uniform" Margin="3" />
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+              <Button x:Name="btnAddPart" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddPart}" />
+              <Button x:Name="btnDeletePart" Style="{DynamicResource ModernButton}" Content="Удалить деталь" Click="OnRemoveSelectedPart" Margin="6,0,3,0" ToolTip="{ui:Tr Tip_DeletePart}" />
+              <Button x:Name="btnClearAllParts" Style="{DynamicResource ModernButton}" Content="Очистить всё" Click="OnClearAllParts" Margin="3,0" ToolTip="{ui:Tr Tip_ClearParts}" />
+              <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
+              <TextBlock x:Name="lblMultiplier" Text="Множитель (комплектов):" VerticalAlignment="Center" Margin="0,0,4,0" Style="{DynamicResource CaptionText}" />
+              <xctk:IntegerUpDown x:Name="partsMultiplierUpDown" Value="1" Minimum="1" Maximum="10000" Width="55" VerticalAlignment="Center" Margin="0,0,3,0"
+                                  ToolTip="Множитель количества деталей (например, число изготавливаемых комплектов)" />
+              <Button x:Name="btnApplyMultiplier" Style="{DynamicResource ModernButton}" Content="× Применить" Click="OnApplyPartsMultiplier" Margin="2,0"
+                      ToolTip="Умножить количество деталей на указанный множитель" />
+              <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
+            </StackPanel>
+            <TextBlock x:Name="partsHintText" VerticalAlignment="Center" Style="{DynamicResource CaptionText}" TextTrimming="CharacterEllipsis"
+                       ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" Text="💡 Можно перетащить файлы DXF прямо в эту таблицу (Drag &amp; Drop)" />
+          </DockPanel>
+        </Border>
+
+        <!-- Parts Table -->
+        <Grid Grid.Row="1" Background="White">
+          <ListView x:Name="partsListView" SizeChanged="OnPartsListSizeChanged"
+                    ItemsSource="{Binding ActiveDocument.ProjectInfo.DetailLoadInfos}"
+                    SelectedItem="{Binding ActiveDocument.SelectedDetailLoadInfo}"
+                    MouseDoubleClick="OnPartsListDoubleClick"
+                    BorderThickness="0"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListView.Resources>
+              <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource FlatGridViewColumnHeader}" />
+            </ListView.Resources>
+            <ListView.ItemContainerStyle>
+              <Style TargetType="ListViewItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="0,2" />
+                <Setter Property="BorderBrush" Value="#E5E5E5" />
+                <Setter Property="BorderThickness" Value="0,0,0,1" />
+              </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+              <GridView>
+                <!-- Preview Thumbnail -->
+                <GridViewColumn x:Name="colHeaderPartPreview" Header="Эскиз" Width="64">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <Border Width="48" Height="48" Background="White" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" Margin="2">
+                        <Image Source="{Binding PreviewSource, Converter={StaticResource PartPreview}}" Stretch="Uniform" Margin="2" />
                       </Border>
-                      <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" />
-                        <TextBlock Text="{Binding NestingLabel, Mode=OneWay}" FontSize="11" Foreground="{DynamicResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Part Name & Source -->
+                <GridViewColumn x:Name="colHeaderPartName" Header="Деталь (Название / Файл)" Width="280">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <StackPanel VerticalAlignment="Center" Margin="4,0">
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding NestingLabel, Mode=OneWay}" FontSize="10" Foreground="{DynamicResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                        <TextBlock Text="{Binding Path}" FontSize="10" Foreground="{DynamicResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path}" />
                       </StackPanel>
-                      <!-- Always-visible availability: copies left to nest / requested. -->
-                      <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="6,0"
-                                  ToolTip="Parts still to nest / requested (quantity + spares + mirrored)">
-                        <TextBlock Style="{DynamicResource CaptionText}" Text="Available" FontSize="10" HorizontalAlignment="Center" Margin="0,0,0,1" />
-                        <Border Style="{DynamicResource CountBadge}">
-                          <TextBlock Style="{DynamicResource CountBadgeText}" Text="{Binding NestedInfo, Mode=OneWay}" />
-                        </Border>
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Quantity (Inline Editable) -->
+                <GridViewColumn x:Name="colHeaderPartQty" Header="Количество" Width="118">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                        <xctk:IntegerUpDown Width="75" Minimum="1" Maximum="100000" Value="{Binding Quantity, Mode=TwoWay}"
+                                            ValueChanged="OnPartQuantityChanged" Tag="{Binding}"
+                                            VerticalAlignment="Center" ToolTip="{ui:Tr Tip_PartQty}" />
+                        <TextBlock Text="шт." VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
                       </StackPanel>
-                      <!-- The colour this part is drawn in: the swatch IS the button — no arrow, no text,
-                           just the colour it currently has. Clicking it opens the picker. -->
-                      <Button Grid.Column="3" Style="{DynamicResource ColourSwatchButton}"
-                              Width="24" Height="22" VerticalAlignment="Center" Margin="4,0,0,0"
-                              ToolTip="Colour this part is drawn in"
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Dimensions -->
+                <GridViewColumn x:Name="colHeaderDimensions" Header="Габариты (Ш × В), мм" Width="140">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding SizeLabel, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="4,0" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Net Area -->
+                <GridViewColumn x:Name="colHeaderArea" Header="Площадь, мм²" Width="105">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding NetArea, StringFormat='{}{0:0.##}', Mode=OneWay}" VerticalAlignment="Center" Margin="4,0" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Colour Swatch -->
+                <GridViewColumn x:Name="colHeaderColor" Header="Цвет" Width="55">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <Button Style="{DynamicResource ColourSwatchButton}" Width="28" Height="22" VerticalAlignment="Center" Margin="2,0"
+                              ToolTip="{ui:Tr Tip_PartColor}"
                               Click="OnPartColorClick" Tag="{Binding}">
-                        <!-- A size of its own: an empty Border asks for nothing and would vanish. -->
-                        <Border Width="24" Height="22"
+                        <Border Width="28" Height="22" BorderBrush="{DynamicResource Brush.BorderStrong}" BorderThickness="1"
                                 Background="{Binding EffectiveColorRgb, Converter={StaticResource RgbToBrush}}" />
                       </Button>
-                      <Button Grid.Column="4" Style="{DynamicResource IconButton}" Content="&#9998;" VerticalAlignment="Center" Margin="2,0,0,0"
-                              ToolTip="Edit part (quantity, orientations, priority)"
-                              Click="OnEditPart" Tag="{Binding}" />
-                      <Button Grid.Column="5" Style="{DynamicResource IconButton}" Content="&#10005;" VerticalAlignment="Center" Margin="2,0,0,0"
-                              ToolTip="Remove part"
-                              Command="{Binding DataContext.ActiveDocument.RemovePartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                              CommandParameter="{Binding}" />
-                    </Grid>
-                  </Border>
-                </DataTemplate>
-              </ListView.ItemTemplate>
-            </ListView>
-          </DockPanel>
-        </TabItem>
-        <TabItem Header="Sheets">
-          <!-- Same lock as the Parts tab: the result's deduction must stay in sync with this list. -->
-          <DockPanel>
-            <DockPanel.Style>
-              <Style TargetType="DockPanel">
-                <Setter Property="IsEnabled" Value="False" />
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding NestMonitorViewModel.SelectedItem}" Value="{x:Null}">
-                    <Setter Property="IsEnabled" Value="True" />
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </DockPanel.Style>
-            <Button DockPanel.Dock="Bottom" Style="{DynamicResource ModernButton}" Content="+ Add Sheet" Click="OnAddSheetMenu" Margin="4" HorizontalAlignment="Stretch"
-                    ToolTip="Add a stock sheet: pick a standard size or enter a custom one" />
-            <TextBlock DockPanel.Dock="Top" Style="{DynamicResource CaptionText}" Margin="4,4,4,6"
-                       Text="width = long side · every listed sheet participates; for each sheet the nester cuts the size that fills most of itself · tick Unlimited on a size and the job takes as many of it as it needs" TextWrapping="Wrap" />
-            <!-- Industrial stock list: clean text rows ("120 × 60 · Available 31/31 · ✎ ✕"); size and
-                 quantity are BOTH edited through the Edit sheet dialog (✎ or double-click). -->
-            <ListView x:Name="sheetsListView" ItemsSource="{Binding ActiveDocument.ProjectInfo.SheetLoadInfos}"
-                      SelectedItem="{Binding ActiveDocument.SelectedSheetLoadInfo}"
-                      MouseDoubleClick="OnSheetsListDoubleClick">
-              <ListView.Resources>
-                <!-- Scoped to THIS ListView only (safe — never app-wide implicit styles). -->
-                <Style TargetType="GridViewColumnHeader">
-                  <Setter Property="Background" Value="Transparent" />
-                  <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border}" />
-                  <Setter Property="BorderThickness" Value="0,0,0,1" />
-                  <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />
-                  <Setter Property="FontSize" Value="11" />
-                  <Setter Property="Padding" Value="6,3" />
-                  <Setter Property="HorizontalContentAlignment" Value="Left" />
-                </Style>
-              </ListView.Resources>
-              <ListView.View>
-                <GridView>
-                  <GridViewColumn x:Name="sheetSizeColumn" Header="Sheet (in)" Width="120">
-                    <GridViewColumn.CellTemplate>
-                      <DataTemplate>
-                        <TextBlock FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" Margin="4,4"
-                                   ToolTip="Sheet size, width × height (width = the long side). Edit with ✎ or double-click">
-                          <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0} × {1}">
-                              <Binding Path="Width" Mode="OneWay" />
-                              <Binding Path="Height" Mode="OneWay" />
-                            </MultiBinding>
-                          </TextBlock.Text>
-                        </TextBlock>
-                      </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                  </GridViewColumn>
-                  <GridViewColumn Header="Available" Width="130">
-                    <GridViewColumn.CellTemplate>
-                      <DataTemplate>
-                        <!-- Always visible "Quantity Available": sheets of this size
-                             still available / total (31/31 before a nest; 3/31 after one used 28).
-                             An unlimited size has no availability to count down, so it says so and
-                             reports what the nest took instead. -->
-                        <Border Style="{DynamicResource CountBadge}"
-                                ToolTip="Sheets of this size still available / total. An unlimited size never runs down, so it reports how many the nest used.">
-                          <TextBlock Style="{DynamicResource CountBadgeText}" Text="{Binding NestedInfo, Mode=OneWay}" />
-                        </Border>
-                      </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                  </GridViewColumn>
-                  <GridViewColumn Header="" Width="66">
-                    <GridViewColumn.CellTemplate>
-                      <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                          <Button Style="{DynamicResource IconButton}" Content="&#9998;" ToolTip="Edit sheet (size and quantity)"
-                                  Click="OnEditSheet" Tag="{Binding}" />
-                          <Button Style="{DynamicResource IconButton}" Content="&#10005;" Margin="2,0,0,0" ToolTip="Remove sheet"
-                                  Command="{Binding DataContext.ActiveDocument.RemoveSheetCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                  CommandParameter="{Binding}" />
-                        </StackPanel>
-                      </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                  </GridViewColumn>
-                </GridView>
-              </ListView.View>
-            </ListView>
-          </DockPanel>
-        </TabItem>
-        <TabItem Header="Clearances">
-          <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="12" DataContext="{Binding SvgNestConfigViewModel}">
-              <TextBlock Text="Clearances" FontWeight="Bold" FontSize="14" Margin="0,0,0,10" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
 
-              <Grid>
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" />
-                  <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                <!-- Priority -->
+                <GridViewColumn x:Name="colHeaderPriority" Header="Приоритет" Width="125">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <ComboBox Width="110"
+                                SelectedValue="{Binding Priority, Mode=TwoWay, Converter={StaticResource PriorityToOption}}"
+                                SelectedValuePath="Value"
+                                DisplayMemberPath="Display"
+                                ItemsSource="{Binding Source={x:Static ui:PriorityHelper.CurrentOptions}}"
+                                VerticalAlignment="Center" Margin="2,0"
+                                ToolTip="{ui:Tr Tip_PartPriority}" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
 
-                <!-- Part spacing, rotation and common-line are set PER PART in the Edit Part dialog
-                     (pencil button / double-click a part). For 3D (STEP/IGES) parts the K-factor,
-                     thickness and unit also live in that dialog — per part, editable, re-unfolds on change. -->
+                <!-- Status / Available -->
+                <GridViewColumn x:Name="colHeaderPartStatus" Header="Статус" Width="80">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <Border Style="{DynamicResource CountBadge}" ToolTip="{ui:Tr Tip_PartStatus}">
+                        <TextBlock Style="{DynamicResource CountBadgeText}" Text="{Binding NestedInfo, Mode=OneWay}" />
+                      </Border>
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Style="{DynamicResource SettingLabel}" Text="Sheet edge margin" />
-                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="0,4">
-                  <xctk:DoubleUpDown x:Name="sheetEdgeMarginBox" Width="100" Minimum="0" Increment="0.5"
-                                     Value="{Binding SvgNestConfig.SheetSpacing}"
-                                     ToolTip="Empty border kept clear around the sheet (in the drawing's units)." />
-                </StackPanel>
-              </Grid>
+                <!-- Actions: Details button + Remove -->
+                <GridViewColumn x:Name="colHeaderPartActions" Header="Действия" Width="185">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{DynamicResource ModernButton}" Content="⚙ Подробности..." Margin="2,0"
+                                Click="OnEditPart" Tag="{Binding}"
+                                ToolTip="{ui:Tr Tip_PartDetails}" />
+                        <Button Style="{DynamicResource IconButton}" Content="✕" Margin="4,0,0,0"
+                                ToolTip="{ui:Tr Tip_PartRemove}"
+                                Command="{Binding DataContext.ActiveDocument.RemovePartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+              </GridView>
+            </ListView.View>
+          </ListView>
+
+          <!-- Empty Parts Drag & Drop Hint -->
+          <Border x:Name="partsEmptyHint" Background="#FBFBFB" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                  Margin="40" Padding="30" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+            <StackPanel HorizontalAlignment="Center">
+              <TextBlock Text="📂" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,10" />
+              <TextBlock x:Name="partsEmptyTitle" Text="В проекте пока нет ни одной детали" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,6" />
+              <TextBlock x:Name="partsEmptySub" Text="Перетащите сюда файлы DXF или проекты (Drag &amp; Drop)" FontSize="12" Foreground="{DynamicResource Brush.TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,14" />
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="btnAddPartEmpty" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="4,0" />
+              </StackPanel>
             </StackPanel>
-          </ScrollViewer>
-        </TabItem>
-      </TabControl>
+          </Border>
+        </Grid>
+      </Grid>
+
+
+      <!-- ═══════════════════ SCREEN 2: SHEETS (ЛИСТЫ) ═══════════════════ -->
+      <Grid x:Name="gridModeSheets" Visibility="Collapsed">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Sheets Top Action Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,6">
+          <DockPanel>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock x:Name="sheetsCountSummary" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold" Text="Типоразмеров: 0" />
+              <Button x:Name="btnBackToParts" Style="{DynamicResource ModernButton}" Content="⮜ Назад к моделям" Click="OnGoToParts" Margin="4,0" ToolTip="{ui:Tr Tip_BackToParts}" />
+              <Button x:Name="btnGoToNesting" Style="{DynamicResource PrimaryButton}" Content="Далее: Нестинг ➔" Click="OnGoToNesting" Margin="4,0" ToolTip="{ui:Tr Tip_GoToNesting}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <Button x:Name="btnAddSheet" Style="{DynamicResource PrimaryButton}" Content="+ Добавить лист..." Click="OnAddSheetMenu" Margin="3,0" ToolTip="{ui:Tr Tip_AddSheet}" />
+              <Button x:Name="btnDeleteSheet" Style="{DynamicResource ModernButton}" Content="Удалить лист" Click="OnRemoveSelectedSheet" Margin="3,0" ToolTip="{ui:Tr Tip_DeleteSheet}" />
+              <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
+              <TextBlock x:Name="lblSheetEdgeMargin" Text="Отступ от края листа:" VerticalAlignment="Center" Margin="4,0" />
+              <xctk:DoubleUpDown x:Name="sheetEdgeMarginBox" Width="75" Minimum="0" Increment="0.5"
+                                 Value="{Binding SvgNestConfigViewModel.SvgNestConfig.SheetSpacing}"
+                                 ToolTip="{ui:Tr Tip_EdgeMargin}" />
+              <TextBlock x:Name="marginUnitsLabel" Text="in" VerticalAlignment="Center" Margin="4,0,8,0" Foreground="{DynamicResource Brush.TextMuted}" />
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <!-- Sheets Table -->
+        <Grid Grid.Row="1" Background="White">
+          <ListView x:Name="sheetsListView"
+                    ItemsSource="{Binding ActiveDocument.ProjectInfo.SheetLoadInfos}"
+                    SelectedItem="{Binding ActiveDocument.SelectedSheetLoadInfo}"
+                    MouseDoubleClick="OnSheetsListDoubleClick"
+                    BorderThickness="0"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListView.Resources>
+              <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource FlatGridViewColumnHeader}" />
+            </ListView.Resources>
+            <ListView.ItemContainerStyle>
+              <Style TargetType="ListViewItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="0,4" />
+                <Setter Property="BorderBrush" Value="#E5E5E5" />
+                <Setter Property="BorderThickness" Value="0,0,0,1" />
+              </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+              <GridView>
+                <!-- Sheet Dimensions -->
+                <GridViewColumn x:Name="colHeaderSheetDimensions" Header="Размеры листа (Ширина × Высота), мм" Width="230">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <TextBlock FontWeight="Bold" FontSize="13" VerticalAlignment="Center" Margin="4,0">
+                        <TextBlock.Text>
+                          <MultiBinding StringFormat="{}{0} × {1}">
+                            <Binding Path="Width" Mode="OneWay" />
+                            <Binding Path="Height" Mode="OneWay" />
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Quantity -->
+                <GridViewColumn x:Name="colHeaderSheetQty" Header="Количество в наличии" Width="170">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                        <xctk:IntegerUpDown Width="80" Minimum="1" Maximum="100000" Value="{Binding Quantity, Mode=TwoWay}"
+                                            IsEnabled="{Binding Unlimited, Converter={StaticResource InvertBool}}"
+                                            VerticalAlignment="Center" ToolTip="{ui:Tr Tip_SheetQty}" />
+                        <TextBlock Text="шт." VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Unlimited Stock Checkbox -->
+                <GridViewColumn x:Name="colHeaderSheetUnlimited" Header="Неограниченно" Width="130">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <CheckBox IsChecked="{Binding Unlimited, Mode=TwoWay}" Content="{ui:Tr Sheet_UnlimitedShort}"
+                                VerticalAlignment="Center" Margin="4,0" ToolTip="{ui:Tr Tip_SheetUnlimited}" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Priority -->
+                <GridViewColumn x:Name="colHeaderSheetPriority" Header="Приоритет" Width="130">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <ComboBox Width="110"
+                                SelectedValue="{Binding Priority, Mode=TwoWay, Converter={StaticResource PriorityToOption}}"
+                                SelectedValuePath="Value"
+                                DisplayMemberPath="Display"
+                                ItemsSource="{Binding Source={x:Static ui:PriorityHelper.CurrentOptions}}"
+                                VerticalAlignment="Center" Margin="2,0"
+                                ToolTip="{ui:Tr Tip_SheetPriority}" />
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Available / Used Status -->
+                <GridViewColumn x:Name="colHeaderSheetStatus" Header="Доступно / Использовано" Width="160">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <Border Style="{DynamicResource CountBadge}">
+                        <TextBlock Style="{DynamicResource CountBadgeText}" Text="{Binding NestedInfo, Mode=OneWay}" />
+                      </Border>
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
+                <!-- Actions -->
+                <GridViewColumn x:Name="colHeaderSheetActions" Header="Действия" Width="160">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_EditSheet}" Margin="2,0"
+                                Click="OnEditSheet" Tag="{Binding}" ToolTip="{ui:Tr Tip_EditSheet}" />
+                        <Button Style="{DynamicResource IconButton}" Content="✕" Margin="4,0,0,0"
+                                ToolTip="{ui:Tr Tip_RemoveSheet}"
+                                Command="{Binding DataContext.ActiveDocument.RemoveSheetCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+              </GridView>
+            </ListView.View>
+          </ListView>
+
+          <!-- Empty Sheets Hint -->
+          <Border x:Name="sheetsEmptyHint" Background="#FBFBFB" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                  Margin="40" Padding="30" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+            <StackPanel HorizontalAlignment="Center">
+              <TextBlock Text="📋" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,10" />
+              <TextBlock x:Name="sheetsEmptyTitle" Text="Листы материала не добавлены" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,6" />
+              <TextBlock x:Name="sheetsEmptySub" Text="{ui:Tr Sheets_EmptySub}" FontSize="12" Foreground="{DynamicResource Brush.TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,14" />
+              <Button x:Name="btnAddSheetEmpty" Style="{DynamicResource PrimaryButton}" Content="+ Добавить лист..." Click="OnAddSheetMenu" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Border>
+        </Grid>
+      </Grid>
+
+
+      <!-- ═══════════════════ SCREEN 3: NESTING (НЕСТИНГ) ═══════════════════ -->
+      <Grid x:Name="gridModeNesting" Visibility="Collapsed">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Nesting Control Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,6">
+          <DockPanel>
+            <!-- Right: Open Layout Button -->
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+              <Button x:Name="btnOpenLayoutFromNesting" Style="{DynamicResource PrimaryButton}" Content="Открыть раскладку и отчёт ➔"
+                      Click="OnGoToLayout" Margin="4,0" ToolTip="{ui:Tr Tip_OpenLayout}" />
+            </StackPanel>
+
+            <!-- Left / Center: Controls & Progress -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <Button x:Name="btnStartNest" Style="{DynamicResource PrimaryButton}" Content="▶  ЗАПУСК НЕСТИНГА" Click="OnNest"
+                      MinWidth="160" ToolTip="{ui:Tr Tip_StartNest}" Margin="2,0,0,0" />
+              <Button x:Name="nestEffortButton" Style="{DynamicResource PrimaryButton}" Margin="0,0,4,0"
+                      MinWidth="24" Padding="6,4" Content="&#9662;" Click="OnNestEffortMenu">
+                <Button.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem x:Name="effortFastItem" Header="Fast (Быстрый)" IsCheckable="True" Tag="0" Click="OnNestEffortChosen" />
+                    <MenuItem x:Name="effortNormalItem" Header="Normal (Стандартный)" IsCheckable="True" Tag="1" Click="OnNestEffortChosen" />
+                    <MenuItem x:Name="effortBestItem" Header="Best (Глубокий поиск)" IsCheckable="True" Tag="2" Click="OnNestEffortChosen" />
+                  </ContextMenu>
+                </Button.ContextMenu>
+              </Button>
+              <Button x:Name="cancelNestButton" Style="{DynamicResource DangerButton}" Margin="4,0" Content="■  Остановить"
+                      Click="OnCancelNest" Visibility="Collapsed" ToolTip="{ui:Tr Tip_CancelNest}" />
+              <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
+              <TextBlock x:Name="nestPhaseText" Style="{DynamicResource StatusValue}" VerticalAlignment="Center"
+                         FontWeight="Bold" Foreground="{DynamicResource Brush.Accent}" Margin="6,0" />
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <!-- Two-Pane Work Area: Left = Runs/Iterations Table, Right = DxfViewer Run Preview -->
+        <Grid Grid.Row="1" x:Name="nestWorkArea" SizeChanged="OnNestWorkAreaSizeChanged">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="380" MinWidth="260" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" MinWidth="360" />
+          </Grid.ColumnDefinitions>
+
+          <!-- Left Pane: Runs Table -->
+          <Border x:Name="runsPane" Grid.Column="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,1,0">
+            <DockPanel>
+              <!-- Runs Table Header Caption -->
+              <Border DockPanel.Dock="Top" Background="#EAEAEA" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,5">
+                <DockPanel>
+                  <Button x:Name="btnClearRuns" DockPanel.Dock="Right" Style="{DynamicResource ModernButton}" Padding="6,1" Content="🗑 Очистить" Click="OnClearRunsClicked" ToolTip="Очистить список вариантов раскладки" />
+                  <TextBlock x:Name="runsListTitle" FontWeight="Bold" FontSize="11" Text="Варианты и прогоны раскладки" VerticalAlignment="Center" />
+                </DockPanel>
+              </Border>
+
+              <!-- Hint Footer -->
+              <Border DockPanel.Dock="Bottom" Background="#F0F0F0" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0" Padding="8,4">
+                <TextBlock x:Name="runsListHint" Style="{DynamicResource CaptionText}" Text="💡 Кликните по варианту для предпросмотра; дважды кликните для перехода к раскладке." TextWrapping="Wrap" />
+              </Border>
+
+              <!-- Runs ListView -->
+              <ListView x:Name="runsListView"
+                        MouseDoubleClick="OnRunsListDoubleClick"
+                        SelectionChanged="OnRunsListSelectionChanged"
+                        BorderThickness="0" Background="White">
+                <ListView.Resources>
+                  <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource FlatGridViewColumnHeader}" />
+                </ListView.Resources>
+                <ListView.ItemContainerStyle>
+                  <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="4,4" />
+                    <Setter Property="BorderBrush" Value="#E5E5E5" />
+                    <Setter Property="BorderThickness" Value="0,0,0,1" />
+                  </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                  <GridView>
+                    <GridViewColumn x:Name="colHeaderRunNum" Header="№" Width="36" DisplayMemberBinding="{Binding RunNumber}" />
+                    <GridViewColumn x:Name="colHeaderRunUtil" Header="% Утилиз." Width="90">
+                      <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                          <TextBlock Text="{Binding UtilizationText}" FontWeight="Bold" Foreground="{DynamicResource Brush.Accent}" />
+                        </DataTemplate>
+                      </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn x:Name="colHeaderRunPlaced" Header="Размещено" Width="95" DisplayMemberBinding="{Binding PlacedText}" />
+                    <GridViewColumn x:Name="colHeaderRunSheets" Header="Листов" Width="60" DisplayMemberBinding="{Binding SheetsText}" />
+                    <GridViewColumn x:Name="colHeaderRunTime" Header="Время" Width="75" DisplayMemberBinding="{Binding TimeText}" />
+                  </GridView>
+                </ListView.View>
+              </ListView>
+            </DockPanel>
+          </Border>
+
+          <!-- Splitter -->
+          <GridSplitter x:Name="runsSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="{DynamicResource Brush.BorderSubtle}" />
+
+          <!-- Right Pane: Preview of Selected Run -->
+          <Grid x:Name="previewPane" Grid.Column="2" Background="{DynamicResource Brush.Panel}">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Metrics bar above preview -->
+            <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="10,6">
+              <DockPanel>
+                <TextBlock x:Name="nestPreviewMetricsText" Foreground="{DynamicResource Brush.TextPrimary}" FontWeight="SemiBold"
+                           VerticalAlignment="Center" Text="Предпросмотр раскладки: выберите вариант в списке вариантов" />
+              </DockPanel>
+            </Border>
+
+            <!-- Run Preview DxfViewer -->
+            <Border Grid.Row="1" Margin="2" BorderBrush="{DynamicResource Brush.BorderStrong}" BorderThickness="1">
+              <userControls:DxfViewer x:Name="nestDxfViewer" SheetIndex="0" />
+            </Border>
+          </Grid>
+        </Grid>
+      </Grid>
+
+
+      <!-- ═══════════════════ SCREEN 4: LAYOUT & REPORT (РАСКЛАДКА И ОТЧЁТ) ═══════════════════ -->
+      <Grid x:Name="gridModeLayout" Visibility="Collapsed">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Layout Top Action Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,6">
+          <DockPanel>
+            <!-- Right: Export & Print Buttons -->
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+              <Button x:Name="btnExportDxf" Style="{DynamicResource ModernButton}" Margin="3,0" Content="📁 Экспорт в DXF" Click="OnExportDxf" ToolTip="{ui:Tr Tip_ExportDxf}" />
+              <Button x:Name="btnExportPdf" Style="{DynamicResource ModernButton}" Margin="3,0" Content="📄 Экспорт отчёта (PDF)" Click="OnNestReportPdf" ToolTip="{ui:Tr Tip_ExportPdf}" />
+              <Button x:Name="btnPrintReport" Style="{DynamicResource PrimaryButton}" Margin="3,0" Content="🖨️ Печать отчета..." Click="OnPrintReport" ToolTip="{ui:Tr Tip_PrintReport}" />
+            </StackPanel>
+
+            <!-- Left: View Toggle (DXF Layout vs Report Preview) -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <RadioButton x:Name="viewTypeDxfRadio" GroupName="LayoutViewMode" Style="{DynamicResource ModernRadioButtonStyle}"
+                           Content="Чертеж раскладки (DXF)" IsChecked="True" Checked="OnLayoutViewTypeChanged" Margin="2,0" />
+              <RadioButton x:Name="viewTypeReportRadio" GroupName="LayoutViewMode" Style="{DynamicResource ModernRadioButtonStyle}"
+                           Content="Сводный отчёт" Checked="OnLayoutViewTypeChanged" Margin="2,0" />
+              <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
+              <Button x:Name="btnBackToNesting" Style="{DynamicResource ModernButton}" Content="⮜ Вернуться к нестингу" Click="OnGoToNesting" Margin="2,0" ToolTip="{ui:Tr Tip_BackToNesting}" />
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <!-- Work Area: DXF Layout Viewer or Report Preview -->
+        <Grid Grid.Row="1">
+
+          <!-- 1. DXF Layout View -->
+          <Border x:Name="dxfViewerBorder" Margin="2" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" Visibility="Visible">
+            <userControls:DxfViewer x:Name="dxfViewer" Result="{Binding NestMonitorViewModel.SelectedItem}" SheetIndex="0" />
+          </Border>
+
+          <!-- 2. PDF Report Preview View -->
+          <Grid x:Name="reportPreviewGrid" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- PDF Viewer Toolbar (Sticky) -->
+            <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="10,6">
+              <DockPanel>
+                <!-- Right: Save & Print buttons directly in the preview -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                  <Button x:Name="btnReportSavePdf" Style="{DynamicResource ModernButton}" Margin="4,0" Content="📄 Сохранить PDF" Click="OnNestReportPdf" ToolTip="{ui:Tr Tip_ExportPdf}" />
+                  <Button x:Name="btnReportPrint" Style="{DynamicResource PrimaryButton}" Margin="4,0" Content="🖨️ Печать отчета" Click="OnPrintReport" ToolTip="{ui:Tr Tip_ReportPrint}" />
+                </StackPanel>
+
+                <!-- Left: Navigation and Zoom -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                  <!-- Page Navigation -->
+                  <Button x:Name="btnReportPrevPage" Style="{DynamicResource ModernButton}" MinWidth="36" Padding="8,2" Content="◀" Click="OnReportPrevPage" ToolTip="{ui:Tr Tip_PrevPage}" />
+                  <TextBlock x:Name="reportPageIndicatorText" Text="Стр. 1 из 1" Foreground="{DynamicResource Brush.TextPrimary}" VerticalAlignment="Center" Margin="8,0" FontWeight="Bold" FontSize="12" />
+                  <Button x:Name="btnReportNextPage" Style="{DynamicResource ModernButton}" MinWidth="36" Padding="8,2" Content="▶" Click="OnReportNextPage" ToolTip="{ui:Tr Tip_NextPage}" />
+
+                  <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="12,2" />
+
+                  <!-- Zoom Controls -->
+                  <Button x:Name="btnReportZoomOut" Style="{DynamicResource ModernButton}" MinWidth="36" Padding="8,2" Content="🔍 -" Click="OnReportZoomOut" ToolTip="{ui:Tr Tip_ZoomOut}" />
+                  <TextBlock x:Name="reportZoomText" Text="100%" Foreground="{DynamicResource Brush.TextPrimary}" VerticalAlignment="Center" Margin="6,0" Width="42" TextAlignment="Center" FontSize="12" />
+                  <Button x:Name="btnReportZoomIn" Style="{DynamicResource ModernButton}" MinWidth="36" Padding="8,2" Content="🔍 +" Click="OnReportZoomIn" ToolTip="{ui:Tr Tip_ZoomIn}" />
+                  <Button x:Name="btnReportZoom100" Style="{DynamicResource ModernButton}" Margin="4,0" Padding="8,2" Content="100%" Click="OnReportZoom100" ToolTip="{ui:Tr Tip_Zoom100}" />
+                  <Button x:Name="btnReportZoomFit" Style="{DynamicResource ModernButton}" Margin="4,0" Padding="8,2" Content="⤢ По ширине" Click="OnReportZoomFit" ToolTip="{ui:Tr Tip_ZoomFit}" />
+
+                  <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="12,2" />
+
+                  <!-- Total info -->
+                  <TextBlock x:Name="reportSummaryText" Text="Производственный отчёт раскроя" Foreground="{DynamicResource Brush.TextMuted}" VerticalAlignment="Center" Margin="6,0" />
+                </StackPanel>
+              </DockPanel>
+            </Border>
+
+            <!-- PDF Pages ScrollViewer -->
+            <ScrollViewer x:Name="reportPagesScroll" Grid.Row="1" Background="{DynamicResource Brush.Workspace}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="OnReportScrollPreviewMouseWheel" ScrollChanged="OnReportPagesScrollChanged">
+              <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Margin="24">
+                <!-- Stack of A4 Pages -->
+                <StackPanel x:Name="reportPagesStackPanel" HorizontalAlignment="Center">
+                  <StackPanel.LayoutTransform>
+                    <ScaleTransform x:Name="reportScaleTransform" ScaleX="1.0" ScaleY="1.0" />
+                  </StackPanel.LayoutTransform>
+                </StackPanel>
+
+                <!-- Empty State Notice (if no nest run yet) -->
+                <Border x:Name="reportEmptyNotice" Background="White" BorderBrush="#D0D5DD" BorderThickness="1" CornerRadius="8" Padding="40" MaxWidth="500" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,60">
+                  <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="📄" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,12" />
+                    <TextBlock x:Name="reportEmptyTitle" Text="Отчёт раскроя ещё не сформирован" FontSize="16" FontWeight="Bold" Foreground="#101828" HorizontalAlignment="Center" Margin="0,0,0,6" />
+                    <TextBlock x:Name="reportEmptySub" Text="Выполните нестинг деталей на 3-м экране, чтобы просмотреть и напечатать готовый производственный отчёт со спецификацией и картами резки." TextWrapping="Wrap" TextAlignment="Center" Foreground="#667085" FontSize="13" Margin="0,0,0,18" />
+                    <Button Style="{DynamicResource PrimaryButton}" Content="{ui:Tr Btn_GoToNestingShort}" Click="OnGoToNesting" HorizontalAlignment="Center" Padding="16,8" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </ScrollViewer>
+          </Grid>
+
+        </Grid>
+      </Grid>
+
     </Grid>
 
-    <!-- Status bar -->
+    <!-- Row 3: Status bar -->
     <Border Grid.Row="3" Background="{DynamicResource Brush.StatusBar}" BorderBrush="{DynamicResource Brush.BorderStrong}" BorderThickness="0,1,0,0">
       <StackPanel Orientation="Horizontal" Height="28">
-        <TextBlock Style="{DynamicResource StatusLabel}" Text="Utilization:" />
+        <TextBlock x:Name="statusLabelUtilization" Style="{DynamicResource StatusLabel}" Text="Utilization:" />
         <TextBlock Style="{DynamicResource StatusValue}" Foreground="{DynamicResource Brush.Accent}" FontSize="14"
                    Text="{Binding NestMonitorViewModel.SelectedItem.MaterialUtilization, StringFormat={}{0:P1}, FallbackValue=--}" />
-        <TextBlock Style="{DynamicResource StatusLabel}" Text="Sheets:" />
+        <TextBlock x:Name="statusLabelSheets" Style="{DynamicResource StatusLabel}" Text="Sheets:" />
         <TextBlock Style="{DynamicResource StatusValue}" Text="{Binding NestMonitorViewModel.SelectedItem.UsedSheets.Count, FallbackValue=--}" />
-        <TextBlock Style="{DynamicResource StatusLabel}" Text="Placed:" />
+        <TextBlock x:Name="statusLabelPlaced" Style="{DynamicResource StatusLabel}" Text="Placed:" />
         <TextBlock Style="{DynamicResource StatusValue}" Text="{Binding NestMonitorViewModel.SelectedItem.TotalPlacedCount, FallbackValue=--}" />
-        <TextBlock Style="{DynamicResource StatusLabel}" Text="Unplaced:" />
+        <TextBlock x:Name="statusLabelUnplaced" Style="{DynamicResource StatusLabel}" Text="Unplaced:" />
         <TextBlock Style="{DynamicResource StatusValue}" Text="{Binding NestMonitorViewModel.SelectedItem.TotalUnplacedCount, FallbackValue=--}" />
         <!-- Live nest status: elapsed time only, visible while a nest runs and the final time after it ends. -->
-        <TextBlock x:Name="nestPhaseText" Style="{DynamicResource StatusValue}" Visibility="Collapsed" Margin="18,0,6,0" />
+        <TextBlock x:Name="statusBarNestPhaseText" Style="{DynamicResource StatusValue}" Visibility="Collapsed" Margin="18,0,6,0" />
         <!-- Startup update check lights this up; click opens the GitHub release page. -->
         <TextBlock x:Name="updateNotice" Style="{DynamicResource StatusValue}" Visibility="Collapsed"
                    Cursor="Hand" TextDecorations="Underline" Margin="18,0,0,0"
                    MouseLeftButtonUp="OnUpdateNoticeClick"
-                   ToolTip="A newer SheetNest is available. Click to open the download page." />
+                   ToolTip="{ui:Tr Tip_UpdateNotice}" />
       </StackPanel>
     </Border>
 
-    <!-- Part colour picker. One popup for the whole list, moved onto whichever row's swatch was clicked.
-         Built here rather than with the toolkit's ColorPicker: that control's Advanced tab does not switch,
-         so its colour canvas was unreachable. This uses the same canvas directly, with no tabs in the way. -->
-    <!-- Opens to the LEFT of the swatch, i.e. INTO the window. The swatch sits near the right edge of the
-         Parts panel, so anchoring below it pushed the panel past the window edge - and a Popup is a
-         top-level window, so WPF only keeps it on the SCREEN, never inside its parent. -->
+    <!-- Part colour picker popup -->
     <Popup x:Name="partColorPopup" StaysOpen="False" AllowsTransparency="True"
            Placement="Left" HorizontalOffset="-4" PopupAnimation="Fade">
-      <Border Background="#C0C0C0" BorderBrush="#404040" BorderThickness="1" Padding="6">
+      <Border Background="{DynamicResource Brush.Card}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" CornerRadius="4" Padding="6">
         <StackPanel>
-          <TextBlock Text="Part colour" FontWeight="SemiBold" Margin="0,0,0,4" />
+          <TextBlock Text="{ui:Tr PartColour_Title}" FontWeight="SemiBold" Margin="0,0,0,4" />
           <ItemsControl x:Name="partColorSwatches">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>

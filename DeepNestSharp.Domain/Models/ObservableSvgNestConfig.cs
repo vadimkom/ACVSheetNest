@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.Domain.Models
+namespace DeepNestSharp.Domain.Models
 {
   using System;
   using System.ComponentModel;
@@ -67,6 +67,14 @@
     {
       get => svgNestConfig.DifferentiateChildren;
       set => SetProperty(nameof(DifferentiateChildren), () => svgNestConfig.DifferentiateChildren, v => svgNestConfig.DifferentiateChildren = v, value);
+    }
+
+    /// <inheritdoc />
+    [Category("File Settings")]
+    public DxfPartNameExport DxfPartNameExport
+    {
+      get => svgNestConfig.DxfPartNameExport;
+      set => SetProperty(nameof(DxfPartNameExport), () => svgNestConfig.DxfPartNameExport, v => svgNestConfig.DxfPartNameExport = v, value);
     }
 
     /// <inheritdoc />
@@ -250,10 +258,6 @@
       get => svgNestConfig.SheetSpacing;
       set => SetProperty(nameof(SheetSpacing), () => svgNestConfig.SheetSpacing, v => svgNestConfig.SheetSpacing = v, value);
     }
-
-    // 3D unfold K-factor / unit are now PER PART (Edit Part dialog of a 3D-imported part), not global —
-    // so the old global proxy properties were removed. The last-used values still persist as the import
-    // default via SessionState + the StepUnfoldService statics.
 
     /// <inheritdoc />
     [Category("Sheet Defaults")]

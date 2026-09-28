@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.NestProject
+namespace DeepNestLib.NestProject
 {
   using System.Text.Json;
   using System.Text.Json.Serialization;
@@ -34,6 +34,12 @@
     /// which is exactly how the app behaved before it existed.</para>
     /// </summary>
     public virtual bool Unlimited { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sheet priority (1-10, lower number nests first; 5 = normal).
+    /// Remnants/offcuts set to Highest (1) or High (3) are consumed before lower-priority sheets.
+    /// </summary>
+    public virtual int Priority { get; set; } = 5;
 
     public override string ToJson(bool writeIndented = false)
     {

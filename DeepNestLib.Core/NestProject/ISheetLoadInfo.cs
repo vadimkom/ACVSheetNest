@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.NestProject
+namespace DeepNestLib.NestProject
 {
   public interface ISheetLoadInfo
   {
@@ -11,5 +11,8 @@
     bool Unlimited { get; set; }
 
     int Width { get; set; }
+ 
+    /// <summary>Gets or sets the sheet priority (1-10, lower number nests first; 5 = normal).</summary>
+    int Priority { get; set; }
   }
 }

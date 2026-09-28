@@ -23,8 +23,8 @@ namespace DeepNestSharp.RasterNest
   {
     public static RasterMask Rasterize(INfp poly, double pxPerUnit)
     {
-      double minX = poly.Points.Min(p => p.X);
-      double minY = poly.Points.Min(p => p.Y);
+      double minX = poly.MinX;
+      double minY = poly.MinY;
 
       var contours = new List<double[]> { ToPixels(poly, minX, minY, pxPerUnit) };
       if (poly.Children != null)
@@ -35,8 +35,8 @@ namespace DeepNestSharp.RasterNest
         }
       }
 
-      double maxX = poly.Points.Max(p => p.X);
-      double maxY = poly.Points.Max(p => p.Y);
+      double maxX = poly.MaxX;
+      double maxY = poly.MaxY;
       int w = Math.Max(1, (int)Math.Ceiling((maxX - minX) * pxPerUnit));
       int h = Math.Max(1, (int)Math.Ceiling((maxY - minY) * pxPerUnit));
       return Fill(contours, w, h);
@@ -52,10 +52,10 @@ namespace DeepNestSharp.RasterNest
     /// </summary>
     public static RasterMask RasterizeAligned(INfp poly, double offX, double offY, double pxPerUnit, out int gx, out int gy)
     {
-      double minX = (poly.Points.Min(p => p.X) + offX) * pxPerUnit;
-      double minY = (poly.Points.Min(p => p.Y) + offY) * pxPerUnit;
-      double maxX = (poly.Points.Max(p => p.X) + offX) * pxPerUnit;
-      double maxY = (poly.Points.Max(p => p.Y) + offY) * pxPerUnit;
+      double minX = (poly.MinX + offX) * pxPerUnit;
+      double minY = (poly.MinY + offY) * pxPerUnit;
+      double maxX = (poly.MaxX + offX) * pxPerUnit;
+      double maxY = (poly.MaxY + offY) * pxPerUnit;
       gx = (int)Math.Floor(minX);
       gy = (int)Math.Floor(minY);
       int w = Math.Max(1, (int)Math.Ceiling(maxX) - gx);

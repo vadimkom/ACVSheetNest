@@ -10,27 +10,27 @@
     <Style x:Key="RotationOptionStyle" TargetType="ToggleButton">
       <Setter Property="Margin" Value="1.5,0" />
       <Setter Property="Padding" Value="2,3" />
-      <Setter Property="Width" Value="46" />
+      <Setter Property="Width" Value="54" />
       <Setter Property="Background" Value="#FFFFFF" />
       <Setter Property="BorderBrush" Value="#C8C8C8" />
       <Setter Property="Cursor" Value="Hand" />
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="ToggleButton">
-            <Border x:Name="bd" CornerRadius="0" BorderThickness="1.5"
+            <Border x:Name="bd" CornerRadius="3" BorderThickness="1.5"
                     Background="{TemplateBinding Background}"
                     BorderBrush="{TemplateBinding BorderBrush}"
                     Padding="{TemplateBinding Padding}">
-              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Top" />
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="bd" Property="BorderBrush" Value="#666699" />
-                <Setter TargetName="bd" Property="Background" Value="#D6D6E8" />
+                <Setter TargetName="bd" Property="BorderBrush" Value="#0067C0" />
+                <Setter TargetName="bd" Property="Background" Value="#E5F1FB" />
               </Trigger>
               <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="bd" Property="BorderBrush" Value="#000080" />
-                <Setter TargetName="bd" Property="Background" Value="#D6D6E8" />
+                <Setter TargetName="bd" Property="BorderBrush" Value="#0067C0" />
+                <Setter TargetName="bd" Property="Background" Value="#CCE4F7" />
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>

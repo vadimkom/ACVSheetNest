@@ -126,6 +126,25 @@ namespace DeepNestSharp.CiTests
       rows[0].Quantity.Should().Be(3);
     }
 
+    [Fact]
+    public void RecalculatingNestRestoresStockBeforeSecondNestRuns()
+    {
+      var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 5) };
+
+      // First nest uses 3 sheets
+      var consumedFirst = MainWindow.ConsumeStock(rows, Used((120, 60, 3)));
+      rows[0].Quantity.Should().Be(2);
+
+      // When Nest is pressed again, previous consumed stock is returned before recalculating
+      MainWindow.ReturnStock(rows, consumedFirst);
+      rows[0].Quantity.Should().Be(5);
+
+      // Second nest recalculation now has the full stock available
+      var consumedSecond = MainWindow.ConsumeStock(rows, Used((120, 60, 4)));
+      rows[0].Quantity.Should().Be(1);
+      consumedSecond[(120, 60)].Should().Be(4);
+    }
+
     private static Dictionary<(int W, int H), int> Used(params (int W, int H, int Count)[] entries)
     {
       var used = new Dictionary<(int W, int H), int>();

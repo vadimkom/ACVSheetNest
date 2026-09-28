@@ -1,13 +1,11 @@
-﻿<Application x:Class="DeepNestSharp.App"
+<Application x:Class="DeepNestSharp.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:DeepNestSharp">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Authentic Windows Classic (9x/2000) control chrome for EVERY default control:
-                     3D-beveled buttons, square tabs, classic scrollbars/menus. Deliberate retro look. -->
-                <ResourceDictionary Source="/PresentationFramework.Classic;component/themes/classic.xaml" />
+                <!-- Standard controls keep WPF's own Windows theme; this adds the palette and keyed styles. -->
                 <ResourceDictionary Source="Ui/Themes/SheetNestTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

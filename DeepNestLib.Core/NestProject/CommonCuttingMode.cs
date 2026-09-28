@@ -31,7 +31,7 @@
   /// unrecorded pair at Common Line Gap.
   /// </para>
   /// <para>
-  /// 5. There are two deliberately separate domains. Direct DXF and unfolded STEP/IGES parts have no
+  /// 5. There are two deliberately separate domains. Direct DXF parts have no
   /// toolpath yet: their nominal edges stay at Common Line Gap and export as CUT_OUTER cluster boundaries
   /// plus one midpoint COMMON_LINE. A part shares only inside its own contract, and only with a part
   /// naming that same contract.

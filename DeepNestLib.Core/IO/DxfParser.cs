@@ -1,4 +1,4 @@
-﻿namespace DeepNestLib.IO
+namespace DeepNestLib.IO
 {
   using System;
   using System.Collections.Generic;
@@ -40,6 +40,8 @@
       DxfEntityType.DgnUnderlay, DxfEntityType.DwfUnderlay, DxfEntityType.PdfUnderlay,
       DxfEntityType.Underlay, DxfEntityType.Light, DxfEntityType.Shape, DxfEntityType.Section,
     };
+
+    internal static bool IsAnnotation(DxfEntity ent) => ent != null && AnnotationTypes.Contains(ent.EntityType);
 
     private static double ArcStepDegrees(double radius)
     {
@@ -140,11 +142,13 @@
         throw new ArgumentException($"'{fullFilename}' has no geometry to nest - it holds only text, dimensions or other annotation.");
       }
 
-      s.AddRangeContour(ConnectElements(approximations));
-      if (s.Outers.Any(z => z.Points.Count < 3))
+      var contours = ConnectElements(approximations);
+      if (contours.Length == 0 || contours.All(z => z.Points.Count < 3))
       {
         throw new Exception("Too few points");
       }
+
+      s.AddRangeContour(contours);
 
       return s;
     }
@@ -562,8 +566,12 @@
 
       void CloseContour()
       {
-        newContourCurved.Add(true); // the invented closing segment
-        result.Add(new LocalContour<DxfEntity>(newContourPoints.ToList(), newContourEntities, newContourCurved.ToList()));
+        if (newContourPoints.Count >= 3)
+        {
+          newContourCurved.Add(true); // the invented closing segment
+          result.Add(new LocalContour<DxfEntity>(newContourPoints.ToList(), newContourEntities, newContourCurved.ToList()));
+        }
+
         newContourPoints = new List<PointF>();
         newContourEntities = new HashSet<DxfEntity>();
         newContourCurved = new List<bool>();
@@ -603,7 +611,11 @@
         CloseContour();
       }
 
-      result.OrderByDescending(o => Math.Abs(Geometry.GeometryUtil.PolygonArea(o.Points))).First().IsChild = false;
+      if (result.Any())
+      {
+        result.OrderByDescending(o => Math.Abs(Geometry.GeometryUtil.PolygonArea(o.Points))).First().IsChild = false;
+      }
+
       return result.ToArray();
     }
 

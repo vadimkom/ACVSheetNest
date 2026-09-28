@@ -7,7 +7,7 @@ namespace DeepNestLib.IO
   using IxMilia.Dxf.Entities;
 
   /// <summary>
-  /// Joins exploded LINE/ARC soup (FreeCAD unfolds, many client CAD exports) into CLOSED
+  /// Joins exploded LINE/ARC soup (common in client CAD exports) into CLOSED
   /// LWPOLYLINEs (arcs become bulge segments). Laser CAM and AutoCAD treat loose entities as
   /// "open" geometry even when every endpoint coincides exactly — a cut file must be one closed
   /// polyline per contour. Chains that do not close (or single loose segments) are left untouched
@@ -27,7 +27,7 @@ namespace DeepNestLib.IO
         return;
       }
 
-      // FreeCAD writes R12, which cannot hold LWPOLYLINE — save as R2000 (same as the exporter).
+      // R12 cannot hold LWPOLYLINE — save as R2000 (same as the exporter).
       if (file.Header.Version < DxfAcadVersion.R2000)
       {
         file.Header.Version = DxfAcadVersion.R2000;

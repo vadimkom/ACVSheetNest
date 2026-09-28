@@ -1,4 +1,4 @@
-﻿namespace DeepNestSharp.Domain.ViewModels
+namespace DeepNestSharp.Domain.ViewModels
 {
   using System;
   using System.Linq;
@@ -18,14 +18,11 @@
     private IDetailLoadInfo selectedDetailLoadInfo;
     private int selectedSheetLoadInfoIndex;
     private ISheetLoadInfo selectedSheetLoadInfo;
-    private AsyncRelayCommand executeNestCommand;
     private AsyncRelayCommand addPartCommand;
-    private AsyncRelayCommand addPart3DCommand;
     private RelayCommand addSheetCommand;
     private RelayCommand clearPartsCommand;
     private RelayCommand<IDetailLoadInfo> removePartCommand;
     private RelayCommand<ISheetLoadInfo> removeSheetCommand;
-    private RelayCommand<string> loadPartCommand;
     private IFileIoService fileIoService;
     private ObservableProjectInfo observableProjectInfo;
 
@@ -52,9 +49,6 @@
 
     public IAsyncRelayCommand AddPartCommand => addPartCommand ?? (addPartCommand = new AsyncRelayCommand(OnAddPartAsync));
 
-    /// <summary>Add a 3D (STEP/IGES) part: the file dialog is filtered to 3D; the unfold happens on load.</summary>
-    public IAsyncRelayCommand AddPart3DCommand => addPart3DCommand ?? (addPart3DCommand = new AsyncRelayCommand(OnAddPart3DAsync));
-
     public IRelayCommand AddSheetCommand => addSheetCommand ?? (addSheetCommand = new RelayCommand(OnAddSheet));
 
     public IRelayCommand ClearPartsCommand => clearPartsCommand ?? (clearPartsCommand = new RelayCommand(OnClearParts));
@@ -63,21 +57,7 @@
 
     public IRelayCommand<ISheetLoadInfo> RemoveSheetCommand => removeSheetCommand ?? (removeSheetCommand = new RelayCommand<ISheetLoadInfo>(OnRemoveSheet));
 
-    public AsyncRelayCommand ExecuteNestCommand => this.executeNestCommand ?? (this.executeNestCommand = new AsyncRelayCommand(this.OnExecuteNest, CanExecuteNest));
-
-    private bool CanExecuteNest()
-    {
-      if (MainViewModel.NestMonitorViewModel.IsRunning || this.ProjectInfo.DetailLoadInfos.Count == 0)
-      {
-        return false;
-      }
-
-      return !this.ProjectInfo.DetailLoadInfos.Any(o => o is ObservableDetailLoadInfo cast && !cast.IsValid);
-    }
-
     public override string FileDialogFilter => DeepNestLib.NestProject.ProjectInfo.FileDialogFilter;
-
-    public IRelayCommand<string> LoadPartCommand => loadPartCommand ?? (loadPartCommand = new RelayCommand<string>(OnLoadPart));
 
     public IProjectInfo ProjectInfo => observableProjectInfo ?? (observableProjectInfo = new ObservableProjectInfo(MainViewModel));
 
@@ -116,8 +96,6 @@
     protected override void LoadContent()
     {
       this.ProjectInfo.Load(this.MainViewModel.SvgNestConfigViewModel.SvgNestConfig, this.FilePath);
-      this.ExecuteNestCommand.MustNotBeNull();
-      this.executeNestCommand.NotifyCanExecuteChanged();
     }
 
     protected override void NotifyContentUpdated()
@@ -135,21 +113,7 @@
         this.observableProjectInfo.IsDirtyChanged += this.ObservableProjectInfo_IsDirtyChanged;
       }
 
-      mainViewModel.NestMonitorViewModel.PropertyChanged += this.NestMonitorViewModel_PropertyChanged;
       this.fileIoService = fileIoService;
-    }
-
-    private void NestMonitorViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-      if (MainViewModel.DispatcherService.InvokeRequired)
-      {
-        MainViewModel.DispatcherService.Invoke(() => NestMonitorViewModel_PropertyChanged(sender, e));
-      }
-
-      if (e.PropertyName == $"{nameof(INestMonitorViewModel.IsRunning)}")
-      {
-        MainViewModel.DispatcherService.Invoke(() => executeNestCommand?.NotifyCanExecuteChanged());
-      }
     }
 
     private void ObservableProjectInfo_IsDirtyChanged(object sender, EventArgs e)
@@ -159,11 +123,15 @@
 
     private Task OnAddPartAsync() => AddPartsAsync(NoFitPolygon.FileDialogFilter);
 
-    private Task OnAddPart3DAsync() => AddPartsAsync(DeepNestLib.IO.StepUnfoldService.FileDialogFilter3D);
-
     private async Task AddPartsAsync(string fileDialogFilter)
     {
-      var filePaths = await this.fileIoService.GetOpenFilePathsAsync(fileDialogFilter);
+      await AddPartFilesAsync(await this.fileIoService.GetOpenFilePathsAsync(fileDialogFilter));
+    }
+
+    /// <summary>Adds the given drawings as parts (dialog or drag-and-drop), refusing each one that cannot
+    /// be nested with a message saying why.</summary>
+    public async Task AddPartFilesAsync(System.Collections.Generic.IEnumerable<string> filePaths)
+    {
       foreach (var filePath in filePaths)
       {
         if (string.IsNullOrWhiteSpace(filePath) || !this.fileIoService.Exists(filePath))
@@ -171,30 +139,15 @@
           continue;
         }
 
-        if (DeepNestLib.IO.StepUnfoldService.IsStepFile(filePath))
+        // Read it now and refuse what cannot be used, saying why.
+        var reason = await Task.Run(() => DescribeLoadFailure(filePath));
+        if (reason != null)
         {
-          // Add Part is 2D-only by design. 3D imports go through File > Import 3D, which probes the
-          // sheet thickness and asks for the K-factor — never unfold silently with defaults here.
-          this.MainViewModel.MessageService.DisplayMessageBox(
-            "To import a 3D part use File > Import 3D (STEP / IGES)... It detects the sheet thickness and lets you set the K-factor.",
-            "Add Part",
-            DeepNestLib.MessageBoxIcon.Information);
+          this.MainViewModel.MessageService.DisplayMessageBox(reason, UiText.Get("Title_AddPart"), MessageBoxIcon.Stop);
           continue;
         }
-        else
-        {
-          // Nothing checked the file here before: the part went in as a bare path, the thumbnail swallowed
-          // whatever went wrong, and the operator only found out at NEST - by which time the job is built
-          // around a part that cannot be cut. Read it now and refuse what cannot be used, saying why.
-          var reason = await Task.Run(() => DescribeLoadFailure(filePath));
-          if (reason != null)
-          {
-            this.MainViewModel.MessageService.DisplayMessageBox(reason, "Add Part", MessageBoxIcon.Stop);
-            continue;
-          }
 
-          AddPartRows(filePath);
-        }
+        AddPartRows(filePath);
       }
 
       Contextualise();
@@ -238,7 +191,7 @@
     {
       try
       {
-        return System.IO.Path.GetExtension(filePath).Equals(".dxf", StringComparison.OrdinalIgnoreCase)
+        return DeepNestLib.IO.DxfFileExtensions.IsDxf(filePath)
           ? DeepNestLib.IO.DxfPartSplitter.WriteParts(filePath)
           : Array.Empty<DeepNestLib.IO.DxfPartSplitter.SplitPartFile>();
       }
@@ -258,47 +211,15 @@
         var detail = new NestExecutionHelper().LoadRawDetail(new System.IO.FileInfo(filePath));
         if (detail == null || !detail.TryConvertToNfp(0, out INfp nfp) || nfp.Points.Length < 3)
         {
-          return $"{name} holds no shape that can be nested.";
+          return UiText.Format("Msg_NoShape", name);
         }
 
         return null;
       }
       catch (Exception ex)
       {
-        return $"{name} cannot be used:{Environment.NewLine}{Environment.NewLine}{ex.GetBaseException().Message}";
+        return UiText.Format("Msg_CannotUse", name, ex.GetBaseException().Message);
       }
-    }
-
-    /// <summary>Metadata for one flat produced by a 3D unfold — lets the part be re-unfolded later
-    /// (e.g. when the user changes its K-factor in Edit Part) and rebuilt if the temp DXF is gone.</summary>
-    public readonly record struct UnfoldedPartInfo(
-      string FlatDxfPath, string SourceStepPath, int UnfoldIndex,
-      double KFactor, string KFactorStandard, bool UnfoldUnitInch, double ThicknessMm);
-
-    /// <summary>Adds flats from a 3D unfold, each carrying its source STEP + K-factor + thickness.</summary>
-    public void AddUnfoldedParts(System.Collections.Generic.IEnumerable<UnfoldedPartInfo> parts)
-    {
-      foreach (var p in parts)
-      {
-        if (string.IsNullOrWhiteSpace(p.FlatDxfPath))
-        {
-          continue;
-        }
-
-        observableProjectInfo?.DetailLoadInfos.Add(new DetailLoadInfo()
-        {
-          Path = p.FlatDxfPath,
-          SourceStepPath = p.SourceStepPath,
-          UnfoldIndex = p.UnfoldIndex,
-          KFactor = p.KFactor,
-          KFactorStandard = p.KFactorStandard,
-          UnfoldUnitInch = p.UnfoldUnitInch,
-          ThicknessMm = p.ThicknessMm,
-        });
-      }
-
-      Contextualise();
-      this.IsDirty = true;
     }
 
     private void OnAddSheet()
@@ -320,25 +241,6 @@
     private void Contextualise()
     {
       OnPropertyChanged(nameof(ProjectInfo));
-
-      // Use the property (lazy-inits the command), not the field: with the redesigned UI the NEST button
-      // may run the raster engine and never touch ExecuteNestCommand, leaving the field null → NRE here
-      // on Add/Remove Part/Sheet. The property guarantees the command exists before we refresh it.
-      this.ExecuteNestCommand.NotifyCanExecuteChanged();
-    }
-
-    private async Task OnExecuteNest()
-    {
-      MainViewModel.SetSelectedToolView(this);
-      await MainViewModel.NestMonitorViewModel.TryStartAsync(this).ConfigureAwait(false);
-    }
-
-    private void OnLoadPart(string path)
-    {
-      if (!string.IsNullOrWhiteSpace(path))
-      {
-        MainViewModel.LoadPart(path);
-      }
     }
 
     private void OnRemovePart(IDetailLoadInfo arg)

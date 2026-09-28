@@ -21,7 +21,6 @@ If you cut sheet metal, SheetNest helps you get the most parts out of every shee
 
 - **Fits the most parts on every sheet, automatically.** True-shape nesting packs your parts tightly by their real outline, so you waste less material and buy fewer sheets. Real 800-part jobs nest in seconds.
 - **Imports your DXF part drawings.** Drop in the DXF files you already have and start nesting.
-- **Imports 3D parts and flattens them for you.** Bring in a 3D sheet-metal part (STEP or IGES) and SheetNest unfolds it to a flat pattern that's ready to nest. The 3D unfolding engine is built in, runs offline, and needs nothing extra installed. You can set a per-part bend allowance (K-factor) and check the flat length with the built-in Measure tool.
 - **Tell it what you need.** Enter how many of each part you want (including mirrored copies), and list the sheet sizes and stock you actually have. Save your own sheet-size presets so they're one click next time.
 - **Nest with one click, then fine-tune by hand.** Let SheetNest lay everything out, then drag, rotate, nudge, and drop parts to contact yourself, with spacing kept safe and full undo/redo.
 - **Compatible parts can share one cut.** Choose per part whether it may share with any compatible part or only another copy of itself. SheetNest keeps ordinary spacing everywhere else, seats selected straight outside edges at the configurable Common Line Gap, and exports each cluster as a closed outer boundary plus one midpoint seam on clearly named layers your CAM can read.
@@ -58,6 +57,6 @@ If you cut sheet metal, SheetNest helps you get the most parts out of every shee
 
 SheetNest is open-source software released under the MIT License. See [LICENSE](LICENSE).
 
-SheetNest bundles an offline 3D-unfolding engine built from open-source software (FreeCAD and the SheetMetal workbench under the GNU LGPL, and NetworkX under the BSD license). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the full list, licenses and sources.
+SheetNest bundles the open-source sparrow nesting engine (MIT) with the jagua-rs geometry library (MPL-2.0) compiled in. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for licenses and sources.
 
 Building from source? See [BUILDING.md](BUILDING.md).
