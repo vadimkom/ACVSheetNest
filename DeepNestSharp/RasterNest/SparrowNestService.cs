@@ -1281,6 +1281,10 @@ namespace DeepNestSharp.RasterNest
         // finish the same wave, but computes the same nest. Tying the wave itself to ProcessorCount (it
         // used to be the whole story) meant a 4-core laptop and a 20-core desktop nested the same job
         // differently.
+        // A sheet holding a part that may share a cut keeps the thorough search: the direct planner needs its
+        // neighbours laid exactly, and the common-line benches are pinned on it.
+        string[] searchFlags = batch.Any(l => l.RequiresMergedLines) ? Array.Empty<string>() : EngineSearchFlags(effort);
+
         int waveTries = Math.Min(tries, WaveSize);
         int maxConc = Math.Max(1, Math.Min(waveTries, Concurrency(effort)));
 
@@ -1309,7 +1313,7 @@ namespace DeepNestSharp.RasterNest
             string tryDir = Path.Combine(workDir, "try" + seed.ToString(CultureInfo.InvariantCulture));
             Directory.CreateDirectory(tryDir);
             var diagRun = System.Diagnostics.Stopwatch.StartNew();
-            string outJson = RunSparrowOnce(exe, tryDir, inputPath, budget, workers, hardTimeoutSec, seed, cancel, aggDensity, out string tryErr);
+            string outJson = RunSparrowOnce(exe, tryDir, inputPath, budget, workers, searchFlags, hardTimeoutSec, seed, cancel, aggDensity, out string tryErr);
             if (tryErr != null)
             {
               // Not fatal on its own: the other races may still return something. But when they ALL fail the
@@ -5276,6 +5280,23 @@ namespace DeepNestSharp.RasterNest
     /// many parts it has. A sparse tail sheet converges long before it spends the budget anyway, because its
     /// iterations are cheap.</para>
     /// </remarks>
+    /// <summary>How the engine searches at each effort, beyond how long (<see cref="BudgetFor"/>).</summary>
+    /// <remarks>
+    /// <para>The engine's own defaults are made for strip-packing benchmarks, where 0.1 % off the strip is a
+    /// result. On a sheet it is a fraction of a millimetre, and chasing it was most of what Fast cost: a 36 part
+    /// job spent 26 s per search on ten exploration and nine compression attempts that all failed, and
+    /// returned the layout it started from. Fast now shrinks in 0.5 % steps, gives up after three failures in
+    /// a row, skips the millimetre-shaving compression and lets each separation attempt stall for 50
+    /// iterations instead of 200.</para>
+    /// <para>Measured on four shop jobs (72 duct parts, a box set, the fly set, a scrubber with a perforated
+    /// sheet), two seed sets each, 4 cores: 421 s in all before, 100 s after, 47 sheets before and 46 after.
+    /// The offcut on the last sheet moves both ways, as it already did between seed sets. Normal and Best keep
+    /// the engine's defaults: they are the settings for when the time is there.</para>
+    /// </remarks>
+    internal static string[] EngineSearchFlags(NestEffort effort) => effort == NestEffort.Fast
+      ? new[] { "--shrink-step", "0.005", "--max-fails", "3", "--compress-share", "0", "--no-improve-limit", "50" }
+      : Array.Empty<string>();
+
     private static int BudgetFor(NestEffort effort) => effort switch
     {
       NestEffort.Fast => 300,
@@ -5555,7 +5576,7 @@ namespace DeepNestSharp.RasterNest
     /// machine is, which is what made a repeated nest come back with a different offcut every time.
     /// <paramref name="hardTimeoutSec"/> is only a watchdog for a hung process — if it ever fires the
     /// result is discarded rather than used, because a truncated search is not reproducible.</summary>
-    private static string RunSparrowOnce(string exe, string workDir, string inputPath, int iterations, int workers, int hardTimeoutSec, int seed, CancellationToken cancel, Action<double>? onDensity, out string error)
+    private static string RunSparrowOnce(string exe, string workDir, string inputPath, int iterations, int workers, IReadOnlyList<string> searchFlags, int hardTimeoutSec, int seed, CancellationToken cancel, Action<double>? onDensity, out string error)
     {
       error = null;
       var psi = new ProcessStartInfo
@@ -5576,6 +5597,20 @@ namespace DeepNestSharp.RasterNest
       psi.ArgumentList.Add(seed.ToString(CultureInfo.InvariantCulture));
       psi.ArgumentList.Add("--workers");
       psi.ArgumentList.Add(workers.ToString(CultureInfo.InvariantCulture));
+      foreach (string flag in searchFlags ?? Array.Empty<string>())
+      {
+        psi.ArgumentList.Add(flag);
+      }
+
+      // Calibration only: extra engine flags, space separated, to try a search setting on a real job.
+      string extra = Environment.GetEnvironmentVariable("SHEETNEST_SPARROW_ARGS");
+      if (!string.IsNullOrWhiteSpace(extra))
+      {
+        foreach (string a in extra.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+          psi.ArgumentList.Add(a);
+        }
+      }
 
       Process proc;
       try

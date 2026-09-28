@@ -39,6 +39,26 @@ To build it:
    folder, which the test project copies for you). Preprocessor directives select the right
    DLL for the architecture.
 
+## The nesting engine: sparrow.exe
+
+`SparrowEngine/sparrow.exe` is upstream [sparrow](https://github.com/JeroenGar/sparrow) at commit
+`961ec31` with `SparrowEngine/sheetnest-sparrow.patch` applied. To rebuild it you need Rust (rustup,
+stable, the MSVC toolchain; Visual Studio's C++ tools provide the linker):
+
+```powershell
+git clone https://github.com/JeroenGar/sparrow.git
+cd sparrow
+git checkout 961ec31
+git am ..\SheetNest\SparrowEngine\sheetnest-sparrow.patch
+cargo build --release --bin sparrow
+copy target\release\sparrow.exe ..\SheetNest\SparrowEngine\
+```
+
+The search must stay reproducible: after rebuilding, nest a job with a fixed seed on the old and the
+new binary (`sparrow -i job.json --max-iterations 300 -x -s 1 --workers 1`) and compare
+`output\final_job.json`. The engine is started with extra search-effort flags per effort level
+(`SparrowNestService`); they are listed in the second patch.
+
 ## Installer (MSI)
 
 The Windows installer is built with WiX; see `installer/` and the

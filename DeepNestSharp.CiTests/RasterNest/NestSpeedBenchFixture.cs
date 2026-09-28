@@ -80,7 +80,8 @@ namespace DeepNestSharp.CiTests.RasterNest
         SparrowNestService.DiagTries = 0;
 
         var sw = Stopwatch.StartNew();
-        var result = SparrowNestService.Nest(parts, stock, rotations, spacing, margin, 5, exe, out string err, effort: effort);
+        // Each run races a different set of seeds, as pressing Nest again in the window does.
+        var result = SparrowNestService.Nest(parts, stock, rotations, spacing, margin, 5, exe, out string err, effort: effort, seedOffset: 50 * (r - 1));
         sw.Stop();
 
         log.AppendLine(FormattableString.Invariant(

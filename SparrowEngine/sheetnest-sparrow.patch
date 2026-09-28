@@ -1,8 +1,8 @@
-From 4f7ddcaa761a239e13ac19a3e3f198644c7595f2 Mon Sep 17 00:00:00 2001
+From b528be525a5b3de39617a46faed5049ede7bdc0f Mon Sep 17 00:00:00 2001
 From: SheetNest <noreply@sheetnest.io>
 Date: Sat, 25 Jul 2026 16:48:14 -0400
-Subject: [PATCH] Make the search reproducible: iteration budget, fixed worker
- count, failure-based compression decay
+Subject: [PATCH 1/2] Make the search reproducible: iteration budget, fixed
+ worker count, failure-based compression decay
 
 ---
  src/main.rs                 | 78 +++++++++++++++++++++++++++-------
@@ -272,5 +272,99 @@ index 645d757..91584da 100644
 +#[cfg(not(target_arch = "wasm32"))]
 +pub mod iter_terminator;
 -- 
-2.53.0
+2.55.0.windows.3
+
+
+From c7a0e0d4b6902d0cba116237ad0767ed8226c8c0 Mon Sep 17 00:00:00 2001
+From: SheetNest <noreply@sheetnest.io>
+Date: Mon, 28 Sep 2026 22:36:15 +0300
+Subject: [PATCH 2/2] Expose the search effort: shrink step, failure limit,
+ compression share
+
+The upstream defaults are tuned for strip-packing benchmarks, where a
+0.1% shorter strip is a result. On a laser sheet it is a fraction of a
+millimetre, and chasing it is most of what a search costs: on a 36 part
+job every one of 10 exploration and 9 compression attempts failed, 26 s
+for +0.000%. These flags let the caller trade that for time; unset,
+each keeps the upstream default, so a run without them is unchanged.
+
+  --shrink-step       exploration shrink per step (default 0.001)
+  --max-fails         consecutive failed attempts before stopping
+  --compress-share    share of --max-iterations spent compressing
+  --compress-step     largest compression shrink (smallest = /50)
+  --no-improve-limit  separator iterations without improvement
+  --strike-limit      separator strikes per attempt
+---
+ src/main.rs    | 13 ++++++++++++-
+ src/util/io.rs | 24 ++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/src/main.rs b/src/main.rs
+index 8e2a4b9..c8c2ecd 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -78,6 +78,16 @@ fn main() -> Result<()>{
+         // is the deterministic equivalent, so a deterministic budget always implies it.
+         config.cmpr_cfg.shrink_decay = ShrinkDecayStrategy::FailureBased(DEFAULT_FAIL_DECAY_RATIO_CMPR);
+     }
++    // Search effort knobs, so the caller can trade a search a machine shop does not need (fractions of a
++    // millimetre off the strip) for time. Unset, every one keeps the upstream default.
++    if let Some(s) = args.shrink_step { config.expl_cfg.shrink_step = s; }
++    if let Some(n) = args.max_fails { config.expl_cfg.max_conseq_failed_attempts = Some(n.max(1)); }
++    if let Some(c) = args.compress_step { config.cmpr_cfg.shrink_range = (c, c / 50.0); }
++    if let Some(n) = args.no_improve_limit {
++        config.expl_cfg.separator_config.iter_no_imprv_limit = n.max(1);
++        config.cmpr_cfg.separator_config.iter_no_imprv_limit = (n / 2).max(1);
++    }
++    if let Some(n) = args.strike_limit { config.expl_cfg.separator_config.strike_limit = n.max(1); }
+     if let Some(arg_rng_seed) = args.rng_seed {
+         config.rng_seed = Some(arg_rng_seed as usize);
+     }
+@@ -137,7 +147,8 @@ fn main() -> Result<()>{
+     // same solution. Without it the original wall-clock behaviour is kept.
+     let solution = match args.max_iterations {
+         Some(total) => {
+-            let explore = ((total as f32) * DEFAULT_EXPLORE_TIME_RATIO).round() as usize;
++            let explore_ratio = args.compress_share.map(|c| 1.0 - c.clamp(0.0, 1.0)).unwrap_or(DEFAULT_EXPLORE_TIME_RATIO);
++            let explore = ((total as f32) * explore_ratio).round() as usize;
+             let compress = total.saturating_sub(explore);
+             let mut terminator = IterTerminator::new(vec![explore, compress]);
+             optimize(
+diff --git a/src/util/io.rs b/src/util/io.rs
+index 149a986..fa5603c 100644
+--- a/src/util/io.rs
++++ b/src/util/io.rs
+@@ -42,6 +42,30 @@ pub struct MainCli {
+     /// Separator worker threads. Part of the search, so it must match across machines to reproduce a run.
+     #[arg(long, help = "Number of separator worker threads")]
+     pub workers: Option<usize>,
++
++    /// How much the exploration phase shrinks the strip per step, as a fraction (default 0.001).
++    #[arg(long, help = "Exploration shrink step as a fraction of the strip (default 0.001)")]
++    pub shrink_step: Option<f32>,
++
++    /// Consecutive failed exploration attempts before stopping (with -x the default is 10).
++    #[arg(long, help = "Consecutive failed exploration attempts before stopping")]
++    pub max_fails: Option<usize>,
++
++    /// Share of --max-iterations spent on compression (default 0.2; 0 skips it).
++    #[arg(long, help = "Share of the iteration budget spent compressing (default 0.2)")]
++    pub compress_share: Option<f32>,
++
++    /// Largest compression shrink step as a fraction; the smallest is a fiftieth of it (default 0.0005).
++    #[arg(long, help = "Largest compression shrink step as a fraction (default 0.0005)")]
++    pub compress_step: Option<f32>,
++
++    /// Separator: iterations without improvement before a strike (default 200 exploring, 100 compressing).
++    #[arg(long, help = "Separator iterations without improvement before a strike")]
++    pub no_improve_limit: Option<usize>,
++
++    /// Separator: strikes before an attempt is given up (default 3 exploring, 5 compressing).
++    #[arg(long, help = "Separator strikes before an attempt is given up")]
++    pub strike_limit: Option<usize>,
+ }
+ 
+ #[derive(Serialize, Deserialize, Clone)]
+-- 
+2.55.0.windows.3
 

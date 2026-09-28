@@ -11,8 +11,11 @@ To arrange parts on the sheet, the SheetNest installer bundles an offline nestin
 local change so that nesting the same job twice gives the same result: a `--max-iterations`
 budget that ends the search on a counter instead of on elapsed time, a fixed worker-thread count
 instead of one derived from the machine's cores, and the failure-based (rather than time-based)
-compression decay whenever that budget is used. The change is kept in this repository as
-`SparrowEngine/sheetnest-sparrow.patch`, which applies to the upstream commit below.
+compression decay whenever that budget is used; and command-line flags for the search effort
+(shrink step, failure limit, compression share and step, separator limits), each of which keeps
+the upstream default when it is not given. The change is kept in this repository as
+`SparrowEngine/sheetnest-sparrow.patch` (two patches, apply with `git am`) on the upstream
+commit below.
 Corresponding source is available from the upstream projects below.
 
 | Component | Version | License | Source |
