@@ -11,15 +11,16 @@ namespace DeepNestSharp.CiTests.RasterNest
   public class NestConcurrencyFixture
   {
     [Theory]
-    [InlineData(4, (int)NestEffort.Normal, 1)] // a 4-thread Celeron: one two-thread search, a core left over
-    [InlineData(4, (int)NestEffort.Best, 1)]
-    [InlineData(4, (int)NestEffort.Fast, 3)]
+    [InlineData(4, (int)NestEffort.Normal, 2)] // a 4-thread Celeron: two two-thread searches
+    [InlineData(4, (int)NestEffort.Best, 2)]
+    [InlineData(4, (int)NestEffort.Fast, 4)] // all four of Fast's last-sheet races at once
+    [InlineData(3, (int)NestEffort.Normal, 1)]
     [InlineData(2, (int)NestEffort.Normal, 1)] // never fewer than one
     [InlineData(1, (int)NestEffort.Fast, 1)]
-    [InlineData(12, (int)NestEffort.Normal, 5)]
+    [InlineData(12, (int)NestEffort.Normal, 6)]
     [InlineData(12, (int)NestEffort.Fast, 8)] // capped at one wave
     [InlineData(64, (int)NestEffort.Best, 8)]
-    public void AutoLeavesACoreFreeAndCountsEachSearchsThreads(int cores, int effort, int expected)
+    public void AutoSharesTheCoresOutByEachSearchsThreads(int cores, int effort, int expected)
     {
       SparrowNestService.AutoConcurrency(cores, (NestEffort)effort).Should().Be(expected);
     }

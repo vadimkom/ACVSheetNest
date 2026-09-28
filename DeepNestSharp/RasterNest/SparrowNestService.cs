@@ -72,6 +72,7 @@ namespace DeepNestSharp.RasterNest
     private const double DirectSeamTolerance = 2.5e-6; // compaction/export coordinates are quantised to 1e-6
 
     private static int diagPackSeq;
+    private static int diagDumpSeq;
 
     private sealed class Loaded
     {
@@ -1266,6 +1267,13 @@ namespace DeepNestSharp.RasterNest
         double stripHeight = needsEdgeShell ? usableHeight + edgeShell : usableHeight;
         string inputPath = Path.Combine(workDir, "job.json");
         File.WriteAllText(inputPath, BuildJaguaJson("job", stripHeight, batch, batchQty));
+        string dumpDir = Environment.GetEnvironmentVariable("SHEETNEST_DUMP_JOBS");
+        if (!string.IsNullOrWhiteSpace(dumpDir))
+        {
+          // Diagnostics: the exact instance the engine is handed, to time it or feed it by hand.
+          Directory.CreateDirectory(dumpDir);
+          File.Copy(inputPath, Path.Combine(dumpDir, $"job_{System.Threading.Interlocked.Increment(ref diagDumpSeq)}.json"), true);
+        }
 
         // WHICH seeds are raced against each other, and how many, decides the result — so the wave is a
         // FIXED size on every machine. How many of those run at the same instant is just scheduling, and
@@ -5227,7 +5235,17 @@ namespace DeepNestSharp.RasterNest
     /// is part of the search: each worker carries its own generator and the best of their competing proposals
     /// is kept, so a machine with a different number of them lands on a different layout for the same job.</para>
     /// </remarks>
-    private static int SearchWorkers(NestEffort effort) => effort == NestEffort.Fast ? 1 : 2;
+    private static int SearchWorkers(NestEffort effort)
+    {
+      // SHEETNEST_NEST_WORKERS is for calibration, like SHEETNEST_NEST_ITERS and SHEETNEST_NEST_TRIES.
+      var env = Environment.GetEnvironmentVariable("SHEETNEST_NEST_WORKERS");
+      if (int.TryParse(env, NumberStyles.Integer, CultureInfo.InvariantCulture, out int n) && n >= 1)
+      {
+        return Math.Min(n, 8);
+      }
+
+      return effort == NestEffort.Fast ? 1 : 2;
+    }
 
     /// <summary>How hard a sheet is searched, in sparrow iterations, for each <see cref="NestEffort"/>.
     /// An "iteration" is one pass of sparrow's outer loop.</summary>
@@ -5295,18 +5313,20 @@ namespace DeepNestSharp.RasterNest
     }
 
     /// <summary>
-    /// How many searches fit the machine: one logical core is left for the window and for mapping each
-    /// finished search, and the rest are shared out by how many threads one search brings
+    /// How many searches fit the machine: the logical cores shared out by how many threads one search brings
     /// (<see cref="SearchWorkers"/>).
     /// </summary>
     /// <remarks>
     /// It used to be one search per logical core, written when every search ran on one thread. Normal and
-    /// Best since run two, so a 4-thread Celeron was asked for eight busy threads plus the app's own work,
-    /// and a 12-thread laptop for sixteen. Four cores now get one Normal search (two threads) or three
-    /// Fast ones; twelve get five Normal or eight Fast.
+    /// Best since run two, so a 4-thread Celeron was asked for eight busy threads plus the app's own work.
+    /// <para>For a while a core was also held back for the window. That cost the Celeron dearly: Fast races
+    /// four searches for the last sheet, three ran and the fourth waited for one of them, so that sheet took
+    /// two searches' time instead of one (a 36 part job, 54 s against 37 s, the same nest). The window does
+    /// not need a core of its own, because every search runs at below-normal priority.</para>
+    /// <para>Four cores now get two Normal searches or four Fast ones; twelve get six Normal or eight Fast.</para>
     /// </remarks>
     internal static int AutoConcurrency(int logicalCores, NestEffort effort)
-      => Math.Max(1, Math.Min(MaxConcurrencyLimit, (logicalCores - 1) / SearchWorkers(effort)));
+      => Math.Max(1, Math.Min(MaxConcurrencyLimit, logicalCores / SearchWorkers(effort)));
 
     /// <summary>How long a sheet's search runs, in sparrow iterations. Deliberately NOT a function of the
     /// clock or of the machine: this is the number that has to match for two computers to agree on a

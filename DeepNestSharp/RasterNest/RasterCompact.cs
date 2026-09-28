@@ -978,6 +978,24 @@ namespace DeepNestSharp.RasterNest
     /// <summary>True when the two polygons overlap in real area (holes respected via even-odd).</summary>
     private static bool Intersects(List<List<IntPoint>> a, List<List<IntPoint>> b)
     {
+      // Even-odd, a contour only decides what is inside it, so one whose box misses the other shape's box
+      // changes nothing the two share and can be left out, exactly. A perforated sheet brought all 1393 of
+      // its holes (85 000 points) to every test against every neighbour, and compacting a sheet took minutes.
+      if (a.Count > 1 || b.Count > 1)
+      {
+        a = ReachingInto(a, BoundsOf(b));
+        if (a.Count == 0)
+        {
+          return false;
+        }
+
+        b = ReachingInto(b, BoundsOf(a));
+        if (b.Count == 0)
+        {
+          return false;
+        }
+      }
+
       var clipper = new Clipper();
       clipper.AddPaths(a, PolyType.ptSubject, true);
       clipper.AddPaths(b, PolyType.ptClip, true);
@@ -990,6 +1008,35 @@ namespace DeepNestSharp.RasterNest
       }
 
       return area > EpsArea;
+    }
+
+    /// <summary>The contours of <paramref name="paths"/> whose own box touches <paramref name="box"/>.</summary>
+    private static List<List<IntPoint>> ReachingInto(List<List<IntPoint>> paths, IntRect box)
+    {
+      if (paths.Count <= 1)
+      {
+        return paths;
+      }
+
+      var kept = new List<List<IntPoint>>(paths.Count);
+      foreach (var path in paths)
+      {
+        long minX = long.MaxValue, minY = long.MaxValue, maxX = long.MinValue, maxY = long.MinValue;
+        foreach (var p in path)
+        {
+          minX = Math.Min(minX, p.X);
+          maxX = Math.Max(maxX, p.X);
+          minY = Math.Min(minY, p.Y);
+          maxY = Math.Max(maxY, p.Y);
+        }
+
+        if (BoxesTouch(new IntRect(minX, minY, maxX, maxY), box))
+        {
+          kept.Add(path);
+        }
+      }
+
+      return kept.Count == paths.Count ? paths : kept;
     }
 
     private static IntRect BoundsOf(List<List<IntPoint>> paths)
