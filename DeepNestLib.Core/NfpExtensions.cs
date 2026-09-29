@@ -6,7 +6,7 @@ namespace DeepNestLib
   public static class NfpExtensions
   {
     public static bool ContainsDxfs(this ICollection<INfp> list) => list.Any(o => o?.Name != null
-      && (o.Name.Contains(".dxf", System.StringComparison.OrdinalIgnoreCase) || o.Name.Contains(".dfx", System.StringComparison.OrdinalIgnoreCase)));
+      && DeepNestLib.IO.DxfFileExtensions.IsDxf(o.Name));
 
     public static bool ContainsSvgs(this ICollection<INfp> list) => list.Any(o => o.Name.ToLower().Contains(".svg"));
   }

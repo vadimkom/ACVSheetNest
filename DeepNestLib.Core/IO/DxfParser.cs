@@ -110,7 +110,7 @@ namespace DeepNestLib.IO
         {
           lock (loadLock)
           {
-            dxffile = DxfFile.Load(fi.FullName);
+            dxffile = DrawingFile.Load(fi.FullName);
             IEnumerable<DxfEntity> entities = dxffile.Entities.ToArray();
             return ConvertDxfToRawDetail(fi.FullName, entities);
           }

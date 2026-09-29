@@ -205,7 +205,7 @@ namespace DeepNestLib.IO
       foreach (var polygon in polygons)
       {
         RawDetail<DxfEntity> fl;
-        if (polygon.Fitted == false || !polygon.Name.ToLower().Contains(".dxf") || polygon.Sheet.Id != sheet.Id)
+        if (polygon.Fitted == false || !DxfFileExtensions.IsDxf(polygon.Name) || polygon.Sheet.Id != sheet.Id)
         {
           continue;
         }
@@ -221,7 +221,7 @@ namespace DeepNestLib.IO
             else
 #endif
             {
-              fl = DxfParser.ConvertDxfToRawDetail(polygon.Name, DxfFile.Load(polygon.Name).Entities.ToArray());
+              fl = DxfParser.ConvertDxfToRawDetail(polygon.Name, DrawingFile.Load(polygon.Name).Entities.ToArray());
             }
           }
           catch
@@ -1712,7 +1712,7 @@ namespace DeepNestLib.IO
       {
         if (File.Exists(sourcePath))
         {
-          return DxfFile.Load(sourcePath);
+          return DrawingFile.Load(sourcePath);
         }
       }
       catch

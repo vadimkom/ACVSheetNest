@@ -1,0 +1,4092 @@
+scFlie
+5
+<Begin Graphs>
+92
+####graph NO:1
+8
+0.100000
+<Glyphs>
+12.566371
+1186.587455,14.210981
+1190.587455,18.210981
+1190.587455,16.210981
+1190.587455,16.210981
+1
+####Gly: 1
+1
+4
+1188.587455,16.210981
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:2
+8
+0.100000
+<Glyphs>
+12.566371
+1071.320788,14.210981
+1075.320788,18.210981
+1075.320788,16.210981
+1075.320788,16.210981
+1
+####Gly: 1
+1
+4
+1073.320788,16.210981
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:3
+8
+0.100000
+<Glyphs>
+12.566371
+956.054122,14.210981
+960.054122,18.210981
+960.054122,16.210981
+960.054122,16.210981
+1
+####Gly: 1
+1
+4
+958.054122,16.210981
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:4
+8
+0.100000
+<Glyphs>
+12.566371
+840.787455,14.210981
+844.787455,18.210981
+844.787455,16.210981
+844.787455,16.210981
+1
+####Gly: 1
+1
+4
+842.787455,16.210981
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:5
+8
+0.100000
+<Glyphs>
+411.992893
+809.591008,25.635649
+1221.583901,25.635649
+809.591008,25.635649
+1221.583901,25.635649
+1
+####Gly: 1
+-1
+2
+1221.583901,25.635649
+809.591008,25.635649
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:6
+8
+0.100000
+<Glyphs>
+412.692893
+809.241008,50.884985
+1221.933901,50.884985
+1221.933901,50.884985
+809.241008,50.884985
+1
+####Gly: 1
+1
+2
+1221.933901,50.884985
+809.241008,50.884985
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:7
+8
+0.100000
+<Glyphs>
+12.723450
+840.762455,58.284653
+844.812455,62.334653
+844.812455,60.309653
+844.812455,60.309653
+1
+####Gly: 1
+1
+4
+842.787455,60.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:8
+8
+0.100000
+<Glyphs>
+12.723450
+956.029122,58.284653
+960.079122,62.334653
+960.079122,60.309653
+960.079122,60.309653
+1
+####Gly: 1
+1
+4
+958.054122,60.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:9
+8
+0.100000
+<Glyphs>
+12.723450
+1071.295788,58.284653
+1075.345788,62.334653
+1075.345788,60.309653
+1075.345788,60.309653
+1
+####Gly: 1
+1
+4
+1073.320788,60.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:10
+8
+0.100000
+<Glyphs>
+12.723450
+1186.562455,58.284653
+1190.612455,62.334653
+1190.612455,60.309653
+1190.612455,60.309653
+1
+####Gly: 1
+1
+4
+1188.587455,60.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:11
+8
+0.100000
+<Glyphs>
+12.566371
+1255.086127,82.709653
+1259.086127,86.709653
+1259.086127,84.709653
+1259.086127,84.709653
+1
+####Gly: 1
+1
+4
+1257.086127,84.709653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:12
+8
+0.100000
+<Glyphs>
+12.723450
+1210.962455,82.684653
+1215.012455,86.734653
+1215.012455,84.709653
+1215.012455,84.709653
+1
+####Gly: 1
+1
+4
+1212.987455,84.709653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:13
+8
+0.100000
+<Glyphs>
+12.723450
+816.162455,82.684653
+820.212455,86.734653
+820.212455,84.709653
+820.212455,84.709653
+1
+####Gly: 1
+1
+4
+818.187455,84.709653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:14
+8
+0.100000
+<Glyphs>
+12.566371
+772.088783,82.709653
+776.088783,86.709653
+776.088783,84.709653
+776.088783,84.709653
+1
+####Gly: 1
+1
+4
+774.088783,84.709653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:15
+8
+0.100000
+<Glyphs>
+12.566371
+772.088783,242.909653
+776.088783,246.909653
+776.088783,244.909653
+776.088783,244.909653
+1
+####Gly: 1
+1
+4
+774.088783,244.909653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:16
+8
+0.100000
+<Glyphs>
+12.723450
+816.162455,242.884653
+820.212455,246.934653
+820.212455,244.909653
+820.212455,244.909653
+1
+####Gly: 1
+1
+4
+818.187455,244.909653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:17
+8
+0.100000
+<Glyphs>
+12.723450
+1210.962455,242.884653
+1215.012455,246.934653
+1215.012455,244.909653
+1215.012455,244.909653
+1
+####Gly: 1
+1
+4
+1212.987455,244.909653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:18
+8
+0.100000
+<Glyphs>
+12.566371
+1255.086127,242.909653
+1259.086127,246.909653
+1259.086127,244.909653
+1259.086127,244.909653
+1
+####Gly: 1
+1
+4
+1257.086127,244.909653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:19
+8
+0.100000
+<Glyphs>
+12.566371
+1255.086127,403.109653
+1259.086127,407.109653
+1259.086127,405.109653
+1259.086127,405.109653
+1
+####Gly: 1
+1
+4
+1257.086127,405.109653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:20
+8
+0.100000
+<Glyphs>
+12.723450
+1210.962455,403.084653
+1215.012455,407.134653
+1215.012455,405.109653
+1215.012455,405.109653
+1
+####Gly: 1
+1
+4
+1212.987455,405.109653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:21
+8
+0.100000
+<Glyphs>
+12.723450
+816.162455,403.084653
+820.212455,407.134653
+820.212455,405.109653
+820.212455,405.109653
+1
+####Gly: 1
+1
+4
+818.187455,405.109653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:22
+8
+0.100000
+<Glyphs>
+12.566371
+772.088783,403.109653
+776.088783,407.109653
+776.088783,405.109653
+776.088783,405.109653
+1
+####Gly: 1
+1
+4
+774.088783,405.109653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:23
+8
+0.100000
+<Glyphs>
+12.566371
+772.088783,563.309653
+776.088783,567.309653
+776.088783,565.309653
+776.088783,565.309653
+1
+####Gly: 1
+1
+4
+774.088783,565.309653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:24
+8
+0.100000
+<Glyphs>
+12.723450
+816.162455,563.284653
+820.212455,567.334653
+820.212455,565.309653
+820.212455,565.309653
+1
+####Gly: 1
+1
+4
+818.187455,565.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:25
+8
+0.100000
+<Glyphs>
+12.723450
+1210.962455,563.284653
+1215.012455,567.334653
+1215.012455,565.309653
+1215.012455,565.309653
+1
+####Gly: 1
+1
+4
+1212.987455,565.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:26
+8
+0.100000
+<Glyphs>
+12.566371
+1255.086127,563.309653
+1259.086127,567.309653
+1259.086127,565.309653
+1259.086127,565.309653
+1
+####Gly: 1
+1
+4
+1257.086127,565.309653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:27
+8
+0.100000
+<Glyphs>
+12.566371
+1255.086127,723.509653
+1259.086127,727.509653
+1259.086127,725.509653
+1259.086127,725.509653
+1
+####Gly: 1
+1
+4
+1257.086127,725.509653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:28
+8
+0.100000
+<Glyphs>
+12.723450
+1210.962455,723.484653
+1215.012455,727.534653
+1215.012455,725.509653
+1215.012455,725.509653
+1
+####Gly: 1
+1
+4
+1212.987455,725.509653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:29
+8
+0.100000
+<Glyphs>
+12.723450
+816.162455,723.484653
+820.212455,727.534653
+820.212455,725.509653
+820.212455,725.509653
+1
+####Gly: 1
+1
+4
+818.187455,725.509653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:30
+8
+0.100000
+<Glyphs>
+12.566371
+772.088783,723.509653
+776.088783,727.509653
+776.088783,725.509653
+776.088783,725.509653
+1
+####Gly: 1
+1
+4
+774.088783,725.509653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:31
+8
+0.100000
+<Glyphs>
+12.566371
+772.088783,883.709653
+776.088783,887.709653
+776.088783,885.709653
+776.088783,885.709653
+1
+####Gly: 1
+1
+4
+774.088783,885.709653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:32
+8
+0.100000
+<Glyphs>
+12.723450
+816.162455,883.684653
+820.212455,887.734653
+820.212455,885.709653
+820.212455,885.709653
+1
+####Gly: 1
+1
+4
+818.187455,885.709653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:33
+8
+0.100000
+<Glyphs>
+12.723450
+1210.962455,883.684653
+1215.012455,887.734653
+1215.012455,885.709653
+1215.012455,885.709653
+1
+####Gly: 1
+1
+4
+1212.987455,885.709653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:34
+8
+0.100000
+<Glyphs>
+12.566371
+1255.086127,883.709653
+1259.086127,887.709653
+1259.086127,885.709653
+1259.086127,885.709653
+1
+####Gly: 1
+1
+4
+1257.086127,885.709653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:35
+8
+0.100000
+<Glyphs>
+412.692893
+809.241008,919.534321
+1221.933901,919.534321
+1221.933901,919.534321
+809.241008,919.534321
+1
+####Gly: 1
+-1
+2
+809.241008,919.534321
+1221.933901,919.534321
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:36
+8
+0.100000
+<Glyphs>
+10.838495
+832.516008,930.433989
+835.966008,933.883989
+835.966008,932.158989
+835.966008,932.158989
+1
+####Gly: 1
+1
+4
+834.241008,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:37
+8
+0.100000
+<Glyphs>
+10.838495
+925.318739,930.433989
+928.768739,933.883989
+928.768739,932.158989
+928.768739,932.158989
+1
+####Gly: 1
+1
+4
+927.043739,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:38
+8
+0.100000
+<Glyphs>
+10.838495
+1015.282126,930.433989
+1018.732126,933.883989
+1018.732126,932.158989
+1018.732126,932.158989
+1
+####Gly: 1
+1
+4
+1017.007126,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:39
+8
+0.100000
+<Glyphs>
+10.838495
+1105.245514,930.433989
+1108.695514,933.883989
+1108.695514,932.158989
+1108.695514,932.158989
+1
+####Gly: 1
+1
+4
+1106.970514,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:40
+8
+0.100000
+<Glyphs>
+10.838495
+1195.208901,930.433989
+1198.658901,933.883989
+1198.658901,932.158989
+1198.658901,932.158989
+1
+####Gly: 1
+1
+4
+1196.933901,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:41
+8
+0.100000
+<Glyphs>
+411.992893
+809.591008,944.783657
+1221.583901,944.783657
+1221.583901,944.783657
+809.591008,944.783657
+1
+####Gly: 1
+-1
+2
+809.591008,944.783657
+1221.583901,944.783657
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:42
+8
+0.100000
+<Glyphs>
+866.992893
+1247.661459,51.713207
+1247.661459,918.706100
+1247.661459,918.706100
+1247.661459,51.713207
+1
+####Gly: 1
+1
+2
+1247.661459,918.706100
+1247.661459,51.713207
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:43
+8
+0.100000
+<Glyphs>
+867.692893
+1222.412123,51.363207
+1222.412123,919.056100
+1222.412123,51.363207
+1222.412123,919.056100
+1
+####Gly: 1
+-1
+2
+1222.412123,919.056100
+1222.412123,51.363207
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:44
+8
+0.100000
+<Glyphs>
+867.692893
+808.762787,51.363207
+808.762787,919.056100
+808.762787,919.056100
+808.762787,51.363207
+1
+####Gly: 1
+-1
+2
+808.762787,51.363207
+808.762787,919.056100
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:45
+8
+0.100000
+<Glyphs>
+866.992893
+783.513451,51.713207
+783.513451,918.706100
+783.513451,51.713207
+783.513451,918.706100
+1
+####Gly: 1
+1
+2
+783.513451,51.713207
+783.513451,918.706100
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:46
+8
+0.100000
+<Glyphs>
+2830.363537
+764.088783,6.210981
+1267.086127,964.208326
+784.338119,919.056100
+784.338119,919.056100
+28
+####Gly: 1
+1
+7
+0
+3
+4
+784.338119,919.056100
+783.513451,918.706100
+782.688783,918.356100
+782.688783,918.356100
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 2
+1
+2
+782.688783,918.356100
+764.088783,899.756100
+####Gly: 3
+1
+2
+764.088783,899.756100
+764.088783,70.663207
+####Gly: 4
+1
+2
+764.088783,70.663207
+782.688783,52.063207
+####Gly: 5
+1
+7
+0
+3
+4
+782.688783,52.063207
+783.513451,51.713207
+784.338119,51.363207
+784.338119,51.363207
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 6
+1
+2
+784.338119,51.363207
+809.241008,51.363207
+####Gly: 7
+1
+2
+809.241008,51.363207
+809.241008,26.460317
+####Gly: 8
+1
+7
+0
+3
+4
+809.241008,26.460317
+809.591008,25.635649
+809.941008,24.810981
+809.941008,24.810981
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 9
+1
+2
+809.941008,24.810981
+828.541008,6.210981
+####Gly: 10
+1
+2
+828.541008,6.210981
+1202.633901,6.210981
+####Gly: 11
+1
+2
+1202.633901,6.210981
+1221.233901,24.810981
+####Gly: 12
+1
+7
+0
+3
+4
+1221.233901,24.810981
+1221.583901,25.635649
+1221.933901,26.460317
+1221.933901,26.460317
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 13
+1
+2
+1221.933901,26.460317
+1221.933901,51.363207
+####Gly: 14
+1
+2
+1221.933901,51.363207
+1246.836791,51.363207
+####Gly: 15
+1
+7
+0
+3
+4
+1246.836791,51.363207
+1247.661459,51.713207
+1248.486127,52.063207
+1248.486127,52.063207
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 16
+1
+2
+1248.486127,52.063207
+1267.086127,70.663207
+####Gly: 17
+1
+2
+1267.086127,70.663207
+1267.086127,899.756100
+####Gly: 18
+1
+2
+1267.086127,899.756100
+1248.486127,918.356100
+####Gly: 19
+1
+7
+0
+3
+4
+1248.486127,918.356100
+1247.661459,918.706100
+1246.836791,919.056100
+1246.836791,919.056100
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 20
+1
+2
+1246.836791,919.056100
+1221.933901,919.056100
+####Gly: 21
+1
+2
+1221.933901,919.056100
+1221.933901,943.958989
+####Gly: 22
+1
+7
+0
+3
+4
+1221.933901,943.958989
+1221.583901,944.783657
+1221.233901,945.608326
+1221.233901,945.608326
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 23
+1
+2
+1221.233901,945.608326
+1202.633901,964.208326
+####Gly: 24
+1
+2
+1202.633901,964.208326
+828.541008,964.208326
+####Gly: 25
+1
+2
+828.541008,964.208326
+809.941008,945.608326
+####Gly: 26
+1
+7
+0
+3
+4
+809.941008,945.608326
+809.591008,944.783657
+809.241008,943.958989
+809.241008,943.958989
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 27
+1
+2
+809.241008,943.958989
+809.241008,919.056100
+####Gly: 28
+1
+2
+809.241008,919.056100
+784.338119,919.056100
+<End Glyphs>
+0
+1
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:47
+8
+0.100000
+<Glyphs>
+12.566371
+331.590110,14.210981
+335.590110,18.210981
+335.590110,16.210981
+335.590110,16.210981
+1
+####Gly: 1
+1
+4
+333.590110,16.210981
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:48
+8
+0.100000
+<Glyphs>
+12.566371
+446.856777,14.210981
+450.856777,18.210981
+450.856777,16.210981
+450.856777,16.210981
+1
+####Gly: 1
+1
+4
+448.856777,16.210981
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:49
+8
+0.100000
+<Glyphs>
+12.566371
+562.123444,14.210981
+566.123444,18.210981
+566.123444,16.210981
+566.123444,16.210981
+1
+####Gly: 1
+1
+4
+564.123444,16.210981
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:50
+8
+0.100000
+<Glyphs>
+12.566371
+677.390110,14.210981
+681.390110,18.210981
+681.390110,16.210981
+681.390110,16.210981
+1
+####Gly: 1
+1
+4
+679.390110,16.210981
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:51
+8
+0.100000
+<Glyphs>
+411.992893
+300.593664,25.635649
+712.586557,25.635649
+712.586557,25.635649
+300.593664,25.635649
+1
+####Gly: 1
+-1
+2
+300.593664,25.635649
+712.586557,25.635649
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:52
+8
+0.100000
+<Glyphs>
+412.692893
+300.243664,50.884985
+712.936557,50.884985
+300.243664,50.884985
+712.936557,50.884985
+1
+####Gly: 1
+1
+2
+300.243664,50.884985
+712.936557,50.884985
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:53
+8
+0.100000
+<Glyphs>
+12.723450
+677.365110,58.284653
+681.415110,62.334653
+681.415110,60.309653
+681.415110,60.309653
+1
+####Gly: 1
+1
+4
+679.390110,60.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:54
+8
+0.100000
+<Glyphs>
+12.723450
+562.098444,58.284653
+566.148444,62.334653
+566.148444,60.309653
+566.148444,60.309653
+1
+####Gly: 1
+1
+4
+564.123444,60.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:55
+8
+0.100000
+<Glyphs>
+12.723450
+446.831777,58.284653
+450.881777,62.334653
+450.881777,60.309653
+450.881777,60.309653
+1
+####Gly: 1
+1
+4
+448.856777,60.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:56
+8
+0.100000
+<Glyphs>
+12.723450
+331.565110,58.284653
+335.615110,62.334653
+335.615110,60.309653
+335.615110,60.309653
+1
+####Gly: 1
+1
+4
+333.590110,60.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:57
+8
+0.100000
+<Glyphs>
+12.566371
+263.091438,82.709653
+267.091438,86.709653
+267.091438,84.709653
+267.091438,84.709653
+1
+####Gly: 1
+1
+4
+265.091438,84.709653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:58
+8
+0.100000
+<Glyphs>
+12.723450
+307.165110,82.684653
+311.215110,86.734653
+311.215110,84.709653
+311.215110,84.709653
+1
+####Gly: 1
+1
+4
+309.190110,84.709653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:59
+8
+0.100000
+<Glyphs>
+12.723450
+701.965110,82.684653
+706.015110,86.734653
+706.015110,84.709653
+706.015110,84.709653
+1
+####Gly: 1
+1
+4
+703.990110,84.709653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:60
+8
+0.100000
+<Glyphs>
+12.566371
+746.088783,82.709653
+750.088783,86.709653
+750.088783,84.709653
+750.088783,84.709653
+1
+####Gly: 1
+1
+4
+748.088783,84.709653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:61
+8
+0.100000
+<Glyphs>
+12.566371
+746.088783,242.909653
+750.088783,246.909653
+750.088783,244.909653
+750.088783,244.909653
+1
+####Gly: 1
+1
+4
+748.088783,244.909653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:62
+8
+0.100000
+<Glyphs>
+12.723450
+701.965110,242.884653
+706.015110,246.934653
+706.015110,244.909653
+706.015110,244.909653
+1
+####Gly: 1
+1
+4
+703.990110,244.909653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:63
+8
+0.100000
+<Glyphs>
+12.723450
+307.165110,242.884653
+311.215110,246.934653
+311.215110,244.909653
+311.215110,244.909653
+1
+####Gly: 1
+1
+4
+309.190110,244.909653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:64
+8
+0.100000
+<Glyphs>
+12.566371
+263.091438,242.909653
+267.091438,246.909653
+267.091438,244.909653
+267.091438,244.909653
+1
+####Gly: 1
+1
+4
+265.091438,244.909653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:65
+8
+0.100000
+<Glyphs>
+12.566371
+263.091438,403.109653
+267.091438,407.109653
+267.091438,405.109653
+267.091438,405.109653
+1
+####Gly: 1
+1
+4
+265.091438,405.109653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:66
+8
+0.100000
+<Glyphs>
+12.723450
+307.165110,403.084653
+311.215110,407.134653
+311.215110,405.109653
+311.215110,405.109653
+1
+####Gly: 1
+1
+4
+309.190110,405.109653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:67
+8
+0.100000
+<Glyphs>
+12.723450
+701.965110,403.084653
+706.015110,407.134653
+706.015110,405.109653
+706.015110,405.109653
+1
+####Gly: 1
+1
+4
+703.990110,405.109653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:68
+8
+0.100000
+<Glyphs>
+12.566371
+746.088783,403.109653
+750.088783,407.109653
+750.088783,405.109653
+750.088783,405.109653
+1
+####Gly: 1
+1
+4
+748.088783,405.109653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:69
+8
+0.100000
+<Glyphs>
+12.566371
+746.088783,563.309653
+750.088783,567.309653
+750.088783,565.309653
+750.088783,565.309653
+1
+####Gly: 1
+1
+4
+748.088783,565.309653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:70
+8
+0.100000
+<Glyphs>
+12.723450
+701.965110,563.284653
+706.015110,567.334653
+706.015110,565.309653
+706.015110,565.309653
+1
+####Gly: 1
+1
+4
+703.990110,565.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:71
+8
+0.100000
+<Glyphs>
+12.723450
+307.165110,563.284653
+311.215110,567.334653
+311.215110,565.309653
+311.215110,565.309653
+1
+####Gly: 1
+1
+4
+309.190110,565.309653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:72
+8
+0.100000
+<Glyphs>
+12.566371
+263.091438,563.309653
+267.091438,567.309653
+267.091438,565.309653
+267.091438,565.309653
+1
+####Gly: 1
+1
+4
+265.091438,565.309653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:73
+8
+0.100000
+<Glyphs>
+12.566371
+263.091438,723.509653
+267.091438,727.509653
+267.091438,725.509653
+267.091438,725.509653
+1
+####Gly: 1
+1
+4
+265.091438,725.509653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:74
+8
+0.100000
+<Glyphs>
+12.723450
+307.165110,723.484653
+311.215110,727.534653
+311.215110,725.509653
+311.215110,725.509653
+1
+####Gly: 1
+1
+4
+309.190110,725.509653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:75
+8
+0.100000
+<Glyphs>
+12.723450
+701.965110,723.484653
+706.015110,727.534653
+706.015110,725.509653
+706.015110,725.509653
+1
+####Gly: 1
+1
+4
+703.990110,725.509653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:76
+8
+0.100000
+<Glyphs>
+12.566371
+746.088783,723.509653
+750.088783,727.509653
+750.088783,725.509653
+750.088783,725.509653
+1
+####Gly: 1
+1
+4
+748.088783,725.509653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:77
+8
+0.100000
+<Glyphs>
+12.566371
+746.088783,883.709653
+750.088783,887.709653
+750.088783,885.709653
+750.088783,885.709653
+1
+####Gly: 1
+1
+4
+748.088783,885.709653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:78
+8
+0.100000
+<Glyphs>
+12.723450
+701.965110,883.684653
+706.015110,887.734653
+706.015110,885.709653
+706.015110,885.709653
+1
+####Gly: 1
+1
+4
+703.990110,885.709653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:79
+8
+0.100000
+<Glyphs>
+12.723450
+307.165110,883.684653
+311.215110,887.734653
+311.215110,885.709653
+311.215110,885.709653
+1
+####Gly: 1
+1
+4
+309.190110,885.709653
+2.025000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:80
+8
+0.100000
+<Glyphs>
+12.566371
+263.091438,883.709653
+267.091438,887.709653
+267.091438,885.709653
+267.091438,885.709653
+1
+####Gly: 1
+1
+4
+265.091438,885.709653
+2.000000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:81
+8
+0.100000
+<Glyphs>
+412.692893
+300.243664,919.534321
+712.936557,919.534321
+300.243664,919.534321
+712.936557,919.534321
+1
+####Gly: 1
+-1
+2
+712.936557,919.534321
+300.243664,919.534321
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:82
+8
+0.100000
+<Glyphs>
+10.838495
+686.211557,930.433989
+689.661557,933.883989
+689.661557,932.158989
+689.661557,932.158989
+1
+####Gly: 1
+1
+4
+687.936557,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:83
+8
+0.100000
+<Glyphs>
+10.838495
+593.408827,930.433989
+596.858827,933.883989
+596.858827,932.158989
+596.858827,932.158989
+1
+####Gly: 1
+1
+4
+595.133827,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:84
+8
+0.100000
+<Glyphs>
+10.838495
+503.445439,930.433989
+506.895439,933.883989
+506.895439,932.158989
+506.895439,932.158989
+1
+####Gly: 1
+1
+4
+505.170439,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:85
+8
+0.100000
+<Glyphs>
+10.838495
+413.482051,930.433989
+416.932051,933.883989
+416.932051,932.158989
+416.932051,932.158989
+1
+####Gly: 1
+1
+4
+415.207051,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:86
+8
+0.100000
+<Glyphs>
+10.838495
+323.518664,930.433989
+326.968664,933.883989
+326.968664,932.158989
+326.968664,932.158989
+1
+####Gly: 1
+1
+4
+325.243664,932.158989
+1.725000
+<End Glyphs>
+0
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:87
+8
+0.100000
+<Glyphs>
+411.992893
+300.593664,944.783657
+712.586557,944.783657
+300.593664,944.783657
+712.586557,944.783657
+1
+####Gly: 1
+-1
+2
+712.586557,944.783657
+300.593664,944.783657
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:88
+8
+0.100000
+<Glyphs>
+866.992893
+274.516106,51.713207
+274.516106,918.706100
+274.516106,918.706100
+274.516106,51.713207
+1
+####Gly: 1
+1
+2
+274.516106,918.706100
+274.516106,51.713207
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:89
+8
+0.100000
+<Glyphs>
+867.692893
+299.765442,51.363207
+299.765442,919.056100
+299.765442,51.363207
+299.765442,919.056100
+1
+####Gly: 1
+-1
+2
+299.765442,919.056100
+299.765442,51.363207
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:90
+8
+0.100000
+<Glyphs>
+867.692893
+713.414778,51.363207
+713.414778,919.056100
+713.414778,919.056100
+713.414778,51.363207
+1
+####Gly: 1
+-1
+2
+713.414778,51.363207
+713.414778,919.056100
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+1
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:91
+8
+0.100000
+<Glyphs>
+866.992893
+738.664115,51.713207
+738.664115,918.706100
+738.664115,51.713207
+738.664115,918.706100
+1
+####Gly: 1
+1
+2
+738.664115,51.713207
+738.664115,918.706100
+<End Glyphs>
+1
+2
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+####graph NO:92
+8
+0.100000
+<Glyphs>
+2830.363537
+255.091438,6.210981
+758.088783,964.208326
+737.839446,919.056100
+737.839446,919.056100
+28
+####Gly: 1
+1
+7
+0
+3
+4
+737.839446,919.056100
+738.664115,918.706100
+739.488783,918.356100
+739.488783,918.356100
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 2
+1
+2
+739.488783,918.356100
+758.088783,899.756100
+####Gly: 3
+1
+2
+758.088783,899.756100
+758.088783,70.663207
+####Gly: 4
+1
+2
+758.088783,70.663207
+739.488783,52.063207
+####Gly: 5
+1
+7
+0
+3
+4
+739.488783,52.063207
+738.664115,51.713207
+737.839446,51.363207
+737.839446,51.363207
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 6
+1
+2
+737.839446,51.363207
+712.936557,51.363207
+####Gly: 7
+1
+2
+712.936557,51.363207
+712.936557,26.460317
+####Gly: 8
+1
+7
+0
+3
+4
+712.936557,26.460317
+712.586557,25.635649
+712.236557,24.810981
+712.236557,24.810981
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 9
+1
+2
+712.236557,24.810981
+693.636557,6.210981
+####Gly: 10
+1
+2
+693.636557,6.210981
+319.543664,6.210981
+####Gly: 11
+1
+2
+319.543664,6.210981
+300.943664,24.810981
+####Gly: 12
+1
+7
+0
+3
+4
+300.943664,24.810981
+300.593664,25.635649
+300.243664,26.460317
+300.243664,26.460317
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 13
+1
+2
+300.243664,26.460317
+300.243664,51.363207
+####Gly: 14
+1
+2
+300.243664,51.363207
+275.340774,51.363207
+####Gly: 15
+1
+7
+0
+3
+4
+275.340774,51.363207
+274.516106,51.713207
+273.691438,52.063207
+273.691438,52.063207
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 16
+1
+2
+273.691438,52.063207
+255.091438,70.663207
+####Gly: 17
+1
+2
+255.091438,70.663207
+255.091438,899.756100
+####Gly: 18
+1
+2
+255.091438,899.756100
+273.691438,918.356100
+####Gly: 19
+1
+7
+0
+3
+4
+273.691438,918.356100
+274.516106,918.706100
+275.340774,919.056100
+275.340774,919.056100
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 20
+1
+2
+275.340774,919.056100
+300.243664,919.056100
+####Gly: 21
+1
+2
+300.243664,919.056100
+300.243664,943.958989
+####Gly: 22
+1
+7
+0
+3
+4
+300.243664,943.958989
+300.593664,944.783657
+300.943664,945.608326
+300.943664,945.608326
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 23
+1
+2
+300.943664,945.608326
+319.543664,964.208326
+####Gly: 24
+1
+2
+319.543664,964.208326
+693.636557,964.208326
+####Gly: 25
+1
+2
+693.636557,964.208326
+712.236557,945.608326
+####Gly: 26
+1
+7
+0
+3
+4
+712.236557,945.608326
+712.586557,944.783657
+712.936557,943.958989
+712.936557,943.958989
+8
+0.0
+0.0
+0.0
+0.0
+1.000000
+1.000000
+1.000000
+1.000000
+####Gly: 27
+1
+2
+712.936557,943.958989
+712.936557,919.056100
+####Gly: 28
+1
+2
+712.936557,919.056100
+737.839446,919.056100
+<End Glyphs>
+0
+1
+<Crafts>
+-1
+0.0
+<PWM Control>
+1
+0
+0
+<End PWM Control>
+0.0
+0.0
+<GuideCurve Para>
+0
+90.000000
+5.000000
+0.0
+0
+<End GuideCurve Para>
+<coolPos Para>
+0
+<End coolPos Para>
+<End Crafts>
+<End Graphs>
+0
+0.0
+0.000000,0.000000
+0.000000,0.000000
+eof

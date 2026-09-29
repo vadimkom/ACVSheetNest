@@ -83,8 +83,7 @@ namespace DeepNestLib.IO
         candidate => new Lazy<DxfContourCatalog>(
           () =>
           {
-            using var stream = new MemoryStream(sourceBytes, writable: false);
-            DxfFile file = DxfFile.Load(stream);
+            DxfFile file = DrawingFile.Load(sourceBytes);
             return Create(
               candidate.Path,
               file.Entities.ToArray(),
@@ -136,8 +135,7 @@ namespace DeepNestLib.IO
 
       string fullPath = Path.GetFullPath(path);
       byte[] sourceBytes = File.ReadAllBytes(fullPath);
-      using var stream = new MemoryStream(sourceBytes, writable: false);
-      DxfFile file = DxfFile.Load(stream);
+      DxfFile file = DrawingFile.Load(sourceBytes);
       DxfContourCatalog catalog = Create(
         fullPath,
         file.Entities.ToArray(),
@@ -1068,11 +1066,7 @@ namespace DeepNestLib.IO
 
     internal DxfContourCatalog Catalog { get; }
 
-    internal DxfFile OpenFile()
-    {
-      using var stream = new MemoryStream(this.sourceBytes, writable: false);
-      return DxfFile.Load(stream);
-    }
+    internal DxfFile OpenFile() => DrawingFile.Load(this.sourceBytes);
   }
 
   public sealed class DxfSourceContour

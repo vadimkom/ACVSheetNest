@@ -1341,8 +1341,7 @@ namespace DeepNestLib.Placement
 
     private static SourceOuterDefinition LoadSourceOuter(string path, byte[] sourceBytes)
     {
-      using var stream = new MemoryStream(sourceBytes, writable: false);
-      DxfFile file = DxfFile.Load(stream);
+      DxfFile file = DrawingFile.Load(sourceBytes);
       RawDetail<DxfEntity> detail = DxfParser.ConvertDxfToRawDetail(
         path,
         file.Entities.ToArray());

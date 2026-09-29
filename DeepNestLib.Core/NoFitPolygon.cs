@@ -16,7 +16,7 @@ namespace DeepNestLib
 
   public class NoFitPolygon : PolygonBase, INfp, IHiddenNfp, IStringify
   {
-    public const string FileDialogFilter = "AutoCad Drawing Exchange Format (*.dxf;*.dfx)|*.dxf;*.dfx;*.DXF;*.DFX|DeepNest Polygon (*.dnpoly)|*.dnpoly|All files (*.*)|*.*";
+    public const string FileDialogFilter = "Drawings (*.dxf;*.dfx;*.chf)|*.dxf;*.dfx;*.chf;*.DXF;*.DFX;*.CHF|AutoCad Drawing Exchange Format (*.dxf;*.dfx)|*.dxf;*.dfx;*.DXF;*.DFX|SC2000 (*.chf)|*.chf;*.CHF|DeepNest Polygon (*.dnpoly)|*.dnpoly|All files (*.*)|*.*";
     private double rotation;
 
     // Per segment, whether it is a chord the parser cut a curve into rather than an edge the drawing

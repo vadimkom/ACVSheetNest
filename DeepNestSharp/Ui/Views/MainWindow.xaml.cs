@@ -2092,25 +2092,20 @@ namespace DeepNestSharp.Ui.Views
       // identical sheets don't each produce a duplicate DXF. Fall back to every sheet if no grouping.
       var export = new List<(DeepNestLib.Placement.ISheetPlacement Sheet, int Count, IReadOnlyCollection<DeepNestLib.IO.OffcutLine> Offcut)>();
       var plan = this.dxfViewer.GetProductionPlan();
+      // The offcut is not cut off: the shop keeps the last sheet whole and cuts the remnant when it is needed,
+      // so no sheet carries the separation line. The viewer still outlines the remnant, for the eye.
       if (plan != null && plan.Count > 0)
       {
-        var offcutSheet = this.dxfViewer.OffcutSheet;
         foreach (var (sheet, count, _) in plan)
         {
-          // The offcut separation cut(s) travel only with the genuine remainder sheet the engine
-          // shaped (same rule as the viewer overlay) — never a replicated pattern or a synthetic
-          // production-plan representative — so the cut matches the packed remainder exactly.
-          var offcut = ReferenceEquals(sheet, offcutSheet) ? OffcutGeometry.BuildLines(sheet, this.CurrentOffcutOptions()) : null;
-          export.Add((sheet, count, offcut));
+          export.Add((sheet, count, null));
         }
       }
       else
       {
-        var used = selected.UsedSheets.ToList();
-        for (int si = 0; si < used.Count; si++)
+        foreach (var sheet in selected.UsedSheets)
         {
-          var offcut = si == used.Count - 1 ? OffcutGeometry.BuildLines(used[si], this.CurrentOffcutOptions()) : null;
-          export.Add((used[si], 1, offcut));
+          export.Add((sheet, 1, null));
         }
       }
 

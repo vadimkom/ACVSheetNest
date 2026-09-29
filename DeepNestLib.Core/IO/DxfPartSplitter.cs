@@ -252,13 +252,7 @@
     /// <summary>A fresh reading of the same bytes, so each part is written out of entities that have
     /// never been saved before. The parse is deterministic, which is what lets a part be identified by
     /// the position of its entities rather than by the objects themselves.</summary>
-    private static DxfFile Reload(byte[] source)
-    {
-      using (var stream = new MemoryStream(source))
-      {
-        return DxfFile.Load(stream);
-      }
-    }
+    private static DxfFile Reload(byte[] source) => DrawingFile.Load(source);
 
     /// <summary>The part's label makes the file name, because a row is named after its file. Without a
     /// label it falls back to the drawing's own name and a number, which is what a drawing that was
