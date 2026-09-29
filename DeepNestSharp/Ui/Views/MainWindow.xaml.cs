@@ -28,6 +28,12 @@ namespace DeepNestSharp.Ui.Views
     public class NestRunHistoryItem
     {
       public int RunNumber { get; set; }
+
+      /// <summary>The number, with a star on the best finished nest in the list.</summary>
+      public string RunLabel => this.IsBest ? $"★ {this.RunNumber}" : this.RunNumber.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+      public bool IsBest { get; set; }
+
       public INestResult Result { get; set; }
       public string UtilizationText { get; set; }
       public string PlacedText { get; set; }
@@ -1160,9 +1166,7 @@ namespace DeepNestSharp.Ui.Views
       if (this.cancelNestButton != null) this.cancelNestButton.Content = Localization.Get("Btn_StopNest");
       if (this.btnOpenLayoutFromNesting != null) this.btnOpenLayoutFromNesting.Content = Localization.Get("Btn_GoToLayout");
       if (this.runsListTitle != null) this.runsListTitle.Text = Localization.Get("Lbl_RunsList");
-      if (this.runsListHint != null) this.runsListHint.Text = Localization.CurrentLanguage == Localization.LangBulgarian
-        ? "💡 Щракнете върху вариант за предварителен преглед; щракнете два пъти за разкрой."
-        : (Localization.CurrentLanguage == Localization.LangEnglish ? "💡 Click a run to preview; double-click to view layout." : "💡 Кликните по варианту для предпросмотра; дважды кликните для перехода к раскладке.");
+      if (this.runsListHint != null) this.runsListHint.Text = Localization.Get("Hint_RunsList");
       if (this.colHeaderRunNum != null) this.colHeaderRunNum.Header = Localization.Get("Col_RunNum");
       if (this.colHeaderRunUtil != null) this.colHeaderRunUtil.Header = Localization.Get("Col_RunUtil");
       if (this.colHeaderRunPlaced != null) this.colHeaderRunPlaced.Header = Localization.Get("Col_RunPlaced");
@@ -1757,22 +1761,20 @@ namespace DeepNestSharp.Ui.Views
           this.nestDxfViewer.PartSpacings = this.dxfViewer?.PartSpacings;
         }
 
+        // The search's work in progress is only DRAWN, sheet by sheet as it goes. It used to be added to the
+        // variants list too, one row per try per sheet, so the list mixed a first sheet on its own (7 of 24
+        // parts, "68%") with finished nests, and a partial nest looked better than the finished one.
         Action<INestResult> candidateCallback = candidateResult =>
         {
           this.Dispatcher.BeginInvoke(new Action(() =>
           {
-            if (this.nestRuns == null || candidateResult == null) return;
-            var runItem = new NestRunHistoryItem
-            {
-              RunNumber = this.nestRuns.Count + 1,
-              Result = candidateResult,
-              UtilizationText = FormattableString.Invariant($"{candidateResult.MaterialUtilization * 100:0.#}%"),
-              PlacedText = FormattableString.Invariant($"{candidateResult.TotalPlacedCount} / {candidateResult.TotalPartsCount}"),
-              SheetsText = FormattableString.Invariant($"{candidateResult.UsedSheets.Count}"),
-              TimeText = NestElapsed()
-            };
-            this.nestRuns.Insert(0, runItem);
-            this.runsListView.SelectedItem = runItem;
+            if (candidateResult == null || this.nestDxfViewer == null || this.nestCts == null) return;
+            this.nestDxfViewer.Result = candidateResult;
+            this.nestPreviewMetricsText.Text = Localization.Format(
+              "Nest_LivePreview",
+              candidateResult.TotalPlacedCount,
+              candidateResult.TotalPartsCount,
+              candidateResult.UsedSheets.Count);
           }));
         };
 
@@ -1827,17 +1829,7 @@ namespace DeepNestSharp.Ui.Views
           this.nestDxfViewer.Result = result;
         }
 
-        var finalRunItem = new NestRunHistoryItem
-        {
-          RunNumber = this.nestRuns.Count + 1,
-          Result = result,
-          UtilizationText = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%"),
-          PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
-          SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
-          TimeText = NestElapsed()
-        };
-        this.nestRuns.Insert(0, finalRunItem);
-        this.runsListView.SelectedItem = finalRunItem;
+        this.AddFinishedNest(result);
 
         // Consume the stock this nest used, right in the Sheets tab — the count visibly drops
         // (35 in stock, nest used 31 → the tab now shows 4) and closing the app persists what
@@ -2500,6 +2492,7 @@ namespace DeepNestSharp.Ui.Views
     private void OnClearRunsClicked(object sender, RoutedEventArgs e)
     {
       this.nestRuns.Clear();
+      this.finishedNests = 0;
       if (this.nestDxfViewer != null)
       {
         this.nestDxfViewer.Result = null;
@@ -2687,6 +2680,54 @@ namespace DeepNestSharp.Ui.Views
     #endregion
 
     #region Runs History & Layout Selection
+
+    private int finishedNests;
+
+    /// <summary>
+    /// Adds a finished nest to the variants list, the way Solid Edge Nesting keeps its solutions: one row per
+    /// complete nest, best first (every part placed, then fewest sheets, then most material used), the best
+    /// starred. A nest that comes out the same as one already listed is not listed twice; that row is selected.
+    /// </summary>
+    private void AddFinishedNest(INestResult result)
+    {
+      string util = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%");
+      string placed = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}");
+      string sheets = FormattableString.Invariant($"{result.UsedSheets.Count}");
+      var same = this.nestRuns.FirstOrDefault(r => r.UtilizationText == util && r.PlacedText == placed && r.SheetsText == sheets);
+      if (same != null)
+      {
+        this.runsListView.SelectedItem = same;
+        return;
+      }
+
+      var item = new NestRunHistoryItem
+      {
+        RunNumber = ++this.finishedNests,
+        Result = result,
+        UtilizationText = util,
+        PlacedText = placed,
+        SheetsText = sheets,
+        TimeText = NestElapsed(),
+      };
+
+      static (int Placed, int Sheets, double Util) Rank(INestResult r)
+        => (r.TotalPlacedCount, -r.UsedSheets.Count, r.MaterialUtilization);
+
+      int at = 0;
+      while (at < this.nestRuns.Count && Rank(this.nestRuns[at].Result).CompareTo(Rank(result)) >= 0)
+      {
+        at++;
+      }
+
+      this.nestRuns.Insert(at, item);
+      for (int i = 0; i < this.nestRuns.Count; i++)
+      {
+        this.nestRuns[i].IsBest = i == 0;
+      }
+
+      this.runsListView.Items.Refresh();
+      this.runsListView.SelectedItem = item;
+    }
 
     private void OnRunsListSelectionChanged(object sender, SelectionChangedEventArgs e)
     {

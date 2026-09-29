@@ -553,7 +553,7 @@
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                   <GridView>
-                    <GridViewColumn x:Name="colHeaderRunNum" Header="№" Width="36" DisplayMemberBinding="{Binding RunNumber}" />
+                    <GridViewColumn x:Name="colHeaderRunNum" Header="№" Width="46" DisplayMemberBinding="{Binding RunLabel}" />
                     <GridViewColumn x:Name="colHeaderRunUtil" Header="% Утилиз." Width="90">
                       <GridViewColumn.CellTemplate>
                         <DataTemplate>
