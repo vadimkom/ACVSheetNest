@@ -2913,14 +2913,50 @@ namespace DeepNestSharp.Ui.Views
           $"{Localization.Get("Kpi_Utilization")} {overallUtil:0.#}% | {Localization.Get("Kpi_SheetsUsed")} {totalSheets} | {Localization.Get("Kpi_PartsPlaced")} {totalParts}");
       }
 
-      if (this.reportPagesScroll != null && this.reportPagesScroll.ActualWidth > 300)
+      this.ApplyReportFit();
+    }
+
+    // How the report page is fitted to the window. A whole page is the default: the operator reads a sheet
+    // at a glance. Zooming by hand stops the fitting until a fit button is pressed again.
+    private enum ReportFit
+    {
+      None,
+      Width,
+      Page,
+    }
+
+    private ReportFit reportFit = ReportFit.Page;
+
+    private void ApplyReportFit()
+    {
+      if (this.reportFit == ReportFit.None || this.reportPagesScroll == null)
       {
-        double avail = this.reportPagesScroll.ActualWidth - 60;
-        if (avail > 300 && avail < 842)
-        {
-          SetReportZoom(avail / 842.0);
-        }
+        return;
       }
+
+      // A4 landscape is 842 x 595 points; the pages sit 28 apart inside a 24 margin, with a scroll bar.
+      double width = this.reportPagesScroll.ActualWidth - 60;
+      double height = this.reportPagesScroll.ActualHeight - 48;
+      if (width < 200 || height < 150)
+      {
+        return; // not laid out yet; the size change that follows fits it
+      }
+
+      double zoom = width / 842.0;
+      if (this.reportFit == ReportFit.Page)
+      {
+        zoom = Math.Min(zoom, height / (595.0 + 28.0));
+      }
+
+      SetReportZoom(zoom);
+    }
+
+    private void OnReportScrollSizeChanged(object sender, SizeChangedEventArgs e) => this.ApplyReportFit();
+
+    private void OnReportZoomPage(object sender, RoutedEventArgs e)
+    {
+      this.reportFit = ReportFit.Page;
+      this.ApplyReportFit();
     }
 
     private void UpdateReportPageIndicator()
@@ -2955,30 +2991,26 @@ namespace DeepNestSharp.Ui.Views
 
     private void OnReportZoomIn(object sender, RoutedEventArgs e)
     {
+      this.reportFit = ReportFit.None;
       SetReportZoom(this.reportZoom + 0.15);
     }
 
     private void OnReportZoomOut(object sender, RoutedEventArgs e)
     {
+      this.reportFit = ReportFit.None;
       SetReportZoom(this.reportZoom - 0.15);
     }
 
     private void OnReportZoom100(object sender, RoutedEventArgs e)
     {
+      this.reportFit = ReportFit.None;
       SetReportZoom(1.0);
     }
 
     private void OnReportZoomFit(object sender, RoutedEventArgs e)
     {
-      double availableWidth = (this.reportPagesScroll?.ActualWidth ?? 0) - 60;
-      if (availableWidth > 200)
-      {
-        SetReportZoom(availableWidth / 842.0);
-      }
-      else
-      {
-        SetReportZoom(1.0);
-      }
+      this.reportFit = ReportFit.Width;
+      this.ApplyReportFit();
     }
 
     private void OnReportScrollPreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
@@ -2987,6 +3019,7 @@ namespace DeepNestSharp.Ui.Views
       {
         e.Handled = true;
         double delta = e.Delta > 0 ? 0.1 : -0.1;
+        this.reportFit = ReportFit.None;
         SetReportZoom(this.reportZoom + delta);
       }
     }

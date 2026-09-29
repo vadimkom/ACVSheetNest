@@ -15,6 +15,7 @@ namespace DeepNestSharp.Domain.Models
     private readonly DetailLoadInfo detailLoadInfo;
     private int? netArea;
     private INfp nfp;
+    private bool loading;
     private int effectiveColorRgb = -1;
 
     private static JoinableTaskContext joinableTaskContext = new JoinableTaskContext();
@@ -319,12 +320,13 @@ namespace DeepNestSharp.Domain.Models
     {
       get
       {
-        if (netArea == null)
+        // Zero until the part has loaded in the background; it says so when it has.
+        if (netArea == null && this.Nfp is INfp loaded)
         {
-          this.netArea = (int)this.Nfp.NetArea;
+          this.netArea = (int)loaded.NetArea;
         }
 
-        return netArea.Value;
+        return netArea ?? 0;
       }
     }
 
@@ -374,45 +376,75 @@ namespace DeepNestSharp.Domain.Models
     /// <summary>The thumbnail binds here so it refreshes once the (possibly slow) geometry loads.</summary>
     public IDetailLoadInfo PreviewSource => this;
 
+    /// <summary>
+    /// The part's shape, or null while it is still loading; asking starts the load, once.
+    /// </summary>
+    /// <remarks>
+    /// The load runs on the thread pool. <see cref="DxfParser.LoadDxfFile"/> only awaits when it has to
+    /// retry a locked file, so awaited here directly it read the drawing on the UI thread and raised "the
+    /// size is in" from inside the very getter the row was asking - a notification WPF drops. Rows whose
+    /// file happened to be locked by the thumbnail went through the retry and showed their size; the
+    /// others stayed blank.
+    /// </remarks>
     internal INfp Nfp
     {
       get
       {
-        _ = joinableTaskContext.Factory.RunAsync(async () =>
+        if (this.nfp == null && !this.loading)
         {
-          this.netArea = (int)(await this.LoadAsync().ConfigureAwait(false)).NetArea;
-          await joinableTaskContext.Factory.SwitchToMainThreadAsync();
-          this.OnPropertyChanged(nameof(this.PreviewSource));
-          this.OnPropertyChanged(nameof(this.SizeLabel));
-          this.OnPropertyChanged(nameof(this.NetArea));
-        });
+          this.loading = true;
+          _ = joinableTaskContext.Factory.RunAsync(async () =>
+          {
+            try
+            {
+              INfp loaded = await Task.Run(this.LoadAsync).ConfigureAwait(false);
+              this.netArea = (int)loaded.NetArea;
+            }
+            catch
+            {
+              // A shape without an area still has a size to show, or shows none.
+            }
+
+            await joinableTaskContext.Factory.SwitchToMainThreadAsync();
+            this.loading = false;
+            this.OnPropertyChanged(nameof(this.PreviewSource));
+            this.OnPropertyChanged(nameof(this.SizeLabel));
+            this.OnPropertyChanged(nameof(this.NetArea));
+          });
+        }
+
         return this.nfp;
       }
     }
 
     public async Task<INfp> LoadAsync()
     {
+      INfp cached = this.nfp;
+      if (cached != null)
+      {
+        return cached;
+      }
+
+      string path = detailLoadInfo.Path;
+      INfp loaded;
       try
       {
-        if (this.nfp == null)
-        {
-          if (new FileInfo(detailLoadInfo.Path).Exists)
-          {
-            IRawDetail raw = await DxfParser.LoadDxfFile(detailLoadInfo.Path);
-            this.nfp = raw.ToNfp();
-          }
-          else
-          {
-            this.nfp = new NoFitPolygon();
-          }
-        }
+        loaded = new FileInfo(path).Exists
+          ? (await DxfParser.LoadDxfFile(path).ConfigureAwait(false)).ToNfp()
+          : new NoFitPolygon();
       }
       catch
       {
-        this.nfp = new InvalidNoFitPolygon();
+        loaded = new InvalidNoFitPolygon();
       }
 
-      return this.nfp;
+      // A part flipped while it loaded is another file now; its old shape must not stick.
+      if (path == detailLoadInfo.Path)
+      {
+        this.nfp = loaded;
+      }
+
+      return loaded;
     }
   }
 }

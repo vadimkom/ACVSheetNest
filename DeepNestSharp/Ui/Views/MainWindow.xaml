@@ -250,7 +250,7 @@
                 </GridViewColumn>
 
                 <!-- Mirrored copies on top of the quantity (left/right pairs) -->
-                <GridViewColumn x:Name="colHeaderMirrored" Header="{ui:Tr Col_Mirrored}" Width="95">
+                <GridViewColumn x:Name="colHeaderMirrored" Header="{ui:Tr Col_Mirrored}" Width="100">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <xctk:IntegerUpDown Width="75" Minimum="0" Maximum="100000" Value="{Binding MirrorQuantity, Mode=TwoWay}"
@@ -275,7 +275,7 @@
                 </GridViewColumn>
 
                 <!-- Priority -->
-                <GridViewColumn x:Name="colHeaderPriority" Header="Приоритет" Width="125">
+                <GridViewColumn x:Name="colHeaderPriority" Header="Приоритет" Width="135">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <ComboBox Width="110"
@@ -301,7 +301,7 @@
                 </GridViewColumn>
 
                 <!-- Actions: Details button + Remove -->
-                <GridViewColumn x:Name="colHeaderPartActions" Header="Действия" Width="150">
+                <GridViewColumn x:Name="colHeaderPartActions" Header="Действия" Width="180">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -681,6 +681,7 @@
                   <Button x:Name="btnReportZoomIn" Style="{DynamicResource ModernButton}" MinWidth="36" Padding="8,2" Content="🔍 +" Click="OnReportZoomIn" ToolTip="{ui:Tr Tip_ZoomIn}" />
                   <Button x:Name="btnReportZoom100" Style="{DynamicResource ModernButton}" Margin="4,0" Padding="8,2" Content="100%" Click="OnReportZoom100" ToolTip="{ui:Tr Tip_Zoom100}" />
                   <Button x:Name="btnReportZoomFit" Style="{DynamicResource ModernButton}" Margin="4,0" Padding="8,2" Content="⤢ По ширине" Click="OnReportZoomFit" ToolTip="{ui:Tr Tip_ZoomFit}" />
+                  <Button x:Name="btnReportZoomPage" Style="{DynamicResource ModernButton}" Margin="4,0" Padding="8,2" Content="{ui:Tr Btn_ZoomPage}" Click="OnReportZoomPage" ToolTip="{ui:Tr Tip_ZoomPage}" />
 
                   <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="12,2" />
 
@@ -691,7 +692,7 @@
             </Border>
 
             <!-- PDF Pages ScrollViewer -->
-            <ScrollViewer x:Name="reportPagesScroll" Grid.Row="1" Background="{DynamicResource Brush.Workspace}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="OnReportScrollPreviewMouseWheel" ScrollChanged="OnReportPagesScrollChanged">
+            <ScrollViewer x:Name="reportPagesScroll" Grid.Row="1" Background="{DynamicResource Brush.Workspace}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="OnReportScrollPreviewMouseWheel" ScrollChanged="OnReportPagesScrollChanged" SizeChanged="OnReportScrollSizeChanged">
               <Grid HorizontalAlignment="Center" VerticalAlignment="Top" Margin="24">
                 <!-- Stack of A4 Pages -->
                 <StackPanel x:Name="reportPagesStackPanel" HorizontalAlignment="Center">
