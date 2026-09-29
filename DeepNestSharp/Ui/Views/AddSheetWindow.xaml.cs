@@ -37,6 +37,20 @@ namespace DeepNestSharp.Ui.Views
 
       this.priorityCombo.SelectedValue = 5;
       ApplyLocalization();
+
+      // Typing a size is what the dialog is for: open in the width field with its number selected, so the
+      // first keystroke replaces it. Queued at Input priority, after the window has taken focus itself.
+      this.Loaded += (_, __) => this.Dispatcher.BeginInvoke(
+        System.Windows.Threading.DispatcherPriority.Input,
+        new Action(() =>
+        {
+          this.widthUpDown.Focus();
+          if (this.widthUpDown.Template?.FindName("PART_TextBox", this.widthUpDown) is System.Windows.Controls.TextBox box)
+          {
+            box.Focus();
+            box.SelectAll();
+          }
+        }));
     }
 
     private void ApplyLocalization()

@@ -79,6 +79,13 @@ namespace DeepNestSharp.Ui.UserControls
     // Manual nesting state: rendered path per placement, current selection, drag bookkeeping, and
     // the placements currently overlapping something (drawn red).
     private readonly List<(System.Windows.Shapes.Path Path, IPartPlacement Pp)> partPaths = new List<(System.Windows.Shapes.Path, IPartPlacement)>();
+
+    // Each part's name, by the same index as partPaths; null where a part has none to show.
+    private readonly List<System.Windows.Shapes.Path> partLabels = new List<System.Windows.Shapes.Path>();
+
+    private static readonly Typeface LabelFace = new Typeface("Segoe UI");
+    private static readonly Brush DarkInk = new SolidColorBrush(Color.FromRgb(0x14, 0x14, 0x14));
+    private static readonly Brush LightInk = Brushes.White;
     private readonly HashSet<IPartPlacement> invalid = new HashSet<IPartPlacement>();
 
     // The offcut cut line and its size label. Same reason: the strip's edge follows the pack, so it has to
@@ -922,6 +929,7 @@ namespace DeepNestSharp.Ui.UserControls
       this.dragCache = null; // placements may have been replaced wholesale — never answer from stale geometry
       this.canvas.Children.Clear();
       this.partPaths.Clear();
+      this.partLabels.Clear();
       this.offcutShapes.Clear();
       this.ClearMeasure(); // canvas was cleared; drop dangling measure-shape references
 
@@ -1022,6 +1030,22 @@ namespace DeepNestSharp.Ui.UserControls
         {
           // Skip a part that can't be rendered rather than blanking the whole view.
         }
+      }
+
+      // Names over the parts, after every part so no neighbour paints over one. Same index as partPaths.
+      foreach (var (_, pp) in this.partPaths)
+      {
+        var label = this.BuildLabel(pp, h);
+        this.partLabels.Add(label);
+        if (label != null)
+        {
+          this.canvas.Children.Add(label);
+        }
+      }
+
+      if (this.inspectedPp != null && !sheetPlacement.PartPlacements.Contains(this.inspectedPp))
+      {
+        this.InspectPart(null);
       }
 
       this.DrawOffcutOverlay(sheetPlacement, idx, w, h, stroke);
@@ -1227,7 +1251,7 @@ namespace DeepNestSharp.Ui.UserControls
 
     private Brush FillFor(IPartPlacement pp)
     {
-      return this.invalid.Contains(pp) ? InvalidFill : pp == this.selectedPp ? SelectedFill : this.TypeFill(pp);
+      return this.invalid.Contains(pp) ? InvalidFill : (pp == this.selectedPp || pp == this.inspectedPp) ? SelectedFill : this.TypeFill(pp);
     }
 
     /// <summary>The fill for a part's FILE, so several different parts on one sheet can be told apart at a
@@ -1397,6 +1421,8 @@ namespace DeepNestSharp.Ui.UserControls
 
       if (this.EditMode)
       {
+        this.InspectPart(null); // editing has its own selection and its own panel for it
+
         if (this.measureToggle != null && this.measureToggle.IsChecked == true)
         {
           this.measureToggle.IsChecked = false; // mutually exclusive with Measure
@@ -1929,6 +1955,9 @@ namespace DeepNestSharp.Ui.UserControls
 
     internal const string AngleFormat = "0.##";
 
+    // The status line is read off a tape measure, not typed back: a tenth is plenty.
+    internal const string StatusFormat = "0.#";
+
     /// <summary>What the panel would show for this value.</summary>
     internal static string Shown(double value, string format) => value.ToString(format, CultureInfo.CurrentCulture);
 
@@ -2126,7 +2155,150 @@ namespace DeepNestSharp.Ui.UserControls
         }
 
         this.SelectPart(null);
+        return;
       }
+
+      // Looking, not editing: a click says which part that is and where, in the window's status line.
+      Point at = e.GetPosition(this.canvas);
+      this.InspectPart(PickAt(this.partPaths.Select(p => p.Pp).ToList(), at.X, this.currentSheetH - at.Y));
+    }
+
+    /// <summary>
+    /// The part's name drawn inside it, the one the DXF writes (the file name without "Flat-Pattern - "),
+    /// anchored where the exporter anchors it: the middle of the part if that is on the material, else a
+    /// point that is. Sized from the part so it reads on screen, not the capped engraving height, and turned
+    /// along a part that stands tall. Vector text in sheet units, so it zooms with the drawing.
+    /// </summary>
+    private System.Windows.Shapes.Path BuildLabel(IPartPlacement pp, double sheetH)
+    {
+      try
+      {
+        var placed = pp?.PlacedPart;
+        if (placed?.Points == null || placed.Points.Length < 3)
+        {
+          return null;
+        }
+
+        string text = DeepNestLib.IO.DxfExporter.GetPartNameLabel(pp.Part?.Name);
+        if (string.IsNullOrWhiteSpace(text))
+        {
+          return null;
+        }
+
+        double w = placed.MaxX - placed.MinX, h = placed.MaxY - placed.MinY;
+        bool vertical = h > w * 1.4;
+        double along = vertical ? h : w;
+        double across = vertical ? w : h;
+        double em = Math.Min(along * 0.8 / (0.55 * text.Length), across * 0.3);
+
+        // A long name on a small part comes out unreadably small in one line. Drawing names read
+        // "piece^assembly_size", so break it after the '^' when two lines make bigger letters.
+        int caret = text.IndexOf('^');
+        if (caret > 0 && caret < text.Length - 1)
+        {
+          string first = text.Substring(0, caret + 1);
+          string second = text.Substring(caret + 1);
+          double twoLines = Math.Min(along * 0.8 / (0.55 * Math.Max(first.Length, second.Length)), across * 0.3 / 1.25);
+          if (twoLines > em * 1.15)
+          {
+            text = first + "\n" + second;
+            em = twoLines;
+          }
+        }
+
+        if (!(em > 0))
+        {
+          return null;
+        }
+
+        var formatted = new FormattedText(
+          text,
+          System.Globalization.CultureInfo.InvariantCulture,
+          FlowDirection.LeftToRight,
+          LabelFace,
+          em,
+          Brushes.Black,
+          VisualTreeHelper.GetDpi(this).PixelsPerDip);
+        var geometry = formatted.BuildGeometry(new Point(0, 0));
+        var box = geometry.Bounds;
+        if (box.IsEmpty || box.Width <= 0)
+        {
+          return null;
+        }
+
+        var (cx, cy) = DeepNestLib.IO.DxfExporter.ComputePartCentroid(placed);
+        double fit = Math.Min(1.0, along * 0.85 / box.Width);
+        var transform = new TransformGroup();
+        transform.Children.Add(new TranslateTransform(-(box.X + (box.Width / 2)), -(box.Y + (box.Height / 2))));
+        transform.Children.Add(new ScaleTransform(fit, fit));
+        if (vertical)
+        {
+          transform.Children.Add(new RotateTransform(-90));
+        }
+
+        transform.Children.Add(new TranslateTransform(cx, sheetH - cy));
+        geometry.Transform = transform;
+        geometry.Freeze();
+
+        return new System.Windows.Shapes.Path
+        {
+          Data = geometry,
+          Fill = InkOn(this.TypeFill(pp)),
+          IsHitTestVisible = false,
+        };
+      }
+      catch
+      {
+        return null; // a name is a courtesy; never lose the drawing over one
+      }
+    }
+
+    /// <summary>Dark letters on a light part colour, white on a dark one.</summary>
+    private static Brush InkOn(Brush fill)
+    {
+      if (fill is SolidColorBrush solid)
+      {
+        var c = solid.Color;
+        return ((0.299 * c.R) + (0.587 * c.G) + (0.114 * c.B)) < 140 ? LightInk : DarkInk;
+      }
+
+      return DarkInk;
+    }
+
+    /// <summary>A part was clicked outside manual editing (null: clicked off every part). The text is its
+    /// name, size and bottom-left corner, ready for a status line; null clears it.</summary>
+    public event Action<string> PartInspected;
+
+    private IPartPlacement inspectedPp;
+
+    private void InspectPart(IPartPlacement pp)
+    {
+      this.inspectedPp = pp;
+      foreach (var (path, p) in this.partPaths)
+      {
+        path.Fill = this.FillFor(p);
+      }
+
+      this.PartInspected?.Invoke(pp == null ? null : this.DescribePart(pp));
+    }
+
+    private string DescribePart(IPartPlacement pp)
+    {
+      var placed = pp.PlacedPart;
+      if (placed == null)
+      {
+        return null;
+      }
+
+      string name = DeepNestLib.IO.DxfExporter.GetPartNameLabel(pp.Part?.Name);
+      return Localization.Format(
+        "Dxf_PartStatus",
+        string.IsNullOrEmpty(name) ? Localization.Get("Rep_PartFallback") : name,
+        Shown(placed.MaxX - placed.MinX, StatusFormat),
+        Shown(placed.MaxY - placed.MinY, StatusFormat),
+        Localization.Get(this.UnitsMm ? "Unit_Mm" : "Unit_In"),
+        Shown(placed.MinX, StatusFormat),
+        Shown(placed.MinY, StatusFormat));
     }
 
     private void OnPanMove(object sender, MouseEventArgs e)
@@ -2223,6 +2395,21 @@ namespace DeepNestSharp.Ui.UserControls
         if (this.partPaths[i].Pp == this.selectedPp)
         {
           this.partPaths[i].Path.Data = BuildPlacedGeometry(this.selectedPp, this.currentSheetH);
+          if (i < this.partLabels.Count)
+          {
+            // The name goes where the part went.
+            if (this.partLabels[i] != null)
+            {
+              this.canvas.Children.Remove(this.partLabels[i]);
+            }
+
+            this.partLabels[i] = this.BuildLabel(this.selectedPp, this.currentSheetH);
+            if (this.partLabels[i] != null)
+            {
+              this.canvas.Children.Add(this.partLabels[i]);
+            }
+          }
+
           break;
         }
       }

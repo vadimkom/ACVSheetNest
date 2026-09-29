@@ -69,7 +69,7 @@ namespace DeepNestSharp.CiTests.RasterNest
 
       log.AppendLine(FormattableString.Invariant(
         $"# iters={SparrowNestService.IterationBudget(effort)} tries={Environment.GetEnvironmentVariable("SHEETNEST_NEST_TRIES") ?? "default"} effort={effort} spacing={spacing} margin={margin} rotations={rotations} conc={Environment.GetEnvironmentVariable("SHEETNEST_MAX_CONC") ?? "auto"} cores={Environment.ProcessorCount}"));
-      log.AppendLine("run,totalSec,sparrowSec,mapSec,holesSec,loadSec,waves,tries,sheets,placed,unplaced,utilPct,lastSheetPct,lastExtentMm");
+      log.AppendLine("run,totalSec,sparrowSec,mapSec,holesSec,loadSec,waves,tries,sheets,placed,unplaced,utilPct,lastSheetPct,lastExtentMm,tailRepacks");
       for (int r = 1; r <= runs; r++)
       {
         SparrowNestService.DiagLoadMs = 0;
@@ -78,14 +78,15 @@ namespace DeepNestSharp.CiTests.RasterNest
         SparrowNestService.DiagHolesMs = 0;
         SparrowNestService.DiagWaves = 0;
         SparrowNestService.DiagTries = 0;
+        SparrowNestService.DiagTailRepacks = 0;
 
         var sw = Stopwatch.StartNew();
         // Each run races a different set of seeds, as pressing Nest again in the window does.
-        var result = SparrowNestService.Nest(parts, stock, rotations, spacing, margin, 5, exe, out string err, effort: effort, seedOffset: 50 * (r - 1));
+        var result = SparrowNestService.Nest(parts, stock, rotations, spacing, margin, 5, exe, out string err, effort: effort, seedOffset: (int)Read("SHEETNEST_BENCH_SEED_BASE", 0) + (50 * (r - 1)));
         sw.Stop();
 
         log.AppendLine(FormattableString.Invariant(
-          $"{r},{sw.Elapsed.TotalSeconds:F1},{SparrowNestService.DiagSparrowMs / 1000.0:F1},{SparrowNestService.DiagMapMs / 1000.0:F1},{SparrowNestService.DiagHolesMs / 1000.0:F1},{SparrowNestService.DiagLoadMs / 1000.0:F1},{SparrowNestService.DiagWaves},{SparrowNestService.DiagTries},{result?.UsedSheets.Count ?? -1},{result?.TotalPlacedCount ?? -1},{result?.UnplacedParts.Count ?? -1},{(result?.MaterialUtilization ?? 0) * 100:F1},{LastSheetFill(result):F1},{LastExtent(result):F0}{(err == null ? string.Empty : " " + err)}"));
+          $"{r},{sw.Elapsed.TotalSeconds:F1},{SparrowNestService.DiagSparrowMs / 1000.0:F1},{SparrowNestService.DiagMapMs / 1000.0:F1},{SparrowNestService.DiagHolesMs / 1000.0:F1},{SparrowNestService.DiagLoadMs / 1000.0:F1},{SparrowNestService.DiagWaves},{SparrowNestService.DiagTries},{result?.UsedSheets.Count ?? -1},{result?.TotalPlacedCount ?? -1},{result?.UnplacedParts.Count ?? -1},{(result?.MaterialUtilization ?? 0) * 100:F1},{LastSheetFill(result):F1},{LastExtent(result):F0},{SparrowNestService.DiagTailRepacks}{(err == null ? string.Empty : " " + err)}"));
       }
 
       this.output.WriteLine(log.ToString());

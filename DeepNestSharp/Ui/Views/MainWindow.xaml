@@ -644,11 +644,6 @@
             <!-- PDF Viewer Toolbar (Sticky) -->
             <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="10,6">
               <DockPanel>
-                <!-- Right: Save & Print buttons directly in the preview -->
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                  <Button x:Name="btnReportSavePdf" Style="{DynamicResource ModernButton}" Margin="4,0" Content="📄 Сохранить PDF" Click="OnNestReportPdf" ToolTip="{ui:Tr Tip_ExportPdf}" />
-                  <Button x:Name="btnReportPrint" Style="{DynamicResource PrimaryButton}" Margin="4,0" Content="🖨️ Печать отчета" Click="OnPrintReport" ToolTip="{ui:Tr Tip_ReportPrint}" />
-                </StackPanel>
 
                 <!-- Left: Navigation and Zoom -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -716,6 +711,8 @@
         <TextBlock Style="{DynamicResource StatusValue}" Text="{Binding NestMonitorViewModel.SelectedItem.TotalUnplacedCount, FallbackValue=--}" />
         <!-- Live nest status: elapsed time only, visible while a nest runs and the final time after it ends. -->
         <TextBlock x:Name="statusBarNestPhaseText" Style="{DynamicResource StatusValue}" Visibility="Collapsed" Margin="18,0,6,0" />
+        <!-- The part last clicked on a drawing: its name, size and bottom-left corner. -->
+        <TextBlock x:Name="statusPartInfo" Style="{DynamicResource StatusValue}" Visibility="Collapsed" Margin="18,0,6,0" />
         <!-- Startup update check lights this up; click opens the GitHub release page. -->
         <TextBlock x:Name="updateNotice" Style="{DynamicResource StatusValue}" Visibility="Collapsed"
                    Cursor="Hand" TextDecorations="Underline" Margin="18,0,0,0"

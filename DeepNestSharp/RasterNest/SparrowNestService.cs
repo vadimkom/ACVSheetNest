@@ -100,6 +100,14 @@ namespace DeepNestSharp.RasterNest
       public int Qty;
       public bool Mirrored;   // this population is X-flipped — placements carry IsMirrored for the exporter
       public int Priority;    // 1-10, LOWER nests first (1 = highest); decides which parts fill earlier sheets
+
+      /// <summary>The same part, loaded once already, asked for a different number of times.</summary>
+      public Loaded WithQty(int qty)
+      {
+        var copy = (Loaded)this.MemberwiseClone();
+        copy.Qty = qty;
+        return copy;
+      }
     }
 
     /// <summary>
@@ -802,6 +810,11 @@ namespace DeepNestSharp.RasterNest
         return null;
       }
 
+      if (TailRepackEnabled && effort == NestEffort.Fast && pool.Values.Sum() == 0 && !cancel.IsCancellationRequested)
+      {
+        ShrinkTail(sheetLayouts, sheetCommonEdges, sheetSizes, loadedById, sizes, margin, perSheetBudgetSec, sparrowExePath, cancel, commonLineGap, geometryTolerance, commonLineMaxClusterParts, seedOffset);
+      }
+
       // jagua ignores item holes, so sparrow never nests inside them. Recover that density ourselves:
       // drop leftover parts into the holes of already-placed parts (exact geometry, spacing preserved).
       var diagHoles = System.Diagnostics.Stopwatch.StartNew();
@@ -919,6 +932,94 @@ namespace DeepNestSharp.RasterNest
 
       int placedTotal = sheetLayouts.Sum(s => s.Count);
       return new NestResult(placedTotal + unplaced.Count, collection, unplaced, PlacementTypeEnum.BoundingBox, 0, 0);
+    }
+
+    /// <summary>Off until it has been measured on shop jobs: written, not yet shown to save a sheet.</summary>
+    private static readonly bool TailRepackEnabled = false;
+
+    /// <summary>Sheets a tail repack may take together, the last one included.</summary>
+    private const int TailRepackMaxSheets = 4;
+
+    /// <summary>Tail repacks that saved a sheet on the last nest (diagnostics).</summary>
+    internal static int DiagTailRepacks;
+
+    /// <summary>
+    /// Tries to take the last sheet away. Fast packs sheet by sheet and the last one gets whatever is left,
+    /// which is sometimes a sheet cut for a handful of parts. The parts of the last k sheets (2 to
+    /// <see cref="TailRepackMaxSheets"/>, all one size, none sharing cuts) are packed again, at Normal effort,
+    /// onto k - 1 of them; if every part goes on, those sheets replace the k.
+    /// <para>Only when it can plausibly work: k - 1 sheets must not need to be fuller than the fullest sheet
+    /// this same job already managed. A tail of 30% behind sheets at 70% fits nowhere short of repacking the
+    /// whole job, and trying would only turn Fast into Normal; a tail of a few parts often does fit. One
+    /// attempt, at the smallest k that qualifies, so a failure costs one short search.</para>
+    /// </summary>
+    private static void ShrinkTail(
+      List<List<IPartPlacement>> layouts,
+      List<List<CommonEdgeIntent>> edges,
+      List<(int W, int H)> sizesUsed,
+      Dictionary<int, Loaded> loadedById,
+      List<StockSize> stock,
+      double margin,
+      int perSheetBudgetSec,
+      string exe,
+      CancellationToken cancel,
+      double commonLineGap,
+      double geometryTolerance,
+      int commonLineMaxClusterParts,
+      int seedOffset)
+    {
+      int n = layouts.Count;
+      if (n < 2)
+      {
+        return;
+      }
+
+      var (w, h) = sizesUsed[n - 1];
+      double sheetArea = (double)w * h;
+      double Fill(int i) => layouts[i].Sum(p => Math.Abs(loadedById[p.Source].Nfp.Area)) / sheetArea;
+      double fullest = Enumerable.Range(0, n - 1).Where(i => sizesUsed[i] == (w, h)).Select(Fill).DefaultIfEmpty(0).Max();
+
+      for (int k = 2; k <= Math.Min(TailRepackMaxSheets, n); k++)
+      {
+        int from = n - k;
+        if (sizesUsed[from] != (w, h)
+            || edges[from].Count > 0
+            || layouts[from].Any(p => loadedById[p.Source].RequiresMergedLines))
+        {
+          return; // the run of plain sheets of this size ends here
+        }
+
+        double needed = Enumerable.Range(from, k).Sum(Fill) / (k - 1);
+        if (needed > fullest)
+        {
+          continue;
+        }
+
+        var subset = layouts.Skip(from).SelectMany(l => l)
+          .GroupBy(p => p.Source)
+          .Select(g => loadedById[g.Key].WithQty(g.Count()))
+          .ToList();
+        int priority = stock.FirstOrDefault(s => s.W == w && s.H == h)?.Priority ?? 5;
+        var fewer = new List<StockSize> { new StockSize { W = w, H = h, Remaining = k - 1, Unlimited = false, Priority = priority } };
+        var repacked = RunNestBody(subset, fewer, margin, perSheetBudgetSec, exe, cancel, null, NestEffort.Normal, commonLineGap, geometryTolerance, commonLineMaxClusterParts, out _, null, seedOffset + 500);
+        if (repacked == null || cancel.IsCancellationRequested || repacked.UnplacedParts.Count > 0 || repacked.UsedSheets.Count > k - 1)
+        {
+          return;
+        }
+
+        layouts.RemoveRange(from, k);
+        edges.RemoveRange(from, k);
+        sizesUsed.RemoveRange(from, k);
+        foreach (var sheet in repacked.UsedSheets)
+        {
+          layouts.Add(sheet.PartPlacements.ToList());
+          edges.Add(new List<CommonEdgeIntent>());
+          sizesUsed.Add((w, h));
+        }
+
+        System.Threading.Interlocked.Increment(ref DiagTailRepacks);
+        return;
+      }
     }
 
     /// <summary>Loads each part's contour once (arcs tessellated by the app pipeline) and pre-computes its

@@ -235,6 +235,7 @@ namespace DeepNestSharp.Ui
       ("Title_EditNest", "Ручная правка", "Ръчна корекция", "Edit nest"),
       ("Dxf_NotANumber", "это не число  ·  деталь осталась на месте", "това не е число  ·  детайлът остана на мястото си", "that is not a number I can read  ·  the part has been left where it was"),
       ("Dxf_Distance", "расстояние: {0}  ·  X: {1}  ·  Y: {2}", "разстояние: {0}  ·  X: {1}  ·  Y: {2}", "distance: {0}  ·  X: {1}  ·  Y: {2}"),
+      ("Dxf_PartStatus", "{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}", "{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}", "{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}"),
       ("Dxf_MeasureAgain", "  ·  щёлкните, чтобы измерить снова", "  ·  щракнете, за да измерите отново", "  ·  click to measure again"),
       ("Dxf_Gap", "зазор {0}", "разстояние {0}", "gap {0}"),
       ("Dxf_Layout", "Раскладка {0}", "Разкрой {0}", "Layout {0}"),

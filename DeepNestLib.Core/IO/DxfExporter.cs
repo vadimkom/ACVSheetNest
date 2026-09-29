@@ -1974,7 +1974,7 @@ namespace DeepNestLib.IO
     private static readonly System.Text.RegularExpressions.Regex FlatPatternPrefix = new System.Text.RegularExpressions.Regex(
       @"^\s*Flat[\s_-]*Pattern\s*-\s*", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 
-    internal static string GetPartNameLabel(string source)
+    public static string GetPartNameLabel(string source)
     {
       if (string.IsNullOrWhiteSpace(source))
       {
@@ -2021,7 +2021,7 @@ namespace DeepNestLib.IO
       targetDxf.Layers.Add(layer);
     }
 
-    internal static (double X, double Y) ComputePartCentroid(INfp poly)
+    public static (double X, double Y) ComputePartCentroid(INfp poly)
     {
       if (poly?.Points == null || poly.Points.Length < 3)
       {

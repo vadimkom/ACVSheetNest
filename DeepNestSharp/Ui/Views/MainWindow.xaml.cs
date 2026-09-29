@@ -129,22 +129,27 @@ namespace DeepNestSharp.Ui.Views
       new SheetPreset("144 × 72 in   (12 × 6 ft)", 144, 72),
     };
 
-    // Standard metric mill sizes (mm), width = the LONG side; grouped by the short side like above.
+    // The metric sizes the shop actually stocks (mm), width = the LONG side. Anything else is typed in under
+    // Custom size, and can be remembered there as one of "My sheets".
     private static readonly SheetPreset[] SheetPresetsMm =
     {
       new SheetPreset("2000 × 1000 mm", 2000, 1000),
-      new SheetPreset("3000 × 1000 mm", 3000, 1000),
       new SheetPreset("2500 × 1250 mm", 2500, 1250),
-      new SheetPreset("3000 × 1250 mm", 3000, 1250),
-      new SheetPreset("3000 × 1500 mm", 3000, 1500),
-      new SheetPreset("4000 × 1500 mm", 4000, 1500),
-      new SheetPreset("6000 × 1500 mm", 6000, 1500),
-      new SheetPreset("4000 × 2000 mm", 4000, 2000),
-      new SheetPreset("6000 × 2000 mm", 6000, 2000),
+      new SheetPreset("1250 × 500 mm", 1250, 500),
     };
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
+      // A part clicked on either drawing says what and where it is in the status line.
+      void ShowPart(string text)
+      {
+        this.statusPartInfo.Text = text ?? string.Empty;
+        this.statusPartInfo.Visibility = string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
+      }
+
+      this.dxfViewer.PartInspected += ShowPart;
+      this.nestDxfViewer.PartInspected += ShowPart;
+
       // Sensible defaults: always use all cores; drop the removed "Squeeze" arrangement.
       var cfg = ViewModel.SvgNestConfigViewModel.SvgNestConfig;
       cfg.UseParallel = true;
@@ -1172,8 +1177,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.btnExportDxf != null) this.btnExportDxf.Content = Localization.Get("Btn_ExportDxf");
       if (this.btnExportPdf != null) this.btnExportPdf.Content = Localization.Get("Btn_ExportPdf");
       if (this.btnPrintReport != null) this.btnPrintReport.Content = Localization.Get("Btn_PrintReport");
-      if (this.btnReportSavePdf != null) this.btnReportSavePdf.Content = Localization.Get("Report_PreviewToolbar_SavePdf");
-      if (this.btnReportPrint != null) this.btnReportPrint.Content = Localization.Get("Report_PreviewToolbar_Print");
       if (this.btnReportZoomFit != null) this.btnReportZoomFit.Content = Localization.Get("Report_PreviewToolbar_ZoomFit");
       if (this.reportEmptyTitle != null) this.reportEmptyTitle.Text = Localization.Get("Report_EmptyTitle");
       if (this.reportEmptySub != null) this.reportEmptySub.Text = Localization.Get("Report_EmptySub");
@@ -1259,7 +1262,7 @@ namespace DeepNestSharp.Ui.Views
       int lastShortSide = -1;
       foreach (var preset in this.unitsMm ? SheetPresetsMm : SheetPresets)
       {
-        if (lastShortSide >= 0 && preset.Height != lastShortSide)
+        if (!this.unitsMm && lastShortSide >= 0 && preset.Height != lastShortSide)
         {
           menu.Items.Add(new Separator()); // visual break between the 48-wide and 60-wide groups
         }
