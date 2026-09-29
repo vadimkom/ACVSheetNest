@@ -153,6 +153,14 @@ namespace DeepNestLib.NestProject
 
     public int PartIndex { get; set; } = 0;
 
+    // A part the operator flipped in the parts list: Path is then a mirrored copy of UnflippedPath, which
+    // is what the row showed before. Both persist, so a copy lost with the temp folder can be written again.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public PartFlip Flip { get; set; } = PartFlip.None;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string UnflippedPath { get; set; }
+
     public override string ToJson(bool writeIndented = false)
     {
       var options = new JsonSerializerOptions();

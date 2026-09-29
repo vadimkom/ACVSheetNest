@@ -152,6 +152,7 @@
             </StackPanel>
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
               <Button x:Name="btnAddPart" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddPart}" />
+              <Button x:Name="btnAddShape" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_AddShape}" Click="OnAddShapeClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddShape}" />
               <Button x:Name="btnDeletePart" Style="{DynamicResource ModernButton}" Content="Удалить деталь" Click="OnRemoveSelectedPart" Margin="6,0,3,0" ToolTip="{ui:Tr Tip_DeletePart}" />
               <Button x:Name="btnClearAllParts" Style="{DynamicResource ModernButton}" Content="Очистить всё" Click="OnClearAllParts" Margin="3,0" ToolTip="{ui:Tr Tip_ClearParts}" />
               <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
@@ -208,6 +209,17 @@
                       <StackPanel VerticalAlignment="Center" Margin="4,0">
                         <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12" TextTrimming="CharacterEllipsis" />
                         <TextBlock Text="{Binding NestingLabel, Mode=OneWay}" FontSize="10" Foreground="{DynamicResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                        <TextBlock Text="{Binding FlipLabel, Mode=OneWay}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Accent}" TextTrimming="CharacterEllipsis">
+                          <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                              <Style.Triggers>
+                                <DataTrigger Binding="{Binding FlipLabel, Mode=OneWay}" Value="">
+                                  <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                              </Style.Triggers>
+                            </Style>
+                          </TextBlock.Style>
+                        </TextBlock>
                         <TextBlock Text="{Binding Path}" FontSize="10" Foreground="{DynamicResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Path}" />
                       </StackPanel>
                     </DataTemplate>
@@ -237,11 +249,13 @@
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>
 
-                <!-- Net Area -->
-                <GridViewColumn x:Name="colHeaderArea" Header="Площадь, мм²" Width="105">
+                <!-- Mirrored copies on top of the quantity (left/right pairs) -->
+                <GridViewColumn x:Name="colHeaderMirrored" Header="{ui:Tr Col_Mirrored}" Width="95">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
-                      <TextBlock Text="{Binding NetArea, StringFormat='{}{0:0.##}', Mode=OneWay}" VerticalAlignment="Center" Margin="4,0" />
+                      <xctk:IntegerUpDown Width="75" Minimum="0" Maximum="100000" Value="{Binding MirrorQuantity, Mode=TwoWay}"
+                                          ValueChanged="OnPartQuantityChanged" Tag="{Binding}" HorizontalAlignment="Left"
+                                          VerticalAlignment="Center" Margin="4,0" ToolTip="{ui:Tr Tip_PartMirrorQty}" />
                     </DataTemplate>
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>
@@ -287,13 +301,19 @@
                 </GridViewColumn>
 
                 <!-- Actions: Details button + Remove -->
-                <GridViewColumn x:Name="colHeaderPartActions" Header="Действия" Width="185">
+                <GridViewColumn x:Name="colHeaderPartActions" Header="Действия" Width="150">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Style="{DynamicResource ModernButton}" Content="⚙ Подробности..." Margin="2,0"
+                        <Button Style="{DynamicResource ModernButton}" Content="…" MinWidth="30" Margin="2,0"
                                 Click="OnEditPart" Tag="{Binding}"
                                 ToolTip="{ui:Tr Tip_PartDetails}" />
+                        <Button Style="{DynamicResource ModernButton}" Content="↔" MinWidth="30" Margin="2,0"
+                                Click="OnFlipPartLeftRight" Tag="{Binding}"
+                                ToolTip="{ui:Tr Tip_FlipLeftRight}" />
+                        <Button Style="{DynamicResource ModernButton}" Content="↕" MinWidth="30" Margin="2,0"
+                                Click="OnFlipPartUpDown" Tag="{Binding}"
+                                ToolTip="{ui:Tr Tip_FlipUpDown}" />
                         <Button Style="{DynamicResource IconButton}" Content="✕" Margin="4,0,0,0"
                                 ToolTip="{ui:Tr Tip_PartRemove}"
                                 Command="{Binding DataContext.ActiveDocument.RemovePartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -315,6 +335,7 @@
               <TextBlock x:Name="partsEmptySub" Text="Перетащите сюда файлы DXF или проекты (Drag &amp; Drop)" FontSize="12" Foreground="{DynamicResource Brush.TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,14" />
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button x:Name="btnAddPartEmpty" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="4,0" />
+                <Button Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_AddShape}" Click="OnAddShapeClicked" Margin="4,0" ToolTip="{ui:Tr Tip_AddShape}" />
               </StackPanel>
             </StackPanel>
           </Border>

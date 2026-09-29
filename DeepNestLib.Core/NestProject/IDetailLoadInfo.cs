@@ -96,5 +96,15 @@
 
     /// <summary>Which part of <see cref="SourceDxfPath"/> this is.</summary>
     int PartIndex { get; set; }
+
+    /// <summary>
+    /// Gets or sets how the operator flipped the part itself. Unlike <see cref="MirrorQuantity"/>, which
+    /// adds mirrored copies, this changes the part: <see cref="Path"/> is then a mirrored copy of
+    /// <see cref="UnflippedPath"/>.
+    /// </summary>
+    PartFlip Flip { get; set; }
+
+    /// <summary>Gets or sets the drawing the part was flipped from; null while it is not flipped.</summary>
+    string UnflippedPath { get; set; }
   }
 }

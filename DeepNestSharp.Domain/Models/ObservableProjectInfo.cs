@@ -156,16 +156,32 @@
     {
       foreach (IDetailLoadInfo detail in projectInfo.DetailLoadInfos)
       {
-        if (string.IsNullOrEmpty(detail.SourceDxfPath) || detail.IsExists)
+        if (detail.IsExists)
         {
           continue;
         }
 
-        string rebuilt = DeepNestLib.IO.DxfPartSplitter.Rebuild(detail.SourceDxfPath, detail.PartIndex);
-        if (!string.IsNullOrEmpty(rebuilt))
+        // A flipped part is a copy of a copy when it was split out of a drawing: the split part comes back
+        // first, then the flip is written from it again.
+        bool flipped = detail.Flip != PartFlip.None;
+        string unflipped = flipped ? detail.UnflippedPath : detail.Path;
+        if (!string.IsNullOrEmpty(detail.SourceDxfPath) && !System.IO.File.Exists(unflipped))
         {
-          detail.Path = rebuilt;
+          string rebuilt = DeepNestLib.IO.DxfPartSplitter.Rebuild(detail.SourceDxfPath, detail.PartIndex);
+          if (!string.IsNullOrEmpty(rebuilt))
+          {
+            if (flipped)
+            {
+              detail.UnflippedPath = rebuilt;
+            }
+            else
+            {
+              detail.Path = rebuilt;
+            }
+          }
         }
+
+        DeepNestLib.IO.PartMirror.Restore(detail);
       }
     }
 

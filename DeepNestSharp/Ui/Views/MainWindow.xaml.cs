@@ -1030,7 +1030,6 @@ namespace DeepNestSharp.Ui.Views
     private void ApplyUnits()
     {
       string u = this.unitsMm ? (Localization.CurrentLanguage == Localization.LangEnglish ? "mm" : "мм") : "in";
-      string uArea = this.unitsMm ? (Localization.CurrentLanguage == Localization.LangEnglish ? "mm²" : "мм²") : "in²";
       if (this.marginUnitsLabel != null)
       {
         this.marginUnitsLabel.Text = u;
@@ -1045,11 +1044,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderDimensions != null)
       {
         this.colHeaderDimensions.Header = $"{Localization.Get("Col_Dimensions")}, {u}";
-      }
-
-      if (this.colHeaderArea != null)
-      {
-        this.colHeaderArea.Header = $"{Localization.Get("Col_NetArea")}, {uArea}";
       }
 
       if (this.colHeaderSheetDimensions != null)
@@ -1554,6 +1548,89 @@ namespace DeepNestSharp.Ui.Views
       {
         OpenEditPart(part);
       }
+    }
+
+    private void OnFlipPartLeftRight(object sender, RoutedEventArgs e) => this.FlipPart(sender, PartFlip.LeftRight);
+
+    private void OnFlipPartUpDown(object sender, RoutedEventArgs e) => this.FlipPart(sender, PartFlip.UpDown);
+
+    /// <summary>Flips the part itself, for a drawing that came the wrong hand; the same button again undoes it.</summary>
+    private void FlipPart(object sender, PartFlip axis)
+    {
+      if ((sender as FrameworkElement)?.Tag is not IDetailLoadInfo part || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      try
+      {
+        DeepNestLib.IO.PartMirror.Toggle(part, axis);
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show(Localization.Format("Msg_FlipFailed", part.Name, ex.GetBaseException().Message), "SheetNest", MessageBoxButton.OK, MessageBoxImage.Warning);
+        return;
+      }
+
+      doc.IsDirty = true;
+
+      // Colours and thumbnails are keyed by the file, and a flipped part is another file.
+      this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+    }
+
+    /// <summary>A rectangle or a circle straight from the program: 50 squares 100 x 100 without a CAD trip.</summary>
+    private async void OnAddShapeClicked(object sender, RoutedEventArgs e)
+    {
+      if (ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      var dialog = new AddShapeWindow(this.unitsMm) { Owner = this };
+      if (dialog.ShowDialog() != true)
+      {
+        return;
+      }
+
+      var shape = dialog.Shape;
+      string kind = shape == DeepNestLib.IO.PartShape.Circle ? "Shape_Circle"
+        : Math.Abs(dialog.ShapeWidth - dialog.ShapeHeight) < 1e-9 ? "Shape_Square" : "Shape_Rectangle";
+      string name = Localization.Get(kind) + " " + DeepNestLib.IO.PartShapes.SizeText(shape, dialog.ShapeWidth, dialog.ShapeHeight);
+      string path;
+      try
+      {
+        path = DeepNestLib.IO.PartShapes.Write(DeepNestLib.IO.PartShapes.DefaultFolder, name, shape, dialog.ShapeWidth, dialog.ShapeHeight, this.unitsMm);
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show(ex.GetBaseException().Message, "SheetNest", MessageBoxButton.OK, MessageBoxImage.Warning);
+        return;
+      }
+
+      // The same shape again is more of the same part, not a second row drawing the same file.
+      IDetailLoadInfo Row() => doc.ProjectInfo.DetailLoadInfos.LastOrDefault(p => string.Equals(p.Path, path, StringComparison.OrdinalIgnoreCase));
+      if (Row() is IDetailLoadInfo existing)
+      {
+        existing.Quantity += dialog.Quantity;
+      }
+      else
+      {
+        await doc.AddPartFilesAsync(new[] { path });
+        if (this.isClosed || !this.IsLoaded)
+        {
+          return;
+        }
+
+        if (Row() is IDetailLoadInfo added)
+        {
+          added.Quantity = dialog.Quantity;
+        }
+
+        this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+      }
+
+      doc.IsDirty = true;
+      UpdateSummaryBadges();
     }
 
     private void OnPartsListDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -2611,8 +2688,7 @@ namespace DeepNestSharp.Ui.Views
     #region Narrow and portrait windows
 
     // At the laser the monitor stands on end (1080 x 1920). The part columns were sized for a landscape screen and
-    // ran off its right edge; the name now takes what the others leave, and a narrow window drops the area
-    // column, which the size column beside it already tells.
+    // ran off its right edge; the name now takes what the others leave.
     private void OnPartsListSizeChanged(object sender, SizeChangedEventArgs e)
     {
       if (!e.WidthChanged)
@@ -2621,9 +2697,8 @@ namespace DeepNestSharp.Ui.Views
       }
 
       double available = this.partsListView.ActualWidth - SystemParameters.VerticalScrollBarWidth - 10;
-      this.colHeaderArea.Width = available < 1150 ? 0 : 105;
       double others = this.colHeaderPartPreview.Width + this.colHeaderPartQty.Width + this.colHeaderDimensions.Width
-        + this.colHeaderArea.Width + this.colHeaderColor.Width + this.colHeaderPriority.Width
+        + this.colHeaderMirrored.Width + this.colHeaderColor.Width + this.colHeaderPriority.Width
         + this.colHeaderPartStatus.Width + this.colHeaderPartActions.Width;
       this.colHeaderPartName.Width = Math.Max(220, available - others);
     }

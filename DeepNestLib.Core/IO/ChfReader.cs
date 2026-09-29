@@ -63,6 +63,11 @@ namespace DeepNestLib.IO
 
       var file = new DxfFile();
       file.Header.Version = DxfAcadVersion.R2000;
+
+      // SC2000 works in millimetres and the file does not say so. Left unitless, the drawing reads as
+      // inches wherever a tolerance is scaled by units, which is 25 times too tight for common cutting.
+      file.Header.DefaultDrawingUnits = DxfUnits.Millimeters;
+      file.Header.DrawingUnits = DxfDrawingUnits.Metric;
       int i = 0;
       if (lines.Count == 0 || lines[0] != Signature)
       {

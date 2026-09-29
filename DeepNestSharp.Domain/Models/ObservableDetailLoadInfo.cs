@@ -73,10 +73,47 @@ namespace DeepNestSharp.Domain.Models
       get => detailLoadInfo.Path;
       set
       {
+        if (detailLoadInfo.Path == value)
+        {
+          return;
+        }
+
         SetProperty(nameof(Path), () => detailLoadInfo.Path, v => detailLoadInfo.Path = v, value);
+
+        // Another file is another shape (a flipped part is a new file): the loaded one no longer applies.
+        this.nfp = null;
+        this.netArea = null;
+        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(PreviewSource));
+        OnPropertyChanged(nameof(SizeLabel));
         NotifyCommonCuttingCapabilityChanged();
       }
     }
+
+    public PartFlip Flip
+    {
+      get => detailLoadInfo.Flip;
+      set
+      {
+        SetProperty(nameof(Flip), () => detailLoadInfo.Flip, v => detailLoadInfo.Flip = v, value);
+        OnPropertyChanged(nameof(FlipLabel));
+      }
+    }
+
+    public string UnflippedPath
+    {
+      get => detailLoadInfo.UnflippedPath;
+      set => SetProperty(nameof(UnflippedPath), () => detailLoadInfo.UnflippedPath, v => detailLoadInfo.UnflippedPath = v, value);
+    }
+
+    /// <summary>Says on the row that the part is flipped from its drawing; empty when it is not.</summary>
+    public string FlipLabel => detailLoadInfo.Flip switch
+    {
+      PartFlip.LeftRight => DeepNestSharp.Domain.Services.UiText.Get("Part_FlippedLeftRight"),
+      PartFlip.UpDown => DeepNestSharp.Domain.Services.UiText.Get("Part_FlippedUpDown"),
+      PartFlip.LeftRight | PartFlip.UpDown => DeepNestSharp.Domain.Services.UiText.Get("Part_FlippedBoth"),
+      _ => string.Empty,
+    };
 
     public int Quantity
     {
@@ -297,7 +334,15 @@ namespace DeepNestSharp.Domain.Models
       get
       {
         var n = this.nfp;
-        if (n == null || n.Length < 2)
+        if (n == null)
+        {
+          // The row asks for the size first, so asking is what starts the part loading; it says so again
+          // once the shape is in.
+          _ = this.Nfp;
+          return string.Empty;
+        }
+
+        if (n.Length < 2)
         {
           return string.Empty;
         }
