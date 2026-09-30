@@ -231,7 +231,7 @@
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
-                        <xctk:IntegerUpDown Width="75" Minimum="1" Maximum="100000" Value="{Binding Quantity, Mode=TwoWay}"
+                        <xctk:IntegerUpDown Width="75" Minimum="0" Maximum="100000" Value="{Binding Quantity, Mode=TwoWay}"
                                             ValueChanged="OnPartQuantityChanged" Tag="{Binding}"
                                             VerticalAlignment="Center" ToolTip="{ui:Tr Tip_PartQty}" />
                         <TextBlock Text="шт." VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
@@ -652,7 +652,70 @@
 
           <!-- 1. DXF Layout View -->
           <Border x:Name="dxfViewerBorder" Margin="2" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" Visibility="Visible">
-            <userControls:DxfViewer x:Name="dxfViewer" Result="{Binding NestMonitorViewModel.SelectedItem}" SheetIndex="0" />
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <userControls:DxfViewer x:Name="dxfViewer" Result="{Binding NestMonitorViewModel.SelectedItem}" SheetIndex="0" />
+
+              <!-- Every layout as a thumbnail: click to show it, tick what has been cut, then nest the rest. -->
+              <Border x:Name="layoutStrip" Grid.Row="1" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}"
+                      BorderThickness="0,1,0,0" Padding="6,4" Visibility="Collapsed">
+                <DockPanel>
+                  <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" Margin="8,0,2,0" MaxWidth="240">
+                    <Button x:Name="btnCutRenest" Style="{DynamicResource PrimaryButton}" Content="{ui:Tr Btn_CutRenest}" Padding="10,6"
+                            Click="OnCutAndRenest" IsEnabled="False" ToolTip="{ui:Tr Tip_CutRenest}" />
+                    <TextBlock x:Name="layoutCutSummary" Style="{DynamicResource CaptionText}" TextWrapping="Wrap" Margin="0,4,0,0"
+                               Text="{ui:Tr Hint_MarkCut}" />
+                  </StackPanel>
+                  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <ItemsControl x:Name="layoutStripItems">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Border x:Name="card" Margin="3" Padding="5,4" Width="150" Background="White" BorderThickness="2"
+                                  BorderBrush="{DynamicResource Brush.Border}" CornerRadius="3" Cursor="Hand"
+                                  MouseLeftButtonUp="OnLayoutCardClick" ToolTip="{ui:Tr Tip_LayoutCard}">
+                            <StackPanel>
+                              <Grid Height="72">
+                                <Image Source="{Binding Thumbnail}" Stretch="Uniform" />
+                                <Border x:Name="cutBadge" Background="#CC2E7D32" CornerRadius="3" Padding="6,1"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">
+                                  <TextBlock Text="{Binding CutBadge}" Foreground="White" FontWeight="Bold" />
+                                </Border>
+                              </Grid>
+                              <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
+                              <TextBlock Text="{Binding SizeText}" FontSize="10" Foreground="{DynamicResource Brush.TextMuted}" />
+                              <CheckBox Content="{ui:Tr Lbl_SheetCut}" IsChecked="{Binding IsCut}" Margin="0,3,0,0"
+                                        Visibility="{Binding SingleVisibility}" />
+                              <StackPanel Orientation="Horizontal" Margin="0,3,0,0" Visibility="{Binding MultiVisibility}">
+                                <TextBlock Text="{ui:Tr Lbl_SheetsCut}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                <xctk:IntegerUpDown Width="52" Minimum="0" Maximum="{Binding Count}" Value="{Binding CutCount, Mode=TwoWay}" />
+                                <TextBlock Text="{Binding OfCountText}" VerticalAlignment="Center" Margin="4,0,0,0" />
+                              </StackPanel>
+                            </StackPanel>
+                          </Border>
+                          <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                              <Setter TargetName="card" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsAnyCut}" Value="True">
+                              <Setter TargetName="card" Property="Background" Value="#E8F5E9" />
+                              <Setter TargetName="cutBadge" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                          </DataTemplate.Triggers>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </ScrollViewer>
+                </DockPanel>
+              </Border>
+            </Grid>
           </Border>
 
           <!-- 2. PDF Report Preview View -->
@@ -734,7 +797,6 @@
         <!-- Live nest status: elapsed time only, visible while a nest runs and the final time after it ends. -->
         <TextBlock x:Name="statusBarNestPhaseText" Style="{DynamicResource StatusValue}" Visibility="Collapsed" Margin="18,0,6,0" />
         <!-- The part last clicked on a drawing: its name, size and bottom-left corner. -->
-        <TextBlock x:Name="statusPartInfo" Style="{DynamicResource StatusValue}" Visibility="Collapsed" Margin="18,0,6,0" />
         <!-- Startup update check lights this up; click opens the GitHub release page. -->
         <TextBlock x:Name="updateNotice" Style="{DynamicResource StatusValue}" Visibility="Collapsed"
                    Cursor="Hand" TextDecorations="Underline" Margin="18,0,0,0"

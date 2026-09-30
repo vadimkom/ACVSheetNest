@@ -63,6 +63,13 @@
         <ToggleButton x:Name="measureToggle" Content="Измерение" Margin="12,0,0,0" Padding="8,3" FontWeight="SemiBold"
                       Checked="OnMeasureModeChanged" Unchecked="OnMeasureModeChanged"
                       ToolTip="Измерение расстояний: укажите две точки на чертеже." />
+        <!-- The part clicked last: name, size and where it sits, big enough to read at the laser (it used to
+             sit in the status bar, small and at the bottom of the window). -->
+        <Border x:Name="partInfoPanel" Margin="12,0,0,0" Padding="8,1" CornerRadius="3" VerticalAlignment="Center"
+                Background="{DynamicResource Brush.AccentTint}" Visibility="Collapsed">
+          <TextBlock x:Name="partInfoText" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"
+                     Foreground="{DynamicResource Brush.TextPrimary}" />
+        </Border>
       </StackPanel>
     </Border>
 

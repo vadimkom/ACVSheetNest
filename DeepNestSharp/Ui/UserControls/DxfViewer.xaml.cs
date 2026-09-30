@@ -340,6 +340,7 @@ namespace DeepNestSharp.Ui.UserControls
       }
 
       v.Render();
+      v.LayoutsChanged?.Invoke(v, EventArgs.Empty);
     }
 
     /// <summary>
@@ -349,6 +350,56 @@ namespace DeepNestSharp.Ui.UserControls
     /// many near-equal sheets. Mixed jobs fall back to grouping sheets by exact layout.
     /// </summary>
     private void BuildGroups()
+    {
+      this.BuildGroupsInNestOrder();
+      this.PutPriorityStockFirst();
+    }
+
+    /// <summary>
+    /// The priority of the stock a sheet was cut from (1 is the highest, 5 normal), or null to keep the
+    /// nest's own order. Set by the window, which knows the stock.
+    /// </summary>
+    public Func<ISheetPlacement, int> SheetPriority { get; set; }
+
+    /// <summary>
+    /// Offcuts and remnants given a high priority are what the operator cuts first, so their layouts come
+    /// first too, here and in everything built from this plan (report, export). Stable: layouts of equal
+    /// priority keep the nest's order.
+    /// </summary>
+    private void PutPriorityStockFirst()
+    {
+      var priority = this.SheetPriority;
+      if (priority == null || this.groups.Count < 2)
+      {
+        return;
+      }
+
+      var ordered = this.groups
+        .Select((g, i) => (Group: g, Index: i, Priority: g.Representative == null ? int.MaxValue : priority(g.Representative)))
+        .OrderBy(x => x.Priority)
+        .ThenBy(x => x.Index)
+        .Select(x => x.Group)
+        .ToList();
+      if (ordered.SequenceEqual(this.groups))
+      {
+        return;
+      }
+
+      this.groups.Clear();
+      this.groups.AddRange(ordered);
+
+      // Layouts named by number are renumbered in the order they are now shown; the plan's own names
+      // (full sheet, remainder) say what they are and stay.
+      if (this.groups.All(g => g.Members != null))
+      {
+        for (int i = 0; i < this.groups.Count; i++)
+        {
+          this.groups[i].Name = Localization.Format("Dxf_Layout", i + 1);
+        }
+      }
+    }
+
+    private void BuildGroupsInNestOrder()
     {
       this.groups.Clear();
       this.partBrushes.Clear();
@@ -881,7 +932,83 @@ namespace DeepNestSharp.Ui.UserControls
 
     private static void OnSheetIndexPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-      ((DxfViewer)d).Render();
+      var v = (DxfViewer)d;
+      v.Render();
+      v.SheetIndexChanged?.Invoke(v, EventArgs.Empty);
+    }
+
+    /// <summary>Another layout is on screen.</summary>
+    public event EventHandler SheetIndexChanged;
+
+    /// <summary>The layouts were rebuilt: a new result was shown.</summary>
+    public event EventHandler LayoutsChanged;
+
+    /// <summary>One layout of the plan as a strip of thumbnails shows it.</summary>
+    public sealed class LayoutEntry
+    {
+      public int Index { get; init; }
+
+      public string Name { get; init; }
+
+      /// <summary>How many sheets are cut to this layout.</summary>
+      public int Count { get; init; }
+
+      public double Width { get; init; }
+
+      public double Height { get; init; }
+
+      public ImageSource Thumbnail { get; init; }
+
+      /// <summary>The sheets cut to it, one per copy: the nest's own sheets, or the plan's layout repeated
+      /// where the plan condensed several near-equal sheets into one.</summary>
+      public IReadOnlyList<ISheetPlacement> Sheets { get; init; }
+    }
+
+    /// <summary>Every layout in the order shown, each with a small picture of it.</summary>
+    public IReadOnlyList<LayoutEntry> GetLayouts()
+    {
+      var list = new List<LayoutEntry>();
+      for (int i = 0; i < this.groups.Count; i++)
+      {
+        var g = this.groups[i];
+        if (g.Representative?.Sheet == null)
+        {
+          continue;
+        }
+
+        list.Add(new LayoutEntry
+        {
+          Index = i,
+          Name = g.Name,
+          Count = g.Count,
+          Width = g.Representative.Sheet.WidthCalculated,
+          Height = g.Representative.Sheet.HeightCalculated,
+          Thumbnail = this.Thumbnail(g.Representative),
+          Sheets = g.Members != null && g.Members.Count == g.Count
+            ? g.Members.ToList()
+            : Enumerable.Repeat(g.Representative, g.Count).ToList(),
+        });
+      }
+
+      return list;
+    }
+
+    /// <summary>The sheet and its parts in their colours, as a picture that scales to any size.</summary>
+    private ImageSource Thumbnail(ISheetPlacement sheetPlacement)
+    {
+      double w = sheetPlacement.Sheet.WidthCalculated;
+      double h = sheetPlacement.Sheet.HeightCalculated;
+      var drawing = new DrawingGroup();
+      double pen = Math.Max(w, h) / 300.0;
+      drawing.Children.Add(new GeometryDrawing(Brushes.White, new Pen(SheetStroke, pen), new RectangleGeometry(new Rect(0, 0, w, h))));
+      foreach (var pp in sheetPlacement.PartPlacements)
+      {
+        drawing.Children.Add(new GeometryDrawing(this.TypeFill(pp), new Pen(PartStroke, pen / 2), BuildPlacedGeometry(pp, h)));
+      }
+
+      var image = new DrawingImage(drawing);
+      image.Freeze();
+      return image;
     }
 
     private void OnPrevSheet(object sender, RoutedEventArgs e)
@@ -2279,7 +2406,10 @@ namespace DeepNestSharp.Ui.UserControls
         path.Fill = this.FillFor(p);
       }
 
-      this.PartInspected?.Invoke(pp == null ? null : this.DescribePart(pp));
+      string text = pp == null ? null : this.DescribePart(pp);
+      this.partInfoText.Text = text ?? string.Empty;
+      this.partInfoPanel.Visibility = string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
+      this.PartInspected?.Invoke(text);
     }
 
     private string DescribePart(IPartPlacement pp)

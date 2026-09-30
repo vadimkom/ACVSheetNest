@@ -146,15 +146,20 @@ namespace DeepNestSharp.Ui.Views
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-      // A part clicked on either drawing says what and where it is in the status line.
-      void ShowPart(string text)
-      {
-        this.statusPartInfo.Text = text ?? string.Empty;
-        this.statusPartInfo.Visibility = string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
-      }
+      // Offcuts and remnants given a high priority are cut first, so they are listed first: the stock table
+      // and the layouts of a nest both put them at the top.
+      this.dxfViewer.SheetPriority = this.StockPriorityOf;
+      this.nestDxfViewer.SheetPriority = this.StockPriorityOf;
 
-      this.dxfViewer.PartInspected += ShowPart;
-      this.nestDxfViewer.PartInspected += ShowPart;
+      // The strip of layouts under the layout drawing, where cut sheets are ticked off.
+      this.layoutStripItems.ItemsSource = this.layoutCutItems;
+      this.dxfViewer.LayoutsChanged += (_, __) => this.RefreshLayoutStrip();
+      this.dxfViewer.SheetIndexChanged += this.OnLayoutShown;
+      this.RefreshLayoutStrip();
+      this.SortSheetsByPriority();
+      System.ComponentModel.DependencyPropertyDescriptor
+        .FromProperty(ItemsControl.ItemsSourceProperty, typeof(ListView))
+        .AddValueChanged(this.sheetsListView, (_, __) => this.SortSheetsByPriority());
 
       // Sensible defaults: always use all cores; drop the removed "Squeeze" arrangement.
       var cfg = ViewModel.SvgNestConfigViewModel.SvgNestConfig;
@@ -699,6 +704,53 @@ namespace DeepNestSharp.Ui.Views
       {
         this.dxfViewer.OffcutOptions = this.CurrentOffcutOptions();
         this.dxfViewer.RefreshRender();
+      }
+    }
+
+    /// <summary>The priority of the stock a nested sheet came from (1 highest, 5 normal), by its size.</summary>
+    private int StockPriorityOf(ISheetPlacement sheet)
+    {
+      if (sheet?.Sheet == null || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return 5;
+      }
+
+      int w = (int)Math.Round(sheet.Sheet.WidthCalculated);
+      int h = (int)Math.Round(sheet.Sheet.HeightCalculated);
+      var rows = doc.ProjectInfo.SheetLoadInfos
+        .Where(s => (s.Width == w && s.Height == h) || (s.Width == h && s.Height == w))
+        .ToList();
+      return rows.Count == 0 ? 5 : rows.Min(s => s.Priority);
+    }
+
+    /// <summary>Lists the stock by priority, keeping the order sheets were added in among equals, and
+    /// moves a row as soon as its priority is changed.</summary>
+    private void SortSheetsByPriority()
+    {
+      if (System.Windows.Data.CollectionViewSource.GetDefaultView(this.sheetsListView.ItemsSource) is not System.Windows.Data.ListCollectionView view)
+      {
+        return;
+      }
+
+      view.CustomSort = new PriorityComparer(this.sheetsListView.ItemsSource as System.Collections.IList);
+      view.IsLiveSorting = true;
+      if (!view.LiveSortingProperties.Contains(nameof(ISheetLoadInfo.Priority)))
+      {
+        view.LiveSortingProperties.Add(nameof(ISheetLoadInfo.Priority));
+      }
+    }
+
+    private sealed class PriorityComparer : System.Collections.IComparer
+    {
+      private readonly System.Collections.IList source;
+
+      public PriorityComparer(System.Collections.IList source) => this.source = source;
+
+      public int Compare(object a, object b)
+      {
+        int pa = (a as ISheetLoadInfo)?.Priority ?? 5;
+        int pb = (b as ISheetLoadInfo)?.Priority ?? 5;
+        return pa != pb ? pa.CompareTo(pb) : (this.source?.IndexOf(a) ?? 0).CompareTo(this.source?.IndexOf(b) ?? 0);
       }
     }
 
@@ -1740,6 +1792,8 @@ namespace DeepNestSharp.Ui.Views
             });
           }
 
+          // A row whose parts are all cut (see CutSheets) asks for none of a kind; the engine is not asked for zero.
+          populations.RemoveAll(p => p.Quantity <= 0);
           return populations;
         })
         .ToList();
@@ -2844,6 +2898,189 @@ namespace DeepNestSharp.Ui.Views
     #endregion
 
     #region Screen 4: Layout & Report Preview
+
+    private readonly System.Collections.ObjectModel.ObservableCollection<LayoutCutItem> layoutCutItems = new();
+
+    /// <summary>One layout in the strip under the drawing: its picture, and how many of its sheets are cut.</summary>
+    internal sealed class LayoutCutItem : System.ComponentModel.INotifyPropertyChanged
+    {
+      private int cutCount;
+      private bool isCurrent;
+
+      public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+
+      public DeepNestSharp.Ui.UserControls.DxfViewer.LayoutEntry Layout { get; init; }
+
+      public string Title { get; init; }
+
+      public string SizeText { get; init; }
+
+      public System.Windows.Media.ImageSource Thumbnail => this.Layout.Thumbnail;
+
+      public int Count => this.Layout.Count;
+
+      public string OfCountText => Localization.Format("Cut_OfCount", this.Count);
+
+      public Visibility SingleVisibility => this.Count == 1 ? Visibility.Visible : Visibility.Collapsed;
+
+      public Visibility MultiVisibility => this.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+
+      public int CutCount
+      {
+        get => this.cutCount;
+        set
+        {
+          int v = Math.Clamp(value, 0, this.Count);
+          if (v == this.cutCount)
+          {
+            return;
+          }
+
+          this.cutCount = v;
+          this.Changed(nameof(this.CutCount));
+          this.Changed(nameof(this.IsCut));
+          this.Changed(nameof(this.IsAnyCut));
+          this.Changed(nameof(this.CutBadge));
+        }
+      }
+
+      public bool IsCut
+      {
+        get => this.cutCount == this.Count;
+        set => this.CutCount = value ? this.Count : 0;
+      }
+
+      public bool IsAnyCut => this.cutCount > 0;
+
+      public string CutBadge => this.Count == 1 ? Localization.Get("Cut_Badge") : Localization.Format("Cut_BadgeN", this.cutCount, this.Count);
+
+      public bool IsCurrent
+      {
+        get => this.isCurrent;
+        set
+        {
+          if (value != this.isCurrent)
+          {
+            this.isCurrent = value;
+            this.Changed(nameof(this.IsCurrent));
+          }
+        }
+      }
+
+      /// <summary>The sheets ticked as cut.</summary>
+      public IEnumerable<ISheetPlacement> CutSheets => this.Layout.Sheets.Take(this.cutCount);
+
+      private void Changed(string name) => this.PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
+    }
+
+    /// <summary>Fills the strip with the layouts of the nest now shown, none ticked.</summary>
+    private void RefreshLayoutStrip()
+    {
+      foreach (var old in this.layoutCutItems)
+      {
+        old.PropertyChanged -= this.OnLayoutCutChanged;
+      }
+
+      this.layoutCutItems.Clear();
+      var layouts = this.dxfViewer?.GetLayouts() ?? Array.Empty<DeepNestSharp.Ui.UserControls.DxfViewer.LayoutEntry>();
+      foreach (var layout in layouts)
+      {
+        var item = new LayoutCutItem
+        {
+          Layout = layout,
+          Title = layout.Count > 1 ? $"{layout.Name}  ×{layout.Count}" : layout.Name,
+          SizeText = FormattableString.Invariant($"{layout.Width:0.#} × {layout.Height:0.#}"),
+          IsCurrent = layout.Index == this.dxfViewer.SheetIndex,
+        };
+        item.PropertyChanged += this.OnLayoutCutChanged;
+        this.layoutCutItems.Add(item);
+      }
+
+      this.layoutStrip.Visibility = this.layoutCutItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+      this.UpdateLayoutCutSummary();
+    }
+
+    private void OnLayoutCutChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(LayoutCutItem.CutCount))
+      {
+        this.UpdateLayoutCutSummary();
+      }
+    }
+
+    private void UpdateLayoutCutSummary()
+    {
+      int sheets = this.layoutCutItems.Sum(i => i.CutCount);
+      int parts = this.layoutCutItems.SelectMany(i => i.CutSheets).Sum(s => s.PartPlacements.Count);
+      this.btnCutRenest.IsEnabled = sheets > 0;
+      this.layoutCutSummary.Text = sheets > 0 ? Localization.Format("Cut_Summary", sheets, parts) : Localization.Get("Hint_MarkCut");
+    }
+
+    private void OnLayoutCardClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      if ((sender as FrameworkElement)?.DataContext is LayoutCutItem item)
+      {
+        this.dxfViewer.SheetIndex = item.Layout.Index;
+      }
+    }
+
+    private void OnLayoutShown(object sender, EventArgs e)
+    {
+      foreach (var item in this.layoutCutItems)
+      {
+        item.IsCurrent = item.Layout.Index == this.dxfViewer.SheetIndex;
+      }
+    }
+
+    /// <summary>
+    /// The ticked sheets are cut: their parts come off the order, the sheets stay off the stock, and what is
+    /// left is nested again on what is left.
+    /// </summary>
+    private void OnCutAndRenest(object sender, RoutedEventArgs e)
+    {
+      if (ViewModel?.ActiveDocument is not NestProjectViewModel doc || this.nestCts != null)
+      {
+        return;
+      }
+
+      var cut = this.layoutCutItems.SelectMany(i => i.CutSheets).ToList();
+      if (cut.Count == 0)
+      {
+        return;
+      }
+
+      int parts = cut.Sum(s => s.PartPlacements.Count);
+      if (MessageBox.Show(
+            this,
+            Localization.Format("Msg_CutRenestConfirm", cut.Count, parts),
+            Localization.Get("Title_CutRenest"),
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question) != MessageBoxResult.Yes)
+      {
+        return;
+      }
+
+      CutSheets.DeductParts(doc.ProjectInfo.DetailLoadInfos, cut);
+      CutSheets.KeepConsumed(this.lastNestConsumed, cut);
+      doc.IsDirty = true;
+      this.partsListView?.Items.Refresh();
+      this.UpdateSummaryBadges();
+
+      bool anyLeft = doc.ProjectInfo.DetailLoadInfos.Any(p => p.IsIncluded && p.Quantity + p.Extra + p.MirrorQuantity > 0);
+      if (!anyLeft)
+      {
+        this.ClearNestResult();
+        this.RefreshLayoutStrip();
+        MessageBox.Show(this, Localization.Get("Msg_AllCut"), Localization.Get("Title_CutRenest"), MessageBoxButton.OK, MessageBoxImage.Information);
+        return;
+      }
+
+      // The variants listed so far are of the whole order. Left in the list, the old full nest outranks the
+      // nest of the rest (it places more parts) and would sit on top as the best.
+      this.OnClearRunsClicked(this, new RoutedEventArgs());
+      this.SetCurrentMode(WorkflowMode.Nesting);
+      this.OnNest(this.btnStartNest, new RoutedEventArgs());
+    }
 
     private double reportZoom = 1.0;
     private int currentReportPageIndex = 0;
