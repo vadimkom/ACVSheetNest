@@ -13,19 +13,23 @@ namespace DeepNestLib.IO
   /// so a part drawn or kept in the CAM nests, exports and shows like any other.
   /// </summary>
   /// <remarks>
-  /// <para>The format is plain text and undocumented; this reads what the CAM wrote for a DXF saved as CHF.
-  /// The file opens with <c>scFlie</c>, then <c>&lt;Begin Graphs&gt;</c> and a count. Each <c>####graph</c>
-  /// is one contour or line: two header values, then <c>&lt;Glyphs&gt;</c> with its length, box, start, end and
+  /// <para>The format is plain text and undocumented; this reads what the CAM wrote in 572 files an operator
+  /// kept (parts and whole nested sheets), and the length the CAM writes over every contour confirms each
+  /// reading. The file opens with <c>scFlie</c>, then <c>&lt;Begin Graphs&gt;</c> and a count. Each
+  /// <c>####graph</c> is of a kind: 8 one contour, 9 a group of contours (a part on a nested sheet), 10 a
+  /// text with its letters as contours. A contour is <c>&lt;Glyphs&gt;</c> with its length, box, start, end and
   /// the number of pieces, each piece a <c>####Gly</c> with a direction and a type:</para>
   /// <list type="bullet">
   /// <item><c>2</c> a line: two points.</item>
+  /// <item><c>3</c> an arc: centre, radius, from and to angles in radians.</item>
   /// <item><c>4</c> a circle: centre and radius.</item>
-  /// <item><c>7</c> a B-spline: a rational flag, degree, control points, knots (the CAM writes arcs this way).</item>
+  /// <item><c>6</c> a polyline: closed flag, count, then each vertex and its bulge.</item>
+  /// <item><c>7</c> a B-spline: two numbers of no meaning, control points, knots.</item>
   /// </list>
-  /// <para>After <c>&lt;End Glyphs&gt;</c> come the graph's LAYER in the CAM (0 is cut) and whether it is an outer
-  /// (1) or inner (2) contour, then machining settings (<c>&lt;Crafts&gt;</c>) that are not geometry. On the
-  /// sample, holes and outlines were on layer 0 and the bend lines on layer 1, which is how the CAM showed
-  /// them. Layer 0 comes in on layer "0" and anything else on the marking layer, as a DXF would carry it.</para>
+  /// <para>After <c>&lt;End Glyphs&gt;</c> come the contour's LAYER in the CAM and its kind (1 outer, 2 inner,
+  /// others open or lead-ins), then machining settings (<c>&lt;Crafts&gt;</c>) that are not geometry. Which CAM
+  /// layers are cut and which engraved is <see cref="LayerFor"/>. A group or a text ends with two more
+  /// numbers, the group's own layer and kind, which its members already carry.</para>
   /// <para>Anything else is refused by name rather than guessed at: a piece of a type not seen yet would
   /// otherwise be cut as whatever it happened to resemble.</para>
   /// </remarks>
@@ -79,95 +83,239 @@ namespace DeepNestLib.IO
         i++;
       }
 
-      while (i < lines.Count && lines[i] != "<End Graphs>")
+      i++; // <Begin Graphs>
+      int graphs = Int(lines, i++, "the drawing");
+      for (int g = 0; g < graphs; g++)
       {
-        if (!lines[i].StartsWith("####graph", StringComparison.Ordinal))
+        if (i >= lines.Count || !lines[i].StartsWith("####graph", StringComparison.Ordinal))
         {
-          i++;
-          continue;
+          throw Bad("the drawing", $"expected contour {g + 1} of {graphs} at line {i + 1}");
         }
 
-        string graph = lines[i];
-        while (i < lines.Count && lines[i] != "<Glyphs>")
+        string graph = lines[i++];
+        int kind = Int(lines, i++, graph);
+        switch (kind)
         {
-          i++;
-        }
+          case GraphContour:
+            i++; // tolerance
+            i = ReadGlyphs(lines, i, graph, file);
+            break;
 
-        i++; // <Glyphs>
-        i += 5; // length, box min, box max, start, end
-        int pieces = Int(lines, i++, graph);
-        var entities = new List<DxfEntity>();
-        for (int p = 0; p < pieces; p++)
-        {
-          if (!lines[i].StartsWith("####Gly", StringComparison.Ordinal))
-          {
-            throw Bad(graph, $"expected piece {p + 1}, found \"{lines[i]}\"");
-          }
+          case GraphGroup:
+            i += 5; // length, box min, box max, start, end
+            i = ReadMembers(lines, i, graph, file);
+            break;
 
-          i++;
-          i++; // direction: which way the machine runs it, not geometry
-          int type = Int(lines, i++, graph);
-          switch (type)
-          {
-            case 2:
-              entities.Add(new DxfLine(Point(lines, i, graph), Point(lines, i + 1, graph)));
-              i += 2;
-              break;
-            case 4:
-              entities.Add(new DxfCircle(Point(lines, i, graph), Num(lines, i + 1, graph)));
-              i += 2;
-              break;
-            case 7:
+          case GraphText:
+            {
+              // Position, angle, two scales, the text itself and its font; then the letters, already
+              // turned into outlines, as a group.
+              i += 5;
+              while (i < lines.Count && lines[i] != "<End Text para>")
               {
-                int rational = Int(lines, i++, graph);
-                if (rational != 0)
-                {
-                  throw Bad(graph, "a rational spline, which SheetNest has not seen written by the CAM yet");
-                }
-
-                var spline = new DxfSpline { DegreeOfCurve = Int(lines, i++, graph) };
-                int controls = Int(lines, i++, graph);
-                for (int c = 0; c < controls; c++)
-                {
-                  spline.ControlPoints.Add(new DxfControlPoint(Point(lines, i++, graph)));
-                }
-
-                int knots = Int(lines, i++, graph);
-                for (int k = 0; k < knots; k++)
-                {
-                  spline.KnotValues.Add(Num(lines, i++, graph));
-                }
-
-                entities.Add(spline);
-                break;
+                i++;
               }
 
-            default:
-              throw Bad(graph, $"a piece of type {type}, which SheetNest cannot read yet. Send the file so it can be added");
-          }
-        }
+              i++;
+              i += 5; // length, box min, box max, start, end
+              i = ReadMembers(lines, i, graph, file);
+              break;
+            }
 
-        if (i >= lines.Count || lines[i] != "<End Glyphs>")
-        {
-          throw Bad(graph, "its pieces do not end where they should");
-        }
-
-        int layer = Int(lines, i + 1, graph);
-        string layerName = layer == 0 ? DxfOutputLayers.CutName : DxfOutputLayers.PaintName;
-        foreach (var entity in entities)
-        {
-          entity.Layer = layerName;
-          file.Entities.Add(entity);
-        }
-
-        while (i < lines.Count && lines[i] != "<End Crafts>" && lines[i] != "<End Graphs>")
-        {
-          i++;
+          default:
+            throw Bad(graph, $"a contour of kind {kind}, which SheetNest cannot read yet. Send the file so it can be added");
         }
       }
 
       return file;
     }
+
+    // What a ####graph is: one contour, a group of them (a part of a nested sheet), or a text.
+    private const int GraphContour = 8;
+    private const int GraphGroup = 9;
+    private const int GraphText = 10;
+
+    /// <summary>The contours of a group or a text, then the group's own layer and kind, which its
+    /// members already carry.</summary>
+    private static int ReadMembers(List<string> lines, int i, string graph, DxfFile file)
+    {
+      int members = Int(lines, i++, graph);
+      for (int m = 0; m < members; m++)
+      {
+        if (i >= lines.Count || !lines[i].StartsWith("####Group elem", StringComparison.Ordinal))
+        {
+          throw Bad(graph, $"expected member {m + 1} of {members} at line {i + 1}");
+        }
+
+        i += 2; // the member's heading and its tolerance
+        i = ReadGlyphs(lines, i, graph, file);
+      }
+
+      return i + 2;
+    }
+
+    /// <summary>One contour's pieces, from <c>&lt;Glyphs&gt;</c> to the end of its machining settings; returns
+    /// the line after them.</summary>
+    private static int ReadGlyphs(List<string> lines, int i, string graph, DxfFile file)
+    {
+      if (i >= lines.Count || lines[i] != "<Glyphs>")
+      {
+        throw Bad(graph, $"expected its pieces at line {i + 1}");
+      }
+
+      i++;
+      i += 5; // length, box min, box max, start, end
+      int pieces = Int(lines, i++, graph);
+      var entities = new List<DxfEntity>();
+      for (int p = 0; p < pieces; p++)
+      {
+        if (i >= lines.Count || !lines[i].StartsWith("####Gly", StringComparison.Ordinal))
+        {
+          throw Bad(graph, $"expected piece {p + 1}, found \"{(i < lines.Count ? lines[i] : "the end of the file")}\"");
+        }
+
+        i++;
+        i++; // direction: which way the machine runs it, not geometry
+        int type = Int(lines, i++, graph);
+        switch (type)
+        {
+          case 2:
+            entities.Add(new DxfLine(Point(lines, i, graph), Point(lines, i + 1, graph)));
+            i += 2;
+            break;
+
+          case 3:
+            entities.Add(Arc(Point(lines, i, graph), Num(lines, i + 1, graph), Num(lines, i + 2, graph), Num(lines, i + 3, graph)));
+            i += 4;
+            break;
+
+          case 4:
+            entities.Add(new DxfCircle(Point(lines, i, graph), Num(lines, i + 1, graph)));
+            i += 2;
+            break;
+
+          case 6:
+            {
+              // A polyline: 1 closes it (0 and 128 leave it open), then each vertex with the bulge of the
+              // segment after it, as DXF has them.
+              bool closed = Int(lines, i++, graph) == 1;
+              int count = Int(lines, i++, graph);
+              var vertices = new List<DxfLwPolylineVertex>();
+              for (int v = 0; v < count; v++)
+              {
+                DxfPoint at = Point(lines, i++, graph);
+                vertices.Add(new DxfLwPolylineVertex { X = at.X, Y = at.Y, Bulge = Num(lines, i++, graph) });
+              }
+
+              entities.Add(new DxfLwPolyline(vertices) { IsClosed = closed });
+              break;
+            }
+
+          case 7:
+            {
+              // A B-spline. The two numbers before the control points are whatever was in the CAM's memory
+              // (the degree among them only sometimes); the knots are what say the degree.
+              i += 2;
+              int controls = Int(lines, i++, graph);
+              var points = new List<DxfPoint>();
+              for (int c = 0; c < controls; c++)
+              {
+                points.Add(Point(lines, i++, graph));
+              }
+
+              int knots = Int(lines, i++, graph);
+              int degree = knots - controls - 1;
+              if (degree < 1 || degree >= controls)
+              {
+                throw Bad(graph, $"a spline with {controls} control points and {knots} knots, which is not a curve");
+              }
+
+              var spline = new DxfSpline { DegreeOfCurve = degree };
+              points.ForEach(pt => spline.ControlPoints.Add(new DxfControlPoint(pt)));
+              for (int k = 0; k < knots; k++)
+              {
+                spline.KnotValues.Add(Num(lines, i++, graph));
+              }
+
+              entities.Add(spline);
+              break;
+            }
+
+          default:
+            throw Bad(graph, $"a piece of type {type}, which SheetNest cannot read yet. Send the file so it can be added");
+        }
+      }
+
+      if (i >= lines.Count || lines[i] != "<End Glyphs>")
+      {
+        throw Bad(graph, "its pieces do not end where they should");
+      }
+
+      int layer = Int(lines, i + 1, graph);
+      string layerName = LayerFor(layer);
+      foreach (var entity in layerName == null ? new List<DxfEntity>() : entities)
+      {
+        entity.Layer = layerName;
+        file.Entities.Add(entity);
+      }
+
+      i += 3; // <End Glyphs>, layer, outer or inner
+      if (i >= lines.Count || lines[i] != "<Crafts>")
+      {
+        throw Bad(graph, $"expected its machining settings at line {i + 1}");
+      }
+
+      while (i < lines.Count && lines[i] != "<End Crafts>")
+      {
+        i++;
+      }
+
+      return i + 1;
+    }
+
+    /// <summary>
+    /// An arc as the CAM writes it: centre, radius, and the angles (radians) it runs from and to. It turns
+    /// anticlockwise when the second is larger, clockwise otherwise; checked against the length the CAM
+    /// writes over every contour, on 578 of its files.
+    /// </summary>
+    private static DxfEntity Arc(DxfPoint centre, double radius, double from, double to)
+    {
+      double sweep = to - from;
+      if (Math.Abs(sweep) >= (2 * Math.PI) - 1e-9)
+      {
+        return new DxfCircle(centre, radius);
+      }
+
+      // DXF arcs always run anticlockwise, so a clockwise one is the same arc from its other end.
+      double start = sweep > 0 ? from : to;
+      double end = sweep > 0 ? to : from;
+      return new DxfArc(centre, radius, Degrees(start), Degrees(end));
+    }
+
+    private static double Degrees(double radians)
+    {
+      double d = (radians * 180.0 / Math.PI) % 360.0;
+      return d < 0 ? d + 360.0 : d;
+    }
+
+    /// <summary>
+    /// The DXF layer a CAM layer comes in on. SC2000 has ten layers, each with its own settings, and the
+    /// operator uses them this way: the first (0, green) is cut, the second (1, blue) engraves the bend
+    /// lines, and the red ninth (8) engraves too, which is where nearly every text in the operator's 572
+    /// files sits. The others are cut with other settings (5 mm black steel, aluminium): on 27 files parts
+    /// sit only on 2 to 7. Layer 10, past the ten, is the background: the sheet frame and part numbers the
+    /// CAM writes itself in tiny letters, sometimes off the sheet. It is left out (null), because every
+    /// closed shape read in becomes part geometry: the frame would make the whole sheet one part and each
+    /// letter a hole or a part of its own.
+    /// </summary>
+    internal static string LayerFor(int camLayer) => camLayer switch
+    {
+      1 or 8 => DxfOutputLayers.PaintName,
+      Background => null,
+      _ => DxfOutputLayers.CutName,
+    };
+
+    private const int Background = 10;
 
     private static int Int(List<string> lines, int i, string graph)
       => i < lines.Count && int.TryParse(lines[i], NumberStyles.Integer, CultureInfo.InvariantCulture, out int v)
@@ -204,6 +352,12 @@ namespace DeepNestLib.IO
 
     public static DxfFile Load(byte[] bytes)
     {
+      if (bytes.Length == 0)
+      {
+        // Six of the operator's 578 CAM files were empty; say so rather than fail somewhere in the DXF reader.
+        throw new InvalidDataException("The file is empty (0 bytes).");
+      }
+
       if (ChfReader.IsChf(bytes))
       {
         return ChfReader.Read(bytes);
