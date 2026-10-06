@@ -151,7 +151,7 @@ namespace DeepNestSharp.Ui.Views
     /// inner shapes = a whole nested sheet imported as one part. Functional holes stay well under the
     /// area threshold, so a plate with bolt holes doesn't trip this.
     /// </summary>
-    private static bool LooksLikeNestedSheet(DeepNestLib.INfp poly)
+    internal static bool LooksLikeNestedSheet(DeepNestLib.INfp poly)
     {
       if (poly.Children == null || poly.Children.Count < 3 || poly.Points.Length > 8)
       {
@@ -167,7 +167,50 @@ namespace DeepNestSharp.Ui.Views
       double childArea = System.Linq.Enumerable.Sum(poly.Children, c => System.Math.Abs(c.NetArea));
       double outerFillsBox = (poly.NetArea + childArea) / bboxArea;
       double childShare = childArea / bboxArea;
-      return outerFillsBox >= 0.98 && childShare >= 0.3;
+      return outerFillsBox >= 0.98 && childShare >= 0.3 && ContoursHoldingContours(poly.Children) >= 2;
+    }
+
+    /// <summary>
+    /// How many inner contours hold another inside them. A rectangle with many large cut-outs is also a
+    /// panel with an ornament or a grille, and those were being told they were a nested sheet. What a
+    /// nested sheet has and they do not is parts with holes of their own: a contour inside a contour inside
+    /// the frame. A hole in a panel holds nothing, since whatever were inside it would fall out.
+    /// </summary>
+    internal static int ContoursHoldingContours(System.Collections.Generic.IList<DeepNestLib.INfp> contours)
+    {
+      int holding = 0;
+      foreach (var outer in contours)
+      {
+        foreach (var inner in contours)
+        {
+          if (!ReferenceEquals(outer, inner)
+              && inner.Points.Length > 0
+              && inner.MinX >= outer.MinX && inner.MaxX <= outer.MaxX && inner.MinY >= outer.MinY && inner.MaxY <= outer.MaxY
+              && Contains(outer, inner.Points[0].X, inner.Points[0].Y))
+          {
+            holding++;
+            break;
+          }
+        }
+      }
+
+      return holding;
+    }
+
+    private static bool Contains(DeepNestLib.INfp polygon, double x, double y)
+    {
+      bool inside = false;
+      var p = polygon.Points;
+      for (int i = 0, j = p.Length - 1; i < p.Length; j = i++)
+      {
+        if ((p[i].Y > y) != (p[j].Y > y)
+            && x < ((p[j].X - p[i].X) * (y - p[i].Y) / (p[j].Y - p[i].Y)) + p[i].X)
+        {
+          inside = !inside;
+        }
+      }
+
+      return inside;
     }
 
     /// <summary>

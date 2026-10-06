@@ -251,7 +251,9 @@ namespace DeepNestSharp.Domain.ViewModels
 
       // FilePath is never null for a new document (the getter coalesces to string.Empty), so the
       // old `== null` test skipped the Save As dialog entirely and the save silently did nothing.
-      if (string.IsNullOrEmpty(fileToSave.FilePath) || saveAsFlag)
+      // A project opened from a flash drive that has since been pulled cannot be saved where it was; ask
+      // where instead of failing on the write.
+      if (string.IsNullOrEmpty(fileToSave.FilePath) || saveAsFlag || !FolderExists(fileToSave.FilePath))
       {
         // An already-saved document pre-fills its own name and folder, so plain Enter overwrites it
         // and typing renames it; new documents start in the last-used nest folder.
@@ -285,10 +287,33 @@ namespace DeepNestSharp.Domain.ViewModels
           (NestMonitorViewModel.SelectedItem as NestResult)?.ToJson(false) ?? string.Empty;
       }
 
-      File.WriteAllText(fileToSave.FilePath, fileToSave.TextContent);
+      try
+      {
+        File.WriteAllText(fileToSave.FilePath, fileToSave.TextContent);
+      }
+      catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+      {
+        // Read-only folder, full disk, a drive pulled mid-save: say so, and the project stays unsaved
+        // (closing then stops, rather than quitting with the work lost).
+        this.MessageService.DisplayMessageBox(UiText.Format("Msg_SaveFailed", fileToSave.FilePath, ex.Message), UiText.Get("Title_SaveFailed"), MessageBoxIcon.Warning);
+        return false;
+      }
+
       fileToSave.IsDirty = false;
 
       return true;
+    }
+
+    private static bool FolderExists(string filePath)
+    {
+      try
+      {
+        return Directory.Exists(Path.GetDirectoryName(filePath));
+      }
+      catch (Exception)
+      {
+        return false;
+      }
     }
 
     private bool TryLocateFile(string filePath, out string locatedFilePath)
