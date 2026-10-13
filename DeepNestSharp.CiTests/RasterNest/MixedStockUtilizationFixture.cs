@@ -41,7 +41,7 @@ namespace DeepNestSharp.CiTests.RasterNest
 
       // Twelve minutes of engine time; on request only (SHEETNEST_SLOW_TESTS=1), before a release that
       // changes how sheets are chosen.
-      if (Environment.GetEnvironmentVariable("SHEETNEST_SLOW_TESTS") != "1")
+      if (!SlowTests.Enabled)
       {
         this.output.WriteLine("MIX: runs only with SHEETNEST_SLOW_TESTS=1 — skipping.");
         return;

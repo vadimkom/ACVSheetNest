@@ -58,7 +58,7 @@
     public void ANormalEffortNestLeavesAUsableStrip()
     {
       // Normal effort: on request only (SHEETNEST_SLOW_TESTS=1); the operator nests on Fast.
-      if (Environment.GetEnvironmentVariable("SHEETNEST_SLOW_TESTS") != "1")
+      if (!SlowTests.Enabled)
       {
         return;
       }

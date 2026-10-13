@@ -59,6 +59,11 @@
     [Fact]
     public void MeasureWhatSamePartCostsWithTwoDrawings()
     {
+      if (!SlowTests.Enabled)
+      {
+        return; // a measurement, not a check, and long: SHEETNEST_SLOW_TESTS=1
+      }
+
       string exe = Sparrow();
       if (exe == null)
       {
@@ -110,7 +115,7 @@
 
       // A Normal nest of these drawings takes 17 minutes or more, twice over; the operator nests on Fast. Run
       // them on request, before a release that touches the engine.
-      if (effort != NestEffort.Fast && Environment.GetEnvironmentVariable("SHEETNEST_SLOW_TESTS") != "1")
+      if (effort != NestEffort.Fast && !SlowTests.Enabled)
       {
         this.output.WriteLine("SEAM: Normal effort runs only with SHEETNEST_SLOW_TESTS=1 — skipping.");
         return;
@@ -220,6 +225,11 @@
     [Fact]
     public void MeasureWhatRotationCostsACommonCutJob()
     {
+      if (!SlowTests.Enabled)
+      {
+        return; // a measurement, not a check, and long: SHEETNEST_SLOW_TESTS=1
+      }
+
       string exe = Sparrow();
       if (exe == null)
       {

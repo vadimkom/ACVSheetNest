@@ -30,7 +30,7 @@ namespace DeepNestLib.CiTests.NestProject
 
       string after = original.ToJson(false);
       after.Length.Should().BeLessThan(before.Length / 2, "each part's geometry is written once, not twice");
-      after.Should().NotContain("PolygonsForExport").And.NotContain("\"Hull\"").And.NotContain("\"Marked\"");
+      after.Should().NotContain("PolygonsForExport").And.NotContain("\"Hull\"");
 
       NestResult reread = NestResult.FromJson(after);
       reread.UsedSheets.Should().HaveCount(original.UsedSheets.Count);

@@ -32,8 +32,6 @@
       this.Y = point.Y;
     }
 
-    // Almost never set, and written for every point of every part a project saves: left out when false.
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool Marked { get; set; }
 
     [JsonConverter(typeof(DoublePrecisionConverter))]

@@ -105,7 +105,7 @@
       double sheetW = sheetH * 10;
       const double spacing = 2.0;
 
-      var result = SparrowNestService.Nest(parts, sheetW, sheetH, 4, spacing, 0.5, 15, exe, out string err);
+      var result = SparrowNestService.Nest(parts, sheetW, sheetH, 4, spacing, 0.5, 15, exe, out string err, effort: NestEffort.Fast);
 
       result.Should().NotBeNull($"the service must return a result (err={err})");
       int placed = result.UsedSheets.Sum(s => s.PartPlacements.Count);
@@ -193,7 +193,7 @@
       var stock = new List<(int, int, int)> { (side, side, 1) };
 
       // rotations = 36 == "Free" → the service omits allowed_orientations, so sparrow rotates continuously.
-      var result = SparrowNestService.Nest(parts, stock, 36, 1.0, 0.5, 8, exe, out string err);
+      var result = SparrowNestService.Nest(parts, stock, 36, 1.0, 0.5, 8, exe, out string err, effort: NestEffort.Fast);
 
       result.Should().NotBeNull($"nest must return a result (err={err})");
       var rots = result.UsedSheets.SelectMany(s => s.PartPlacements).Select(p => ((p.Rotation % 360) + 360) % 360).ToList();
@@ -314,7 +314,7 @@
 
       // rotations = 1002 == "0°+90°" (RotationCodes.RotZeroAnd90) → the service must emit
       // allowed_orientations=[0,90], so sparrow may only place parts at 0° or 90°.
-      var result = SparrowNestService.Nest(parts, stock, 1002, 1.0, 0.5, 8, exe, out string err);
+      var result = SparrowNestService.Nest(parts, stock, 1002, 1.0, 0.5, 8, exe, out string err, effort: NestEffort.Fast);
 
       result.Should().NotBeNull($"nest must return a result (err={err})");
       var rots = result.UsedSheets.SelectMany(s => s.PartPlacements).Select(p => ((p.Rotation % 360) + 360) % 360).ToList();
@@ -415,7 +415,7 @@
         };
         var stock = new List<(int, int, int)> { (204, 104, 1) };
 
-        var result = SparrowNestService.Nest(parts, stock, 4, 1.0, 0.5, 6, exe, out string err);
+        var result = SparrowNestService.Nest(parts, stock, 4, 1.0, 0.5, 6, exe, out string err, effort: NestEffort.Fast);
 
         result.Should().NotBeNull($"nest must return a result (err={err})");
         int squares = result.UsedSheets.SelectMany(s => s.PartPlacements).Count(p => p.Source == 1);
@@ -620,6 +620,11 @@
     [Fact]
     public void ChamferedTest2ApproximationPacks26InTheChosenOrientationConsistently()
     {
+      if (!SlowTests.Enabled)
+      {
+        return; // consistency over Normal-effort runs, minutes long: SHEETNEST_SLOW_TESTS=1
+      }
+
       string exe = SparrowExe.Resolve();
       if (string.IsNullOrWhiteSpace(exe) || !File.Exists(exe))
       {

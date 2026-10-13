@@ -40,20 +40,20 @@ namespace DeepNestSharp.Ui.UserControls
     // Measure snap: how close (device px) the cursor must be to a vertex to snap onto it.
     private const double SnapScreenPx = 12.0;
 
-    private static readonly Brush SheetFill = new SolidColorBrush(Color.FromRgb(0xFA, 0xFA, 0xFA));
-    private static readonly Brush SheetStroke = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x88));
-    private static readonly Brush PartStroke = new SolidColorBrush(Color.FromRgb(0x10, 0x10, 0x10));
-    private static readonly Brush PartFill = new SolidColorBrush(Color.FromArgb(0xC0, 0xB4, 0xB8, 0xBC)); // aluminum gray
-    private static readonly Brush HoleFill = new SolidColorBrush(Color.FromRgb(0xFA, 0xFA, 0xFA));
-    private static readonly Brush SelectedFill = new SolidColorBrush(Color.FromArgb(0x66, 0x00, 0x00, 0x80)); // classic navy selection
+    private static readonly Brush SheetFill = Frozen(Color.FromRgb(0xFA, 0xFA, 0xFA));
+    private static readonly Brush SheetStroke = Frozen(Color.FromRgb(0x88, 0x88, 0x88));
+    private static readonly Brush PartStroke = Frozen(Color.FromRgb(0x10, 0x10, 0x10));
+    private static readonly Brush PartFill = Frozen(Color.FromArgb(0xC0, 0xB4, 0xB8, 0xBC)); // aluminum gray
+    private static readonly Brush HoleFill = Frozen(Color.FromRgb(0xFA, 0xFA, 0xFA));
+    private static readonly Brush SelectedFill = Frozen(Color.FromArgb(0x66, 0x00, 0x00, 0x80)); // classic navy selection
     // OPAQUE, like the per-type fills. At 47% alpha this composited to a pale salmon over the near-white
     // sheet, which read as "faded" rather than "wrong" once the parts around it became solid colours -
     // reported as moving a part that was "normal, not red" when the code had it flagged all along.
-    private static readonly Brush InvalidFill = new SolidColorBrush(Color.FromRgb(0xD3, 0x2F, 0x2F));
+    private static readonly Brush InvalidFill = Frozen(Color.FromRgb(0xD3, 0x2F, 0x2F));
     // The offcut cut line and its size label: the darkest thing on a near-white sheet, so they are spotted
     // without being looked for. Close to the part outline (#101010) on purpose - the line separates from it
     // by WEIGHT, four solid pixels against one, not by colour.
-    private static readonly Brush OffcutStroke = new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0x00));
+    private static readonly Brush OffcutStroke = Frozen(Color.FromRgb(0x00, 0x00, 0x00));
 
     // The directions the magnets probe. Nests are orthogonal, so a diagonal earns nothing.
     private static readonly (double X, double Y)[] Axes = { (1, 0), (-1, 0), (0, 1), (0, -1) };
@@ -84,7 +84,7 @@ namespace DeepNestSharp.Ui.UserControls
     private readonly List<System.Windows.Shapes.Path> partLabels = new List<System.Windows.Shapes.Path>();
 
     private static readonly Typeface LabelFace = new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
-    private static readonly Brush DarkInk = new SolidColorBrush(Color.FromRgb(0x14, 0x14, 0x14));
+    private static readonly Brush DarkInk = Frozen(Color.FromRgb(0x14, 0x14, 0x14));
     private static readonly Brush LightInk = Brushes.White;
     private readonly HashSet<IPartPlacement> invalid = new HashSet<IPartPlacement>();
 
@@ -260,18 +260,21 @@ namespace DeepNestSharp.Ui.UserControls
       };
     }
 
+    /// <summary>
+    /// A brush frozen as it is made. The shared brushes used to be frozen by the first viewer constructed,
+    /// on its thread, while they belonged to whichever thread first touched this class: a second thread
+    /// building a viewer then failed to freeze another thread's brush. Frozen, a brush belongs to no thread.
+    /// </summary>
+    private static Brush Frozen(Color colour)
+    {
+      var brush = new SolidColorBrush(colour);
+      brush.Freeze();
+      return brush;
+    }
+
     public DxfViewer()
     {
       InitializeComponent();
-      if (SheetFill.CanFreeze)
-      {
-        SheetFill.Freeze();
-        SheetStroke.Freeze();
-        PartStroke.Freeze();
-        PartFill.Freeze();
-        HoleFill.Freeze();
-        OffcutStroke.Freeze();
-      }
 
       this.Loaded += (s, e) =>
       {
