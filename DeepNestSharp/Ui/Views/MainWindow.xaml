@@ -611,7 +611,39 @@
 
             <!-- Run Preview DxfViewer -->
             <Border Grid.Row="1" Margin="2" BorderBrush="{DynamicResource Brush.BorderStrong}" BorderThickness="1">
-              <userControls:DxfViewer x:Name="nestDxfViewer" SheetIndex="0" />
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="*" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <userControls:DxfViewer x:Name="nestDxfViewer" SheetIndex="0" />
+
+                <!-- Every sheet of the previewed nest at a glance; click one to show it. -->
+                <Border x:Name="nestLayoutStrip" Grid.Row="1" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}"
+                        BorderThickness="0,1,0,0" Padding="6,4" Visibility="Collapsed">
+                  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <ItemsControl x:Name="nestLayoutItems">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Border Margin="3" Padding="5,4" Width="130" Background="White" BorderThickness="1"
+                                  BorderBrush="{DynamicResource Brush.Border}" CornerRadius="3" Cursor="Hand"
+                                  MouseLeftButtonUp="OnNestLayoutCardClick" ToolTip="{ui:Tr Tip_LayoutCard}">
+                            <StackPanel>
+                              <Image Source="{Binding Thumbnail}" Height="62" Stretch="Uniform" />
+                              <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </ScrollViewer>
+                </Border>
+              </Grid>
             </Border>
           </Grid>
         </Grid>

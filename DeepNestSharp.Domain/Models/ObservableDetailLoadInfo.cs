@@ -8,7 +8,6 @@ namespace DeepNestSharp.Domain.Models
   using DeepNestLib;
   using DeepNestLib.IO;
   using DeepNestLib.NestProject;
-  using Microsoft.VisualStudio.Threading;
 
   public class ObservableDetailLoadInfo : ObservablePropertyObject, IWrapper<IDetailLoadInfo, DetailLoadInfo>, IDetailLoadInfo
   {
@@ -17,8 +16,6 @@ namespace DeepNestSharp.Domain.Models
     private INfp nfp;
     private bool loading;
     private int effectiveColorRgb = -1;
-
-    private static JoinableTaskContext joinableTaskContext = new JoinableTaskContext();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ObservableDetailLoadInfo"/> class.
@@ -393,11 +390,16 @@ namespace DeepNestSharp.Domain.Models
         if (this.nfp == null && !this.loading)
         {
           this.loading = true;
-          _ = joinableTaskContext.Factory.RunAsync(async () =>
+
+          // Answer on the thread that asked, which is the row's. A context fixed once for the whole type took
+          // whichever thread first made a part as "main": a project opened through the Open dialog makes its
+          // parts off the UI thread, and the answer then never reached the rows, which kept their sizes blank.
+          var asker = System.Threading.SynchronizationContext.Current;
+          _ = Task.Run(async () =>
           {
             try
             {
-              INfp loaded = await Task.Run(this.LoadAsync).ConfigureAwait(false);
+              INfp loaded = await this.LoadAsync().ConfigureAwait(false);
               this.netArea = (int)loaded.NetArea;
             }
             catch
@@ -405,11 +407,22 @@ namespace DeepNestSharp.Domain.Models
               // A shape without an area still has a size to show, or shows none.
             }
 
-            await joinableTaskContext.Factory.SwitchToMainThreadAsync();
-            this.loading = false;
-            this.OnPropertyChanged(nameof(this.PreviewSource));
-            this.OnPropertyChanged(nameof(this.SizeLabel));
-            this.OnPropertyChanged(nameof(this.NetArea));
+            void Announce(object _)
+            {
+              this.loading = false;
+              this.OnPropertyChanged(nameof(this.PreviewSource));
+              this.OnPropertyChanged(nameof(this.SizeLabel));
+              this.OnPropertyChanged(nameof(this.NetArea));
+            }
+
+            if (asker != null)
+            {
+              asker.Post(Announce, null);
+            }
+            else
+            {
+              Announce(null);
+            }
           });
         }
 

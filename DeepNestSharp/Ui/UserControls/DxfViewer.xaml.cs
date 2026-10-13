@@ -83,7 +83,7 @@ namespace DeepNestSharp.Ui.UserControls
     // Each part's name, by the same index as partPaths; null where a part has none to show.
     private readonly List<System.Windows.Shapes.Path> partLabels = new List<System.Windows.Shapes.Path>();
 
-    private static readonly Typeface LabelFace = new Typeface("Segoe UI");
+    private static readonly Typeface LabelFace = new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
     private static readonly Brush DarkInk = new SolidColorBrush(Color.FromRgb(0x14, 0x14, 0x14));
     private static readonly Brush LightInk = Brushes.White;
     private readonly HashSet<IPartPlacement> invalid = new HashSet<IPartPlacement>();
@@ -214,6 +214,18 @@ namespace DeepNestSharp.Ui.UserControls
       public PlacementSnapshot Before;
       public PlacementSnapshot After;
       public bool Nudge; // consecutive arrow-key nudges of the same part merge into ONE undo step
+
+      // A part moved to another sheet: taken out of one layout's list and put at the end of another's.
+      public bool Move;
+      public SheetGroup From;
+      public SheetGroup To;
+      public int FromIndex;
+      public int ToIndex;
+
+      // The layout the move left empty, which went out of the nest with it, and where it stood.
+      public SheetGroup Emptied;
+      public int EmptiedGroupIndex;
+      public int EmptiedSheetIndex;
     }
 
     private struct PlacementSnapshot
@@ -266,7 +278,18 @@ namespace DeepNestSharp.Ui.UserControls
         this.ApplyLocalization();
         this.FitToView();
       };
-      Localization.LanguageChanged += this.ApplyLocalization;
+      // The language can change on another thread than this view's; touching its controls from there throws.
+      Localization.LanguageChanged += () =>
+      {
+        if (this.Dispatcher.CheckAccess())
+        {
+          this.ApplyLocalization();
+        }
+        else
+        {
+          this.Dispatcher.BeginInvoke(new Action(this.ApplyLocalization));
+        }
+      };
       this.host.SizeChanged += (s, e) =>
       {
         if (this.fittedW < 0 || this.viewIsFitted || this.scale.ScaleX <= 0)
@@ -299,6 +322,12 @@ namespace DeepNestSharp.Ui.UserControls
       {
         this.btnMirror.Content = Localization.Get("Dxf_Mirror");
         this.btnMirror.ToolTip = Localization.Get("Dxf_MirrorTip");
+      }
+
+      if (this.btnMoveToSheet != null)
+      {
+        this.btnMoveToSheet.Content = Localization.Get("Dxf_MoveToSheet");
+        this.btnMoveToSheet.ToolTip = Localization.Get("Dxf_MoveToSheetTip");
       }
 
       if (this.undoBtn != null) this.undoBtn.ToolTip = Localization.Get("Dxf_UndoTip");
@@ -2200,6 +2229,12 @@ namespace DeepNestSharp.Ui.UserControls
         this.rotateButtons.Visibility = this.EditMode && this.selectedPp != null ? Visibility.Visible : Visibility.Collapsed;
       }
 
+      if (this.btnMoveToSheet != null)
+      {
+        this.btnMoveToSheet.Visibility = this.groups.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        this.btnMoveToSheet.IsEnabled = this.MoveTargets().Count > 0;
+      }
+
       if (this.undoBtn != null)
       {
         this.undoBtn.IsEnabled = this.undoStack.Count > 0;
@@ -2367,10 +2402,16 @@ namespace DeepNestSharp.Ui.UserControls
         geometry.Transform = transform;
         geometry.Freeze();
 
+        // Outlined in the opposite ink: white letters over a part full of small square holes were lost
+        // wherever they crossed the holes, which show the near-white sheet through them.
+        var ink = InkOn(this.TypeFill(pp));
         return new System.Windows.Shapes.Path
         {
           Data = geometry,
-          Fill = InkOn(this.TypeFill(pp)),
+          Fill = ink,
+          Stroke = ReferenceEquals(ink, LightInk) ? DarkInk : LightInk,
+          StrokeThickness = em * fit * 0.07,
+          StrokeLineJoin = PenLineJoin.Round,
           IsHitTestVisible = false,
         };
       }
@@ -2647,6 +2688,298 @@ namespace DeepNestSharp.Ui.UserControls
     private void OnRotateCcw5(object sender, RoutedEventArgs e) => this.RotateSelected(-5);
 
     private void OnMirror(object sender, RoutedEventArgs e) => this.MirrorSelected();
+
+    /// <summary>A layout was taken out of the nest because a move left it with nothing on it (true), or put
+    /// back by undoing that move (false). The window gives the sheet back to the stock, or takes it again.</summary>
+    public event Action<ISheetPlacement, bool> SheetRemoved;
+
+    /// <summary>
+    /// Whether parts may move on and off this layout: one physical sheet (a part taken off one of 24
+    /// identical sheets would have to come off all of them), editable, and without common cutting, whose
+    /// shared edges belong to the parts that are there.
+    /// </summary>
+    private static bool IsMovable(SheetGroup g)
+      => g?.Representative != null
+        && g.Count == 1
+        && g.Members != null
+        && g.Representative.PartPlacements is IList<IPartPlacement> list
+        && !list.IsReadOnly
+        && !g.Representative.RequiresMergedLines
+        && (g.Representative.CommonEdges == null || g.Representative.CommonEdges.Count == 0);
+
+    /// <summary>The layouts the selected part may move to, by index.</summary>
+    private List<int> MoveTargets()
+    {
+      var from = this.CurrentGroup();
+      if (!this.EditMode || this.selectedPp == null || !IsMovable(from))
+      {
+        return new List<int>();
+      }
+
+      return Enumerable.Range(0, this.groups.Count).Where(i => this.groups[i] != from && IsMovable(this.groups[i])).ToList();
+    }
+
+    private void OnMoveToSheetClick(object sender, RoutedEventArgs e)
+    {
+      var targets = this.MoveTargets();
+      if (targets.Count == 0)
+      {
+        this.hintText.Text = Localization.Get("Dxf_MoveToSheetNone");
+        return;
+      }
+
+      var menu = new ContextMenu { PlacementTarget = this.btnMoveToSheet, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+      foreach (int target in targets)
+      {
+        var g = this.groups[target];
+        var sheet = g.Representative.Sheet;
+        var item = new MenuItem
+        {
+          Header = string.Format(
+            System.Globalization.CultureInfo.CurrentCulture,
+            "{0}   {1:0} × {2:0}   ({3})",
+            g.Name,
+            sheet.WidthCalculated,
+            sheet.HeightCalculated,
+            Localization.Format("Dxf_PartsOnSheet", g.Representative.PartPlacements.Count)),
+        };
+        item.Click += (_, __) => this.MoveSelectedTo(target);
+        menu.Items.Add(item);
+      }
+
+      menu.IsOpen = true;
+    }
+
+    /// <summary>
+    /// Moves the selected part to another sheet, into the first free spot from the bottom left; with none
+    /// free it keeps its position and shows red for the operator to drag into place. A sheet the move leaves
+    /// empty leaves the nest. One undo step takes all of it back.
+    /// </summary>
+    internal void MoveSelectedTo(int targetIndex)
+    {
+      var pp = this.selectedPp;
+      var from = this.CurrentGroup();
+      if (pp == null || targetIndex < 0 || targetIndex >= this.groups.Count)
+      {
+        return;
+      }
+
+      var to = this.groups[targetIndex];
+      if (from == to || !IsMovable(from) || !IsMovable(to))
+      {
+        return;
+      }
+
+      var fromList = (IList<IPartPlacement>)from.Representative.PartPlacements;
+      int fromIndex = fromList.IndexOf(pp);
+      if (fromIndex < 0)
+      {
+        return;
+      }
+
+      var record = new EditRecord { Move = true, From = from, To = to, FromIndex = fromIndex, Before = PlacementSnapshot.Of(pp) };
+      fromList.RemoveAt(fromIndex);
+      this.invalid.Remove(pp);
+      var toList = (IList<IPartPlacement>)to.Representative.PartPlacements;
+      toList.Add(pp);
+      record.ToIndex = toList.Count - 1;
+      if (fromList.Count == 0)
+      {
+        this.TakeOutEmptied(from, record);
+      }
+
+      this.ShowGroup(to, pp);
+      bool free = this.PlaceInFreeSpot(pp);
+      record.After = PlacementSnapshot.Of(pp);
+      this.undoStack.Push(record);
+      this.redoStack.Clear();
+      this.AfterMove(to);
+      if (!free)
+      {
+        this.hintText.Text = Localization.Get("Dxf_MoveNoRoom");
+      }
+    }
+
+    private void ApplyMove(EditRecord record, bool undo)
+    {
+      var fromList = (IList<IPartPlacement>)record.From.Representative.PartPlacements;
+      var toList = (IList<IPartPlacement>)record.To.Representative.PartPlacements;
+      if (undo)
+      {
+        if (record.ToIndex < toList.Count)
+        {
+          this.invalid.Remove(toList[record.ToIndex]);
+          toList.RemoveAt(record.ToIndex);
+        }
+
+        if (record.Emptied != null)
+        {
+          this.groups.Insert(Math.Min(record.EmptiedGroupIndex, this.groups.Count), record.Emptied);
+          if (this.Result?.UsedSheets is IList<ISheetPlacement> used)
+          {
+            used.Insert(Math.Min(record.EmptiedSheetIndex, used.Count), record.Emptied.Representative);
+          }
+
+          this.SheetRemoved?.Invoke(record.Emptied.Representative, false);
+        }
+
+        var back = record.Before.ToPlacement();
+        fromList.Insert(Math.Min(record.FromIndex, fromList.Count), back);
+        this.ShowGroup(record.From, back);
+        this.AfterMove(record.From);
+      }
+      else
+      {
+        if (record.FromIndex < fromList.Count)
+        {
+          this.invalid.Remove(fromList[record.FromIndex]);
+          fromList.RemoveAt(record.FromIndex);
+        }
+
+        var moved = record.After.ToPlacement();
+        toList.Insert(Math.Min(record.ToIndex, toList.Count), moved);
+        if (record.Emptied != null)
+        {
+          this.TakeOutEmptied(record.Emptied, record);
+        }
+
+        this.ShowGroup(record.To, moved);
+        this.AfterMove(record.To);
+      }
+    }
+
+    /// <summary>The layout a move left empty goes out of the plan and out of the nest.</summary>
+    private void TakeOutEmptied(SheetGroup emptied, EditRecord record)
+    {
+      record.Emptied = emptied;
+      record.EmptiedGroupIndex = this.groups.IndexOf(emptied);
+      this.groups.Remove(emptied);
+      if (this.Result?.UsedSheets is IList<ISheetPlacement> used)
+      {
+        record.EmptiedSheetIndex = used.IndexOf(emptied.Representative);
+        used.Remove(emptied.Representative);
+      }
+
+      this.SheetRemoved?.Invoke(emptied.Representative, true);
+    }
+
+    private void ShowGroup(SheetGroup group, IPartPlacement select)
+    {
+      this.selectedPp = select;
+      int index = this.groups.IndexOf(group);
+      if (index >= 0 && this.SheetIndex != index)
+      {
+        this.SheetIndex = index; // renders
+      }
+      else
+      {
+        this.Render();
+      }
+
+      this.selectedPp = select;
+    }
+
+    private void AfterMove(SheetGroup shown)
+    {
+      this.SeedInvalidOn(shown);
+      this.snapPointsStale = true;
+      this.Render();
+      this.UpdateEditButtons();
+      this.LayoutsChanged?.Invoke(this, EventArgs.Empty);
+      this.PartMovedBetweenSheets?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Switches manual editing on and selects the part, as a click would (for tests).</summary>
+    internal void SelectForEdit(IPartPlacement pp)
+    {
+      this.editToggle.IsChecked = true;
+      this.selectedPp = pp;
+      this.UpdateEditButtons();
+    }
+
+    /// <summary>The layouts shown, in order (for tests).</summary>
+    internal int LayoutCount => this.groups.Count;
+
+    internal void UndoLastEdit() => this.Undo();
+
+    /// <summary>A part went from one sheet to another here, so a second view of the same nest is out of date.</summary>
+    public event EventHandler PartMovedBetweenSheets;
+
+    /// <summary>
+    /// Rebuilds the layouts from the nest as it is now, after another view of it moved parts between sheets.
+    /// This view's own undo steps refer to the layouts it had, so they go.
+    /// </summary>
+    public void ReloadLayouts()
+    {
+      this.selectedPp = null;
+      this.undoStack.Clear();
+      this.redoStack.Clear();
+      this.editEntryDepth = 0;
+      this.BuildGroups();
+      this.SeedInvalid();
+      if (this.SheetIndex >= this.groups.Count)
+      {
+        this.SheetIndex = Math.Max(0, this.groups.Count - 1);
+      }
+
+      this.Render();
+      this.UpdateEditButtons();
+      this.LayoutsChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// The first spot on the sheet now shown, scanning rows from the bottom left, where the part sits clear of
+    /// everything; its own position first, in case that is already free. False when there is none, leaving
+    /// the part where it was.
+    /// </summary>
+    private bool PlaceInFreeSpot(IPartPlacement pp)
+    {
+      var placed = pp.PlacedPart;
+      if (placed == null)
+      {
+        return false;
+      }
+
+      double offX = placed.MinX - pp.X;
+      double offY = placed.MinY - pp.Y;
+      double partW = placed.MaxX - placed.MinX;
+      double partH = placed.MaxY - placed.MinY;
+      double m = Math.Max(0, this.SheetEdgeMargin);
+      double step = Math.Max(Math.Min(this.currentSheetW, this.currentSheetH) / 250.0, this.UnitsMm ? 2.0 : 0.08);
+      double startX = pp.X;
+      double startY = pp.Y;
+
+      this.selectedPp = pp;
+      this.dragCache = this.BuildDragCache(pp);
+      try
+      {
+        if (this.IsPositionValid(pp, pp))
+        {
+          return true;
+        }
+
+        for (double y = m; y + partH <= this.currentSheetH - m + 1e-9; y += step)
+        {
+          for (double x = m; x + partW <= this.currentSheetW - m + 1e-9; x += step)
+          {
+            pp.X = x - offX;
+            pp.Y = y - offY;
+            if (this.IsPositionValid(pp, pp))
+            {
+              return true;
+            }
+          }
+        }
+      }
+      finally
+      {
+        this.dragCache = null;
+      }
+
+      pp.X = startX;
+      pp.Y = startY;
+      return false;
+    }
 
     /// <summary>
     /// Rotates the selected part in place about its bounding-box centre. The placement is REPLACED
@@ -3986,7 +4319,14 @@ namespace DeepNestSharp.Ui.UserControls
       // Undoing past the mark moves the mark: it stands for the deepest point reached since the editor
       // was switched on, so "leave anyway" still undoes everything done after this.
       this.editEntryDepth = Math.Min(this.editEntryDepth, this.undoStack.Count);
-      this.ApplyRecord(record, useBefore: true);
+      if (record.Move)
+      {
+        this.ApplyMove(record, undo: true);
+      }
+      else
+      {
+        this.ApplyRecord(record, useBefore: true);
+      }
     }
 
     private void Redo()
@@ -3998,7 +4338,14 @@ namespace DeepNestSharp.Ui.UserControls
 
       var record = this.redoStack.Pop();
       this.undoStack.Push(record);
-      this.ApplyRecord(record, useBefore: false);
+      if (record.Move)
+      {
+        this.ApplyMove(record, undo: false);
+      }
+      else
+      {
+        this.ApplyRecord(record, useBefore: false);
+      }
     }
 
     private void ApplyRecord(EditRecord record, bool useBefore)

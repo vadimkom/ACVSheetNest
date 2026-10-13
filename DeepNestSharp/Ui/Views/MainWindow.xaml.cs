@@ -156,6 +156,22 @@ namespace DeepNestSharp.Ui.Views
       this.dxfViewer.LayoutsChanged += (_, __) => this.RefreshLayoutStrip();
       this.dxfViewer.SheetIndexChanged += this.OnLayoutShown;
       this.RefreshLayoutStrip();
+
+      this.nestLayoutItems.ItemsSource = this.nestLayouts;
+      this.nestDxfViewer.LayoutsChanged += (_, __) => this.RefreshNestLayoutStrip();
+
+      // A part moved to another sheet by hand can leave a sheet empty: it goes back on the rack. The other
+      // view of the same nest is rebuilt so both show the sheets as they now are.
+      this.dxfViewer.SheetRemoved += this.OnNestSheetRemoved;
+      this.nestDxfViewer.SheetRemoved += this.OnNestSheetRemoved;
+      this.dxfViewer.PartMovedBetweenSheets += (_, __) =>
+      {
+        if (ReferenceEquals(this.nestDxfViewer.Result, this.dxfViewer.Result)) this.nestDxfViewer.ReloadLayouts();
+      };
+      this.nestDxfViewer.PartMovedBetweenSheets += (_, __) =>
+      {
+        if (ReferenceEquals(this.nestDxfViewer.Result, this.dxfViewer.Result)) this.dxfViewer.ReloadLayouts();
+      };
       this.SortSheetsByPriority();
       System.ComponentModel.DependencyPropertyDescriptor
         .FromProperty(ItemsControl.ItemsSourceProperty, typeof(ListView))
@@ -2971,6 +2987,72 @@ namespace DeepNestSharp.Ui.Views
       public IEnumerable<ISheetPlacement> CutSheets => this.Layout.Sheets.Take(this.cutCount);
 
       private void Changed(string name) => this.PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
+    }
+
+    /// <summary>
+    /// A sheet left empty by moving its last part elsewhere went out of the nest (or came back on undo): give
+    /// it back to the stock it was taken from, or take it again.
+    /// </summary>
+    private void OnNestSheetRemoved(ISheetPlacement sheet, bool removed)
+    {
+      if (sheet?.Sheet == null || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      var key = ((int)Math.Round(sheet.Sheet.WidthCalculated), (int)Math.Round(sheet.Sheet.HeightCalculated));
+      var one = new Dictionary<(int W, int H), int> { [key] = 1 };
+      if (removed)
+      {
+        if (this.lastNestConsumed != null && this.lastNestConsumed.TryGetValue(key, out int n) && n > 0)
+        {
+          ReturnStock(doc.ProjectInfo.SheetLoadInfos, one);
+          if (n == 1)
+          {
+            this.lastNestConsumed.Remove(key);
+          }
+          else
+          {
+            this.lastNestConsumed[key] = n - 1;
+          }
+        }
+      }
+      else
+      {
+        var taken = ConsumeStock(doc.ProjectInfo.SheetLoadInfos, one);
+        if (taken.Count > 0)
+        {
+          this.lastNestConsumed ??= new Dictionary<(int W, int H), int>();
+          this.lastNestConsumed[key] = (this.lastNestConsumed.TryGetValue(key, out int had) ? had : 0) + 1;
+        }
+      }
+
+      doc.IsDirty = true;
+      this.sheetsListView?.Items.Refresh();
+      this.UpdateNestedInfo(this.dxfViewer?.Result);
+      this.UpdateSummaryBadges();
+    }
+
+    private readonly System.Collections.ObjectModel.ObservableCollection<DeepNestSharp.Ui.UserControls.DxfViewer.LayoutEntry> nestLayouts = new();
+
+    /// <summary>Every sheet of the nest previewed on the nesting step, as thumbnails under it.</summary>
+    private void RefreshNestLayoutStrip()
+    {
+      this.nestLayouts.Clear();
+      foreach (var layout in this.nestDxfViewer?.GetLayouts() ?? Array.Empty<DeepNestSharp.Ui.UserControls.DxfViewer.LayoutEntry>())
+      {
+        this.nestLayouts.Add(layout);
+      }
+
+      this.nestLayoutStrip.Visibility = this.nestLayouts.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void OnNestLayoutCardClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      if ((sender as FrameworkElement)?.DataContext is DeepNestSharp.Ui.UserControls.DxfViewer.LayoutEntry layout)
+      {
+        this.nestDxfViewer.SheetIndex = layout.Index;
+      }
     }
 
     /// <summary>Fills the strip with the layouts of the nest now shown, none ticked.</summary>

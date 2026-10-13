@@ -48,9 +48,15 @@ namespace DeepNestSharp.CiTests.RasterNest
 
       var project = new ProjectInfo(new TestSvgNestConfig());
       project.Load(new TestSvgNestConfig(), projectPath);
+      // Mirrored copies are a population of their own, as the window builds them.
       var parts = project.DetailLoadInfos
         .Where(o => o.IsIncluded && !string.IsNullOrWhiteSpace(o.Path))
-        .Select(o => new RasterPartInfo { Path = o.Path, Quantity = (o.Quantity + o.Extra) * qtyMult, Rotations = o.Rotations, Priority = o.Priority, Spacing = o.Spacing })
+        .SelectMany(o => new[]
+        {
+          new RasterPartInfo { Path = o.Path, Quantity = (o.Quantity + o.Extra) * qtyMult, Rotations = o.Rotations, Priority = o.Priority, Spacing = o.Spacing },
+          new RasterPartInfo { Path = o.Path, Quantity = o.MirrorQuantity * qtyMult, Rotations = o.Rotations, Priority = o.Priority, Spacing = o.Spacing, Mirrored = true },
+        })
+        .Where(p => p.Quantity > 0)
         .ToList();
       var stock = project.SheetLoadInfos
         .Where(s => s.Width > 0 && s.Height > 0 && (s.Unlimited || s.Quantity > 0))

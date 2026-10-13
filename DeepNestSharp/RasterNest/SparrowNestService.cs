@@ -739,6 +739,24 @@ namespace DeepNestSharp.RasterNest
           break;
         }
 
+        // A sheet of big parts can come back half empty with parts still waiting that would fit in the gap:
+        // the engine packs a strip and the sheet keeps what lands inside it, so which parts those are is
+        // decided by the order along the strip, not by what fits. Offer the waiting ones one at a time.
+        if (FillUpEnabled && !cancel.IsCancellationRequested)
+        {
+          var fill = FillUp(
+            loaded, loadedById, pool, bestPlacements, bestPlacedBySrc, bestW, bestH, margin,
+            effort, WatchdogSeconds(perSheetBudgetSec, effort), sparrowExePath, cancel,
+            commonLineGap, geometryTolerance, commonLineMaxClusterParts, seedOffset);
+          if (fill.Placements != null)
+          {
+            bestPlacements = fill.Placements;
+            bestPlacedBySrc = fill.PlacedBySrc;
+            bestCommonEdges = fill.CommonEdges;
+            bestUtilization = fill.PlacedBySrc.Sum(kv => kv.Value * Math.Abs(loadedById[kv.Key].Nfp.Area)) / Math.Max(1e-9, (double)bestW * bestH);
+          }
+        }
+
         // Only the size/attempt that was actually kept ever gets cut — every other stock size tried for
         // this sheet, and the first attempt when the last-chance retry beat it, are thrown away just like
         // a losing search candidate, and their seam counts go with them.
@@ -942,6 +960,11 @@ namespace DeepNestSharp.RasterNest
 
     /// <summary>Tail repacks that saved a sheet on the last nest (diagnostics).</summary>
     internal static int DiagTailRepacks;
+
+    /// <summary>Packs the fill-up of sheets ran (see FillUp), and how many of them put another part on.</summary>
+    internal static int DiagFillAttempts;
+
+    internal static int DiagFillKept;
 
     /// <summary>
     /// Tries to take the last sheet away. Fast packs sheet by sheet and the last one gets whatever is left,
@@ -1179,6 +1202,112 @@ namespace DeepNestSharp.RasterNest
       }
 
       return false;
+    }
+
+    /// <summary>Whether a packed sheet is offered the big parts still waiting (see <see cref="FillUp"/>).</summary>
+    internal static bool FillUpEnabled = Environment.GetEnvironmentVariable("SHEETNEST_FILL_UP") != "0";
+
+    /// <summary>A part this share of the sheet or more is big enough for the strip order to strand it.</summary>
+    private const double BigPartShare = 0.05;
+
+    /// <summary>Packs one sheet may cost on top of its own, at most.</summary>
+    private const int MaxFillAttempts = 4;
+
+    /// <summary>
+    /// Offers a packed sheet the big parts still waiting, one at a time, biggest first, and keeps each that
+    /// goes on with everything already there. Null when nothing more went on.
+    /// </summary>
+    /// <remarks>
+    /// The engine packs a strip and a sheet keeps what lands inside it, so which parts those are is decided
+    /// by their order along the strip. With a few big parts that strands one: an operator's order of a
+    /// 1354 x 1210 front, a 1354 x 688 top and two 649 x 1209 sides on 2500 x 1250 came out on three sheets,
+    /// the front alone on the first with a side's worth of room beside it, because the top came next along
+    /// the strip and did not fit. Only parts of a twentieth of the sheet or more are offered: a small part
+    /// left over is one the strip ran out of room for, and searching again for each would cost a laser-side
+    /// PC minutes for nothing. A sheet with common cutting keeps the search its references were set on.
+    /// </remarks>
+    private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySrc, List<CommonEdgeIntent> CommonEdges) FillUp(
+      List<Loaded> loaded,
+      Dictionary<int, Loaded> loadedById,
+      Dictionary<int, int> pool,
+      List<IPartPlacement> placements,
+      Dictionary<int, int> placedBySrc,
+      int w,
+      int h,
+      double margin,
+      NestEffort effort,
+      int hardTimeoutSec,
+      string exe,
+      CancellationToken cancel,
+      double commonLineGap,
+      double geometryTolerance,
+      int commonLineMaxClusterParts,
+      int seedOffset)
+    {
+      if (placements == null || placedBySrc == null || placedBySrc.Keys.Any(k => loadedById[k].RequiresMergedLines))
+      {
+        return (null, null, null);
+      }
+
+      double usable = Math.Max(0, w - (2 * margin)) * Math.Max(0, h - (2 * margin));
+      double Area(int src) => Math.Abs(loadedById[src].Nfp.Area);
+      int Waiting(int src, Dictionary<int, int> on) => pool[src] - (on.TryGetValue(src, out int n) ? n : 0);
+
+      var current = new Dictionary<int, int>(placedBySrc);
+      double used = current.Sum(kv => kv.Value * Area(kv.Key));
+      List<IPartPlacement> keptPlacements = null;
+      List<CommonEdgeIntent> keptEdges = null;
+      var candidates = pool.Keys
+        .Where(k => Waiting(k, current) > 0
+          && !loadedById[k].RequiresMergedLines
+          && Area(k) >= BigPartShare * usable
+          && FitsOnSheet(loadedById[k], w, h, margin))
+        .OrderByDescending(Area)
+        .ThenBy(k => k)
+        .ToList();
+
+      int attempts = 0;
+      foreach (int src in candidates)
+      {
+        while (attempts < MaxFillAttempts && !cancel.IsCancellationRequested && Waiting(src, current) > 0 && used + Area(src) <= usable)
+        {
+          attempts++;
+          Interlocked.Increment(ref DiagFillAttempts);
+          var batch = new Dictionary<int, int>(current);
+          batch[src] = (batch.TryGetValue(src, out int n) ? n : 0) + 1;
+          var (pl, by, _, _, _, _, edges, _) = PackOneSheet(
+            loaded,
+            batch,
+            w,
+            h,
+            margin,
+            IterationBudget(effort),
+            SearchWorkers(effort),
+            hardTimeoutSec,
+            TriesFor(1, true, effort),
+            exe,
+            cancel,
+            null,
+            commonLineGap,
+            geometryTolerance,
+            effort,
+            commonLineMaxClusterParts,
+            out _,
+            seedOffset: seedOffset);
+          if (pl == null || by == null || by.Values.Sum() < batch.Values.Sum())
+          {
+            break; // this one does not go on with the rest; a smaller one still might
+          }
+
+          current = by;
+          Interlocked.Increment(ref DiagFillKept);
+          keptPlacements = pl;
+          keptEdges = edges;
+          used += Area(src);
+        }
+      }
+
+      return keptPlacements == null ? (null, null, null) : (keptPlacements, current, keptEdges);
     }
 
     /// <summary>Picks a batch from the pool up to ~1.3× the sheet area (extra choice for sparrow), keeping

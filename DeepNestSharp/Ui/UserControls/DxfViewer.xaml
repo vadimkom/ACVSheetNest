@@ -55,6 +55,8 @@
           <Button x:Name="btnRotateCw5" Content="&#8635; 5" Margin="3,0,0,0" Padding="6,3" Click="OnRotateCw5" ToolTip="Повернуть на 5° по часовой стрелке" />
           <Button x:Name="btnMirror" Content="&#8646; Зеркало" Margin="10,0,0,0" Padding="6,3" Click="OnMirror"
                   ToolTip="Отразить зеркально выбранную деталь (влево ↔ вправо). Экспорт DXF также сохранит деталь зеркальной." />
+          <Button x:Name="btnMoveToSheet" Margin="10,0,0,0" Padding="6,3" Click="OnMoveToSheetClick" />
+
         </StackPanel>
         <!-- On a full sheet the part left on top of another can be off screen, so say so in words. -->
         <TextBlock x:Name="overlapCount" Margin="12,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold"

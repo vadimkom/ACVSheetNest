@@ -304,7 +304,7 @@ namespace DeepNestSharp.Reports
         double py = ty - 16;
         c.Text(40, py, 10.5, bold: true, L("Rep_PartTotals"));
         py -= 15;
-        var totalRows = partTotals.Select(t => new PartRow(t.Number, t.Colour, t.File, t.BoxArea, t.CutLength, t.Qty)).ToList();
+        var totalRows = partTotals.Select(t => new PartRow(t.Number, t.Colour, t.File, t.BoxArea, t.CutLength, t.Qty, SizeText(t.BoxWidth, t.BoxHeight))).ToList();
         int next = PartTable(c, py, totalRows, 0, colours, colourCoded, units);
         ContinueOnNewPages(totalRows, next, L("Rep_PartTotals"));
       }
@@ -341,7 +341,8 @@ namespace DeepNestSharp.Reports
             t.File,
             partInfo.TryGetValue(t.File, out var pi) ? pi.BoxArea : (double?)null,
             partInfo.TryGetValue(t.File, out var pc) ? pc.CutLength : (double?)null,
-            t.Qty))
+            t.Qty,
+            partInfo.TryGetValue(t.File, out var ps) ? SizeText(ps.BoxWidth, ps.BoxHeight) : null))
           .ToList();
 
         // Up to LayoutListRows rows share the page with the drawing; the rest carry on overleaf.
@@ -421,7 +422,7 @@ namespace DeepNestSharp.Reports
     private const int LayoutListRows = 12;
     private const double RowPitch = 13;
 
-    private readonly record struct PartRow(int? Number, string Colour, string File, double? BoxArea, double? CutLength, int Qty);
+    private readonly record struct PartRow(int? Number, string Colour, string File, double? BoxArea, double? CutLength, int Qty, string Size = null);
 
     /// <summary>The parts table in ONE column across the page: header at <paramref name="py"/>, then rows from
     /// <paramref name="from"/> for as long as they clear the footer. Returns the first row it had no room for.</summary>
@@ -434,12 +435,13 @@ namespace DeepNestSharp.Reports
       bool colourCoded,
       string units)
     {
-      const double numX = 48, swatchX = 72, areaX = 470, cutX = 610, qtyX = 740;
+      const double numX = 48, swatchX = 72, sizeX = 430, areaX = 525, cutX = 625, qtyX = 740;
       double nameX = colourCoded ? 86 : 72;
 
       c.FillRect(40, py - 4, 762, 15, 0.92, 0.92, 0.92);
       c.Text(numX, py, 8, bold: true, L("Rep_No"));
       c.Text(nameX, py, 8, bold: true, L("Rep_Part"));
+      c.Text(sizeX, py, 8, bold: true, LF("Rep_SizeCol", UnitWord(units)));
       c.Text(areaX, py, 8, bold: true, L("Rep_BoxArea"));
       c.Text(cutX, py, 8, bold: true, L("Rep_CutLength"));
       c.Text(qtyX, py, 8, bold: true, L("Rep_Qty"));
@@ -460,6 +462,11 @@ namespace DeepNestSharp.Reports
         }
 
         c.Text(nameX, py, 8, bold: false, Trunc(row.File, colourCoded ? 65 : 70));
+        if (!string.IsNullOrEmpty(row.Size))
+        {
+          c.Text(sizeX, py, 8, bold: false, row.Size);
+        }
+
         if (row.BoxArea.HasValue)
         {
           c.Text(areaX, py, 8, bold: false, FormatArea(row.BoxArea.Value, units));
@@ -549,12 +556,12 @@ namespace DeepNestSharp.Reports
     /// different mark.
     /// </para>
     /// </summary>
-    internal static List<(string File, string Colour, int Qty, int Number, double BoxArea, double CutLength)> NumberedPartTotals(
+    internal static List<(string File, string Colour, int Qty, int Number, double BoxArea, double CutLength, double BoxWidth, double BoxHeight)> NumberedPartTotals(
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts)
     {
       if (layouts == null || layouts.Count == 0)
       {
-        return new List<(string, string, int, int, double, double)>();
+        return new List<(string, string, int, int, double, double, double, double)>();
       }
 
       return layouts
@@ -570,7 +577,7 @@ namespace DeepNestSharp.Reports
             part = part.Rotate(-p.Rotation);
           }
 
-          var (_, _, boxArea) = ComputeBoundingBox(part);
+          var (boxW, boxH, boxArea) = ComputeBoundingBox(part);
           double cutLength = LaserCutLength(part);
 
           return (
@@ -578,10 +585,12 @@ namespace DeepNestSharp.Reports
             Colour: first.Colour,
             Qty: g.Sum(t => t.Count),
             BoxArea: boxArea,
+            BoxWidth: Math.Max(boxW, boxH),
+            BoxHeight: Math.Min(boxW, boxH),
             CutLength: cutLength);
         })
         .OrderByDescending(t => t.Qty)
-        .Select((t, i) => (t.File, t.Colour, t.Qty, Number: i + 1, t.BoxArea, t.CutLength))
+        .Select((t, i) => (t.File, t.Colour, t.Qty, Number: i + 1, t.BoxArea, t.CutLength, t.BoxWidth, t.BoxHeight))
         .ToList();
     }
 
@@ -707,6 +716,10 @@ namespace DeepNestSharp.Reports
 
       return length;
     }
+
+    /// <summary>A part's size across its box, the longer side first: "1354 × 1210".</summary>
+    internal static string SizeText(double width, double height)
+      => width > 0 && height > 0 ? FormattableString.Invariant($"{width:0.#} × {height:0.#}") : null;
 
     internal static string FormatArea(double area, string units)
     {
