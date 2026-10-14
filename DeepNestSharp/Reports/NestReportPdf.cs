@@ -229,9 +229,11 @@ namespace DeepNestSharp.Reports
         double boxTop = 544;
 
         // What a quote needs besides the sheets: how far the head travels cutting and how many times it
-        // pierces (once per contour, outline and holes), and with a material chosen what it all weighs.
+        // pierces (once per contour, outline and holes, and once per piece of a cut inside a part), and with a
+        // material chosen what it all weighs.
         double cutLength = partTotals.Sum(t => t.CutLength * t.Qty);
-        int pierces = layouts.Sum(l => l.Count * l.Sheet.PartPlacements.Sum(p => 1 + (p.Part?.Children?.Count ?? 0)));
+        int pierces = layouts.Sum(l => l.Count * l.Sheet.PartPlacements.Sum(p =>
+          1 + (p.Part?.Children?.Count ?? 0) + DeepNestLib.IO.DxfInnerCuts.Measure(p.Part?.Name).Pieces));
         bool weighs = material != null && material.Thickness > 0 && IsMillimetres(units);
         int jRows = (unplacedCount > 0 ? 4 : 3) + 2 + (material != null ? 1 : 0) + (weighs ? 2 : 0);
         double stockBoxH = (stockLines.Count * 22) + 28;
@@ -609,7 +611,8 @@ namespace DeepNestSharp.Reports
           }
 
           var (boxW, boxH, boxArea) = ComputeBoundingBox(part);
-          double cutLength = LaserCutLength(part);
+          // The outline and holes, and any cut inside the part that encloses nothing (strips of a tape blank).
+          double cutLength = LaserCutLength(part) + DeepNestLib.IO.DxfInnerCuts.Measure(p?.Part?.Name).Length;
 
           return (
             File: g.Key,

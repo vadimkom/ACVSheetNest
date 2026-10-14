@@ -1474,6 +1474,14 @@ namespace DeepNestSharp.Ui.UserControls
             AppendContour(ctx, child, Tx);
           }
         }
+
+        // Cuts inside the part that enclose nothing (between the strips of a tape blank): open lines, placed
+        // the way the export places them, so they show where they will be cut and move with the part.
+        foreach (var (a, b) in DeepNestLib.IO.DxfInnerCuts.Placed(pp.Part?.Name, pp.X, pp.Y, pp.Part?.Rotation ?? 0, pp.IsMirrored))
+        {
+          ctx.BeginFigure(Tx(a.X, a.Y), false, false);
+          ctx.LineTo(Tx(b.X, b.Y), true, false);
+        }
       }
 
       geometry.Freeze();

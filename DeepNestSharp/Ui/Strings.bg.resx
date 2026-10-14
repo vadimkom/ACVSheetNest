@@ -1350,7 +1350,7 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
     <value>Добави детайли от DXF файлове</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Добави правоъгълник, кръг или шайба без DXF, направо в нужното количество</value>
+    <value>Добави правоъгълник, кръг, шайба или перфолента без DXF, направо в нужното количество</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Избери стандартен размер или въведи свой</value>
@@ -1625,22 +1625,82 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   <data name="Shape_WasherWideName" xml:space="preserve">
     <value>Шайба широка</value>
   </data>
-  <data name="Shape_WasherKind" xml:space="preserve">
-    <value>Вид:</value>
-  </data>
   <data name="Shape_WasherStandard" xml:space="preserve">
     <value>Нормална (DIN 125)</value>
   </data>
   <data name="Shape_WasherWide" xml:space="preserve">
     <value>Широка (DIN 9021)</value>
   </data>
-  <data name="Shape_WasherCustom" xml:space="preserve">
-    <value>Собствена</value>
-  </data>
   <data name="Shape_OuterDiameter" xml:space="preserve">
     <value>Външен Ø:</value>
   </data>
   <data name="Shape_HoleDiameter" xml:space="preserve">
     <value>Отвор Ø:</value>
+  </data>
+  <data name="Shape_Kind" xml:space="preserve">
+    <value>Фигура:</value>
+  </data>
+  <data name="Shape_Preset" xml:space="preserve">
+    <value>Вариант:</value>
+  </data>
+  <data name="Shape_Custom" xml:space="preserve">
+    <value>Собствен размер</value>
+  </data>
+  <data name="Shape_NeedsSize" xml:space="preserve">
+    <value>Всички размери трябва да са по-големи от нула.</value>
+  </data>
+  <data name="Shape_WasherHoleTooBig" xml:space="preserve">
+    <value>Отворът трябва да е по-малък от външния диаметър.</value>
+  </data>
+  <data name="Shape_Tape" xml:space="preserve">
+    <value>Перфолента</value>
+  </data>
+  <data name="Shape_TapePreset" xml:space="preserve">
+    <value>Лента</value>
+  </data>
+  <data name="Shape_Length" xml:space="preserve">
+    <value>Дължина:</value>
+  </data>
+  <data name="Shape_BlankWidth" xml:space="preserve">
+    <value>Ширина на заготовката:</value>
+  </data>
+  <data name="Shape_StripWidth" xml:space="preserve">
+    <value>Ширина на лентата B:</value>
+  </data>
+  <data name="Shape_BigHole" xml:space="preserve">
+    <value>Голям отвор Ø:</value>
+  </data>
+  <data name="Shape_SmallHole" xml:space="preserve">
+    <value>Малки отвори Ø:</value>
+  </data>
+  <data name="Shape_Pitch" xml:space="preserve">
+    <value>Стъпка на големите отвори:</value>
+  </data>
+  <data name="Shape_RowGap" xml:space="preserve">
+    <value>Между редовете малки:</value>
+  </data>
+  <data name="Shape_SmallOffset" xml:space="preserve">
+    <value>Малки от големия, надлъжно:</value>
+  </data>
+  <data name="Shape_Bridge" xml:space="preserve">
+    <value>Мостче в общия рез:</value>
+  </data>
+  <data name="Shape_BridgeEvery" xml:space="preserve">
+    <value>Мостчета приблизително през:</value>
+  </data>
+  <data name="Shape_TapeSummary" xml:space="preserve">
+    <value>Ленти: {0}, заготовка {1} × {2} {3}, големи отвори на лента: {4}</value>
+  </data>
+  <data name="Shape_TapeBlankTooNarrow" xml:space="preserve">
+    <value>Заготовката е по-тясна от една лента.</value>
+  </data>
+  <data name="Shape_TapeTooShort" xml:space="preserve">
+    <value>Твърде къса дори за една група отвори.</value>
+  </data>
+  <data name="Shape_TapeHolesOutside" xml:space="preserve">
+    <value>Отворите не се побират по ширината на лентата.</value>
+  </data>
+  <data name="Shape_TapeHolesTouch" xml:space="preserve">
+    <value>Отворите се допират един до друг.</value>
   </data>
 </root>

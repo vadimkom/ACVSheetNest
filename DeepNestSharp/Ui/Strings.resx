@@ -1350,7 +1350,7 @@ Open the download page?</value>
     <value>Add parts from DXF files</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Add a rectangle, a circle or a washer without a DXF, in the quantity you need</value>
+    <value>Add a rectangle, circle, washer or perforated tape without a DXF, in the quantity you need</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Pick a standard size or enter your own</value>
@@ -1625,22 +1625,82 @@ Open the download page?</value>
   <data name="Shape_WasherWideName" xml:space="preserve">
     <value>Washer, wide</value>
   </data>
-  <data name="Shape_WasherKind" xml:space="preserve">
-    <value>Type:</value>
-  </data>
   <data name="Shape_WasherStandard" xml:space="preserve">
     <value>Standard (DIN 125)</value>
   </data>
   <data name="Shape_WasherWide" xml:space="preserve">
     <value>Wide (DIN 9021)</value>
   </data>
-  <data name="Shape_WasherCustom" xml:space="preserve">
-    <value>Custom</value>
-  </data>
   <data name="Shape_OuterDiameter" xml:space="preserve">
     <value>Outer Ø:</value>
   </data>
   <data name="Shape_HoleDiameter" xml:space="preserve">
     <value>Hole Ø:</value>
+  </data>
+  <data name="Shape_Kind" xml:space="preserve">
+    <value>Shape:</value>
+  </data>
+  <data name="Shape_Preset" xml:space="preserve">
+    <value>Size:</value>
+  </data>
+  <data name="Shape_Custom" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="Shape_NeedsSize" xml:space="preserve">
+    <value>Every size has to be greater than zero.</value>
+  </data>
+  <data name="Shape_WasherHoleTooBig" xml:space="preserve">
+    <value>The hole has to be smaller than the outside.</value>
+  </data>
+  <data name="Shape_Tape" xml:space="preserve">
+    <value>Perforated tape</value>
+  </data>
+  <data name="Shape_TapePreset" xml:space="preserve">
+    <value>Tape</value>
+  </data>
+  <data name="Shape_Length" xml:space="preserve">
+    <value>Length:</value>
+  </data>
+  <data name="Shape_BlankWidth" xml:space="preserve">
+    <value>Blank width:</value>
+  </data>
+  <data name="Shape_StripWidth" xml:space="preserve">
+    <value>Strip width B:</value>
+  </data>
+  <data name="Shape_BigHole" xml:space="preserve">
+    <value>Big hole Ø:</value>
+  </data>
+  <data name="Shape_SmallHole" xml:space="preserve">
+    <value>Small holes Ø:</value>
+  </data>
+  <data name="Shape_Pitch" xml:space="preserve">
+    <value>Big hole pitch:</value>
+  </data>
+  <data name="Shape_RowGap" xml:space="preserve">
+    <value>Small rows apart:</value>
+  </data>
+  <data name="Shape_SmallOffset" xml:space="preserve">
+    <value>Small from big, along:</value>
+  </data>
+  <data name="Shape_Bridge" xml:space="preserve">
+    <value>Bridge in shared cut:</value>
+  </data>
+  <data name="Shape_BridgeEvery" xml:space="preserve">
+    <value>Bridges about every:</value>
+  </data>
+  <data name="Shape_TapeSummary" xml:space="preserve">
+    <value>{0} strips, blank {1} × {2} {3}, {4} big holes per strip</value>
+  </data>
+  <data name="Shape_TapeBlankTooNarrow" xml:space="preserve">
+    <value>The blank is narrower than one strip.</value>
+  </data>
+  <data name="Shape_TapeTooShort" xml:space="preserve">
+    <value>Too short for even one group of holes.</value>
+  </data>
+  <data name="Shape_TapeHolesOutside" xml:space="preserve">
+    <value>The holes do not fit across the strip.</value>
+  </data>
+  <data name="Shape_TapeHolesTouch" xml:space="preserve">
+    <value>The holes would touch each other.</value>
   </data>
 </root>

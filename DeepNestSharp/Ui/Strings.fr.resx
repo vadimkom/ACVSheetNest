@@ -1350,7 +1350,7 @@ Ouvrir la page de téléchargement ?</value>
     <value>Ajouter des pièces depuis des fichiers DXF</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Ajouter un rectangle, un cercle ou une rondelle sans DXF, dans la quantité voulue</value>
+    <value>Ajouter un rectangle, un cercle, une rondelle ou un feuillard perforé sans DXF, dans la quantité voulue</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Choisir un format standard ou saisir le vôtre</value>
@@ -1625,22 +1625,82 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Shape_WasherWideName" xml:space="preserve">
     <value>Rondelle large</value>
   </data>
-  <data name="Shape_WasherKind" xml:space="preserve">
-    <value>Type :</value>
-  </data>
   <data name="Shape_WasherStandard" xml:space="preserve">
     <value>Normale (DIN 125)</value>
   </data>
   <data name="Shape_WasherWide" xml:space="preserve">
     <value>Large (DIN 9021)</value>
   </data>
-  <data name="Shape_WasherCustom" xml:space="preserve">
-    <value>Personnalisée</value>
-  </data>
   <data name="Shape_OuterDiameter" xml:space="preserve">
     <value>Ø extérieur :</value>
   </data>
   <data name="Shape_HoleDiameter" xml:space="preserve">
     <value>Ø du trou :</value>
+  </data>
+  <data name="Shape_Kind" xml:space="preserve">
+    <value>Forme :</value>
+  </data>
+  <data name="Shape_Preset" xml:space="preserve">
+    <value>Variante :</value>
+  </data>
+  <data name="Shape_Custom" xml:space="preserve">
+    <value>Sur mesure</value>
+  </data>
+  <data name="Shape_NeedsSize" xml:space="preserve">
+    <value>Toutes les cotes doivent être supérieures à zéro.</value>
+  </data>
+  <data name="Shape_WasherHoleTooBig" xml:space="preserve">
+    <value>Le trou doit être plus petit que le diamètre extérieur.</value>
+  </data>
+  <data name="Shape_Tape" xml:space="preserve">
+    <value>Feuillard perforé</value>
+  </data>
+  <data name="Shape_TapePreset" xml:space="preserve">
+    <value>Feuillard</value>
+  </data>
+  <data name="Shape_Length" xml:space="preserve">
+    <value>Longueur :</value>
+  </data>
+  <data name="Shape_BlankWidth" xml:space="preserve">
+    <value>Largeur du flan :</value>
+  </data>
+  <data name="Shape_StripWidth" xml:space="preserve">
+    <value>Largeur de bande B :</value>
+  </data>
+  <data name="Shape_BigHole" xml:space="preserve">
+    <value>Grand trou Ø :</value>
+  </data>
+  <data name="Shape_SmallHole" xml:space="preserve">
+    <value>Petits trous Ø :</value>
+  </data>
+  <data name="Shape_Pitch" xml:space="preserve">
+    <value>Pas des grands trous :</value>
+  </data>
+  <data name="Shape_RowGap" xml:space="preserve">
+    <value>Écart des rangées :</value>
+  </data>
+  <data name="Shape_SmallOffset" xml:space="preserve">
+    <value>Petits / grand, en long :</value>
+  </data>
+  <data name="Shape_Bridge" xml:space="preserve">
+    <value>Pont dans la coupe commune :</value>
+  </data>
+  <data name="Shape_BridgeEvery" xml:space="preserve">
+    <value>Ponts environ tous les :</value>
+  </data>
+  <data name="Shape_TapeSummary" xml:space="preserve">
+    <value>{0} bandes, flan {1} × {2} {3}, {4} grands trous par bande</value>
+  </data>
+  <data name="Shape_TapeBlankTooNarrow" xml:space="preserve">
+    <value>Le flan est plus étroit qu'une bande.</value>
+  </data>
+  <data name="Shape_TapeTooShort" xml:space="preserve">
+    <value>Trop court même pour un groupe de trous.</value>
+  </data>
+  <data name="Shape_TapeHolesOutside" xml:space="preserve">
+    <value>Les trous ne tiennent pas dans la largeur de la bande.</value>
+  </data>
+  <data name="Shape_TapeHolesTouch" xml:space="preserve">
+    <value>Les trous se toucheraient.</value>
   </data>
 </root>

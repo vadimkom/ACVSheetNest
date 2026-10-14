@@ -255,6 +255,11 @@ namespace DeepNestLib.IO
       return OffsetToNest(allEntities, offsetdistance, rotation, mirror);
     }
 
+    /// <summary>Moves a part's own entities to where a placement puts them, as the export does. The entities
+    /// are changed in place.</summary>
+    public static List<DxfEntity> PlaceEntities(IList<DxfEntity> entities, DxfPoint offset, double rotation, bool mirror)
+      => OffsetToNest(entities, offset, rotation, mirror);
+
     private static List<DxfEntity> OffsetToNest(IList<DxfEntity> dxfEntities, DxfPoint offset, double rotationAngle, bool mirror)
     {
       var result = new List<DxfEntity>();
@@ -1574,6 +1579,9 @@ namespace DeepNestLib.IO
       public string LayerName { get; set; }
       public DxfLayer LayerDef { get; set; }
       public List<DxfLineType> LineTypes { get; set; } = new List<DxfLineType>();
+
+      /// <summary>Lines on the inner-cut layer: cut through, on the cut layer, not marked.</summary>
+      public List<DxfEntity> InnerCutEntities { get; set; } = new List<DxfEntity>();
     }
 
     private static bool IsBendEntity(DxfEntity entity)
@@ -1746,13 +1754,15 @@ namespace DeepNestLib.IO
         var cutEntities = new HashSet<DxfEntity>(
           detail.Outers.OfType<LocalContour<DxfEntity>>().SelectMany(c => c.Entities));
 
+        // Open lines are bends, marked; those on the inner-cut layer are cut, like the outline.
+        var innerCuts = sourceDxf.Entities.Where(e => DxfParser.IsInnerCut(e) && IsBendEntity(e)).ToList();
         var bendEntities = sourceDxf.Entities
-          .Where(e => !cutEntities.Contains(e) && !DxfParser.IsAnnotation(e) && IsBendEntity(e))
+          .Where(e => !cutEntities.Contains(e) && !DxfParser.IsAnnotation(e) && !DxfParser.IsInnerCut(e) && IsBendEntity(e))
           .ToList();
 
         if (bendEntities.Count == 0)
         {
-          return new PartBendInfo();
+          return new PartBendInfo { InnerCutEntities = innerCuts };
         }
 
         var (layerName, layerDef) = ResolveBendLayer(sourceDxf, bendEntities);
@@ -1787,6 +1797,7 @@ namespace DeepNestLib.IO
           LayerName = layerName,
           LayerDef = layerDef,
           LineTypes = lineTypes,
+          InnerCutEntities = innerCuts,
         };
       }
       catch
@@ -1938,6 +1949,24 @@ namespace DeepNestLib.IO
         {
           info = ExtractPartBendInfo(sourcePath, sourceSnapshots);
           bendCache[cacheKey] = info;
+        }
+
+        if (info?.InnerCutEntities?.Count > 0)
+        {
+          var cuts = info.InnerCutEntities
+            .Select(e => CloneBendEntity(e, DxfOutputLayers.Cut.Name))
+            .Where(e => e != null)
+            .ToList();
+          foreach (var cut in cuts)
+          {
+            cut.Color = DxfColor.ByLayer;
+            cut.LineTypeName = "BYLAYER";
+          }
+
+          foreach (var ent in SnapToGrid(OffsetToNest(cuts, offset, rotation, isMirrored)))
+          {
+            targetDxf.Entities.Add(ent);
+          }
         }
 
         if (info == null || info.TemplateEntities == null || info.TemplateEntities.Count == 0)

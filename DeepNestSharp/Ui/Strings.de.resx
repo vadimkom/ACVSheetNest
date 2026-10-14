@@ -1350,7 +1350,7 @@ Downloadseite öffnen?</value>
     <value>Teile aus DXF-Dateien hinzufügen</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Ein Rechteck, einen Kreis oder eine Unterlegscheibe ohne DXF hinzufügen, in der benötigten Anzahl</value>
+    <value>Rechteck, Kreis, Unterlegscheibe oder Lochband ohne DXF hinzufügen, in der benötigten Anzahl</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Standardgröße wählen oder eigene eingeben</value>
@@ -1625,22 +1625,82 @@ Downloadseite öffnen?</value>
   <data name="Shape_WasherWideName" xml:space="preserve">
     <value>Unterlegscheibe, groß</value>
   </data>
-  <data name="Shape_WasherKind" xml:space="preserve">
-    <value>Art:</value>
-  </data>
   <data name="Shape_WasherStandard" xml:space="preserve">
     <value>Normal (DIN 125)</value>
   </data>
   <data name="Shape_WasherWide" xml:space="preserve">
     <value>Groß (DIN 9021)</value>
   </data>
-  <data name="Shape_WasherCustom" xml:space="preserve">
-    <value>Eigene</value>
-  </data>
   <data name="Shape_OuterDiameter" xml:space="preserve">
     <value>Außen-Ø:</value>
   </data>
   <data name="Shape_HoleDiameter" xml:space="preserve">
     <value>Loch-Ø:</value>
+  </data>
+  <data name="Shape_Kind" xml:space="preserve">
+    <value>Form:</value>
+  </data>
+  <data name="Shape_Preset" xml:space="preserve">
+    <value>Variante:</value>
+  </data>
+  <data name="Shape_Custom" xml:space="preserve">
+    <value>Eigene Maße</value>
+  </data>
+  <data name="Shape_NeedsSize" xml:space="preserve">
+    <value>Alle Maße müssen größer als null sein.</value>
+  </data>
+  <data name="Shape_WasherHoleTooBig" xml:space="preserve">
+    <value>Das Loch muss kleiner als der Außendurchmesser sein.</value>
+  </data>
+  <data name="Shape_Tape" xml:space="preserve">
+    <value>Lochband</value>
+  </data>
+  <data name="Shape_TapePreset" xml:space="preserve">
+    <value>Band</value>
+  </data>
+  <data name="Shape_Length" xml:space="preserve">
+    <value>Länge:</value>
+  </data>
+  <data name="Shape_BlankWidth" xml:space="preserve">
+    <value>Zuschnittbreite:</value>
+  </data>
+  <data name="Shape_StripWidth" xml:space="preserve">
+    <value>Bandbreite B:</value>
+  </data>
+  <data name="Shape_BigHole" xml:space="preserve">
+    <value>Großes Loch Ø:</value>
+  </data>
+  <data name="Shape_SmallHole" xml:space="preserve">
+    <value>Kleine Löcher Ø:</value>
+  </data>
+  <data name="Shape_Pitch" xml:space="preserve">
+    <value>Teilung große Löcher:</value>
+  </data>
+  <data name="Shape_RowGap" xml:space="preserve">
+    <value>Abstand kleine Reihen:</value>
+  </data>
+  <data name="Shape_SmallOffset" xml:space="preserve">
+    <value>Kleine zum großen, längs:</value>
+  </data>
+  <data name="Shape_Bridge" xml:space="preserve">
+    <value>Steg im gemeinsamen Schnitt:</value>
+  </data>
+  <data name="Shape_BridgeEvery" xml:space="preserve">
+    <value>Stege etwa alle:</value>
+  </data>
+  <data name="Shape_TapeSummary" xml:space="preserve">
+    <value>{0} Bänder, Zuschnitt {1} × {2} {3}, {4} große Löcher je Band</value>
+  </data>
+  <data name="Shape_TapeBlankTooNarrow" xml:space="preserve">
+    <value>Der Zuschnitt ist schmaler als ein Band.</value>
+  </data>
+  <data name="Shape_TapeTooShort" xml:space="preserve">
+    <value>Zu kurz für auch nur eine Lochgruppe.</value>
+  </data>
+  <data name="Shape_TapeHolesOutside" xml:space="preserve">
+    <value>Die Löcher passen nicht in die Bandbreite.</value>
+  </data>
+  <data name="Shape_TapeHolesTouch" xml:space="preserve">
+    <value>Die Löcher würden sich berühren.</value>
   </data>
 </root>

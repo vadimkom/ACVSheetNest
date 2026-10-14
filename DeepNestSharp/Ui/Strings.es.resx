@@ -1350,7 +1350,7 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
     <value>Añadir piezas desde archivos DXF</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Añadir un rectángulo, un círculo o una arandela sin DXF, en la cantidad necesaria</value>
+    <value>Añadir un rectángulo, un círculo, una arandela o un fleje perforado sin DXF, en la cantidad necesaria</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Elegir un tamaño estándar o introducir el suyo</value>
@@ -1625,22 +1625,82 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
   <data name="Shape_WasherWideName" xml:space="preserve">
     <value>Arandela ancha</value>
   </data>
-  <data name="Shape_WasherKind" xml:space="preserve">
-    <value>Tipo:</value>
-  </data>
   <data name="Shape_WasherStandard" xml:space="preserve">
     <value>Normal (DIN 125)</value>
   </data>
   <data name="Shape_WasherWide" xml:space="preserve">
     <value>Ancha (DIN 9021)</value>
   </data>
-  <data name="Shape_WasherCustom" xml:space="preserve">
-    <value>Personalizada</value>
-  </data>
   <data name="Shape_OuterDiameter" xml:space="preserve">
     <value>Ø exterior:</value>
   </data>
   <data name="Shape_HoleDiameter" xml:space="preserve">
     <value>Ø del agujero:</value>
+  </data>
+  <data name="Shape_Kind" xml:space="preserve">
+    <value>Forma:</value>
+  </data>
+  <data name="Shape_Preset" xml:space="preserve">
+    <value>Variante:</value>
+  </data>
+  <data name="Shape_Custom" xml:space="preserve">
+    <value>Personalizado</value>
+  </data>
+  <data name="Shape_NeedsSize" xml:space="preserve">
+    <value>Todas las medidas deben ser mayores que cero.</value>
+  </data>
+  <data name="Shape_WasherHoleTooBig" xml:space="preserve">
+    <value>El agujero debe ser menor que el diámetro exterior.</value>
+  </data>
+  <data name="Shape_Tape" xml:space="preserve">
+    <value>Fleje perforado</value>
+  </data>
+  <data name="Shape_TapePreset" xml:space="preserve">
+    <value>Fleje</value>
+  </data>
+  <data name="Shape_Length" xml:space="preserve">
+    <value>Longitud:</value>
+  </data>
+  <data name="Shape_BlankWidth" xml:space="preserve">
+    <value>Ancho total:</value>
+  </data>
+  <data name="Shape_StripWidth" xml:space="preserve">
+    <value>Ancho de fleje B:</value>
+  </data>
+  <data name="Shape_BigHole" xml:space="preserve">
+    <value>Agujero grande Ø:</value>
+  </data>
+  <data name="Shape_SmallHole" xml:space="preserve">
+    <value>Agujeros pequeños Ø:</value>
+  </data>
+  <data name="Shape_Pitch" xml:space="preserve">
+    <value>Paso agujeros grandes:</value>
+  </data>
+  <data name="Shape_RowGap" xml:space="preserve">
+    <value>Entre filas pequeñas:</value>
+  </data>
+  <data name="Shape_SmallOffset" xml:space="preserve">
+    <value>Pequeños al grande, a lo largo:</value>
+  </data>
+  <data name="Shape_Bridge" xml:space="preserve">
+    <value>Puente en el corte común:</value>
+  </data>
+  <data name="Shape_BridgeEvery" xml:space="preserve">
+    <value>Puentes aprox. cada:</value>
+  </data>
+  <data name="Shape_TapeSummary" xml:space="preserve">
+    <value>{0} flejes, pieza {1} × {2} {3}, {4} agujeros grandes por fleje</value>
+  </data>
+  <data name="Shape_TapeBlankTooNarrow" xml:space="preserve">
+    <value>La pieza es más estrecha que un fleje.</value>
+  </data>
+  <data name="Shape_TapeTooShort" xml:space="preserve">
+    <value>Demasiado corto incluso para un grupo de agujeros.</value>
+  </data>
+  <data name="Shape_TapeHolesOutside" xml:space="preserve">
+    <value>Los agujeros no caben en el ancho del fleje.</value>
+  </data>
+  <data name="Shape_TapeHolesTouch" xml:space="preserve">
+    <value>Los agujeros se tocarían.</value>
   </data>
 </root>

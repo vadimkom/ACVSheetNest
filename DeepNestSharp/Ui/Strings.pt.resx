@@ -1350,7 +1350,7 @@ Abrir a página de download?</value>
     <value>Adicionar peças de arquivos DXF</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Adicionar um retângulo, um círculo ou uma arruela sem DXF, na quantidade necessária</value>
+    <value>Adicionar um retângulo, um círculo, uma arruela ou uma fita perfurada sem DXF, na quantidade necessária</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Escolher um tamanho padrão ou digitar o seu</value>
@@ -1625,22 +1625,82 @@ Abrir a página de download?</value>
   <data name="Shape_WasherWideName" xml:space="preserve">
     <value>Arruela larga</value>
   </data>
-  <data name="Shape_WasherKind" xml:space="preserve">
-    <value>Tipo:</value>
-  </data>
   <data name="Shape_WasherStandard" xml:space="preserve">
     <value>Normal (DIN 125)</value>
   </data>
   <data name="Shape_WasherWide" xml:space="preserve">
     <value>Larga (DIN 9021)</value>
   </data>
-  <data name="Shape_WasherCustom" xml:space="preserve">
-    <value>Personalizada</value>
-  </data>
   <data name="Shape_OuterDiameter" xml:space="preserve">
     <value>Ø externo:</value>
   </data>
   <data name="Shape_HoleDiameter" xml:space="preserve">
     <value>Ø do furo:</value>
+  </data>
+  <data name="Shape_Kind" xml:space="preserve">
+    <value>Forma:</value>
+  </data>
+  <data name="Shape_Preset" xml:space="preserve">
+    <value>Variante:</value>
+  </data>
+  <data name="Shape_Custom" xml:space="preserve">
+    <value>Personalizado</value>
+  </data>
+  <data name="Shape_NeedsSize" xml:space="preserve">
+    <value>Todas as medidas devem ser maiores que zero.</value>
+  </data>
+  <data name="Shape_WasherHoleTooBig" xml:space="preserve">
+    <value>O furo deve ser menor que o diâmetro externo.</value>
+  </data>
+  <data name="Shape_Tape" xml:space="preserve">
+    <value>Fita perfurada</value>
+  </data>
+  <data name="Shape_TapePreset" xml:space="preserve">
+    <value>Fita</value>
+  </data>
+  <data name="Shape_Length" xml:space="preserve">
+    <value>Comprimento:</value>
+  </data>
+  <data name="Shape_BlankWidth" xml:space="preserve">
+    <value>Largura total:</value>
+  </data>
+  <data name="Shape_StripWidth" xml:space="preserve">
+    <value>Largura da fita B:</value>
+  </data>
+  <data name="Shape_BigHole" xml:space="preserve">
+    <value>Furo grande Ø:</value>
+  </data>
+  <data name="Shape_SmallHole" xml:space="preserve">
+    <value>Furos pequenos Ø:</value>
+  </data>
+  <data name="Shape_Pitch" xml:space="preserve">
+    <value>Passo dos furos grandes:</value>
+  </data>
+  <data name="Shape_RowGap" xml:space="preserve">
+    <value>Entre fileiras pequenas:</value>
+  </data>
+  <data name="Shape_SmallOffset" xml:space="preserve">
+    <value>Pequenos ao grande, ao longo:</value>
+  </data>
+  <data name="Shape_Bridge" xml:space="preserve">
+    <value>Ponte no corte comum:</value>
+  </data>
+  <data name="Shape_BridgeEvery" xml:space="preserve">
+    <value>Pontes aprox. a cada:</value>
+  </data>
+  <data name="Shape_TapeSummary" xml:space="preserve">
+    <value>{0} fitas, chapa {1} × {2} {3}, {4} furos grandes por fita</value>
+  </data>
+  <data name="Shape_TapeBlankTooNarrow" xml:space="preserve">
+    <value>A chapa é mais estreita que uma fita.</value>
+  </data>
+  <data name="Shape_TapeTooShort" xml:space="preserve">
+    <value>Curto demais até para um grupo de furos.</value>
+  </data>
+  <data name="Shape_TapeHolesOutside" xml:space="preserve">
+    <value>Os furos não cabem na largura da fita.</value>
+  </data>
+  <data name="Shape_TapeHolesTouch" xml:space="preserve">
+    <value>Os furos se tocariam.</value>
   </data>
 </root>

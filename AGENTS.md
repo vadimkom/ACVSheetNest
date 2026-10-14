@@ -119,7 +119,14 @@ Last verified (2026-10-14): core 1061/1063, app 475/478, 0 failures (skips are t
 **Parts and sheets**
 - Flip ↔/↕ mirrors the part itself (`PartMirror`): a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.
 - The **Mirrored** column holds copies on top of the quantity.
-- Shapes (`AddShapeWindow`, `PartShapes`): rectangle, square, circle or washer written as DXF under `%LOCALAPPDATA%\SheetNest\shapes`. Adding the same shape again adds to that row. Washers: `PartShapes.Washers` holds M8/M10/M12 per DIN 125-A (hole 8.4/10.5/13, outside 16/20/24) and DIN 9021 (outside 24/30/37), converted to inches in inch mode; custom takes any outside and hole.
+- Shapes (`AddShapeWindow`, `PartShapes`): a catalogue of `ShapeKind`s (rectangle, circle, washer, perforated tape), each with its parameters (label key + default in mm), optional presets (values they set and lock) and `Draw`. The dialog builds its fields from the kind, so a new shape is one class plus its texts. Files go to `%LOCALAPPDATA%\SheetNest\shapes`; adding the same shape again adds to that row. Values are in drawing units; defaults and presets are converted from mm in inch mode.
+  - Washers: DIN 125-A M8/M10/M12 (hole 8.4/10.5/13, outside 16/20/24) and DIN 9021 (outside 24/30/37), or custom.
+  - Perforated tape (`PerforatedTapeShape`): blank L × W cut into whole strips of width B; per strip a big hole every pitch with four small ones at ±offset along and ±rowGap/2 across, the groups centred along the length. Presets B25 Ø8 and B17 Ø6.2, both with Ø3.2 small holes, pitch 15, rows 8 apart, offset 5. The B25 numbers other than Ø8/Ø3.2 are a guess from the B17 drawing; ask the user to confirm against a real tape. Shared cuts between strips get 0.5 mm bridges about every 400 mm (both editable).
+- **Cuts inside a part that enclose nothing** live on the source layer `SHEETNEST_INNER_CUT` (`DxfOutputLayers.InnerCutSourceName`).
+  - The parser ignores them, so nesting sees the outline and holes.
+  - The export writes them on CUT, turned with the part (`PartBendInfo.InnerCutEntities`); other open lines stay bends on PAINT.
+  - The layout draws them inside each part's geometry (`DxfInnerCuts.Placed`, using `Part.Rotation` as the export does).
+  - The report adds their length and pieces to cut length and pierces (`DxfInnerCuts.Measure`).
 - Material and thickness are set per project (`ProjectInfo.Material/Thickness`) and remembered for the next job.
   - Materials: black, galvanized, stainless, aluminium; densities 7.85 / 7.85 / 7.93 / 2.70.
   - Thickness: 0.6, 0.7, 0.8, 1, 1.2, 1.5, 2, 3, 4, 5, or typed.

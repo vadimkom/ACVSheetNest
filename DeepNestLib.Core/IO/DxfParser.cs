@@ -43,6 +43,10 @@ namespace DeepNestLib.IO
 
     internal static bool IsAnnotation(DxfEntity ent) => ent != null && AnnotationTypes.Contains(ent.EntityType);
 
+    /// <summary>A line on <see cref="DxfOutputLayers.InnerCutSourceName"/>: cut, but not part of the shape.</summary>
+    internal static bool IsInnerCut(DxfEntity ent)
+      => ent != null && string.Equals(ent.Layer, DxfOutputLayers.InnerCutSourceName, StringComparison.OrdinalIgnoreCase);
+
     private static double ArcStepDegrees(double radius)
     {
       if (radius <= 0)
@@ -164,6 +168,12 @@ namespace DeepNestLib.IO
 
       foreach (DxfEntity ent in entities)
       {
+        // Cuts inside the part that enclose nothing: not part of its shape, the export cuts them.
+        if (IsInnerCut(ent))
+        {
+          continue;
+        }
+
         var elems = new List<LineElement>();
         switch (ent.EntityType)
         {

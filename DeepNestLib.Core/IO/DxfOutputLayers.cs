@@ -38,5 +38,13 @@ namespace DeepNestLib.IO
 
     /// <summary>For the eye only, never processed: part names written for display.</summary>
     public static readonly DxfOutputLayer Background = new DxfOutputLayer(BackgroundName, 8);
+
+    /// <summary>
+    /// A layer of a PART drawing, never of an exported sheet: open lines on it are cuts inside the part that
+    /// enclose nothing, such as the shared cut between strips of perforated tape drawn as one block. The
+    /// nest ignores them (the block's outline and holes are the part) and the export writes them on
+    /// <see cref="Cut"/>. Any other open line in a part drawing is a bend and is marked, not cut.
+    /// </summary>
+    public const string InnerCutSourceName = "SHEETNEST_INNER_CUT";
   }
 }

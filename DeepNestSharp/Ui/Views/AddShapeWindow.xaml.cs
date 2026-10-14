@@ -1,53 +1,55 @@
 namespace DeepNestSharp.Ui.Views
 {
   using System;
+  using System.Collections.Generic;
+  using System.Linq;
   using System.Windows;
   using System.Windows.Controls;
   using DeepNestLib.IO;
+  using Xceed.Wpf.Toolkit;
   using Localization = DeepNestSharp.Ui.Localization;
 
-  /// <summary>A rectangle, a circle or a washer, its size and how many: a part without a drawing.</summary>
+  /// <summary>
+  /// A part without a drawing: one of <see cref="PartShapes.Kinds"/>, a preset or custom sizes, and how many.
+  /// The fields are built from the shape, so a new shape needs no change here.
+  /// </summary>
   public partial class AddShapeWindow : Window
   {
-    private const int StandardWasher = 0;
-    private const int WideWasher = 1;
-    private const int CustomWasher = 2;
-
-    // The next shape usually looks like the last one: keep what was typed for the session.
-    private static PartShape lastShape = PartShape.Rectangle;
-    private static double lastWidth = 100;
-    private static double lastHeight = 100;
+    // The next shape usually looks like the last one: keep what was typed, per shape, for the session.
+    private static readonly Dictionary<ShapeKind, double[]> LastValues = new Dictionary<ShapeKind, double[]>();
+    private static readonly Dictionary<ShapeKind, int> LastPreset = new Dictionary<ShapeKind, int>();
+    private static ShapeKind lastKind = PartShapes.Rectangle;
     private static int lastQuantity = 1;
-    private static int lastWasherKind = StandardWasher;
-    private static int lastWasherSize;
-    private static double lastWasherOuter = 30;
-    private static double lastWasherHole = 10;
 
     private readonly bool millimetres;
-    private bool ready;
+    private readonly string unit;
+    private readonly ComboBox kindCombo = new ComboBox { MinWidth = 170 };
+    private readonly ComboBox presetCombo = new ComboBox { MinWidth = 170 };
+    private readonly IntegerUpDown qtyUpDown = new IntegerUpDown { Minimum = 1, Maximum = 100000, Value = 1 };
+    private readonly List<DoubleUpDown> fields = new List<DoubleUpDown>();
+    private bool building;
 
     public AddShapeWindow(bool millimetres)
     {
       InitializeComponent();
       this.millimetres = millimetres;
-      string units = Localization.Get(millimetres ? "Unit_Mm" : "Unit_In");
+      this.unit = Localization.Get(millimetres ? "Unit_Mm" : "Unit_In");
 
-      this.widthUnits.Text = units;
-      this.heightUnits.Text = units;
+      foreach (var kind in PartShapes.Kinds)
+      {
+        this.kindCombo.Items.Add(Localization.Get(kind.NameKey));
+      }
+
+      this.kindCombo.SelectionChanged += (_, __) => this.Build();
+      this.presetCombo.SelectionChanged += (_, __) => this.ApplyPreset();
       this.qtyUpDown.Value = lastQuantity;
-      this.washerSizeCombo.ItemsSource = PartShapes.Washers;
-      this.washerSizeCombo.SelectedIndex = lastWasherSize;
-      this.washerKindCombo.SelectedIndex = lastWasherKind;
-      this.circleRadio.IsChecked = lastShape == PartShape.Circle;
-      this.washerRadio.IsChecked = lastShape == PartShape.Washer;
-      this.ready = true;
-      this.ShowShape(restore: true);
+      this.kindCombo.SelectedIndex = Math.Max(0, PartShapes.Kinds.ToList().IndexOf(lastKind));
 
       this.Loaded += (_, __) => this.Dispatcher.BeginInvoke(
         System.Windows.Threading.DispatcherPriority.Input,
         new Action(() =>
         {
-          var first = this.widthUpDown.IsEnabled ? this.widthUpDown : (Control)this.qtyUpDown;
+          Control first = this.fields.FirstOrDefault(f => f.IsEnabled) ?? (Control)this.qtyUpDown;
           first.Focus();
           if (first.Template?.FindName("PART_TextBox", first) is TextBox box)
           {
@@ -57,115 +59,171 @@ namespace DeepNestSharp.Ui.Views
         }));
     }
 
-    public PartShape Shape { get; private set; }
+    public ShapeKind Kind { get; private set; }
 
-    /// <summary>The width, the diameter of a circle, or the outside of a washer.</summary>
-    public double ShapeWidth { get; private set; }
+    /// <summary>The shape's parameters, in the drawing's units.</summary>
+    public IReadOnlyList<double> Values { get; private set; }
 
-    /// <summary>The height, or the hole of a washer.</summary>
-    public double ShapeHeight { get; private set; }
+    /// <summary>The preset chosen, or null for custom sizes.</summary>
+    public ShapePreset Preset { get; private set; }
 
     public int Quantity { get; private set; }
 
-    /// <summary>"M8" for a standard or wide washer; null for any other shape.</summary>
-    public string WasherThread { get; private set; }
+    private ShapeKind CurrentKind => PartShapes.Kinds[Math.Max(0, this.kindCombo.SelectedIndex)];
 
-    public bool WideWasherChosen { get; private set; }
+    private ShapePreset CurrentPreset
+      => this.presetCombo.SelectedIndex >= 0 && this.presetCombo.SelectedIndex < this.CurrentKind.Presets.Count
+        ? this.CurrentKind.Presets[this.presetCombo.SelectedIndex]
+        : null;
 
-    private PartShape Chosen => this.washerRadio.IsChecked == true ? PartShape.Washer
-      : this.circleRadio.IsChecked == true ? PartShape.Circle : PartShape.Rectangle;
+    /// <summary>Millimetres to the drawing's units.</summary>
+    private double FromMm(double mm) => this.millimetres ? mm : Math.Round(mm / 25.4, 4);
 
-    private void OnShapeChanged(object sender, RoutedEventArgs e) => this.ShowShape(restore: true);
-
-    private void OnWasherChanged(object sender, SelectionChangedEventArgs e) => this.ShowShape(restore: false);
-
-    /// <summary>Labels and fields for the chosen shape. A standard or wide washer fills in its sizes and locks
-    /// them; restore puts back what was last typed for the shape.</summary>
-    private void ShowShape(bool restore)
+    /// <summary>Lays out the rows for the chosen shape: shape, preset (if it has any), its parameters, quantity.</summary>
+    private void Build()
     {
-      if (!this.ready)
+      this.building = true;
+      var kind = this.CurrentKind;
+      var grid = this.fieldsGrid;
+      grid.Children.Clear();
+      grid.RowDefinitions.Clear();
+      this.fields.Clear();
+      int row = 0;
+
+      void Row(string labelKey, FrameworkElement field, bool withUnit)
+      {
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        var label = new TextBlock { Text = Localization.Get(labelKey), VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 10, 6) };
+        Grid.SetRow(label, row);
+        grid.Children.Add(label);
+        field.Margin = new Thickness(0, 0, 0, 6);
+        Grid.SetRow(field, row);
+        Grid.SetColumn(field, 1);
+        if (field is ComboBox)
+        {
+          Grid.SetColumnSpan(field, 2);
+        }
+
+        grid.Children.Add(field);
+        if (withUnit)
+        {
+          var units = new TextBlock { Text = this.unit, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(6, 0, 0, 6), Foreground = (System.Windows.Media.Brush)this.FindResource("Brush.TextMuted") };
+          Grid.SetRow(units, row);
+          Grid.SetColumn(units, 2);
+          grid.Children.Add(units);
+        }
+
+        row++;
+      }
+
+      Row("Shape_Kind", this.kindCombo, false);
+
+      this.presetCombo.Items.Clear();
+      if (kind.Presets.Count > 0)
+      {
+        foreach (var preset in kind.Presets)
+        {
+          this.presetCombo.Items.Add(Localization.Get(preset.LabelKey) + " " + preset.Detail);
+        }
+
+        this.presetCombo.Items.Add(Localization.Get("Shape_Custom"));
+        Row("Shape_Preset", this.presetCombo, false);
+      }
+
+      double[] remembered = LastValues.TryGetValue(kind, out var v) ? v : kind.Parameters.Select(p => this.FromMm(p.DefaultMm)).ToArray();
+      for (int i = 0; i < kind.Parameters.Count; i++)
+      {
+        var field = new DoubleUpDown { Minimum = 0, Maximum = 100000, FormatString = "0.###", Value = remembered[i] };
+        field.ValueChanged += (_, __) => this.ShowSummary();
+        this.fields.Add(field);
+        Row(kind.Parameters[i].LabelKey, field, true);
+      }
+
+      Row("Shape_Quantity", this.qtyUpDown, false);
+
+      this.building = false;
+      if (kind.Presets.Count > 0)
+      {
+        this.presetCombo.SelectedIndex = LastPreset.TryGetValue(kind, out int p) ? p : 0;
+      }
+
+      this.ApplyPreset();
+    }
+
+    /// <summary>A preset fills in and locks the values it sets; custom unlocks them.</summary>
+    private void ApplyPreset()
+    {
+      if (this.building)
       {
         return;
       }
 
-      var shape = this.Chosen;
-      bool washer = shape == PartShape.Washer;
-      bool standard = washer && this.washerKindCombo.SelectedIndex != CustomWasher;
-
-      var washerVisibility = washer ? Visibility.Visible : Visibility.Collapsed;
-      this.washerKindLabel.Visibility = washerVisibility;
-      this.washerKindPanel.Visibility = washerVisibility;
-      this.washerSizeCombo.Visibility = standard ? Visibility.Visible : Visibility.Collapsed;
-
-      this.widthLabel.Text = Localization.Get(shape switch
+      var preset = this.CurrentPreset;
+      for (int i = 0; i < this.fields.Count; i++)
       {
-        PartShape.Circle => "Shape_Diameter",
-        PartShape.Washer => "Shape_OuterDiameter",
-        _ => "Shape_Width",
-      });
-      this.heightLabel.Text = Localization.Get(washer ? "Shape_HoleDiameter" : "Shape_Height");
-      var heightVisibility = shape == PartShape.Circle ? Visibility.Collapsed : Visibility.Visible;
-      this.heightLabel.Visibility = heightVisibility;
-      this.heightUpDown.Visibility = heightVisibility;
-      this.heightUnits.Visibility = heightVisibility;
+        bool set = preset != null && preset.ValuesMm.ContainsKey(i);
+        if (set)
+        {
+          this.fields[i].Value = this.FromMm(preset.ValuesMm[i]);
+        }
 
-      this.widthUpDown.IsEnabled = !standard;
-      this.heightUpDown.IsEnabled = !standard;
-      if (standard && this.washerSizeCombo.SelectedItem is WasherSize size)
-      {
-        double scale = this.millimetres ? 1 : 1 / 25.4;
-        this.widthUpDown.Value = Math.Round((this.washerKindCombo.SelectedIndex == WideWasher ? size.WideOuter : size.Outer) * scale, 3);
-        this.heightUpDown.Value = Math.Round(size.Hole * scale, 3);
+        this.fields[i].IsEnabled = !set;
       }
-      else if (restore || (washer && !standard))
+
+      this.ShowSummary();
+    }
+
+    private double[] Read()
+    {
+      foreach (var f in this.fields)
       {
-        this.widthUpDown.Value = washer ? lastWasherOuter : lastWidth;
-        this.heightUpDown.Value = washer ? lastWasherHole : lastHeight;
+        f.CommitInput();
       }
+
+      return this.fields.Select(f => f.Value ?? 0).ToArray();
+    }
+
+    /// <summary>What the values will make, or what is wrong with them.</summary>
+    private void ShowSummary()
+    {
+      if (this.building || this.fields.Count == 0)
+      {
+        return;
+      }
+
+      var values = this.fields.Select(f => f.Value ?? 0).ToArray();
+      string problem = this.CurrentKind.Problem(values);
+      string summary = problem == null ? this.CurrentKind.Describe(values, Localization.Get, this.unit) : null;
+      this.problemText.Text = problem == null ? string.Empty : Localization.Get(problem);
+      this.problemText.Visibility = problem == null ? Visibility.Collapsed : Visibility.Visible;
+      this.summaryText.Text = summary ?? string.Empty;
+      this.summaryText.Visibility = summary == null ? Visibility.Collapsed : Visibility.Visible;
+      this.addButton.IsEnabled = problem == null;
     }
 
     private void OnOk(object sender, RoutedEventArgs e)
     {
       // Typed text only reaches Value on focus loss, and Enter presses this button without one.
-      this.widthUpDown.CommitInput();
-      this.heightUpDown.CommitInput();
+      var values = this.Read();
       this.qtyUpDown.CommitInput();
+      var kind = this.CurrentKind;
+      if (kind.Problem(values) != null)
+      {
+        this.ShowSummary();
+        return;
+      }
 
-      this.Shape = this.Chosen;
-      this.ShapeWidth = this.widthUpDown.Value ?? 0;
-      this.ShapeHeight = this.Shape == PartShape.Circle ? this.ShapeWidth : this.heightUpDown.Value ?? 0;
+      this.Kind = kind;
+      this.Values = values;
+      this.Preset = this.CurrentPreset;
       this.Quantity = this.qtyUpDown.Value ?? 1;
-      if (!(this.ShapeWidth > 0) || !(this.ShapeHeight > 0))
-      {
-        return;
-      }
 
-      bool standard = this.Shape == PartShape.Washer && this.washerKindCombo.SelectedIndex != CustomWasher;
-      if (this.Shape == PartShape.Washer && !(this.ShapeHeight < this.ShapeWidth))
-      {
-        this.heightUpDown.Focus();
-        return;
-      }
-
-      this.WasherThread = standard ? (this.washerSizeCombo.SelectedItem as WasherSize)?.Thread : null;
-      this.WideWasherChosen = standard && this.washerKindCombo.SelectedIndex == WideWasher;
-
-      lastShape = this.Shape;
+      lastKind = kind;
       lastQuantity = this.Quantity;
-      if (this.Shape == PartShape.Washer)
+      LastValues[kind] = values;
+      if (kind.Presets.Count > 0)
       {
-        lastWasherKind = this.washerKindCombo.SelectedIndex;
-        lastWasherSize = Math.Max(0, this.washerSizeCombo.SelectedIndex);
-        if (!standard)
-        {
-          lastWasherOuter = this.ShapeWidth;
-          lastWasherHole = this.ShapeHeight;
-        }
-      }
-      else
-      {
-        lastWidth = this.ShapeWidth;
-        lastHeight = this.Shape == PartShape.Circle ? lastHeight : this.ShapeHeight;
+        LastPreset[kind] = this.presetCombo.SelectedIndex;
       }
 
       this.DialogResult = true;
