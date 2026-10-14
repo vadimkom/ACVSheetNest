@@ -1,0 +1,1607 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_BasedOn" xml:space="preserve">
+    <value>Базирано на проекти с отворен код</value>
+  </data>
+  <data name="About_Contributors" xml:space="preserve">
+    <value>Сътрудници</value>
+  </data>
+  <data name="About_DeepNest" xml:space="preserve">
+    <value>оригиналният DeepNest</value>
+  </data>
+  <data name="About_DeepNestPort" xml:space="preserve">
+    <value>порт на DeepNest на C# (WinForms)</value>
+  </data>
+  <data name="About_DeepNestSharp" xml:space="preserve">
+    <value>порт на DeepNest на C# / WPF, от който произлиза SheetNest</value>
+  </data>
+  <data name="About_Dxf" xml:space="preserve">
+    <value>четене и запис на DXF</value>
+  </data>
+  <data name="About_DxfExport" xml:space="preserve">
+    <value>експорт в DXF</value>
+  </data>
+  <data name="About_Engine" xml:space="preserve">
+    <value>двигателят за разкрой (MIT) и геометричната му библиотека jagua-rs (MPL-2.0)</value>
+  </data>
+  <data name="About_License" xml:space="preserve">
+    <value>Софтуер с отворен код, лиценз MIT.</value>
+  </data>
+  <data name="About_NetCore" xml:space="preserve">
+    <value>пренасяне към .NET Core</value>
+  </data>
+  <data name="About_Simplify" xml:space="preserve">
+    <value>опростяване на контурите</value>
+  </data>
+  <data name="About_Summary" xml:space="preserve">
+    <value>SheetNest — програма за разкрой на листов материал: внасяне на DXF, автоматично разполагане на детайлите по листовете, ръчна корекция, рязане по обща линия, експорт в DXF и производствен отчет в PDF.</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>За SheetNest {0}</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Версия {0}</value>
+  </data>
+  <data name="Btn_Add" xml:space="preserve">
+    <value>Добави</value>
+  </data>
+  <data name="Btn_AddDxf" xml:space="preserve">
+    <value>+ Добави DXF...</value>
+  </data>
+  <data name="Btn_AddShape" xml:space="preserve">
+    <value>+ Фигура...</value>
+  </data>
+  <data name="Btn_AddSheet" xml:space="preserve">
+    <value>+ Добави лист...</value>
+  </data>
+  <data name="Btn_BackToNesting" xml:space="preserve">
+    <value>⮜ Назад към нестинга</value>
+  </data>
+  <data name="Btn_BackToParts" xml:space="preserve">
+    <value>⮜ Назад към моделите</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>Отказ</value>
+  </data>
+  <data name="Btn_ClearAll" xml:space="preserve">
+    <value>Изчисти всичко</value>
+  </data>
+  <data name="Btn_ClearRuns" xml:space="preserve">
+    <value>Изчисти списъка</value>
+  </data>
+  <data name="Btn_Close" xml:space="preserve">
+    <value>Затвори</value>
+  </data>
+  <data name="Btn_CutRenest" xml:space="preserve">
+    <value>✂ Изрязани — разкрой остатъка</value>
+  </data>
+  <data name="Btn_DeletePart" xml:space="preserve">
+    <value>Изтрий детайл</value>
+  </data>
+  <data name="Btn_DeleteSheet" xml:space="preserve">
+    <value>Изтрий лист</value>
+  </data>
+  <data name="Btn_Divide" xml:space="preserve">
+    <value>÷ Раздели</value>
+  </data>
+  <data name="Btn_EditDetails" xml:space="preserve">
+    <value>⚙ Подробности...</value>
+  </data>
+  <data name="Btn_EditSheet" xml:space="preserve">
+    <value>✎ Промени...</value>
+  </data>
+  <data name="Btn_ExportDxf" xml:space="preserve">
+    <value>Експорт в DXF...</value>
+  </data>
+  <data name="Btn_ExportPdf" xml:space="preserve">
+    <value>Експорт в PDF...</value>
+  </data>
+  <data name="Btn_GoToLayout" xml:space="preserve">
+    <value>Към разкроя ➔</value>
+  </data>
+  <data name="Btn_GoToNestingShort" xml:space="preserve">
+    <value>Към нестинга</value>
+  </data>
+  <data name="Btn_Multiply" xml:space="preserve">
+    <value>× Умножи</value>
+  </data>
+  <data name="Btn_NestCut" xml:space="preserve">
+    <value>▶ Разкрой</value>
+  </data>
+  <data name="Btn_NestDraft" xml:space="preserve">
+    <value>⚡ Чернова</value>
+  </data>
+  <data name="Btn_New" xml:space="preserve">
+    <value>Нов</value>
+  </data>
+  <data name="Btn_NextNesting" xml:space="preserve">
+    <value>Напред: Нестинг ➔</value>
+  </data>
+  <data name="Btn_NextSheets" xml:space="preserve">
+    <value>Напред: Листове ➔</value>
+  </data>
+  <data name="Btn_OK" xml:space="preserve">
+    <value>ОК</value>
+  </data>
+  <data name="Btn_Open" xml:space="preserve">
+    <value>Отвори...</value>
+  </data>
+  <data name="Btn_PrintReport" xml:space="preserve">
+    <value>🖨 Печат на отчет...</value>
+  </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>Запази</value>
+  </data>
+  <data name="Btn_StartNest" xml:space="preserve">
+    <value>▶ Старт нестинг</value>
+  </data>
+  <data name="Btn_StopNest" xml:space="preserve">
+    <value>⏹ Спри</value>
+  </data>
+  <data name="Btn_ZoomPage" xml:space="preserve">
+    <value>▣ Цяла страница</value>
+  </data>
+  <data name="Chk_Unlimited" xml:space="preserve">
+    <value>Без ограничение</value>
+  </data>
+  <data name="Col_Actions" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="Col_AvailableUsed" xml:space="preserve">
+    <value>Достъпно / Използвано</value>
+  </data>
+  <data name="Col_Color" xml:space="preserve">
+    <value>Цвят</value>
+  </data>
+  <data name="Col_Dimensions" xml:space="preserve">
+    <value>Габарити (Ш × В)</value>
+  </data>
+  <data name="Col_Mirrored" xml:space="preserve">
+    <value>Огледални</value>
+  </data>
+  <data name="Col_NetArea" xml:space="preserve">
+    <value>Площ</value>
+  </data>
+  <data name="Col_PartName" xml:space="preserve">
+    <value>Детайл (Име / Файл)</value>
+  </data>
+  <data name="Col_Preview" xml:space="preserve">
+    <value>Скица</value>
+  </data>
+  <data name="Col_Priority" xml:space="preserve">
+    <value>Приоритет</value>
+  </data>
+  <data name="Col_Quantity" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="Col_RunNum" xml:space="preserve">
+    <value>№</value>
+  </data>
+  <data name="Col_RunPlaced" xml:space="preserve">
+    <value>Разположени</value>
+  </data>
+  <data name="Col_RunSheets" xml:space="preserve">
+    <value>Листове</value>
+  </data>
+  <data name="Col_RunTime" xml:space="preserve">
+    <value>Време</value>
+  </data>
+  <data name="Col_RunUtil" xml:space="preserve">
+    <value>Оползотворяване</value>
+  </data>
+  <data name="Col_SheetPriority" xml:space="preserve">
+    <value>Приоритет</value>
+  </data>
+  <data name="Col_SheetSize" xml:space="preserve">
+    <value>Размер на листа (Ш × В)</value>
+  </data>
+  <data name="Col_Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Col_Unlimited" xml:space="preserve">
+    <value>Без ограничение</value>
+  </data>
+  <data name="Crash_Copy" xml:space="preserve">
+    <value>Копирай подробностите</value>
+  </data>
+  <data name="Crash_Explain" xml:space="preserve">
+    <value>Докладването помага грешката да бъде поправена. Бутонът по-долу отваря в браузъра попълнен проблем в GitHub — там може да прегледате всичко и НИЩО не се изпраща, докато сами не го изпратите.</value>
+  </data>
+  <data name="Crash_Header" xml:space="preserve">
+    <value>В SheetNest възникна проблем.</value>
+  </data>
+  <data name="Crash_NoBrowser" xml:space="preserve">
+    <value>Браузърът не можа да се отвори. Натиснете „Копирай подробностите“ и ги поставете в нов проблем на github.com/ManuelMRosa/SheetNest/issues.</value>
+  </data>
+  <data name="Crash_NoLog" xml:space="preserve">
+    <value>(дневникът не можа да бъде записан)</value>
+  </data>
+  <data name="Crash_Report" xml:space="preserve">
+    <value>Докладвай в GitHub</value>
+  </data>
+  <data name="Crash_SavedTo" xml:space="preserve">
+    <value>Докладът за грешката е записан в:</value>
+  </data>
+  <data name="Crash_Title" xml:space="preserve">
+    <value>SheetNest — доклад за проблем</value>
+  </data>
+  <data name="Cut_Badge" xml:space="preserve">
+    <value>✂ изрязан</value>
+  </data>
+  <data name="Cut_BadgeN" xml:space="preserve">
+    <value>✂ {0} от {1}</value>
+  </data>
+  <data name="Cut_OfCount" xml:space="preserve">
+    <value>от {0}</value>
+  </data>
+  <data name="Cut_Summary" xml:space="preserve">
+    <value>Отбелязани: {0} л., {1} дет.</value>
+  </data>
+  <data name="Dxf_CommonLineLocked" xml:space="preserve">
+    <value>детайлите със споделен срез са заключени · стартирайте нестинга отново за промяна</value>
+  </data>
+  <data name="Dxf_Distance" xml:space="preserve">
+    <value>разстояние: {0}  ·  X: {1}  ·  Y: {2}</value>
+  </data>
+  <data name="Dxf_EditNavHint" xml:space="preserve">
+    <value>влачете детайл за преместване  ·  Alt+пускане = прилепване  ·  стрелки = преместване  ·  Esc = отказ</value>
+  </data>
+  <data name="Dxf_EditNest" xml:space="preserve">
+    <value>✋ Ръчна корекция</value>
+  </data>
+  <data name="Dxf_EditNestTip" xml:space="preserve">
+    <value>Ръчна корекция на разкроя: кликнете детайл за избор, влачете с мишката, завъртайте с бутоните.</value>
+  </data>
+  <data name="Dxf_EmptyHint" xml:space="preserve">
+    <value>Стартирайте нестинг, за да видите резултата тук.</value>
+  </data>
+  <data name="Dxf_FullSheet" xml:space="preserve">
+    <value>Пълен лист</value>
+  </data>
+  <data name="Dxf_Gap" xml:space="preserve">
+    <value>разстояние {0}</value>
+  </data>
+  <data name="Dxf_Layout" xml:space="preserve">
+    <value>Разкрой {0}</value>
+  </data>
+  <data name="Dxf_Measure" xml:space="preserve">
+    <value>Измерване</value>
+  </data>
+  <data name="Dxf_MeasureAgain" xml:space="preserve">
+    <value>  ·  щракнете, за да измерите отново</value>
+  </data>
+  <data name="Dxf_MeasureTip" xml:space="preserve">
+    <value>Измерване на разстояния: посочете две точки на чертежа.</value>
+  </data>
+  <data name="Dxf_Mirror" xml:space="preserve">
+    <value>⇄ Огледално</value>
+  </data>
+  <data name="Dxf_MirrorTip" xml:space="preserve">
+    <value>Огледално обръщане на избрания детайл</value>
+  </data>
+  <data name="Dxf_MoveNoRoom" xml:space="preserve">
+    <value>Няма свободно място: детайлът е червен — преместете го ръчно или отменете (Ctrl+Z)</value>
+  </data>
+  <data name="Dxf_MoveToSheet" xml:space="preserve">
+    <value>⇄ На лист…</value>
+  </data>
+  <data name="Dxf_MoveToSheetNone" xml:space="preserve">
+    <value>Преместване е възможно между единични листове без общо рязане</value>
+  </data>
+  <data name="Dxf_MoveToSheetTip" xml:space="preserve">
+    <value>Премести избрания детайл на друг лист: застава на първото свободно място</value>
+  </data>
+  <data name="Dxf_NavHint" xml:space="preserve">
+    <value>колелце = мащабиране  ·  влачене с колелце = преместване  ·  десен клик = побиране в екрана</value>
+  </data>
+  <data name="Dxf_NestN" xml:space="preserve">
+    <value>Разкрой {0}/{1}</value>
+  </data>
+  <data name="Dxf_NextLayout" xml:space="preserve">
+    <value>Следващ разкрой</value>
+  </data>
+  <data name="Dxf_NotANumber" xml:space="preserve">
+    <value>това не е число  ·  детайлът остана на мястото си</value>
+  </data>
+  <data name="Dxf_PartStatus" xml:space="preserve">
+    <value>{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}</value>
+  </data>
+  <data name="Dxf_PartsOnSheet" xml:space="preserve">
+    <value>{0} дет.</value>
+  </data>
+  <data name="Dxf_PrevLayout" xml:space="preserve">
+    <value>Предишен разкрой</value>
+  </data>
+  <data name="Dxf_RedoTip" xml:space="preserve">
+    <value>Повтори (Ctrl+Y)</value>
+  </data>
+  <data name="Dxf_RemainderSheet" xml:space="preserve">
+    <value>Остатъчен лист</value>
+  </data>
+  <data name="Dxf_RotateCcw5Tip" xml:space="preserve">
+    <value>Завърти на 5° обратно на часовниковата стрелка</value>
+  </data>
+  <data name="Dxf_RotateCcw90Tip" xml:space="preserve">
+    <value>Завърти на 90° обратно на часовниковата стрелка</value>
+  </data>
+  <data name="Dxf_RotateCw5Tip" xml:space="preserve">
+    <value>Завърти на 5° по часовниковата стрелка</value>
+  </data>
+  <data name="Dxf_RotateCw90Tip" xml:space="preserve">
+    <value>Завърти на 90° по часовниковата стрелка</value>
+  </data>
+  <data name="Dxf_UndoTip" xml:space="preserve">
+    <value>Отмени (Ctrl+Z)</value>
+  </data>
+  <data name="Effort_Best" xml:space="preserve">
+    <value>Best (Дълбоко търсене)</value>
+  </data>
+  <data name="Effort_Fast" xml:space="preserve">
+    <value>Fast (Бърз)</value>
+  </data>
+  <data name="Effort_Normal" xml:space="preserve">
+    <value>Normal (Стандартен)</value>
+  </data>
+  <data name="Hint_DragDrop" xml:space="preserve">
+    <value>💡 Можете да пуснете DXF файлове директно в таблицата (Drag &amp; Drop)</value>
+  </data>
+  <data name="Hint_MarkCut" xml:space="preserve">
+    <value>Отбележете листовете, които вече са изрязани</value>
+  </data>
+  <data name="Hint_RunsList" xml:space="preserve">
+    <value>💡 Всяко натискане на „Чернова“ или „Разкрой“ добавя готов разкрой на цялата поръчка (черновите са отбелязани); еднаквите не се повтарят. Отгоре е най-добрият (★): всички детайли, по-малко листове, повече използван метал. Щракване — преглед, двойно — към разкроя.</value>
+  </data>
+  <data name="Kpi_PartsPlaced" xml:space="preserve">
+    <value>Разположени детайли:</value>
+  </data>
+  <data name="Kpi_SheetsUsed" xml:space="preserve">
+    <value>Използвани листове:</value>
+  </data>
+  <data name="Kpi_Unplaced" xml:space="preserve">
+    <value>Непоместени:</value>
+  </data>
+  <data name="Kpi_Utilization" xml:space="preserve">
+    <value>Общо оползотворяване:</value>
+  </data>
+  <data name="Lbl_Material" xml:space="preserve">
+    <value>Материал:</value>
+  </data>
+  <data name="Lbl_Multiplier" xml:space="preserve">
+    <value>Множител (комплекти):</value>
+  </data>
+  <data name="Lbl_NestingEffort" xml:space="preserve">
+    <value>Усилия за нестинг:</value>
+  </data>
+  <data name="Lbl_RunsList" xml:space="preserve">
+    <value>Варианти на разкроя:</value>
+  </data>
+  <data name="Lbl_SheetCut" xml:space="preserve">
+    <value>изрязан</value>
+  </data>
+  <data name="Lbl_SheetEdgeMargin" xml:space="preserve">
+    <value>Отстъп от края на листа:</value>
+  </data>
+  <data name="Lbl_SheetsCut" xml:space="preserve">
+    <value>изрязани</value>
+  </data>
+  <data name="Lbl_Thickness" xml:space="preserve">
+    <value>Дебелина:</value>
+  </data>
+  <data name="Mat_None" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="Mat_aluminium" xml:space="preserve">
+    <value>Алуминий</value>
+  </data>
+  <data name="Mat_black" xml:space="preserve">
+    <value>Черна стомана</value>
+  </data>
+  <data name="Mat_galvanized" xml:space="preserve">
+    <value>Поцинкована стомана</value>
+  </data>
+  <data name="Mat_stainless" xml:space="preserve">
+    <value>Неръждаема стомана</value>
+  </data>
+  <data name="Menu_About" xml:space="preserve">
+    <value>За програмата</value>
+  </data>
+  <data name="Menu_AdvancedSettings" xml:space="preserve">
+    <value>Разширени настройки...</value>
+  </data>
+  <data name="Menu_CheckUpdates" xml:space="preserve">
+    <value>Провери за обновления...</value>
+  </data>
+  <data name="Menu_CustomSize" xml:space="preserve">
+    <value>Индивидуален размер…</value>
+  </data>
+  <data name="Menu_Exit" xml:space="preserve">
+    <value>Изход</value>
+  </data>
+  <data name="Menu_File" xml:space="preserve">
+    <value>_Файл</value>
+  </data>
+  <data name="Menu_Help" xml:space="preserve">
+    <value>_Помощ</value>
+  </data>
+  <data name="Menu_Language" xml:space="preserve">
+    <value>_Език (Language)</value>
+  </data>
+  <data name="Menu_MySheets" xml:space="preserve">
+    <value>Мои размери</value>
+  </data>
+  <data name="Menu_NewProject" xml:space="preserve">
+    <value>Нов проект</value>
+  </data>
+  <data name="Menu_Offcut" xml:space="preserve">
+    <value>Изрезки на листа...</value>
+  </data>
+  <data name="Menu_OpenProject" xml:space="preserve">
+    <value>Отвори проект...</value>
+  </data>
+  <data name="Menu_RecentEmpty" xml:space="preserve">
+    <value>(празно)</value>
+  </data>
+  <data name="Menu_RecentProjects" xml:space="preserve">
+    <value>Скорошни проекти</value>
+  </data>
+  <data name="Menu_RemoveMySheets" xml:space="preserve">
+    <value>Премахни от моите размери</value>
+  </data>
+  <data name="Menu_Save" xml:space="preserve">
+    <value>Запази</value>
+  </data>
+  <data name="Menu_SaveAs" xml:space="preserve">
+    <value>Запази като...</value>
+  </data>
+  <data name="Menu_SendFeedback" xml:space="preserve">
+    <value>Обратна връзка...</value>
+  </data>
+  <data name="Menu_Settings" xml:space="preserve">
+    <value>_Настройки</value>
+  </data>
+  <data name="Msg_AddPartsFirst" xml:space="preserve">
+    <value>Първо отворете проект и добавете детайли.</value>
+  </data>
+  <data name="Msg_AddSheetsFirst" xml:space="preserve">
+    <value>Първо добавете поне един лист в раздела „Листове“.</value>
+  </data>
+  <data name="Msg_AllCut" xml:space="preserve">
+    <value>Всичко е изрязано: няма останали детайли за разкрой.</value>
+  </data>
+  <data name="Msg_CannotUse" xml:space="preserve">
+    <value>{0} не може да се използва:
+
+{1}</value>
+  </data>
+  <data name="Msg_ClearPartsConfirm" xml:space="preserve">
+    <value>Да се изчисти ли целият списък с детайли?</value>
+  </data>
+  <data name="Msg_CommonLineSkipped" xml:space="preserve">
+    <value>Рязането по обща линия е пропуснато за:
+
+{0}
+
+Тези детайли запазиха нормалното разстояние.</value>
+  </data>
+  <data name="Msg_CutRenestConfirm" xml:space="preserve">
+    <value>Отбелязани като изрязани: {0} л., с {1} дет.
+
+Тези детайли се махат от поръчката (количествата в таблицата намаляват), листовете остават изписани, и остатъкът се разкроява наново.
+
+Продължаване?</value>
+  </data>
+  <data name="Msg_EditLeave" xml:space="preserve">
+    <value>Да се излезе ли въпреки това?</value>
+  </data>
+  <data name="Msg_EditUndoLeave" xml:space="preserve">
+    <value>Да се отменят ли промените и да се излезе?</value>
+  </data>
+  <data name="Msg_EditUnfit" xml:space="preserve">
+    <value>Детайли в този разкрой, които не са готови за рязане: {0}{1}.
+
+Те са оцветени в червено. Раздалечете ги, преди да излезете от корекцията.
+
+</value>
+  </data>
+  <data name="Msg_ExportOverwrite" xml:space="preserve">
+    <value>Тези файлове вече съществуват и ще бъдат презаписани:
+
+{0}
+
+Продължаване?</value>
+  </data>
+  <data name="Msg_FileMissing" xml:space="preserve">
+    <value>{0} не е намерен.</value>
+  </data>
+  <data name="Msg_FlipFailed" xml:space="preserve">
+    <value>Неуспешно обръщане на {0}: {1}</value>
+  </data>
+  <data name="Msg_MixedSvgDxf" xml:space="preserve">
+    <value>Не може да се експортира, когато сред детайлите има и SVG, и DXF.</value>
+  </data>
+  <data name="Msg_NestFirstExport" xml:space="preserve">
+    <value>Първо направете разкрой и изберете резултат, след това експортирайте.</value>
+  </data>
+  <data name="Msg_NestFirstReport" xml:space="preserve">
+    <value>Първо направете разкрой и изберете резултат, след това запазете отчета.</value>
+  </data>
+  <data name="Msg_NestFirstToPrint" xml:space="preserve">
+    <value>Първо изпълнете нестинг и изберете резултат за печат.</value>
+  </data>
+  <data name="Msg_NoBrowserFeedback" xml:space="preserve">
+    <value>Браузърът не можа да се отвори. Можете да изпратите обратна връзка тук:
+https://github.com/ManuelMRosa/SheetNest/issues</value>
+  </data>
+  <data name="Msg_NoEngine" xml:space="preserve">
+    <value>Двигателят за разкрой (sparrow.exe) не е намерен. Той се доставя с програмата: преинсталирайте я или задайте пътя в променливата на средата SHEETNEST_SPARROW.</value>
+  </data>
+  <data name="Msg_NoResult" xml:space="preserve">
+    <value>Разкроят не даде резултат.</value>
+  </data>
+  <data name="Msg_NoShape" xml:space="preserve">
+    <value>В {0} няма контур, който може да се разполага.</value>
+  </data>
+  <data name="Msg_NotEnoughSheets" xml:space="preserve">
+    <value>Детайли, които не се побраха на {1} налични листа: {0}.
+
+Увеличете броя листове в раздела „Листове“, отметнете „Без ограничение“ за някой размер или добавете лист и стартирайте разкроя отново.</value>
+  </data>
+  <data name="Msg_NotReadyToCut" xml:space="preserve">
+    <value>Детайли, които не са готови за рязане: {0}
+
+{1}
+
+Те са оцветени в червено. Раздалечете ги с ръчна корекция и опитайте отново.</value>
+  </data>
+  <data name="Msg_PartsDoNotFit" xml:space="preserve">
+    <value>Детайли, които не се побират на нито един размер лист в раздела „Листове“: {0}.
+
+Не листовете са ограничението — един от размерите е без ограничение. Детайлът е по-голям от всеки лист, на който може да легне: добавете по-голям лист (или проверете разстоянието на детайла и отстъпа).</value>
+  </data>
+  <data name="Msg_PrintError" xml:space="preserve">
+    <value>Грешка при печат</value>
+  </data>
+  <data name="Msg_ProfileFileBad" xml:space="preserve">
+    <value>Файлът с настройки на разкроя {0} не се чете, взети са стойностите по подразбиране:
+{1}</value>
+  </data>
+  <data name="Msg_Recover" xml:space="preserve">
+    <value>SheetNest се затвори неочаквано с незапазени промени в {0}{1}.
+
+Да се възстанови ли автоматично запазеният проект?</value>
+  </data>
+  <data name="Msg_RecoverUnsaved" xml:space="preserve">
+    <value>незапазен проект</value>
+  </data>
+  <data name="Msg_RecoverWhen" xml:space="preserve">
+    <value> (автоматично запазване {0})</value>
+  </data>
+  <data name="Msg_ReportWriteFailed" xml:space="preserve">
+    <value>Отчетът не можа да бъде записан: {0}</value>
+  </data>
+  <data name="Msg_SaveBeforeClosing" xml:space="preserve">
+    <value>Има резултат от разкроя. Да се запази ли проектът преди затваряне?</value>
+  </data>
+  <data name="Msg_SaveFailed" xml:space="preserve">
+    <value>Проектът не можа да се запази в
+{0}
+
+{1}
+
+Проектът не е запазен. Запазете го на друго място (Файл → Запази като).</value>
+  </data>
+  <data name="Msg_SaveFirst" xml:space="preserve">
+    <value>Има резултат от разкроя. Първо да се запази ли проектът?</value>
+  </data>
+  <data name="Msg_UnfitRow" xml:space="preserve">
+    <value>    {0}: детайли {1}{2}</value>
+  </data>
+  <data name="Msg_UnsupportedFiles" xml:space="preserve">
+    <value>Не може да се отвори: {0}.
+SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 (*.dxf, *.dfx, *.chf).</value>
+  </data>
+  <data name="Msg_UpToDate" xml:space="preserve">
+    <value>Използвате последната версия (SheetNest {0}).</value>
+  </data>
+  <data name="Msg_UpdateAvailable" xml:space="preserve">
+    <value>Налична е SheetNest {0} (вие имате {1}).
+
+Да се отвори ли страницата за изтегляне?</value>
+  </data>
+  <data name="Msg_UpdateFailed" xml:space="preserve">
+    <value>Проверката за обновления не бе успешна. Проверете връзката с интернет.</value>
+  </data>
+  <data name="Nest_Cancelled" xml:space="preserve">
+    <value>Разкроят е отменен</value>
+  </data>
+  <data name="Nest_Done" xml:space="preserve">
+    <value>Готово за {0}{1}</value>
+  </data>
+  <data name="Nest_GivenUp" xml:space="preserve">
+    <value>, неуспешни: {0}</value>
+  </data>
+  <data name="Nest_KeptNormal" xml:space="preserve">
+    <value>, чертежи с нормално разстояние: {0}</value>
+  </data>
+  <data name="Nest_LivePreview" xml:space="preserve">
+    <value>Търсене: {0} от {1} детайла, листове: {2}</value>
+  </data>
+  <data name="Nest_Running" xml:space="preserve">
+    <value>Разкрой…  {0}</value>
+  </data>
+  <data name="Nest_SharedCuts" xml:space="preserve">
+    <value>  ·  общи резове: {0}</value>
+  </data>
+  <data name="Nesting_VariantMetrics" xml:space="preserve">
+    <value>Вариант #{0}: Оползотворяване {1} | Разположени {2} | Листове: {3} (време: {4})</value>
+  </data>
+  <data name="Off_Auto" xml:space="preserve">
+    <value>Авто (най-добра изрезка)</value>
+  </data>
+  <data name="Off_AutoBadge" xml:space="preserve">
+    <value>АВТО</value>
+  </data>
+  <data name="Off_AutoTip" xml:space="preserve">
+    <value>Сравнява „В края“, „Отстрани“ и „И двете“ за получения разкрой и избира този, който освобождава най-много материал.</value>
+  </data>
+  <data name="Off_Both" xml:space="preserve">
+    <value>И двете (Г-образна)</value>
+  </data>
+  <data name="Off_BothTip" xml:space="preserve">
+    <value>Когато разкроят е оставил място от двете страни, остатъкът се отделя като два правоъгълника (гилотинни резове, така че нито един рез не разделя изрезката).</value>
+  </data>
+  <data name="Off_Enable" xml:space="preserve">
+    <value>Отрязвай остатъка като правоъгълна изрезка</value>
+  </data>
+  <data name="Off_EnableTip" xml:space="preserve">
+    <value>Измерва свободната площ, останала на последния лист след разкроя, и добавя линия на рязане, за да се отдели като използваем правоъгълник. Детайлите не се местят: разкроят вече е готов, когато това се изчислява, затова включването не променя разположението.</value>
+  </data>
+  <data name="Off_End" xml:space="preserve">
+    <value>В края на листа</value>
+  </data>
+  <data name="Off_EndTip" xml:space="preserve">
+    <value>Цяла ивица в края на дългата страна на листа — класическата изрезка.</value>
+  </data>
+  <data name="Off_MaxX" xml:space="preserve">
+    <value>Максимален размер по X ({0}):</value>
+  </data>
+  <data name="Off_MaxXTip" xml:space="preserve">
+    <value>Най-широката изрезка, която още си струва да се отреже. Ако е по-голяма, това е почти цял лист, затова нищо не се реже и листът остава цял. 0 = без ограничение.</value>
+  </data>
+  <data name="Off_MaxY" xml:space="preserve">
+    <value>Максимален размер по Y ({0}):</value>
+  </data>
+  <data name="Off_MaxYTip" xml:space="preserve">
+    <value>Най-дългата изрезка, която още си струва да се отреже. 0 = без ограничение.</value>
+  </data>
+  <data name="Off_MinX" xml:space="preserve">
+    <value>Минимален размер по X ({0}):</value>
+  </data>
+  <data name="Off_MinXTip" xml:space="preserve">
+    <value>Най-тясната изрезка, която си струва да се отреже. Под това листът остава цял. 0 = автоматично (5% от страната на листа).</value>
+  </data>
+  <data name="Off_MinY" xml:space="preserve">
+    <value>Минимален размер по Y ({0}):</value>
+  </data>
+  <data name="Off_MinYTip" xml:space="preserve">
+    <value>Най-късата изрезка, която си струва да се отреже. 0 = автоматично (5% от страната на листа).</value>
+  </data>
+  <data name="Off_Overlap" xml:space="preserve">
+    <value>Излизане на реза извън ръба ({0}):</value>
+  </data>
+  <data name="Off_OverlapTip" xml:space="preserve">
+    <value>Колко излиза резът ИЗВЪН ръба на листа от всяка страна, за да се отдели изрезката, а не да виси на мостче в ъглите. 0 = до ръба.</value>
+  </data>
+  <data name="Off_Position" xml:space="preserve">
+    <value>Позиция на изрезката</value>
+  </data>
+  <data name="Off_Reset" xml:space="preserve">
+    <value>Възстанови по подразбиране</value>
+  </data>
+  <data name="Off_ResetTip" xml:space="preserve">
+    <value>Връща шестте числа по-горе към препоръчаните стойности за единиците на чертежа. Позицията на изрезката и отметката за включване не се променят.</value>
+  </data>
+  <data name="Off_Side" xml:space="preserve">
+    <value>Отстрани на листа</value>
+  </data>
+  <data name="Off_SideTip" xml:space="preserve">
+    <value>Цяла ивица по късата страна на листа.</value>
+  </data>
+  <data name="Off_Spacing" xml:space="preserve">
+    <value>Разстояние до линията на рязане ({0}):</value>
+  </data>
+  <data name="Off_SpacingTip" xml:space="preserve">
+    <value>Разстояние между детайлите и линията на рязане на изрезката (в единиците на чертежа).</value>
+  </data>
+  <data name="Off_Title" xml:space="preserve">
+    <value>Изрезки на листа</value>
+  </data>
+  <data name="PartColour_Title" xml:space="preserve">
+    <value>Цвят на детайла</value>
+  </data>
+  <data name="Part_Cc_None" xml:space="preserve">
+    <value>Няма</value>
+  </data>
+  <data name="Part_Cc_SamePart" xml:space="preserve">
+    <value>Само със същите детайли</value>
+  </data>
+  <data name="Part_Cc_Unrestricted" xml:space="preserve">
+    <value>С всички съвместими детайли</value>
+  </data>
+  <data name="Part_CommonCutting" xml:space="preserve">
+    <value>Общо рязане:</value>
+  </data>
+  <data name="Part_CommonCuttingTip" xml:space="preserve">
+    <value>С кого детайлът може да има обща линия на рязане. Пълните ръбове се поставят с разстоянието за рязане по обща линия и се експортират като контур на клъстера плюс един общ рез по средата. Навсякъде другаде важи разстоянието на детайла. Изричният избор тук включва общото рязане за детайла.</value>
+  </data>
+  <data name="Part_Extra" xml:space="preserve">
+    <value>Резерв:</value>
+  </data>
+  <data name="Part_ExtraTip" xml:space="preserve">
+    <value>Резервни детайли над необходимото количество (например при брак).</value>
+  </data>
+  <data name="Part_File" xml:space="preserve">
+    <value>Файл на детайла:</value>
+  </data>
+  <data name="Part_FlippedBoth" xml:space="preserve">
+    <value>↔↕ обърнат двукратно (= завъртян на 180°)</value>
+  </data>
+  <data name="Part_FlippedLeftRight" xml:space="preserve">
+    <value>↔ обърнат отляво надясно</value>
+  </data>
+  <data name="Part_FlippedUpDown" xml:space="preserve">
+    <value>↕ обърнат отгоре надолу</value>
+  </data>
+  <data name="Part_FullSheetWarn" xml:space="preserve">
+    <value>⚠ Този DXF прилича на ГОТОВ РАЗКРОЙ ({0} контура в рамка {1}×{2}), а не на един детайл. SheetNest внася всеки DXF като ЕДИН детайл, а разстоянията между вътрешните контури идват от оригиналния чертеж. Запазете всеки детайл в отделен DXF.</value>
+  </data>
+  <data name="Part_LegacyCcHint" xml:space="preserve">
+    <value>Запазеният режим на общо рязане от стара версия не е активен. Изберете режим, за да го потвърдите за този детайл.</value>
+  </data>
+  <data name="Part_Mirrored" xml:space="preserve">
+    <value>Огледални:</value>
+  </data>
+  <data name="Part_MirroredTip" xml:space="preserve">
+    <value>Копия, разполагани ОГЛЕДАЛНО (обърнати по X) над количествата по-горе — за двойки лява/дясна. В експортирания DXF се режат огледално.</value>
+  </data>
+  <data name="Part_Orientations" xml:space="preserve">
+    <value>Позволени завъртания:</value>
+  </data>
+  <data name="Part_OrientationsTip" xml:space="preserve">
+    <value>Завъртанията, които разкроят може да прилага към ТОЗИ детайл (например ограничение заради посоката на валцоване).</value>
+  </data>
+  <data name="Part_Priority" xml:space="preserve">
+    <value>Приоритет:</value>
+  </data>
+  <data name="Part_PriorityTip" xml:space="preserve">
+    <value>1 = най-висок приоритет. Детайлите с по-висок приоритет се разполагат първи, затова заемат първите листове и никога не остават извън, ако материалът не стигне.</value>
+  </data>
+  <data name="Part_Quantity" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="Part_Required" xml:space="preserve">
+    <value>Необходими:</value>
+  </data>
+  <data name="Part_RequiredTip" xml:space="preserve">
+    <value>Колко детайла са нужни за заданието.</value>
+  </data>
+  <data name="Part_Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="Part_Spacing" xml:space="preserve">
+    <value>Разстояние на детайла:</value>
+  </data>
+  <data name="Part_SpacingTip" xml:space="preserve">
+    <value>Разстоянието, което детайлът пази до съседите, с които НЕ може да има общ рез (в единиците на чертежа). Между два детайла се получава (разстояниеA + разстояниеB) / 2.</value>
+  </data>
+  <data name="Part_SymmetricHint" xml:space="preserve">
+    <value>Формата е симетрична при завъртане (кръг/квадрат): завъртането не подобрява разкроя, затова „Както е начертано“ спестява търсене.</value>
+  </data>
+  <data name="Part_Title" xml:space="preserve">
+    <value>Параметри на детайла</value>
+  </data>
+  <data name="Part_Units" xml:space="preserve">
+    <value>в единиците на чертежа</value>
+  </data>
+  <data name="Parts_CountSummary" xml:space="preserve">
+    <value>Детайли: {0} (заявени: {1} бр.)</value>
+  </data>
+  <data name="Priority_High" xml:space="preserve">
+    <value>Висок</value>
+  </data>
+  <data name="Priority_Highest" xml:space="preserve">
+    <value>Най-висок</value>
+  </data>
+  <data name="Priority_Low" xml:space="preserve">
+    <value>Нисък</value>
+  </data>
+  <data name="Priority_Lowest" xml:space="preserve">
+    <value>Най-нисък</value>
+  </data>
+  <data name="Priority_Normal" xml:space="preserve">
+    <value>Нормален</value>
+  </data>
+  <data name="Radio_DxfView" xml:space="preserve">
+    <value>Чертеж DXF</value>
+  </data>
+  <data name="Radio_ReportView" xml:space="preserve">
+    <value>Обобщен отчет за разкроя</value>
+  </data>
+  <data name="Rep_BoxArea" xml:space="preserve">
+    <value>Габаритна площ</value>
+  </data>
+  <data name="Rep_Continued" xml:space="preserve">
+    <value>{0} (продължение)</value>
+  </data>
+  <data name="Rep_Cut" xml:space="preserve">
+    <value>Рязане</value>
+  </data>
+  <data name="Rep_CutLength" xml:space="preserve">
+    <value>Дължина на реза</value>
+  </data>
+  <data name="Rep_CutTotal" xml:space="preserve">
+    <value>Дължина на рязане</value>
+  </data>
+  <data name="Rep_CuttingPlan" xml:space="preserve">
+    <value>ПЛАН ЗА РЯЗАНЕ</value>
+  </data>
+  <data name="Rep_DifferentLayouts" xml:space="preserve">
+    <value>Различни разкрои</value>
+  </data>
+  <data name="Rep_Header" xml:space="preserve">
+    <value>SheetNest — отчет за разкроя</value>
+  </data>
+  <data name="Rep_Kg" xml:space="preserve">
+    <value>кг</value>
+  </data>
+  <data name="Rep_Layout" xml:space="preserve">
+    <value>Разкрой</value>
+  </data>
+  <data name="Rep_LayoutN" xml:space="preserve">
+    <value>Разкрой {0}</value>
+  </data>
+  <data name="Rep_LayoutSub" xml:space="preserve">
+    <value>Детайли: {0}   |   използване {1}%   |   лист {2} x {3} {4}</value>
+  </data>
+  <data name="Rep_LayoutTitle" xml:space="preserve">
+    <value>Разкрой {0} от {1}   -   рязане x {2}</value>
+  </data>
+  <data name="Rep_M2" xml:space="preserve">
+    <value>м²</value>
+  </data>
+  <data name="Rep_Material" xml:space="preserve">
+    <value>НЕОБХОДИМ МАТЕРИАЛ</value>
+  </data>
+  <data name="Rep_MaterialKind" xml:space="preserve">
+    <value>Материал</value>
+  </data>
+  <data name="Rep_MaterialUsed" xml:space="preserve">
+    <value>Използване на материала</value>
+  </data>
+  <data name="Rep_Metre" xml:space="preserve">
+    <value>м</value>
+  </data>
+  <data name="Rep_More" xml:space="preserve">
+    <value>... и още {0}</value>
+  </data>
+  <data name="Rep_MoreLayouts" xml:space="preserve">
+    <value>... и още разкрои: {0} (вижте страниците им)</value>
+  </data>
+  <data name="Rep_No" xml:space="preserve">
+    <value>№</value>
+  </data>
+  <data name="Rep_NotPlaced" xml:space="preserve">
+    <value>НЕразположени детайли</value>
+  </data>
+  <data name="Rep_NothingToReport" xml:space="preserve">
+    <value>Няма какво да се включи в отчета. Първо направете разкрой.</value>
+  </data>
+  <data name="Rep_Page" xml:space="preserve">
+    <value>Стр. {0} от {1}</value>
+  </data>
+  <data name="Rep_PageCol" xml:space="preserve">
+    <value>Стр.</value>
+  </data>
+  <data name="Rep_Part" xml:space="preserve">
+    <value>Детайл</value>
+  </data>
+  <data name="Rep_PartFallback" xml:space="preserve">
+    <value>(детайл)</value>
+  </data>
+  <data name="Rep_PartTotals" xml:space="preserve">
+    <value>ОБЩО ПО ДЕТАЙЛИ</value>
+  </data>
+  <data name="Rep_PartWeight" xml:space="preserve">
+    <value>Тегло на детайлите</value>
+  </data>
+  <data name="Rep_Parts" xml:space="preserve">
+    <value>Детайли</value>
+  </data>
+  <data name="Rep_PartsOnLayout" xml:space="preserve">
+    <value>Детайли в този разкрой</value>
+  </data>
+  <data name="Rep_PartsToCut" xml:space="preserve">
+    <value>Детайли за рязане</value>
+  </data>
+  <data name="Rep_Pierces" xml:space="preserve">
+    <value>Пробиви</value>
+  </data>
+  <data name="Rep_Qty" xml:space="preserve">
+    <value>Бр.</value>
+  </data>
+  <data name="Rep_SheetFew" xml:space="preserve">
+    <value>листа</value>
+  </data>
+  <data name="Rep_SheetMany" xml:space="preserve">
+    <value>листа</value>
+  </data>
+  <data name="Rep_SheetOne" xml:space="preserve">
+    <value>лист</value>
+  </data>
+  <data name="Rep_SheetSize" xml:space="preserve">
+    <value>Размер на листа</value>
+  </data>
+  <data name="Rep_SheetWeight" xml:space="preserve">
+    <value>Тегло на листовете</value>
+  </data>
+  <data name="Rep_SheetsOf" xml:space="preserve">
+    <value>{0}  {1} x {2} {3}</value>
+  </data>
+  <data name="Rep_SizeCol" xml:space="preserve">
+    <value>Размери, {0}</value>
+  </data>
+  <data name="Rep_Sq" xml:space="preserve">
+    <value>кв. {0}</value>
+  </data>
+  <data name="Rep_SqFt" xml:space="preserve">
+    <value>кв. фут</value>
+  </data>
+  <data name="Rep_Summary" xml:space="preserve">
+    <value>ОБОБЩЕНИЕ НА ЗАДАНИЕТО</value>
+  </data>
+  <data name="Rep_Total" xml:space="preserve">
+    <value>Общо:  {0} {1}   -   {2}</value>
+  </data>
+  <data name="Rep_Used" xml:space="preserve">
+    <value>Изп.</value>
+  </data>
+  <data name="Report_ColPartArea" xml:space="preserve">
+    <value>Площ (бр.)</value>
+  </data>
+  <data name="Report_ColPartDim" xml:space="preserve">
+    <value>Габарити на детайла</value>
+  </data>
+  <data name="Report_ColPartName" xml:space="preserve">
+    <value>Детайл / Файл</value>
+  </data>
+  <data name="Report_ColPartPos" xml:space="preserve">
+    <value>Поз. №</value>
+  </data>
+  <data name="Report_ColPartQty" xml:space="preserve">
+    <value>Общо бр.</value>
+  </data>
+  <data name="Report_ColSheetFormat" xml:space="preserve">
+    <value>Размер на листа</value>
+  </data>
+  <data name="Report_ColSheetNum" xml:space="preserve">
+    <value>Лист №</value>
+  </data>
+  <data name="Report_ColSheetParts" xml:space="preserve">
+    <value>Детайли на листа</value>
+  </data>
+  <data name="Report_ColSheetRepeat" xml:space="preserve">
+    <value>Брой листове</value>
+  </data>
+  <data name="Report_ColSheetUtil" xml:space="preserve">
+    <value>Оползотворяване</value>
+  </data>
+  <data name="Report_DatePrefix" xml:space="preserve">
+    <value>Дата: </value>
+  </data>
+  <data name="Report_EmptySub" xml:space="preserve">
+    <value>Изпълнете нестинг на детайлите на 3-ти екран, за да прегледате и отпечатате готов производствен отчет със спецификация и карти за рязане.</value>
+  </data>
+  <data name="Report_EmptyTitle" xml:space="preserve">
+    <value>Отчетът за разкрой все още не е генериран</value>
+  </data>
+  <data name="Report_PageXofY" xml:space="preserve">
+    <value>Стр. {0} от {1}</value>
+  </data>
+  <data name="Report_PartsSpecTitle" xml:space="preserve">
+    <value>2. Спецификация на детайлите</value>
+  </data>
+  <data name="Report_PreviewToolbar_Print" xml:space="preserve">
+    <value>🖨️ Печат на отчет</value>
+  </data>
+  <data name="Report_PreviewToolbar_SavePdf" xml:space="preserve">
+    <value>📄 Запази PDF</value>
+  </data>
+  <data name="Report_PreviewToolbar_Summary" xml:space="preserve">
+    <value>Производствен отчет за разкрой</value>
+  </data>
+  <data name="Report_PreviewToolbar_ZoomFit" xml:space="preserve">
+    <value>⤢ По ширина</value>
+  </data>
+  <data name="Report_ProjectPrefix" xml:space="preserve">
+    <value>Проект: </value>
+  </data>
+  <data name="Report_SheetsMapTitle" xml:space="preserve">
+    <value>1. Карта на разкроя по листове</value>
+  </data>
+  <data name="Report_Title" xml:space="preserve">
+    <value>ОБОБЩЕН ОТЧЕТ ЗА РАЗКРОЯ</value>
+  </data>
+  <data name="Report_UnitsPrefix" xml:space="preserve">
+    <value>Единици: </value>
+  </data>
+  <data name="Report_UntitledProject" xml:space="preserve">
+    <value>Безименен</value>
+  </data>
+  <data name="Rot_0And180Tip" xml:space="preserve">
+    <value>0° и 180°: спазва посоката на валцоване, но детайлът може да се обърне.</value>
+  </data>
+  <data name="Rot_0And90Tip" xml:space="preserve">
+    <value>Позволени са 0° и 90°.</value>
+  </data>
+  <data name="Rot_45" xml:space="preserve">
+    <value>Стъпка 45°</value>
+  </data>
+  <data name="Rot_45Tip" xml:space="preserve">
+    <value>Осем положения през 45°. Същата стойност я има и в настройките на заданието и без нея тук детайлът не би могъл да покаже какво реално е зададено.</value>
+  </data>
+  <data name="Rot_4Way" xml:space="preserve">
+    <value>4 посоки</value>
+  </data>
+  <data name="Rot_4WayTip" xml:space="preserve">
+    <value>Всички четири прави положения (0 / 90 / 180 / 270°). Сигурен първи избор за квадратни и Г-образни детайли: при тях обикновено е по-добър от свободното завъртане и винаги е по-бърз за търсене.</value>
+  </data>
+  <data name="Rot_90And270Tip" xml:space="preserve">
+    <value>90° и 270°: детайлът винаги е завъртян, в която и да е посока.</value>
+  </data>
+  <data name="Rot_90Only" xml:space="preserve">
+    <value>Само 90°</value>
+  </data>
+  <data name="Rot_90OnlyTip" xml:space="preserve">
+    <value>Само 90°: детайлът винаги е завъртян веднъж.</value>
+  </data>
+  <data name="Rot_AsDrawn" xml:space="preserve">
+    <value>Както е начертано</value>
+  </data>
+  <data name="Rot_AsDrawnTip" xml:space="preserve">
+    <value>Само 0°: детайлът остава точно както е начертан (спазва посоката на валцоване).</value>
+  </data>
+  <data name="Rot_Free" xml:space="preserve">
+    <value>Свободно</value>
+  </data>
+  <data name="Rot_FreeTip" xml:space="preserve">
+    <value>Всеки ъгъл — и НЕ непременно най-плътният разкрой. Печели при детайли с наклонени или извити ръбове и губи при квадратни и Г-образни, които се наместват точно под прав ъгъл и не печелят от наклон. На две реални задания: 84,3% запълване срещу 81,6% при „4 посоки“ на едното и 69,6% срещу 73,2% на другото. Търсенето е около два пъти по-дълго. Не спазва посоката на валцоване.</value>
+  </data>
+  <data name="Rot_Job" xml:space="preserve">
+    <value>Както в заданието</value>
+  </data>
+  <data name="Rot_JobTip" xml:space="preserve">
+    <value>Както е зададено за цялото задание в Настройки › Разширени настройки. Променете го там и детайлът го следва.</value>
+  </data>
+  <data name="Run_Draft" xml:space="preserve">
+    <value>чернова</value>
+  </data>
+  <data name="Run_Saved" xml:space="preserve">
+    <value>Запазен</value>
+  </data>
+  <data name="Set_AutosaveMinTip" xml:space="preserve">
+    <value>Колко често отвореният проект се запазва автоматично за възстановяване.</value>
+  </data>
+  <data name="Set_AutosaveTip" xml:space="preserve">
+    <value>Периодично запазва копие на отворения проект, за да може незапазената работа да се възстанови след срив.</value>
+  </data>
+  <data name="Set_ClusterMaxTip" xml:space="preserve">
+    <value>Твърд максимум детайли в един клъстер за общо рязане (от 2 до 500).</value>
+  </data>
+  <data name="Set_ClusterModeTip" xml:space="preserve">
+    <value>„Авто“ — SheetNest сам избира безопасен размер на клъстера; „Ръчно“ — твърдо ограничение на броя детайли.</value>
+  </data>
+  <data name="Set_EffortTip" xml:space="preserve">
+    <value>Колко дълго се търси разкроят на всеки лист. Повече време дава по-ПЛЪТЕН разкрой, а не повече детайли на листа: подходящите детайли се намират почти веднага, а останалото време отива за сгъстяването им, така че остатъкът да е едно използваемо парче.</value>
+  </data>
+  <data name="Set_GapTip" xml:space="preserve">
+    <value>За общото рязане се използва това разстояние; преди експорт в DXF SheetNest изгражда един рез по средата. Стойността се пази в инчове и се показва в избраните единици.</value>
+  </data>
+  <data name="Set_MarginTip" xml:space="preserve">
+    <value>Свободна ивица между всеки детайл и ръба на листа.</value>
+  </data>
+  <data name="Set_MergeTip" xml:space="preserve">
+    <value>Настройка на експорта за обикновена геометрия: обединява съвпадащи елементи на DXF. Общото рязане изгражда своята единствена линия по средата независимо от нея.</value>
+  </data>
+  <data name="Set_PartNamesTip" xml:space="preserve">
+    <value>Извеждай имената на файловете като текст във всеки детайл, за да се разпознават след рязане. PAINT е за лазерно гравиране/маркиране (същият слой като линиите на огъване); BACKGROUND се вижда в CAD/CAM, но не се обработва. Всичко, което се реже, винаги е в слой CUT.</value>
+  </data>
+  <data name="Set_ResetClusterTip" xml:space="preserve">
+    <value>Върни автоматичния размер на клъстерите за общо рязане.</value>
+  </data>
+  <data name="Set_ResetGapTip" xml:space="preserve">
+    <value>Върни разстоянието за общо рязане по подразбиране.</value>
+  </data>
+  <data name="Set_RotationsTip" xml:space="preserve">
+    <value>Завъртания, които разкроят може да опитва за детайли без собствена настройка. Настройката в „Параметри на детайла“ винаги има предимство.</value>
+  </data>
+  <data name="Set_SpacingTip" xml:space="preserve">
+    <value>Разстояние между обикновените детайли по подразбиране (в единиците на чертежа). В „Параметри на детайла“ може да се зададе за всеки детайл; за общото рязане се използва отделното разстояние по-долу.</value>
+  </data>
+  <data name="Set_UnitsTip" xml:space="preserve">
+    <value>Единици на чертежа за детайли, листове, разстояния и отстъпи. Изберете тези, в които са начертани вашите DXF; физическото разстояние за общо рязане се преизчислява автоматично.</value>
+  </data>
+  <data name="Settings_Auto" xml:space="preserve">
+    <value>Авто</value>
+  </data>
+  <data name="Settings_Autosave" xml:space="preserve">
+    <value>Автоматично запазване на проекта</value>
+  </data>
+  <data name="Settings_AutosaveTime" xml:space="preserve">
+    <value>Интервал за автозапазване (мин):</value>
+  </data>
+  <data name="Settings_CommonLineGap" xml:space="preserve">
+    <value>Разстояние при рязане по обща линия</value>
+  </data>
+  <data name="Settings_Concurrency" xml:space="preserve">
+    <value>Паралелни търсения:</value>
+  </data>
+  <data name="Settings_Concurrency_Auto" xml:space="preserve">
+    <value>Авто ({0})</value>
+  </data>
+  <data name="Settings_Concurrency_Tip" xml:space="preserve">
+    <value>Колко търсения на разкрой вървят едновременно. По-малко пази бавния компютър отзивчив, повече приключва по-бързо на мощен. Самият разкрой излиза същият.</value>
+  </data>
+  <data name="Settings_Effort" xml:space="preserve">
+    <value>Усилие за търсене:</value>
+  </data>
+  <data name="Settings_Effort_Best" xml:space="preserve">
+    <value>Дълбок (по-бавен)</value>
+  </data>
+  <data name="Settings_Effort_Fast" xml:space="preserve">
+    <value>Бърз</value>
+  </data>
+  <data name="Settings_Effort_Normal" xml:space="preserve">
+    <value>Оптимален (по подразбиране)</value>
+  </data>
+  <data name="Settings_Group_App" xml:space="preserve">
+    <value>Параметри на приложението</value>
+  </data>
+  <data name="Settings_Group_CommonLine" xml:space="preserve">
+    <value>Рязане по обща линия</value>
+  </data>
+  <data name="Settings_Group_Dxf" xml:space="preserve">
+    <value>Параметри за експорт на DXF</value>
+  </data>
+  <data name="Settings_Group_Nesting" xml:space="preserve">
+    <value>Параметри на разкроя</value>
+  </data>
+  <data name="Settings_Manual" xml:space="preserve">
+    <value>Ръчно</value>
+  </data>
+  <data name="Settings_Margin" xml:space="preserve">
+    <value>Отстъп от ръба на листа</value>
+  </data>
+  <data name="Settings_MaxCluster" xml:space="preserve">
+    <value>Макс. детайли в клъстер:</value>
+  </data>
+  <data name="Settings_MergeLines" xml:space="preserve">
+    <value>Обединяване на съвпадащи линии на рязане</value>
+  </data>
+  <data name="Settings_PartNames" xml:space="preserve">
+    <value>Имена на детайлите в DXF:</value>
+  </data>
+  <data name="Settings_PartNames_Background" xml:space="preserve">
+    <value>BACKGROUND — само за преглед</value>
+  </data>
+  <data name="Settings_PartNames_Layer9" xml:space="preserve">
+    <value>PAINT — гравиране, заедно с линиите на огъване</value>
+  </data>
+  <data name="Settings_PartNames_None" xml:space="preserve">
+    <value>Без експорт</value>
+  </data>
+  <data name="Settings_Reset" xml:space="preserve">
+    <value>Възстанови</value>
+  </data>
+  <data name="Settings_Rot_0_180" xml:space="preserve">
+    <value>0 / 180°</value>
+  </data>
+  <data name="Settings_Rot_45" xml:space="preserve">
+    <value>Стъпка 45°</value>
+  </data>
+  <data name="Settings_Rot_90" xml:space="preserve">
+    <value>Стъпка 90°</value>
+  </data>
+  <data name="Settings_Rot_AsDrawn" xml:space="preserve">
+    <value>Както е начертано</value>
+  </data>
+  <data name="Settings_Rot_Free" xml:space="preserve">
+    <value>Свободен (36 стъпки)</value>
+  </data>
+  <data name="Settings_Rotations" xml:space="preserve">
+    <value>Ъгли на завъртане на детайли:</value>
+  </data>
+  <data name="Settings_Spacing" xml:space="preserve">
+    <value>Разстояние между детайли</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Разширени настройки</value>
+  </data>
+  <data name="Settings_Units" xml:space="preserve">
+    <value>Мерни единици:</value>
+  </data>
+  <data name="Settings_Units_In" xml:space="preserve">
+    <value>Инчове (in)</value>
+  </data>
+  <data name="Settings_Units_Mm" xml:space="preserve">
+    <value>Милиметри (mm)</value>
+  </data>
+  <data name="Shape_Circle" xml:space="preserve">
+    <value>Кръг</value>
+  </data>
+  <data name="Shape_Diameter" xml:space="preserve">
+    <value>Диаметър:</value>
+  </data>
+  <data name="Shape_Height" xml:space="preserve">
+    <value>Височина:</value>
+  </data>
+  <data name="Shape_Quantity" xml:space="preserve">
+    <value>Количество:</value>
+  </data>
+  <data name="Shape_Rectangle" xml:space="preserve">
+    <value>Правоъгълник</value>
+  </data>
+  <data name="Shape_Square" xml:space="preserve">
+    <value>Квадрат</value>
+  </data>
+  <data name="Shape_Title" xml:space="preserve">
+    <value>Добавяне на фигура</value>
+  </data>
+  <data name="Shape_Width" xml:space="preserve">
+    <value>Ширина:</value>
+  </data>
+  <data name="Sheet_Dlg_Add" xml:space="preserve">
+    <value>Добави</value>
+  </data>
+  <data name="Sheet_Dlg_Header" xml:space="preserve">
+    <value>Размери на листа в {0} (ширина = дългата страна).</value>
+  </data>
+  <data name="Sheet_Dlg_Height" xml:space="preserve">
+    <value>Височина ({0})</value>
+  </data>
+  <data name="Sheet_Dlg_Priority" xml:space="preserve">
+    <value>Приоритет на използване:</value>
+  </data>
+  <data name="Sheet_Dlg_Qty" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="Sheet_Dlg_Remember" xml:space="preserve">
+    <value>Запази като шаблон</value>
+  </data>
+  <data name="Sheet_Dlg_Title" xml:space="preserve">
+    <value>Нов размер на листа</value>
+  </data>
+  <data name="Sheet_Dlg_Title_Edit" xml:space="preserve">
+    <value>Редактиране на лист</value>
+  </data>
+  <data name="Sheet_Dlg_Unlimited" xml:space="preserve">
+    <value>Без ограничение</value>
+  </data>
+  <data name="Sheet_Dlg_Width" xml:space="preserve">
+    <value>Ширина ({0})</value>
+  </data>
+  <data name="Sheet_PriorityTip" xml:space="preserve">
+    <value>Приоритет на изразходване: листовете с най-висок приоритет се изразходват първи (например остатъци и изрезки).</value>
+  </data>
+  <data name="Sheet_RememberTip" xml:space="preserve">
+    <value>Запази този размер в „Моите листове“ в менюто „Добави лист“.</value>
+  </data>
+  <data name="Sheet_UnlimitedShort" xml:space="preserve">
+    <value>Без ограничение</value>
+  </data>
+  <data name="Sheet_UnlimitedTip" xml:space="preserve">
+    <value>От този размер има колкото са нужни на заданието: разкроят взема листове, докато не разположи всички детайли. Докато отметката е поставена, количеството не се взема предвид (запазва се, ако я махнете).</value>
+  </data>
+  <data name="Sheets_CountSummary" xml:space="preserve">
+    <value>Размери: {0} (листове: {1})</value>
+  </data>
+  <data name="Sheets_EmptySub" xml:space="preserve">
+    <value>Добавете стандартен формат лист или въведете свой размер</value>
+  </data>
+  <data name="Sheets_UnlimitedNote" xml:space="preserve">
+    <value>с неограничени</value>
+  </data>
+  <data name="Status_Placed" xml:space="preserve">
+    <value>Разположени:</value>
+  </data>
+  <data name="Status_Sheets" xml:space="preserve">
+    <value>Листове:</value>
+  </data>
+  <data name="Status_Unplaced" xml:space="preserve">
+    <value>Непоместени:</value>
+  </data>
+  <data name="Status_Utilization" xml:space="preserve">
+    <value>Оползотворяване:</value>
+  </data>
+  <data name="Tab_Layout" xml:space="preserve">
+    <value>4. Разкрой и отчет</value>
+  </data>
+  <data name="Tab_Nesting" xml:space="preserve">
+    <value>3. Нестинг</value>
+  </data>
+  <data name="Tab_Parts" xml:space="preserve">
+    <value>1. Модели (Детайли)</value>
+  </data>
+  <data name="Tab_Sheets" xml:space="preserve">
+    <value>2. Листове</value>
+  </data>
+  <data name="Tip_AddPart" xml:space="preserve">
+    <value>Добави детайли от DXF файлове</value>
+  </data>
+  <data name="Tip_AddShape" xml:space="preserve">
+    <value>Добави правоъгълник или кръг без DXF, направо в нужното количество</value>
+  </data>
+  <data name="Tip_AddSheet" xml:space="preserve">
+    <value>Избери стандартен размер или въведи свой</value>
+  </data>
+  <data name="Tip_BackToNesting" xml:space="preserve">
+    <value>Обратно към вариантите на разкроя (Ctrl+3)</value>
+  </data>
+  <data name="Tip_BackToParts" xml:space="preserve">
+    <value>Обратно към списъка с детайли (Ctrl+1)</value>
+  </data>
+  <data name="Tip_CancelNest" xml:space="preserve">
+    <value>Спри разкроя</value>
+  </data>
+  <data name="Tip_ClearParts" xml:space="preserve">
+    <value>Изчисти целия списък с детайли</value>
+  </data>
+  <data name="Tip_ClearRuns" xml:space="preserve">
+    <value>Изчисти списъка с натрупани варианти на разкроя</value>
+  </data>
+  <data name="Tip_CutRenest" xml:space="preserve">
+    <value>Отбелязаните листове вече са изрязани: детайлите им се махат от поръчката, листовете — от склада, и остатъкът се разкроява наново</value>
+  </data>
+  <data name="Tip_DeletePart" xml:space="preserve">
+    <value>Премахни избрания детайл от проекта</value>
+  </data>
+  <data name="Tip_DeleteSheet" xml:space="preserve">
+    <value>Премахни избрания лист от списъка</value>
+  </data>
+  <data name="Tip_Divide" xml:space="preserve">
+    <value>Раздели количеството на всички (или избрани) детайли на указаното число</value>
+  </data>
+  <data name="Tip_EdgeMargin" xml:space="preserve">
+    <value>Отстъп от ръба на листа (в текущите единици на чертежа)</value>
+  </data>
+  <data name="Tip_EditSheet" xml:space="preserve">
+    <value>Промени размерите и количеството на листа</value>
+  </data>
+  <data name="Tip_ExportDxf" xml:space="preserve">
+    <value>Експорт на контурите на разкроя в DXF (със слой с имената на детайлите)</value>
+  </data>
+  <data name="Tip_ExportPdf" xml:space="preserve">
+    <value>Запази производствения отчет в PDF със спецификацията</value>
+  </data>
+  <data name="Tip_Feedback" xml:space="preserve">
+    <value>Отвори обратна връзка в GitHub</value>
+  </data>
+  <data name="Tip_FlipLeftRight" xml:space="preserve">
+    <value>Обърни самия детайл отляво надясно (всичките му копия стават огледални). Още веднъж — връща както беше.</value>
+  </data>
+  <data name="Tip_FlipUpDown" xml:space="preserve">
+    <value>Обърни самия детайл отгоре надолу (всичките му копия стават огледални). Още веднъж — връща както беше.</value>
+  </data>
+  <data name="Tip_GoToNesting" xml:space="preserve">
+    <value>Към изчисляването на разкроя (Ctrl+3)</value>
+  </data>
+  <data name="Tip_GoToSheets" xml:space="preserve">
+    <value>Към избора на листове материал (Ctrl+2)</value>
+  </data>
+  <data name="Tip_LayoutCard" xml:space="preserve">
+    <value>Щракнете, за да покажете този разкрой</value>
+  </data>
+  <data name="Tip_Material" xml:space="preserve">
+    <value>От какво се реже проектът. Различни материали и дебелини — различни проекти, разкрояват се отделно</value>
+  </data>
+  <data name="Tip_Multiplier" xml:space="preserve">
+    <value>Множител на количеството детайли (напр. брой комплекти от изделието)</value>
+  </data>
+  <data name="Tip_Multiply" xml:space="preserve">
+    <value>Умножи количеството на всички (или избрани) детайли по указания множител</value>
+  </data>
+  <data name="Tip_NavLayout" xml:space="preserve">
+    <value>Окончателен чертеж на разкроя, експорт в DXF, PDF и печат на отчета (Ctrl+4)</value>
+  </data>
+  <data name="Tip_NavNesting" xml:space="preserve">
+    <value>Стартиране на разкроя, варианти и преглед (Ctrl+3)</value>
+  </data>
+  <data name="Tip_NavParts" xml:space="preserve">
+    <value>Списък и параметри на детайлите за разкрой (Ctrl+1)</value>
+  </data>
+  <data name="Tip_NavSheets" xml:space="preserve">
+    <value>Наличните листове материал и отстъпи (Ctrl+2)</value>
+  </data>
+  <data name="Tip_NestDraft" xml:space="preserve">
+    <value>Бърза прикидка за оферта: колко листа, площ и метри рязане. Разкроят е груб, не е за рязане</value>
+  </data>
+  <data name="Tip_New" xml:space="preserve">
+    <value>Създай нов проект за разкрой</value>
+  </data>
+  <data name="Tip_NextPage" xml:space="preserve">
+    <value>Следваща страница</value>
+  </data>
+  <data name="Tip_Open" xml:space="preserve">
+    <value>Отвори запазен проект</value>
+  </data>
+  <data name="Tip_OpenLayout" xml:space="preserve">
+    <value>Към окончателния чертеж на разкроя, експорта в DXF и печата на отчета (Ctrl+4)</value>
+  </data>
+  <data name="Tip_PartColor" xml:space="preserve">
+    <value>Цвят на детайла (щракнете, за да промените)</value>
+  </data>
+  <data name="Tip_PartDetails" xml:space="preserve">
+    <value>Подробности за детайла: резервни, завъртания, разстояние, общо рязане</value>
+  </data>
+  <data name="Tip_PartMirrorQty" xml:space="preserve">
+    <value>Огледални копия НАД количеството — за двойки лява/дясна. 2 бр. и 2 огледални = 4 детайла, два от тях обърнати.</value>
+  </data>
+  <data name="Tip_PartPriority" xml:space="preserve">
+    <value>Приоритет при разполагане на детайла</value>
+  </data>
+  <data name="Tip_PartQty" xml:space="preserve">
+    <value>Необходимият брой детайли за разкрой</value>
+  </data>
+  <data name="Tip_PartRemove" xml:space="preserve">
+    <value>Премахни детайла от проекта</value>
+  </data>
+  <data name="Tip_PartStatus" xml:space="preserve">
+    <value>Разположени / общо</value>
+  </data>
+  <data name="Tip_PrevPage" xml:space="preserve">
+    <value>Предишна страница</value>
+  </data>
+  <data name="Tip_PrintReport" xml:space="preserve">
+    <value>Отпечатай отчета</value>
+  </data>
+  <data name="Tip_RemoveSheet" xml:space="preserve">
+    <value>Премахни листа</value>
+  </data>
+  <data name="Tip_ReportPrint" xml:space="preserve">
+    <value>Отпечатай всички страници на отчета</value>
+  </data>
+  <data name="Tip_Save" xml:space="preserve">
+    <value>Запази проекта</value>
+  </data>
+  <data name="Tip_SheetPriority" xml:space="preserve">
+    <value>Приоритет на изразходване: листовете с най-висок приоритет се изразходват първи (например остатъци и изрезки)</value>
+  </data>
+  <data name="Tip_SheetQty" xml:space="preserve">
+    <value>Брой листове от този размер в наличност</value>
+  </data>
+  <data name="Tip_SheetUnlimited" xml:space="preserve">
+    <value>Ако е отметнато, разкроят използва колкото са нужни листове от този формат</value>
+  </data>
+  <data name="Tip_StartNest" xml:space="preserve">
+    <value>Стартирай изчисляването на разкроя</value>
+  </data>
+  <data name="Tip_Thickness" xml:space="preserve">
+    <value>Дебелина на листа, мм: изберете или впишете своя. Нужна за теглото в отчета</value>
+  </data>
+  <data name="Tip_UpdateNotice" xml:space="preserve">
+    <value>Налична е нова версия на SheetNest. Щракнете, за да отворите страницата за изтегляне.</value>
+  </data>
+  <data name="Tip_Zoom100" xml:space="preserve">
+    <value>Реален размер 100%</value>
+  </data>
+  <data name="Tip_ZoomFit" xml:space="preserve">
+    <value>Побери по ширината на прозореца</value>
+  </data>
+  <data name="Tip_ZoomIn" xml:space="preserve">
+    <value>Увеличи</value>
+  </data>
+  <data name="Tip_ZoomOut" xml:space="preserve">
+    <value>Намали</value>
+  </data>
+  <data name="Tip_ZoomPage" xml:space="preserve">
+    <value>Побери цялата страница в прозореца</value>
+  </data>
+  <data name="Title_AddPart" xml:space="preserve">
+    <value>Добавяне на детайл</value>
+  </data>
+  <data name="Title_CommonLine" xml:space="preserve">
+    <value>Общо рязане</value>
+  </data>
+  <data name="Title_CutRenest" xml:space="preserve">
+    <value>Разкрой на остатъка</value>
+  </data>
+  <data name="Title_EditNest" xml:space="preserve">
+    <value>Ръчна корекция</value>
+  </data>
+  <data name="Title_Export" xml:space="preserve">
+    <value>Експорт</value>
+  </data>
+  <data name="Title_ExportDxf" xml:space="preserve">
+    <value>Експорт в DXF</value>
+  </data>
+  <data name="Title_Feedback" xml:space="preserve">
+    <value>Обратна връзка</value>
+  </data>
+  <data name="Title_FileMissing" xml:space="preserve">
+    <value>Файлът не е намерен</value>
+  </data>
+  <data name="Title_Nest" xml:space="preserve">
+    <value>Разкрой</value>
+  </data>
+  <data name="Title_NotEnoughSheets" xml:space="preserve">
+    <value>Няма достатъчно листове</value>
+  </data>
+  <data name="Title_PartsDoNotFit" xml:space="preserve">
+    <value>Детайлите не се побират</value>
+  </data>
+  <data name="Title_PrintReport" xml:space="preserve">
+    <value>Печат на отчета</value>
+  </data>
+  <data name="Title_Recovery" xml:space="preserve">
+    <value>Възстановяване</value>
+  </data>
+  <data name="Title_Report" xml:space="preserve">
+    <value>Отчет за разкроя</value>
+  </data>
+  <data name="Title_SaveError" xml:space="preserve">
+    <value>Грешка при запис</value>
+  </data>
+  <data name="Title_SaveFailed" xml:space="preserve">
+    <value>Неуспешно запазване</value>
+  </data>
+  <data name="Title_Updates" xml:space="preserve">
+    <value>Проверка за обновления</value>
+  </data>
+  <data name="Unit_In" xml:space="preserve">
+    <value>in</value>
+  </data>
+  <data name="Unit_Mm" xml:space="preserve">
+    <value>мм</value>
+  </data>
+  <data name="Unit_Pcs" xml:space="preserve">
+    <value>бр.</value>
+  </data>
+  <data name="Why_Both" xml:space="preserve">
+    <value>, от тях {0} се застъпват със съседи и {1} навлизат в отстъпа от ръба</value>
+  </data>
+  <data name="Why_Margin" xml:space="preserve">
+    <value>, навлизат в отстъпа от ръба на листа</value>
+  </data>
+  <data name="Why_Overlap" xml:space="preserve">
+    <value>, застъпват се със съседи</value>
+  </data>
+  <data name="Parts_EmptyTitle" xml:space="preserve">
+    <value>В проекта все още няма детайли</value>
+  </data>
+  <data name="Sheets_EmptyTitle" xml:space="preserve">
+    <value>Няма добавени листове</value>
+  </data>
+  <data name="Nest_PreviewPick" xml:space="preserve">
+    <value>Преглед на разкроя: изберете вариант от списъка с варианти</value>
+  </data>
+  <data name="Nest_VariantLine" xml:space="preserve">
+    <value>Вариант #{0}: Утилизация {1} | Поставени {2} | Листа: {3} (време: {4})</value>
+  </data>
+  <data name="Sheet_Dlg_InMm" xml:space="preserve">
+    <value>милиметри</value>
+  </data>
+  <data name="Sheet_Dlg_InInches" xml:space="preserve">
+    <value>инчове</value>
+  </data>
+</root>

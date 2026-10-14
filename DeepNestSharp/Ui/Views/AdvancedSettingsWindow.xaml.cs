@@ -278,7 +278,7 @@ namespace DeepNestSharp.Ui.Views
 
     private void UpdateUnitPresentation()
     {
-      string unit = this.displayedUnitsMm ? (Localization.CurrentLanguage == Localization.LangEnglish ? "mm" : "мм") : "in";
+      string unit = this.displayedUnitsMm ? Localization.Get("Unit_Mm") : Localization.Get("Unit_In");
       this.spacingLabel.Text = $"{Localization.Get("Settings_Spacing")} ({unit}):";
       this.commonLineGapLabel.Text = $"{Localization.Get("Settings_CommonLineGap")} ({unit}):";
       this.marginLabel.Text = $"{Localization.Get("Settings_Margin")} ({unit}):";

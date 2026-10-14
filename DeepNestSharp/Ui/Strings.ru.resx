@@ -1,0 +1,1607 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_BasedOn" xml:space="preserve">
+    <value>Основано на открытых проектах</value>
+  </data>
+  <data name="About_Contributors" xml:space="preserve">
+    <value>Участники</value>
+  </data>
+  <data name="About_DeepNest" xml:space="preserve">
+    <value>оригинальный DeepNest</value>
+  </data>
+  <data name="About_DeepNestPort" xml:space="preserve">
+    <value>порт DeepNest на C# (WinForms)</value>
+  </data>
+  <data name="About_DeepNestSharp" xml:space="preserve">
+    <value>порт DeepNest на C# / WPF, от которого происходит SheetNest</value>
+  </data>
+  <data name="About_Dxf" xml:space="preserve">
+    <value>чтение и запись DXF</value>
+  </data>
+  <data name="About_DxfExport" xml:space="preserve">
+    <value>экспорт DXF</value>
+  </data>
+  <data name="About_Engine" xml:space="preserve">
+    <value>движок раскладки (MIT) и его геометрическая библиотека jagua-rs (MPL-2.0)</value>
+  </data>
+  <data name="About_License" xml:space="preserve">
+    <value>Открытое ПО, лицензия MIT.</value>
+  </data>
+  <data name="About_NetCore" xml:space="preserve">
+    <value>перенос на .NET Core</value>
+  </data>
+  <data name="About_Simplify" xml:space="preserve">
+    <value>упрощение контуров</value>
+  </data>
+  <data name="About_Summary" xml:space="preserve">
+    <value>SheetNest — программа раскроя листового материала: импорт DXF, автоматическая раскладка деталей на листы, ручная правка, резка по общей линии, экспорт DXF и производственный отчёт PDF.</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>О программе SheetNest {0}</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Версия {0}</value>
+  </data>
+  <data name="Btn_Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Btn_AddDxf" xml:space="preserve">
+    <value>+ Добавить DXF...</value>
+  </data>
+  <data name="Btn_AddShape" xml:space="preserve">
+    <value>+ Фигура...</value>
+  </data>
+  <data name="Btn_AddSheet" xml:space="preserve">
+    <value>+ Добавить лист...</value>
+  </data>
+  <data name="Btn_BackToNesting" xml:space="preserve">
+    <value>⮜ Назад к нестингу</value>
+  </data>
+  <data name="Btn_BackToParts" xml:space="preserve">
+    <value>⮜ Назад к моделям</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="Btn_ClearAll" xml:space="preserve">
+    <value>Очистить всё</value>
+  </data>
+  <data name="Btn_ClearRuns" xml:space="preserve">
+    <value>Очистить список</value>
+  </data>
+  <data name="Btn_Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Btn_CutRenest" xml:space="preserve">
+    <value>✂ Вырезаны — разложить остальное</value>
+  </data>
+  <data name="Btn_DeletePart" xml:space="preserve">
+    <value>Удалить деталь</value>
+  </data>
+  <data name="Btn_DeleteSheet" xml:space="preserve">
+    <value>Удалить лист</value>
+  </data>
+  <data name="Btn_Divide" xml:space="preserve">
+    <value>÷ Разделить</value>
+  </data>
+  <data name="Btn_EditDetails" xml:space="preserve">
+    <value>⚙ Подробности...</value>
+  </data>
+  <data name="Btn_EditSheet" xml:space="preserve">
+    <value>✎ Изменить...</value>
+  </data>
+  <data name="Btn_ExportDxf" xml:space="preserve">
+    <value>Экспорт в DXF...</value>
+  </data>
+  <data name="Btn_ExportPdf" xml:space="preserve">
+    <value>Экспорт в PDF...</value>
+  </data>
+  <data name="Btn_GoToLayout" xml:space="preserve">
+    <value>Перейти к раскладке ➔</value>
+  </data>
+  <data name="Btn_GoToNestingShort" xml:space="preserve">
+    <value>Перейти к нестингу</value>
+  </data>
+  <data name="Btn_Multiply" xml:space="preserve">
+    <value>× Умножить</value>
+  </data>
+  <data name="Btn_NestCut" xml:space="preserve">
+    <value>▶ Раскладка</value>
+  </data>
+  <data name="Btn_NestDraft" xml:space="preserve">
+    <value>⚡ Черновик</value>
+  </data>
+  <data name="Btn_New" xml:space="preserve">
+    <value>Новый</value>
+  </data>
+  <data name="Btn_NextNesting" xml:space="preserve">
+    <value>Далее: Нестинг ➔</value>
+  </data>
+  <data name="Btn_NextSheets" xml:space="preserve">
+    <value>Далее: Листы ➔</value>
+  </data>
+  <data name="Btn_OK" xml:space="preserve">
+    <value>ОК</value>
+  </data>
+  <data name="Btn_Open" xml:space="preserve">
+    <value>Открыть...</value>
+  </data>
+  <data name="Btn_PrintReport" xml:space="preserve">
+    <value>🖨 Печать отчета...</value>
+  </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Btn_StartNest" xml:space="preserve">
+    <value>▶ Пуск нестинга</value>
+  </data>
+  <data name="Btn_StopNest" xml:space="preserve">
+    <value>⏹ Остановить</value>
+  </data>
+  <data name="Btn_ZoomPage" xml:space="preserve">
+    <value>▣ Страница целиком</value>
+  </data>
+  <data name="Chk_Unlimited" xml:space="preserve">
+    <value>Без ограничений</value>
+  </data>
+  <data name="Col_Actions" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="Col_AvailableUsed" xml:space="preserve">
+    <value>Доступно / Использовано</value>
+  </data>
+  <data name="Col_Color" xml:space="preserve">
+    <value>Цвет</value>
+  </data>
+  <data name="Col_Dimensions" xml:space="preserve">
+    <value>Габариты (Ш × В)</value>
+  </data>
+  <data name="Col_Mirrored" xml:space="preserve">
+    <value>Зеркальные</value>
+  </data>
+  <data name="Col_NetArea" xml:space="preserve">
+    <value>Площадь</value>
+  </data>
+  <data name="Col_PartName" xml:space="preserve">
+    <value>Деталь (Название / Файл)</value>
+  </data>
+  <data name="Col_Preview" xml:space="preserve">
+    <value>Эскиз</value>
+  </data>
+  <data name="Col_Priority" xml:space="preserve">
+    <value>Приоритет</value>
+  </data>
+  <data name="Col_Quantity" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="Col_RunNum" xml:space="preserve">
+    <value>№</value>
+  </data>
+  <data name="Col_RunPlaced" xml:space="preserve">
+    <value>Размещено</value>
+  </data>
+  <data name="Col_RunSheets" xml:space="preserve">
+    <value>Листов</value>
+  </data>
+  <data name="Col_RunTime" xml:space="preserve">
+    <value>Время</value>
+  </data>
+  <data name="Col_RunUtil" xml:space="preserve">
+    <value>Утилизация</value>
+  </data>
+  <data name="Col_SheetPriority" xml:space="preserve">
+    <value>Приоритет</value>
+  </data>
+  <data name="Col_SheetSize" xml:space="preserve">
+    <value>Размер листа (Ш × В)</value>
+  </data>
+  <data name="Col_Status" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="Col_Unlimited" xml:space="preserve">
+    <value>Неограниченно</value>
+  </data>
+  <data name="Crash_Copy" xml:space="preserve">
+    <value>Скопировать подробности</value>
+  </data>
+  <data name="Crash_Explain" xml:space="preserve">
+    <value>Сообщение об ошибке поможет её исправить. Кнопка ниже откроет в браузере заполненную задачу на GitHub — там всё можно проверить, и НИЧЕГО не будет отправлено, пока вы не отправите её сами.</value>
+  </data>
+  <data name="Crash_Header" xml:space="preserve">
+    <value>В SheetNest произошла ошибка.</value>
+  </data>
+  <data name="Crash_NoBrowser" xml:space="preserve">
+    <value>Не удалось открыть браузер. Нажмите «Скопировать подробности» и вставьте их в новую задачу на github.com/ManuelMRosa/SheetNest/issues.</value>
+  </data>
+  <data name="Crash_NoLog" xml:space="preserve">
+    <value>(журнал записать не удалось)</value>
+  </data>
+  <data name="Crash_Report" xml:space="preserve">
+    <value>Сообщить на GitHub</value>
+  </data>
+  <data name="Crash_SavedTo" xml:space="preserve">
+    <value>Отчёт об ошибке сохранён в:</value>
+  </data>
+  <data name="Crash_Title" xml:space="preserve">
+    <value>SheetNest — отчёт о проблеме</value>
+  </data>
+  <data name="Cut_Badge" xml:space="preserve">
+    <value>✂ вырезан</value>
+  </data>
+  <data name="Cut_BadgeN" xml:space="preserve">
+    <value>✂ {0} из {1}</value>
+  </data>
+  <data name="Cut_OfCount" xml:space="preserve">
+    <value>из {0}</value>
+  </data>
+  <data name="Cut_Summary" xml:space="preserve">
+    <value>Отмечено: {0} л., {1} дет.</value>
+  </data>
+  <data name="Dxf_CommonLineLocked" xml:space="preserve">
+    <value>детали совмещенного реза заблокированы · запустите нестинг заново для изменения их положения</value>
+  </data>
+  <data name="Dxf_Distance" xml:space="preserve">
+    <value>расстояние: {0}  ·  X: {1}  ·  Y: {2}</value>
+  </data>
+  <data name="Dxf_EditNavHint" xml:space="preserve">
+    <value>тяните деталь для перемещения  ·  Alt+отпустить = примагнитить  ·  стрелки = сдвиг  ·  Esc = сброс</value>
+  </data>
+  <data name="Dxf_EditNest" xml:space="preserve">
+    <value>✋ Ручная правка</value>
+  </data>
+  <data name="Dxf_EditNestTip" xml:space="preserve">
+    <value>Ручная доводка раскроя: кликните деталь для выбора, перетаскивайте мышью, вращайте кнопками панели.</value>
+  </data>
+  <data name="Dxf_EmptyHint" xml:space="preserve">
+    <value>Запустите нестинг, чтобы увидеть результат.</value>
+  </data>
+  <data name="Dxf_FullSheet" xml:space="preserve">
+    <value>Полный лист</value>
+  </data>
+  <data name="Dxf_Gap" xml:space="preserve">
+    <value>зазор {0}</value>
+  </data>
+  <data name="Dxf_Layout" xml:space="preserve">
+    <value>Раскладка {0}</value>
+  </data>
+  <data name="Dxf_Measure" xml:space="preserve">
+    <value>Измерение</value>
+  </data>
+  <data name="Dxf_MeasureAgain" xml:space="preserve">
+    <value>  ·  щёлкните, чтобы измерить снова</value>
+  </data>
+  <data name="Dxf_MeasureTip" xml:space="preserve">
+    <value>Измерение расстояний: укажите две точки на чертеже.</value>
+  </data>
+  <data name="Dxf_Mirror" xml:space="preserve">
+    <value>⇄ Зеркало</value>
+  </data>
+  <data name="Dxf_MirrorTip" xml:space="preserve">
+    <value>Отразить зеркально выбранную деталь</value>
+  </data>
+  <data name="Dxf_MoveNoRoom" xml:space="preserve">
+    <value>Свободного места не нашлось: деталь красная — передвиньте её вручную или отмените (Ctrl+Z)</value>
+  </data>
+  <data name="Dxf_MoveToSheet" xml:space="preserve">
+    <value>⇄ На лист…</value>
+  </data>
+  <data name="Dxf_MoveToSheetNone" xml:space="preserve">
+    <value>Переносить можно между одиночными листами без общего реза</value>
+  </data>
+  <data name="Dxf_MoveToSheetTip" xml:space="preserve">
+    <value>Перенести выбранную деталь на другой лист: она встанет в первое свободное место</value>
+  </data>
+  <data name="Dxf_NavHint" xml:space="preserve">
+    <value>колесо = масштаб  ·  зажатое колесо = перемещение  ·  правый клик = по размеру окна</value>
+  </data>
+  <data name="Dxf_NestN" xml:space="preserve">
+    <value>Раскладка {0}/{1}</value>
+  </data>
+  <data name="Dxf_NextLayout" xml:space="preserve">
+    <value>Следующий раскрой</value>
+  </data>
+  <data name="Dxf_NotANumber" xml:space="preserve">
+    <value>это не число  ·  деталь осталась на месте</value>
+  </data>
+  <data name="Dxf_PartStatus" xml:space="preserve">
+    <value>{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}</value>
+  </data>
+  <data name="Dxf_PartsOnSheet" xml:space="preserve">
+    <value>{0} дет.</value>
+  </data>
+  <data name="Dxf_PrevLayout" xml:space="preserve">
+    <value>Предыдущий раскрой</value>
+  </data>
+  <data name="Dxf_RedoTip" xml:space="preserve">
+    <value>Повторить (Ctrl+Y)</value>
+  </data>
+  <data name="Dxf_RemainderSheet" xml:space="preserve">
+    <value>Остаточный лист</value>
+  </data>
+  <data name="Dxf_RotateCcw5Tip" xml:space="preserve">
+    <value>Повернуть на 5° против часовой стрелки</value>
+  </data>
+  <data name="Dxf_RotateCcw90Tip" xml:space="preserve">
+    <value>Повернуть на 90° против часовой стрелки</value>
+  </data>
+  <data name="Dxf_RotateCw5Tip" xml:space="preserve">
+    <value>Повернуть на 5° по часовой стрелке</value>
+  </data>
+  <data name="Dxf_RotateCw90Tip" xml:space="preserve">
+    <value>Повернуть на 90° по часовой стрелке</value>
+  </data>
+  <data name="Dxf_UndoTip" xml:space="preserve">
+    <value>Отменить (Ctrl+Z)</value>
+  </data>
+  <data name="Effort_Best" xml:space="preserve">
+    <value>Best (Глубокий поиск)</value>
+  </data>
+  <data name="Effort_Fast" xml:space="preserve">
+    <value>Fast (Быстрый)</value>
+  </data>
+  <data name="Effort_Normal" xml:space="preserve">
+    <value>Normal (Стандартный)</value>
+  </data>
+  <data name="Hint_DragDrop" xml:space="preserve">
+    <value>💡 Можно перетащить файлы DXF прямо в эту таблицу (Drag &amp; Drop)</value>
+  </data>
+  <data name="Hint_MarkCut" xml:space="preserve">
+    <value>Отметьте листы, которые уже вырезаны</value>
+  </data>
+  <data name="Hint_RunsList" xml:space="preserve">
+    <value>💡 Каждое нажатие «Черновик» или «Раскладка» добавляет готовую раскладку всего заказа (черновики помечены); одинаковые не повторяются. Сверху — лучшая (★): все детали, меньше листов, больше металла в деле. Щелчок — просмотр, двойной щелчок — к раскладке.</value>
+  </data>
+  <data name="Kpi_PartsPlaced" xml:space="preserve">
+    <value>Деталей размещено:</value>
+  </data>
+  <data name="Kpi_SheetsUsed" xml:space="preserve">
+    <value>Листов израсходовано:</value>
+  </data>
+  <data name="Kpi_Unplaced" xml:space="preserve">
+    <value>Не поместилось:</value>
+  </data>
+  <data name="Kpi_Utilization" xml:space="preserve">
+    <value>Общая утилизация:</value>
+  </data>
+  <data name="Lbl_Material" xml:space="preserve">
+    <value>Материал:</value>
+  </data>
+  <data name="Lbl_Multiplier" xml:space="preserve">
+    <value>Множитель (комплектов):</value>
+  </data>
+  <data name="Lbl_NestingEffort" xml:space="preserve">
+    <value>Усилия нестинга:</value>
+  </data>
+  <data name="Lbl_RunsList" xml:space="preserve">
+    <value>Варианты раскладки:</value>
+  </data>
+  <data name="Lbl_SheetCut" xml:space="preserve">
+    <value>вырезан</value>
+  </data>
+  <data name="Lbl_SheetEdgeMargin" xml:space="preserve">
+    <value>Отступ от края листа:</value>
+  </data>
+  <data name="Lbl_SheetsCut" xml:space="preserve">
+    <value>вырезано</value>
+  </data>
+  <data name="Lbl_Thickness" xml:space="preserve">
+    <value>Толщина:</value>
+  </data>
+  <data name="Mat_None" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="Mat_aluminium" xml:space="preserve">
+    <value>Алюминий</value>
+  </data>
+  <data name="Mat_black" xml:space="preserve">
+    <value>Чёрная сталь</value>
+  </data>
+  <data name="Mat_galvanized" xml:space="preserve">
+    <value>Оцинковка</value>
+  </data>
+  <data name="Mat_stainless" xml:space="preserve">
+    <value>Нержавейка</value>
+  </data>
+  <data name="Menu_About" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="Menu_AdvancedSettings" xml:space="preserve">
+    <value>Расширенные настройки...</value>
+  </data>
+  <data name="Menu_CheckUpdates" xml:space="preserve">
+    <value>Проверить обновления...</value>
+  </data>
+  <data name="Menu_CustomSize" xml:space="preserve">
+    <value>Произвольный размер…</value>
+  </data>
+  <data name="Menu_Exit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="Menu_File" xml:space="preserve">
+    <value>_Файл</value>
+  </data>
+  <data name="Menu_Help" xml:space="preserve">
+    <value>_Справка</value>
+  </data>
+  <data name="Menu_Language" xml:space="preserve">
+    <value>_Язык (Language)</value>
+  </data>
+  <data name="Menu_MySheets" xml:space="preserve">
+    <value>Мои форматы</value>
+  </data>
+  <data name="Menu_NewProject" xml:space="preserve">
+    <value>Новый проект</value>
+  </data>
+  <data name="Menu_Offcut" xml:space="preserve">
+    <value>Деловые отходы...</value>
+  </data>
+  <data name="Menu_OpenProject" xml:space="preserve">
+    <value>Открыть проект...</value>
+  </data>
+  <data name="Menu_RecentEmpty" xml:space="preserve">
+    <value>(пусто)</value>
+  </data>
+  <data name="Menu_RecentProjects" xml:space="preserve">
+    <value>Последние проекты</value>
+  </data>
+  <data name="Menu_RemoveMySheets" xml:space="preserve">
+    <value>Удалить из моих форматов</value>
+  </data>
+  <data name="Menu_Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Menu_SaveAs" xml:space="preserve">
+    <value>Сохранить как...</value>
+  </data>
+  <data name="Menu_SendFeedback" xml:space="preserve">
+    <value>Обратная связь...</value>
+  </data>
+  <data name="Menu_Settings" xml:space="preserve">
+    <value>_Настройки</value>
+  </data>
+  <data name="Msg_AddPartsFirst" xml:space="preserve">
+    <value>Сначала откройте проект и добавьте детали.</value>
+  </data>
+  <data name="Msg_AddSheetsFirst" xml:space="preserve">
+    <value>Сначала добавьте хотя бы один лист на вкладке «Листы».</value>
+  </data>
+  <data name="Msg_AllCut" xml:space="preserve">
+    <value>Всё вырезано: деталей для раскладки не осталось.</value>
+  </data>
+  <data name="Msg_CannotUse" xml:space="preserve">
+    <value>Нельзя использовать {0}:
+
+{1}</value>
+  </data>
+  <data name="Msg_ClearPartsConfirm" xml:space="preserve">
+    <value>Очистить весь список деталей?</value>
+  </data>
+  <data name="Msg_CommonLineSkipped" xml:space="preserve">
+    <value>Резка по общей линии пропущена для:
+
+{0}
+
+Эти детали сохранили обычный зазор.</value>
+  </data>
+  <data name="Msg_CutRenestConfirm" xml:space="preserve">
+    <value>Отмечено вырезанными: {0} л., на них {1} дет.
+
+Эти детали снимаются с заказа (количества в таблице деталей уменьшатся), листы остаются списанными, и остальное раскладывается заново.
+
+Продолжить?</value>
+  </data>
+  <data name="Msg_EditLeave" xml:space="preserve">
+    <value>Всё равно выйти?</value>
+  </data>
+  <data name="Msg_EditUndoLeave" xml:space="preserve">
+    <value>Отменить изменения и всё равно выйти?</value>
+  </data>
+  <data name="Msg_EditUnfit" xml:space="preserve">
+    <value>Деталей на этой раскладке, не готовых к резке: {0}{1}.
+
+Они показаны красным. Разведите их, прежде чем выходить из правки.
+
+</value>
+  </data>
+  <data name="Msg_ExportOverwrite" xml:space="preserve">
+    <value>Эти файлы уже существуют и будут перезаписаны:
+
+{0}
+
+Продолжить?</value>
+  </data>
+  <data name="Msg_FileMissing" xml:space="preserve">
+    <value>Не удалось найти {0}.</value>
+  </data>
+  <data name="Msg_FlipFailed" xml:space="preserve">
+    <value>Не удалось отразить {0}: {1}</value>
+  </data>
+  <data name="Msg_MixedSvgDxf" xml:space="preserve">
+    <value>Нельзя экспортировать, если среди деталей есть и SVG, и DXF.</value>
+  </data>
+  <data name="Msg_NestFirstExport" xml:space="preserve">
+    <value>Сначала выполните раскладку и выберите результат, затем экспортируйте.</value>
+  </data>
+  <data name="Msg_NestFirstReport" xml:space="preserve">
+    <value>Сначала выполните раскладку и выберите результат, затем сохраните отчёт.</value>
+  </data>
+  <data name="Msg_NestFirstToPrint" xml:space="preserve">
+    <value>Сначала выполните нестинг и выберите результат для печати.</value>
+  </data>
+  <data name="Msg_NoBrowserFeedback" xml:space="preserve">
+    <value>Не удалось открыть браузер. Отправить отзыв можно здесь:
+https://github.com/ManuelMRosa/SheetNest/issues</value>
+  </data>
+  <data name="Msg_NoEngine" xml:space="preserve">
+    <value>Не найден движок раскладки (sparrow.exe). Он поставляется вместе с программой: переустановите её или укажите путь в переменной окружения SHEETNEST_SPARROW.</value>
+  </data>
+  <data name="Msg_NoResult" xml:space="preserve">
+    <value>Раскладка не дала результата.</value>
+  </data>
+  <data name="Msg_NoShape" xml:space="preserve">
+    <value>В {0} нет контура, который можно раскладывать.</value>
+  </data>
+  <data name="Msg_NotEnoughSheets" xml:space="preserve">
+    <value>Деталей, не поместившихся на {1} доступных листов: {0}.
+
+Увеличьте количество листов на вкладке «Листы», отметьте «Без ограничений» у одного из размеров или добавьте лист и запустите раскладку снова.</value>
+  </data>
+  <data name="Msg_NotReadyToCut" xml:space="preserve">
+    <value>Не готовы к резке деталей: {0}
+
+{1}
+
+Они показаны красным. Разведите их в ручной правке и попробуйте снова.</value>
+  </data>
+  <data name="Msg_PartsDoNotFit" xml:space="preserve">
+    <value>Деталей, не поместившихся ни на один размер листа на вкладке «Листы»: {0}.
+
+Дело не в количестве листов — один из размеров без ограничений. Деталь больше любого листа, на который она может лечь: добавьте лист большего размера (или проверьте зазор детали и отступ от края).</value>
+  </data>
+  <data name="Msg_PrintError" xml:space="preserve">
+    <value>Ошибка печати</value>
+  </data>
+  <data name="Msg_ProfileFileBad" xml:space="preserve">
+    <value>Файл настроек раскладки {0} не читается, взяты значения по умолчанию:
+{1}</value>
+  </data>
+  <data name="Msg_Recover" xml:space="preserve">
+    <value>SheetNest закрылся аварийно, не сохранив изменения в {0}{1}.
+
+Восстановить автосохранённый проект?</value>
+  </data>
+  <data name="Msg_RecoverUnsaved" xml:space="preserve">
+    <value>несохранённом проекте</value>
+  </data>
+  <data name="Msg_RecoverWhen" xml:space="preserve">
+    <value> (автосохранение {0})</value>
+  </data>
+  <data name="Msg_ReportWriteFailed" xml:space="preserve">
+    <value>Не удалось записать отчёт: {0}</value>
+  </data>
+  <data name="Msg_SaveBeforeClosing" xml:space="preserve">
+    <value>Есть результат раскладки. Сохранить проект перед закрытием?</value>
+  </data>
+  <data name="Msg_SaveFailed" xml:space="preserve">
+    <value>Не удалось сохранить проект в
+{0}
+
+{1}
+
+Проект не сохранён. Сохраните его в другое место (Файл → Сохранить как).</value>
+  </data>
+  <data name="Msg_SaveFirst" xml:space="preserve">
+    <value>Есть результат раскладки. Сначала сохранить проект?</value>
+  </data>
+  <data name="Msg_UnfitRow" xml:space="preserve">
+    <value>    {0}: деталей {1}{2}</value>
+  </data>
+  <data name="Msg_UnsupportedFiles" xml:space="preserve">
+    <value>Не удалось открыть: {0}.
+SheetNest открывает проекты (*.dnest) и чертежи DXF и SC2000 (*.dxf, *.dfx, *.chf).</value>
+  </data>
+  <data name="Msg_UpToDate" xml:space="preserve">
+    <value>У вас последняя версия (SheetNest {0}).</value>
+  </data>
+  <data name="Msg_UpdateAvailable" xml:space="preserve">
+    <value>Доступна версия SheetNest {0} (у вас {1}).
+
+Открыть страницу загрузки?</value>
+  </data>
+  <data name="Msg_UpdateFailed" xml:space="preserve">
+    <value>Не удалось проверить обновления. Проверьте подключение к интернету.</value>
+  </data>
+  <data name="Nest_Cancelled" xml:space="preserve">
+    <value>Раскладка отменена</value>
+  </data>
+  <data name="Nest_Done" xml:space="preserve">
+    <value>Готово за {0}{1}</value>
+  </data>
+  <data name="Nest_GivenUp" xml:space="preserve">
+    <value>, не удалось: {0}</value>
+  </data>
+  <data name="Nest_KeptNormal" xml:space="preserve">
+    <value>, чертежей с обычным зазором: {0}</value>
+  </data>
+  <data name="Nest_LivePreview" xml:space="preserve">
+    <value>Идёт поиск: {0} из {1} деталей, листов: {2}</value>
+  </data>
+  <data name="Nest_Running" xml:space="preserve">
+    <value>Раскладка…  {0}</value>
+  </data>
+  <data name="Nest_SharedCuts" xml:space="preserve">
+    <value>  ·  общих резов: {0}</value>
+  </data>
+  <data name="Nesting_VariantMetrics" xml:space="preserve">
+    <value>Вариант #{0}: Утилизация {1} | Размещено {2} | Листов: {3} (время: {4})</value>
+  </data>
+  <data name="Off_Auto" xml:space="preserve">
+    <value>Авто (лучший остаток)</value>
+  </data>
+  <data name="Off_AutoBadge" xml:space="preserve">
+    <value>АВТО</value>
+  </data>
+  <data name="Off_AutoTip" xml:space="preserve">
+    <value>Сравнивает варианты «В конце», «Сбоку» и «Оба» для полученной раскладки и выбирает тот, что освобождает больше материала.</value>
+  </data>
+  <data name="Off_Both" xml:space="preserve">
+    <value>Оба (Г-образный)</value>
+  </data>
+  <data name="Off_BothTip" xml:space="preserve">
+    <value>Если после раскладки свободное место осталось с обеих сторон, остаток отделяется двумя прямоугольниками (сквозными резами, поэтому ни один рез не делит отход пополам).</value>
+  </data>
+  <data name="Off_Enable" xml:space="preserve">
+    <value>Отрезать остаток листа прямоугольным деловым отходом</value>
+  </data>
+  <data name="Off_EnableTip" xml:space="preserve">
+    <value>Измеряет свободную площадь, оставшуюся на последнем листе после раскладки, и добавляет линию реза, чтобы она отделилась пригодным для повторного использования прямоугольником. Детали при этом не сдвигаются: раскладка уже готова к моменту расчёта, поэтому включение не меняет положение деталей.</value>
+  </data>
+  <data name="Off_End" xml:space="preserve">
+    <value>В конце листа</value>
+  </data>
+  <data name="Off_EndTip" xml:space="preserve">
+    <value>Полоса во всю ширину в конце длинной стороны листа — классический деловой отход.</value>
+  </data>
+  <data name="Off_MaxX" xml:space="preserve">
+    <value>Максимальный размер по X ({0}):</value>
+  </data>
+  <data name="Off_MaxXTip" xml:space="preserve">
+    <value>Самый широкий остаток, который ещё стоит отрезать. Если больше — это уже почти целый лист, поэтому ничего не режется и лист остаётся целым. 0 = без ограничения.</value>
+  </data>
+  <data name="Off_MaxY" xml:space="preserve">
+    <value>Максимальный размер по Y ({0}):</value>
+  </data>
+  <data name="Off_MaxYTip" xml:space="preserve">
+    <value>Самый длинный остаток, который ещё стоит отрезать. 0 = без ограничения.</value>
+  </data>
+  <data name="Off_MinX" xml:space="preserve">
+    <value>Минимальный размер по X ({0}):</value>
+  </data>
+  <data name="Off_MinXTip" xml:space="preserve">
+    <value>Самый узкий остаток, который стоит отрезать. Если меньше — лист остаётся целым. 0 = автоматически (5% стороны листа).</value>
+  </data>
+  <data name="Off_MinY" xml:space="preserve">
+    <value>Минимальный размер по Y ({0}):</value>
+  </data>
+  <data name="Off_MinYTip" xml:space="preserve">
+    <value>Самый короткий остаток, который стоит отрезать. 0 = автоматически (5% стороны листа).</value>
+  </data>
+  <data name="Off_Overlap" xml:space="preserve">
+    <value>Выход реза за край листа ({0}):</value>
+  </data>
+  <data name="Off_OverlapTip" xml:space="preserve">
+    <value>На сколько рез выходит ЗА край листа с каждой стороны, чтобы остаток отделился, а не держался на перемычке в углах. 0 = заподлицо с краем.</value>
+  </data>
+  <data name="Off_Position" xml:space="preserve">
+    <value>Положение остатка</value>
+  </data>
+  <data name="Off_Reset" xml:space="preserve">
+    <value>Сбросить по умолчанию</value>
+  </data>
+  <data name="Off_ResetTip" xml:space="preserve">
+    <value>Возвращает шесть чисел выше к рекомендуемым значениям для единиц этого чертежа. Положение остатка и флажок включения не меняются.</value>
+  </data>
+  <data name="Off_Side" xml:space="preserve">
+    <value>Сбоку листа</value>
+  </data>
+  <data name="Off_SideTip" xml:space="preserve">
+    <value>Полоса во всю длину вдоль короткой стороны листа.</value>
+  </data>
+  <data name="Off_Spacing" xml:space="preserve">
+    <value>Зазор до линии реза ({0}):</value>
+  </data>
+  <data name="Off_SpacingTip" xml:space="preserve">
+    <value>Зазор между деталями раскладки и линией реза делового отхода (в единицах чертежа).</value>
+  </data>
+  <data name="Off_Title" xml:space="preserve">
+    <value>Деловые отходы</value>
+  </data>
+  <data name="PartColour_Title" xml:space="preserve">
+    <value>Цвет детали</value>
+  </data>
+  <data name="Part_Cc_None" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="Part_Cc_SamePart" xml:space="preserve">
+    <value>Только с такими же деталями</value>
+  </data>
+  <data name="Part_Cc_Unrestricted" xml:space="preserve">
+    <value>С любыми совместимыми деталями</value>
+  </data>
+  <data name="Part_CommonCutting" xml:space="preserve">
+    <value>Общий рез:</value>
+  </data>
+  <data name="Part_CommonCuttingTip" xml:space="preserve">
+    <value>С кем деталь может иметь общую линию реза. Полные кромки ставятся с зазором резки по общей линии и экспортируются как контур кластера плюс один общий рез посередине. Везде в остальном действует зазор детали. Явный выбор здесь включает общий рез для этой детали.</value>
+  </data>
+  <data name="Part_Extra" xml:space="preserve">
+    <value>Запас:</value>
+  </data>
+  <data name="Part_ExtraTip" xml:space="preserve">
+    <value>Запасные детали сверх требуемого количества (например, на случай брака).</value>
+  </data>
+  <data name="Part_File" xml:space="preserve">
+    <value>Файл детали:</value>
+  </data>
+  <data name="Part_FlippedBoth" xml:space="preserve">
+    <value>↔↕ отражена дважды (= поворот на 180°)</value>
+  </data>
+  <data name="Part_FlippedLeftRight" xml:space="preserve">
+    <value>↔ отражена слева направо</value>
+  </data>
+  <data name="Part_FlippedUpDown" xml:space="preserve">
+    <value>↕ отражена сверху вниз</value>
+  </data>
+  <data name="Part_FullSheetWarn" xml:space="preserve">
+    <value>⚠ Этот DXF похож на ГОТОВУЮ РАСКЛАДКУ ({0} контуров внутри рамки {1}×{2}), а не на одну деталь. SheetNest импортирует каждый DXF как ОДНУ деталь, а промежутки между внутренними контурами берутся из исходного чертежа. Сохраните каждую деталь в отдельный DXF.</value>
+  </data>
+  <data name="Part_LegacyCcHint" xml:space="preserve">
+    <value>Сохранённый режим общего реза из старой версии не активен. Выберите режим, чтобы подтвердить его для этой детали.</value>
+  </data>
+  <data name="Part_Mirrored" xml:space="preserve">
+    <value>Зеркальные:</value>
+  </data>
+  <data name="Part_MirroredTip" xml:space="preserve">
+    <value>Копии, раскладываемые ЗЕРКАЛЬНО (отражение по X) сверх количеств выше — для пар левая/правая. В экспортируемом DXF они вырезаются зеркальными.</value>
+  </data>
+  <data name="Part_Orientations" xml:space="preserve">
+    <value>Разрешённые повороты:</value>
+  </data>
+  <data name="Part_OrientationsTip" xml:space="preserve">
+    <value>Повороты, которые раскладка может применять к ЭТОЙ детали (например, ограничить из-за направления проката).</value>
+  </data>
+  <data name="Part_Priority" xml:space="preserve">
+    <value>Приоритет:</value>
+  </data>
+  <data name="Part_PriorityTip" xml:space="preserve">
+    <value>1 = наивысший приоритет. Детали с более высоким приоритетом раскладываются первыми, поэтому занимают первые листы и никогда не остаются лишними, если материала не хватит.</value>
+  </data>
+  <data name="Part_Quantity" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="Part_Required" xml:space="preserve">
+    <value>Требуется:</value>
+  </data>
+  <data name="Part_RequiredTip" xml:space="preserve">
+    <value>Сколько деталей нужно для задания.</value>
+  </data>
+  <data name="Part_Settings" xml:space="preserve">
+    <value>Параметры</value>
+  </data>
+  <data name="Part_Spacing" xml:space="preserve">
+    <value>Зазор детали:</value>
+  </data>
+  <data name="Part_SpacingTip" xml:space="preserve">
+    <value>Зазор, который деталь держит до соседей, с которыми НЕ может иметь общий рез (в единицах чертежа). Между двумя деталями получается (зазорA + зазорB) / 2.</value>
+  </data>
+  <data name="Part_SymmetricHint" xml:space="preserve">
+    <value>Форма симметрична при повороте (круг/квадрат): поворот не улучшит раскладку, поэтому «Как начертано» экономит время поиска.</value>
+  </data>
+  <data name="Part_Title" xml:space="preserve">
+    <value>Параметры детали</value>
+  </data>
+  <data name="Part_Units" xml:space="preserve">
+    <value>в единицах чертежа</value>
+  </data>
+  <data name="Parts_CountSummary" xml:space="preserve">
+    <value>Деталей: {0} (запрошено: {1} шт.)</value>
+  </data>
+  <data name="Priority_High" xml:space="preserve">
+    <value>Высокий</value>
+  </data>
+  <data name="Priority_Highest" xml:space="preserve">
+    <value>Наивысший</value>
+  </data>
+  <data name="Priority_Low" xml:space="preserve">
+    <value>Низкий</value>
+  </data>
+  <data name="Priority_Lowest" xml:space="preserve">
+    <value>Наименьший</value>
+  </data>
+  <data name="Priority_Normal" xml:space="preserve">
+    <value>Обычный</value>
+  </data>
+  <data name="Radio_DxfView" xml:space="preserve">
+    <value>Чертеж DXF</value>
+  </data>
+  <data name="Radio_ReportView" xml:space="preserve">
+    <value>Сводный отчет раскроя</value>
+  </data>
+  <data name="Rep_BoxArea" xml:space="preserve">
+    <value>Площадь габарита</value>
+  </data>
+  <data name="Rep_Continued" xml:space="preserve">
+    <value>{0} (продолжение)</value>
+  </data>
+  <data name="Rep_Cut" xml:space="preserve">
+    <value>Резать</value>
+  </data>
+  <data name="Rep_CutLength" xml:space="preserve">
+    <value>Длина реза</value>
+  </data>
+  <data name="Rep_CutTotal" xml:space="preserve">
+    <value>Длина реза</value>
+  </data>
+  <data name="Rep_CuttingPlan" xml:space="preserve">
+    <value>ПЛАН РЕЗКИ</value>
+  </data>
+  <data name="Rep_DifferentLayouts" xml:space="preserve">
+    <value>Разных раскладок</value>
+  </data>
+  <data name="Rep_Header" xml:space="preserve">
+    <value>SheetNest — отчёт раскроя</value>
+  </data>
+  <data name="Rep_Kg" xml:space="preserve">
+    <value>кг</value>
+  </data>
+  <data name="Rep_Layout" xml:space="preserve">
+    <value>Раскладка</value>
+  </data>
+  <data name="Rep_LayoutN" xml:space="preserve">
+    <value>Раскладка {0}</value>
+  </data>
+  <data name="Rep_LayoutSub" xml:space="preserve">
+    <value>Деталей: {0}   |   использование {1}%   |   лист {2} x {3} {4}</value>
+  </data>
+  <data name="Rep_LayoutTitle" xml:space="preserve">
+    <value>Раскладка {0} из {1}   -   резать x {2}</value>
+  </data>
+  <data name="Rep_M2" xml:space="preserve">
+    <value>м²</value>
+  </data>
+  <data name="Rep_Material" xml:space="preserve">
+    <value>ТРЕБУЕТСЯ МАТЕРИАЛА</value>
+  </data>
+  <data name="Rep_MaterialKind" xml:space="preserve">
+    <value>Материал</value>
+  </data>
+  <data name="Rep_MaterialUsed" xml:space="preserve">
+    <value>Использование материала</value>
+  </data>
+  <data name="Rep_Metre" xml:space="preserve">
+    <value>м</value>
+  </data>
+  <data name="Rep_More" xml:space="preserve">
+    <value>... и ещё {0}</value>
+  </data>
+  <data name="Rep_MoreLayouts" xml:space="preserve">
+    <value>... и ещё раскладок: {0} (см. их страницы)</value>
+  </data>
+  <data name="Rep_No" xml:space="preserve">
+    <value>№</value>
+  </data>
+  <data name="Rep_NotPlaced" xml:space="preserve">
+    <value>Деталей НЕ размещено</value>
+  </data>
+  <data name="Rep_NothingToReport" xml:space="preserve">
+    <value>Нечего включать в отчёт. Сначала выполните раскладку.</value>
+  </data>
+  <data name="Rep_Page" xml:space="preserve">
+    <value>Стр. {0} из {1}</value>
+  </data>
+  <data name="Rep_PageCol" xml:space="preserve">
+    <value>Стр.</value>
+  </data>
+  <data name="Rep_Part" xml:space="preserve">
+    <value>Деталь</value>
+  </data>
+  <data name="Rep_PartFallback" xml:space="preserve">
+    <value>(деталь)</value>
+  </data>
+  <data name="Rep_PartTotals" xml:space="preserve">
+    <value>ИТОГО ПО ДЕТАЛЯМ</value>
+  </data>
+  <data name="Rep_PartWeight" xml:space="preserve">
+    <value>Вес деталей</value>
+  </data>
+  <data name="Rep_Parts" xml:space="preserve">
+    <value>Детали</value>
+  </data>
+  <data name="Rep_PartsOnLayout" xml:space="preserve">
+    <value>Детали на этой раскладке</value>
+  </data>
+  <data name="Rep_PartsToCut" xml:space="preserve">
+    <value>Деталей к резке</value>
+  </data>
+  <data name="Rep_Pierces" xml:space="preserve">
+    <value>Врезок</value>
+  </data>
+  <data name="Rep_Qty" xml:space="preserve">
+    <value>Кол.</value>
+  </data>
+  <data name="Rep_SheetFew" xml:space="preserve">
+    <value>листа</value>
+  </data>
+  <data name="Rep_SheetMany" xml:space="preserve">
+    <value>листов</value>
+  </data>
+  <data name="Rep_SheetOne" xml:space="preserve">
+    <value>лист</value>
+  </data>
+  <data name="Rep_SheetSize" xml:space="preserve">
+    <value>Размер листа</value>
+  </data>
+  <data name="Rep_SheetWeight" xml:space="preserve">
+    <value>Вес листов</value>
+  </data>
+  <data name="Rep_SheetsOf" xml:space="preserve">
+    <value>{0}  {1} x {2} {3}</value>
+  </data>
+  <data name="Rep_SizeCol" xml:space="preserve">
+    <value>Размеры, {0}</value>
+  </data>
+  <data name="Rep_Sq" xml:space="preserve">
+    <value>кв. {0}</value>
+  </data>
+  <data name="Rep_SqFt" xml:space="preserve">
+    <value>кв. фут</value>
+  </data>
+  <data name="Rep_Summary" xml:space="preserve">
+    <value>СВОДКА ЗАДАНИЯ</value>
+  </data>
+  <data name="Rep_Total" xml:space="preserve">
+    <value>Итого:  {0} {1}   -   {2}</value>
+  </data>
+  <data name="Rep_Used" xml:space="preserve">
+    <value>Исп.</value>
+  </data>
+  <data name="Report_ColPartArea" xml:space="preserve">
+    <value>Площадь (шт.)</value>
+  </data>
+  <data name="Report_ColPartDim" xml:space="preserve">
+    <value>Габариты детали</value>
+  </data>
+  <data name="Report_ColPartName" xml:space="preserve">
+    <value>Деталь / Файл</value>
+  </data>
+  <data name="Report_ColPartPos" xml:space="preserve">
+    <value>Поз. №</value>
+  </data>
+  <data name="Report_ColPartQty" xml:space="preserve">
+    <value>Всего шт.</value>
+  </data>
+  <data name="Report_ColSheetFormat" xml:space="preserve">
+    <value>Формат листа</value>
+  </data>
+  <data name="Report_ColSheetNum" xml:space="preserve">
+    <value>Лист №</value>
+  </data>
+  <data name="Report_ColSheetParts" xml:space="preserve">
+    <value>Деталей на листе</value>
+  </data>
+  <data name="Report_ColSheetRepeat" xml:space="preserve">
+    <value>Кол-во листов</value>
+  </data>
+  <data name="Report_ColSheetUtil" xml:space="preserve">
+    <value>Утилизация</value>
+  </data>
+  <data name="Report_DatePrefix" xml:space="preserve">
+    <value>Дата: </value>
+  </data>
+  <data name="Report_EmptySub" xml:space="preserve">
+    <value>Выполните нестинг деталей на 3-м экране, чтобы просмотреть и напечатать готовый производственный отчёт со спецификацией и картами резки.</value>
+  </data>
+  <data name="Report_EmptyTitle" xml:space="preserve">
+    <value>Отчёт раскроя ещё не сформирован</value>
+  </data>
+  <data name="Report_PageXofY" xml:space="preserve">
+    <value>Стр. {0} из {1}</value>
+  </data>
+  <data name="Report_PartsSpecTitle" xml:space="preserve">
+    <value>2. Спецификация раскроенных деталей</value>
+  </data>
+  <data name="Report_PreviewToolbar_Print" xml:space="preserve">
+    <value>🖨️ Печать отчета</value>
+  </data>
+  <data name="Report_PreviewToolbar_SavePdf" xml:space="preserve">
+    <value>📄 Сохранить PDF</value>
+  </data>
+  <data name="Report_PreviewToolbar_Summary" xml:space="preserve">
+    <value>Производственный отчёт раскроя</value>
+  </data>
+  <data name="Report_PreviewToolbar_ZoomFit" xml:space="preserve">
+    <value>⤢ По ширине</value>
+  </data>
+  <data name="Report_ProjectPrefix" xml:space="preserve">
+    <value>Проект: </value>
+  </data>
+  <data name="Report_SheetsMapTitle" xml:space="preserve">
+    <value>1. Карта раскроя по листам</value>
+  </data>
+  <data name="Report_Title" xml:space="preserve">
+    <value>СВОДНЫЙ ОТЧЕТ РАСКРОЯ</value>
+  </data>
+  <data name="Report_UnitsPrefix" xml:space="preserve">
+    <value>Единицы: </value>
+  </data>
+  <data name="Report_UntitledProject" xml:space="preserve">
+    <value>Безымянный</value>
+  </data>
+  <data name="Rot_0And180Tip" xml:space="preserve">
+    <value>0° и 180°: учитывает направление проката, но деталь может перевернуться.</value>
+  </data>
+  <data name="Rot_0And90Tip" xml:space="preserve">
+    <value>Разрешены 0° и 90°.</value>
+  </data>
+  <data name="Rot_45" xml:space="preserve">
+    <value>Шаг 45°</value>
+  </data>
+  <data name="Rot_45Tip" xml:space="preserve">
+    <value>Восемь положений через 45°. Это же значение есть в настройках задания, и без него здесь деталь не могла бы показать, что для неё задано на самом деле.</value>
+  </data>
+  <data name="Rot_4Way" xml:space="preserve">
+    <value>4 стороны</value>
+  </data>
+  <data name="Rot_4WayTip" xml:space="preserve">
+    <value>Все четыре прямых положения (0 / 90 / 180 / 270°). Надёжный первый выбор для квадратных и Г-образных деталей: на них он обычно лучше свободного поворота и всегда быстрее в поиске.</value>
+  </data>
+  <data name="Rot_90And270Tip" xml:space="preserve">
+    <value>90° и 270°: деталь всегда повёрнута, в любую сторону.</value>
+  </data>
+  <data name="Rot_90Only" xml:space="preserve">
+    <value>Только 90°</value>
+  </data>
+  <data name="Rot_90OnlyTip" xml:space="preserve">
+    <value>Только 90°: деталь всегда повёрнута один раз.</value>
+  </data>
+  <data name="Rot_AsDrawn" xml:space="preserve">
+    <value>Как начертано</value>
+  </data>
+  <data name="Rot_AsDrawnTip" xml:space="preserve">
+    <value>Только 0°: деталь остаётся точно как начерчена (учитывает направление проката).</value>
+  </data>
+  <data name="Rot_Free" xml:space="preserve">
+    <value>Свободно</value>
+  </data>
+  <data name="Rot_FreeTip" xml:space="preserve">
+    <value>Любой угол — и НЕ обязательно самая плотная раскладка. Выигрывает на деталях с косыми или криволинейными кромками и проигрывает на квадратных и Г-образных, которые точно сцепляются под прямым углом и ничего не получают от наклона. На двух реальных заданиях: 84,3% заполнения против 81,6% у «4 стороны» на одном и 69,6% против 73,2% на другом. Поиск примерно вдвое дольше. Не учитывает направление проката.</value>
+  </data>
+  <data name="Rot_Job" xml:space="preserve">
+    <value>Как в задании</value>
+  </data>
+  <data name="Rot_JobTip" xml:space="preserve">
+    <value>Как задано для всего задания в Настройки › Расширенные настройки. Измените там — и деталь последует.</value>
+  </data>
+  <data name="Run_Draft" xml:space="preserve">
+    <value>черновик</value>
+  </data>
+  <data name="Run_Saved" xml:space="preserve">
+    <value>Сохранённый</value>
+  </data>
+  <data name="Set_AutosaveMinTip" xml:space="preserve">
+    <value>Как часто открытый проект автоматически сохраняется для восстановления.</value>
+  </data>
+  <data name="Set_AutosaveTip" xml:space="preserve">
+    <value>Периодически сохраняет копию открытого проекта, чтобы после сбоя несохранённую работу можно было восстановить.</value>
+  </data>
+  <data name="Set_ClusterMaxTip" xml:space="preserve">
+    <value>Жёсткий максимум деталей в одном кластере общего реза (от 2 до 500).</value>
+  </data>
+  <data name="Set_ClusterModeTip" xml:space="preserve">
+    <value>«Авто» — SheetNest сам выбирает безопасный размер кластера; «Вручную» — жёсткое ограничение числа деталей.</value>
+  </data>
+  <data name="Set_EffortTip" xml:space="preserve">
+    <value>Как долго ищется раскладка каждого листа. Больше времени даёт более ПЛОТНУЮ раскладку, а не больше деталей на листе: подходящие детали находятся почти сразу, а остальное время уходит на то, чтобы сжать их и оставить остаток одним удобным куском.</value>
+  </data>
+  <data name="Set_GapTip" xml:space="preserve">
+    <value>Для общего реза используется этот зазор; перед экспортом DXF SheetNest строит один рез посередине. Значение хранится в дюймах и показывается в выбранных единицах.</value>
+  </data>
+  <data name="Set_MarginTip" xml:space="preserve">
+    <value>Свободная полоса между любой деталью и краем листа.</value>
+  </data>
+  <data name="Set_MergeTip" xml:space="preserve">
+    <value>Параметр экспорта для обычной геометрии: объединяет совпадающие элементы DXF. Общий рез строит свою единственную линию посередине независимо от него.</value>
+  </data>
+  <data name="Set_PartNamesTip" xml:space="preserve">
+    <value>Выводить имена файлов деталей текстом внутри каждой детали, чтобы узнать их после резки. PAINT — гравировка/маркировка лазером (тот же слой, что линии сгиба); BACKGROUND виден в CAD/CAM, но не обрабатывается. Всё, что режется, всегда идёт в слой CUT.</value>
+  </data>
+  <data name="Set_ResetClusterTip" xml:space="preserve">
+    <value>Вернуть автоматический размер кластеров общего реза.</value>
+  </data>
+  <data name="Set_ResetGapTip" xml:space="preserve">
+    <value>Вернуть зазор общего реза по умолчанию.</value>
+  </data>
+  <data name="Set_RotationsTip" xml:space="preserve">
+    <value>Повороты, которые раскладка может пробовать для деталей без собственной настройки. Настройка в «Параметрах детали» всегда важнее.</value>
+  </data>
+  <data name="Set_SpacingTip" xml:space="preserve">
+    <value>Зазор между обычными деталями по умолчанию (в единицах чертежа). В «Параметрах детали» его можно задать для каждой детали; для общего реза используется отдельный зазор ниже.</value>
+  </data>
+  <data name="Set_UnitsTip" xml:space="preserve">
+    <value>Единицы чертежа для деталей, листов, зазоров и отступов. Выберите те, в которых начерчены ваши DXF; физический зазор общего реза пересчитывается автоматически.</value>
+  </data>
+  <data name="Settings_Auto" xml:space="preserve">
+    <value>Авто</value>
+  </data>
+  <data name="Settings_Autosave" xml:space="preserve">
+    <value>Автосохранение открытого проекта</value>
+  </data>
+  <data name="Settings_AutosaveTime" xml:space="preserve">
+    <value>Интервал автосохранения (мин):</value>
+  </data>
+  <data name="Settings_CommonLineGap" xml:space="preserve">
+    <value>Зазор резки по общей линии</value>
+  </data>
+  <data name="Settings_Concurrency" xml:space="preserve">
+    <value>Параллельных поисков:</value>
+  </data>
+  <data name="Settings_Concurrency_Auto" xml:space="preserve">
+    <value>Авто ({0})</value>
+  </data>
+  <data name="Settings_Concurrency_Tip" xml:space="preserve">
+    <value>Сколько поисков раскладки идёт одновременно. Меньше — слабый компьютер не тормозит, больше — быстрее на мощном. Сама раскладка от этого не меняется.</value>
+  </data>
+  <data name="Settings_Effort" xml:space="preserve">
+    <value>Усилие поиска:</value>
+  </data>
+  <data name="Settings_Effort_Best" xml:space="preserve">
+    <value>Глубокий (медленнее)</value>
+  </data>
+  <data name="Settings_Effort_Fast" xml:space="preserve">
+    <value>Быстрый</value>
+  </data>
+  <data name="Settings_Effort_Normal" xml:space="preserve">
+    <value>Оптимальный (по умолчанию)</value>
+  </data>
+  <data name="Settings_Group_App" xml:space="preserve">
+    <value>Параметры приложения</value>
+  </data>
+  <data name="Settings_Group_CommonLine" xml:space="preserve">
+    <value>Резка по общей линии (совмещенный рез)</value>
+  </data>
+  <data name="Settings_Group_Dxf" xml:space="preserve">
+    <value>Параметры экспорта DXF</value>
+  </data>
+  <data name="Settings_Group_Nesting" xml:space="preserve">
+    <value>Параметры раскроя</value>
+  </data>
+  <data name="Settings_Manual" xml:space="preserve">
+    <value>Вручную</value>
+  </data>
+  <data name="Settings_Margin" xml:space="preserve">
+    <value>Отступ от края листа</value>
+  </data>
+  <data name="Settings_MaxCluster" xml:space="preserve">
+    <value>Макс. деталей в кластере:</value>
+  </data>
+  <data name="Settings_MergeLines" xml:space="preserve">
+    <value>Объединять совпадающие линии реза</value>
+  </data>
+  <data name="Settings_PartNames" xml:space="preserve">
+    <value>Имена деталей в DXF:</value>
+  </data>
+  <data name="Settings_PartNames_Background" xml:space="preserve">
+    <value>BACKGROUND — только для просмотра</value>
+  </data>
+  <data name="Settings_PartNames_Layer9" xml:space="preserve">
+    <value>PAINT — гравировка, вместе с линиями сгиба</value>
+  </data>
+  <data name="Settings_PartNames_None" xml:space="preserve">
+    <value>Не экспортировать</value>
+  </data>
+  <data name="Settings_Reset" xml:space="preserve">
+    <value>Сброс</value>
+  </data>
+  <data name="Settings_Rot_0_180" xml:space="preserve">
+    <value>0 / 180°</value>
+  </data>
+  <data name="Settings_Rot_45" xml:space="preserve">
+    <value>Шаг 45°</value>
+  </data>
+  <data name="Settings_Rot_90" xml:space="preserve">
+    <value>Шаг 90°</value>
+  </data>
+  <data name="Settings_Rot_AsDrawn" xml:space="preserve">
+    <value>Как начертано</value>
+  </data>
+  <data name="Settings_Rot_Free" xml:space="preserve">
+    <value>Свободный (36 шагов)</value>
+  </data>
+  <data name="Settings_Rotations" xml:space="preserve">
+    <value>Углы поворота деталей:</value>
+  </data>
+  <data name="Settings_Spacing" xml:space="preserve">
+    <value>Зазор между деталями</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Расширенные настройки</value>
+  </data>
+  <data name="Settings_Units" xml:space="preserve">
+    <value>Единицы измерения:</value>
+  </data>
+  <data name="Settings_Units_In" xml:space="preserve">
+    <value>Дюймы (in)</value>
+  </data>
+  <data name="Settings_Units_Mm" xml:space="preserve">
+    <value>Миллиметры (мм)</value>
+  </data>
+  <data name="Shape_Circle" xml:space="preserve">
+    <value>Круг</value>
+  </data>
+  <data name="Shape_Diameter" xml:space="preserve">
+    <value>Диаметр:</value>
+  </data>
+  <data name="Shape_Height" xml:space="preserve">
+    <value>Высота:</value>
+  </data>
+  <data name="Shape_Quantity" xml:space="preserve">
+    <value>Количество:</value>
+  </data>
+  <data name="Shape_Rectangle" xml:space="preserve">
+    <value>Прямоугольник</value>
+  </data>
+  <data name="Shape_Square" xml:space="preserve">
+    <value>Квадрат</value>
+  </data>
+  <data name="Shape_Title" xml:space="preserve">
+    <value>Добавить фигуру</value>
+  </data>
+  <data name="Shape_Width" xml:space="preserve">
+    <value>Ширина:</value>
+  </data>
+  <data name="Sheet_Dlg_Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="Sheet_Dlg_Header" xml:space="preserve">
+    <value>Размеры листа в {0} (ширина = длинная сторона).</value>
+  </data>
+  <data name="Sheet_Dlg_Height" xml:space="preserve">
+    <value>Высота ({0})</value>
+  </data>
+  <data name="Sheet_Dlg_Priority" xml:space="preserve">
+    <value>Приоритет расходования:</value>
+  </data>
+  <data name="Sheet_Dlg_Qty" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="Sheet_Dlg_Remember" xml:space="preserve">
+    <value>Сохранить как шаблон</value>
+  </data>
+  <data name="Sheet_Dlg_Title" xml:space="preserve">
+    <value>Новый размер листа</value>
+  </data>
+  <data name="Sheet_Dlg_Title_Edit" xml:space="preserve">
+    <value>Редактировать лист</value>
+  </data>
+  <data name="Sheet_Dlg_Unlimited" xml:space="preserve">
+    <value>Без ограничений</value>
+  </data>
+  <data name="Sheet_Dlg_Width" xml:space="preserve">
+    <value>Ширина ({0})</value>
+  </data>
+  <data name="Sheet_PriorityTip" xml:space="preserve">
+    <value>Приоритет расходования листов: листы с наивысшим приоритетом расходуются первыми (например, остатки и деловые отходы).</value>
+  </data>
+  <data name="Sheet_RememberTip" xml:space="preserve">
+    <value>Сохранить этот размер в разделе «Мои листы» меню «Добавить лист».</value>
+  </data>
+  <data name="Sheet_UnlimitedShort" xml:space="preserve">
+    <value>Без ограничений</value>
+  </data>
+  <data name="Sheet_UnlimitedTip" xml:space="preserve">
+    <value>Листов этого размера столько, сколько нужно заданию: раскладка берёт листы, пока не разместит все детали. Пока флажок стоит, количество не учитывается (оно сохранится, если флажок снять).</value>
+  </data>
+  <data name="Sheets_CountSummary" xml:space="preserve">
+    <value>Типоразмеров: {0} (листов: {1})</value>
+  </data>
+  <data name="Sheets_EmptySub" xml:space="preserve">
+    <value>Добавьте стандартный формат листа или введите свой размер</value>
+  </data>
+  <data name="Sheets_UnlimitedNote" xml:space="preserve">
+    <value>есть безлимитные</value>
+  </data>
+  <data name="Status_Placed" xml:space="preserve">
+    <value>Размещено:</value>
+  </data>
+  <data name="Status_Sheets" xml:space="preserve">
+    <value>Листов:</value>
+  </data>
+  <data name="Status_Unplaced" xml:space="preserve">
+    <value>Не поместилось:</value>
+  </data>
+  <data name="Status_Utilization" xml:space="preserve">
+    <value>Утилизация:</value>
+  </data>
+  <data name="Tab_Layout" xml:space="preserve">
+    <value>4. Раскладка и отчёт</value>
+  </data>
+  <data name="Tab_Nesting" xml:space="preserve">
+    <value>3. Нестинг</value>
+  </data>
+  <data name="Tab_Parts" xml:space="preserve">
+    <value>1. Модели (Детали)</value>
+  </data>
+  <data name="Tab_Sheets" xml:space="preserve">
+    <value>2. Листы</value>
+  </data>
+  <data name="Tip_AddPart" xml:space="preserve">
+    <value>Добавить детали из файлов DXF</value>
+  </data>
+  <data name="Tip_AddShape" xml:space="preserve">
+    <value>Добавить прямоугольник или круг без DXF, сразу нужным количеством</value>
+  </data>
+  <data name="Tip_AddSheet" xml:space="preserve">
+    <value>Выбрать стандартный размер или ввести свой</value>
+  </data>
+  <data name="Tip_BackToNesting" xml:space="preserve">
+    <value>Вернуться к вариантам раскладки (Ctrl+3)</value>
+  </data>
+  <data name="Tip_BackToParts" xml:space="preserve">
+    <value>Вернуться к списку деталей (Ctrl+1)</value>
+  </data>
+  <data name="Tip_CancelNest" xml:space="preserve">
+    <value>Остановить раскладку</value>
+  </data>
+  <data name="Tip_ClearParts" xml:space="preserve">
+    <value>Очистить весь список деталей</value>
+  </data>
+  <data name="Tip_ClearRuns" xml:space="preserve">
+    <value>Очистить список накопленных вариантов раскладки</value>
+  </data>
+  <data name="Tip_CutRenest" xml:space="preserve">
+    <value>Отмеченные листы уже вырезаны: их детали снимаются с заказа, листы — со склада, и остальное раскладывается заново</value>
+  </data>
+  <data name="Tip_DeletePart" xml:space="preserve">
+    <value>Удалить выбранную деталь из проекта</value>
+  </data>
+  <data name="Tip_DeleteSheet" xml:space="preserve">
+    <value>Удалить выбранный лист из списка</value>
+  </data>
+  <data name="Tip_Divide" xml:space="preserve">
+    <value>Разделить количество всех (или выбранных) деталей на указанное число</value>
+  </data>
+  <data name="Tip_EdgeMargin" xml:space="preserve">
+    <value>Отступ от края листа материала (в текущих единицах чертежа)</value>
+  </data>
+  <data name="Tip_EditSheet" xml:space="preserve">
+    <value>Изменить размеры и количество листа</value>
+  </data>
+  <data name="Tip_ExportDxf" xml:space="preserve">
+    <value>Экспорт контуров раскладки в DXF (со слоем имён деталей)</value>
+  </data>
+  <data name="Tip_ExportPdf" xml:space="preserve">
+    <value>Сохранить производственный отчёт PDF со спецификацией</value>
+  </data>
+  <data name="Tip_Feedback" xml:space="preserve">
+    <value>Открыть обратную связь на GitHub</value>
+  </data>
+  <data name="Tip_FlipLeftRight" xml:space="preserve">
+    <value>Отразить саму деталь слева направо (все её копии станут зеркальными). Ещё раз — вернуть как было.</value>
+  </data>
+  <data name="Tip_FlipUpDown" xml:space="preserve">
+    <value>Отразить саму деталь сверху вниз (все её копии станут зеркальными). Ещё раз — вернуть как было.</value>
+  </data>
+  <data name="Tip_GoToNesting" xml:space="preserve">
+    <value>Перейти к расчёту раскладки (Ctrl+3)</value>
+  </data>
+  <data name="Tip_GoToSheets" xml:space="preserve">
+    <value>Перейти к выбору листов материала (Ctrl+2)</value>
+  </data>
+  <data name="Tip_LayoutCard" xml:space="preserve">
+    <value>Щёлкните, чтобы показать этот раскрой</value>
+  </data>
+  <data name="Tip_Material" xml:space="preserve">
+    <value>Из чего режется проект. Разные материалы и толщины — разные проекты: раскладываются отдельно</value>
+  </data>
+  <data name="Tip_Multiplier" xml:space="preserve">
+    <value>Множитель количества деталей (например, число изготавливаемых комплектов)</value>
+  </data>
+  <data name="Tip_Multiply" xml:space="preserve">
+    <value>Умножить количество всех (или выбранных) деталей на указанный множитель</value>
+  </data>
+  <data name="Tip_NavLayout" xml:space="preserve">
+    <value>Итоговый чертёж раскроя, экспорт в DXF, PDF и печать отчёта (Ctrl+4)</value>
+  </data>
+  <data name="Tip_NavNesting" xml:space="preserve">
+    <value>Запуск раскладки, варианты и предпросмотр (Ctrl+3)</value>
+  </data>
+  <data name="Tip_NavParts" xml:space="preserve">
+    <value>Список и параметры деталей для раскроя (Ctrl+1)</value>
+  </data>
+  <data name="Tip_NavSheets" xml:space="preserve">
+    <value>Листы материала в наличии и отступы (Ctrl+2)</value>
+  </data>
+  <data name="Tip_NestDraft" xml:space="preserve">
+    <value>Быстрая прикидка для коммерческого предложения: сколько листов, площади и метров реза. Раскладка грубая, резать её не стоит</value>
+  </data>
+  <data name="Tip_New" xml:space="preserve">
+    <value>Создать новый проект раскроя</value>
+  </data>
+  <data name="Tip_NextPage" xml:space="preserve">
+    <value>Следующая страница</value>
+  </data>
+  <data name="Tip_Open" xml:space="preserve">
+    <value>Открыть сохранённый проект</value>
+  </data>
+  <data name="Tip_OpenLayout" xml:space="preserve">
+    <value>Перейти к итоговому чертежу раскроя, экспорту в DXF и печати отчёта (Ctrl+4)</value>
+  </data>
+  <data name="Tip_PartColor" xml:space="preserve">
+    <value>Цвет отображения детали (щёлкните, чтобы изменить)</value>
+  </data>
+  <data name="Tip_PartDetails" xml:space="preserve">
+    <value>Подробности детали: запасные, повороты, зазор, общий рез</value>
+  </data>
+  <data name="Tip_PartMirrorQty" xml:space="preserve">
+    <value>Зеркальные копии СВЕРХ количества — для пар левая/правая. 2 шт. и 2 зеркальных = 4 детали, две из них отражённые.</value>
+  </data>
+  <data name="Tip_PartPriority" xml:space="preserve">
+    <value>Приоритет размещения детали</value>
+  </data>
+  <data name="Tip_PartQty" xml:space="preserve">
+    <value>Требуемое количество деталей к раскрою</value>
+  </data>
+  <data name="Tip_PartRemove" xml:space="preserve">
+    <value>Удалить деталь из проекта</value>
+  </data>
+  <data name="Tip_PartStatus" xml:space="preserve">
+    <value>Размещено / всего</value>
+  </data>
+  <data name="Tip_PrevPage" xml:space="preserve">
+    <value>Предыдущая страница</value>
+  </data>
+  <data name="Tip_PrintReport" xml:space="preserve">
+    <value>Распечатать отчёт на принтере</value>
+  </data>
+  <data name="Tip_RemoveSheet" xml:space="preserve">
+    <value>Удалить лист</value>
+  </data>
+  <data name="Tip_ReportPrint" xml:space="preserve">
+    <value>Распечатать все страницы отчёта</value>
+  </data>
+  <data name="Tip_Save" xml:space="preserve">
+    <value>Сохранить проект</value>
+  </data>
+  <data name="Tip_SheetPriority" xml:space="preserve">
+    <value>Приоритет расходования листов: листы с наивысшим приоритетом расходуются первыми (например, остатки и деловые отходы)</value>
+  </data>
+  <data name="Tip_SheetQty" xml:space="preserve">
+    <value>Число листов этого размера в наличии</value>
+  </data>
+  <data name="Tip_SheetUnlimited" xml:space="preserve">
+    <value>Если отмечено, раскладка использует сколько угодно листов этого формата</value>
+  </data>
+  <data name="Tip_StartNest" xml:space="preserve">
+    <value>Запустить расчёт раскладки</value>
+  </data>
+  <data name="Tip_Thickness" xml:space="preserve">
+    <value>Толщина листа, мм: выберите из ряда или впишите свою. Нужна для веса в отчёте</value>
+  </data>
+  <data name="Tip_UpdateNotice" xml:space="preserve">
+    <value>Доступна новая версия SheetNest. Щёлкните, чтобы открыть страницу загрузки.</value>
+  </data>
+  <data name="Tip_Zoom100" xml:space="preserve">
+    <value>Исходный размер 100%</value>
+  </data>
+  <data name="Tip_ZoomFit" xml:space="preserve">
+    <value>Вписать по ширине окна</value>
+  </data>
+  <data name="Tip_ZoomIn" xml:space="preserve">
+    <value>Увеличить</value>
+  </data>
+  <data name="Tip_ZoomOut" xml:space="preserve">
+    <value>Уменьшить</value>
+  </data>
+  <data name="Tip_ZoomPage" xml:space="preserve">
+    <value>Вписать страницу в окно целиком</value>
+  </data>
+  <data name="Title_AddPart" xml:space="preserve">
+    <value>Добавление детали</value>
+  </data>
+  <data name="Title_CommonLine" xml:space="preserve">
+    <value>Общий рез</value>
+  </data>
+  <data name="Title_CutRenest" xml:space="preserve">
+    <value>Разложить остальное</value>
+  </data>
+  <data name="Title_EditNest" xml:space="preserve">
+    <value>Ручная правка</value>
+  </data>
+  <data name="Title_Export" xml:space="preserve">
+    <value>Экспорт</value>
+  </data>
+  <data name="Title_ExportDxf" xml:space="preserve">
+    <value>Экспорт DXF</value>
+  </data>
+  <data name="Title_Feedback" xml:space="preserve">
+    <value>Обратная связь</value>
+  </data>
+  <data name="Title_FileMissing" xml:space="preserve">
+    <value>Файл не найден</value>
+  </data>
+  <data name="Title_Nest" xml:space="preserve">
+    <value>Раскладка</value>
+  </data>
+  <data name="Title_NotEnoughSheets" xml:space="preserve">
+    <value>Не хватает листов</value>
+  </data>
+  <data name="Title_PartsDoNotFit" xml:space="preserve">
+    <value>Детали не помещаются</value>
+  </data>
+  <data name="Title_PrintReport" xml:space="preserve">
+    <value>Печать отчёта</value>
+  </data>
+  <data name="Title_Recovery" xml:space="preserve">
+    <value>Восстановление</value>
+  </data>
+  <data name="Title_Report" xml:space="preserve">
+    <value>Отчёт раскроя</value>
+  </data>
+  <data name="Title_SaveError" xml:space="preserve">
+    <value>Ошибка сохранения</value>
+  </data>
+  <data name="Title_SaveFailed" xml:space="preserve">
+    <value>Не удалось сохранить</value>
+  </data>
+  <data name="Title_Updates" xml:space="preserve">
+    <value>Проверка обновлений</value>
+  </data>
+  <data name="Unit_In" xml:space="preserve">
+    <value>in</value>
+  </data>
+  <data name="Unit_Mm" xml:space="preserve">
+    <value>мм</value>
+  </data>
+  <data name="Unit_Pcs" xml:space="preserve">
+    <value>шт.</value>
+  </data>
+  <data name="Why_Both" xml:space="preserve">
+    <value>, из них {0} перекрывают соседей и {1} заходят в отступ от края листа</value>
+  </data>
+  <data name="Why_Margin" xml:space="preserve">
+    <value>, заходят в отступ от края листа</value>
+  </data>
+  <data name="Why_Overlap" xml:space="preserve">
+    <value>, перекрывают соседей</value>
+  </data>
+  <data name="Parts_EmptyTitle" xml:space="preserve">
+    <value>В проекте пока нет ни одной детали</value>
+  </data>
+  <data name="Sheets_EmptyTitle" xml:space="preserve">
+    <value>Листы материала не добавлены</value>
+  </data>
+  <data name="Nest_PreviewPick" xml:space="preserve">
+    <value>Предпросмотр раскладки: выберите вариант в списке вариантов</value>
+  </data>
+  <data name="Nest_VariantLine" xml:space="preserve">
+    <value>Вариант #{0}: Утилизация {1} | Размещено {2} | Листов: {3} (время: {4})</value>
+  </data>
+  <data name="Sheet_Dlg_InMm" xml:space="preserve">
+    <value>миллиметрах</value>
+  </data>
+  <data name="Sheet_Dlg_InInches" xml:space="preserve">
+    <value>дюймах</value>
+  </data>
+</root>

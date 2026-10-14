@@ -1168,7 +1168,7 @@ namespace DeepNestSharp.Ui.Views
     /// <summary>Reflects the drawing units (in/mm) in every unit-labelled UI element.</summary>
     private void ApplyUnits()
     {
-      string u = this.unitsMm ? (Localization.CurrentLanguage == Localization.LangEnglish ? "mm" : "мм") : "in";
+      string u = this.unitsMm ? Localization.Get("Unit_Mm") : Localization.Get("Unit_In");
       if (this.marginUnitsLabel != null)
       {
         this.marginUnitsLabel.Text = u;
@@ -1254,9 +1254,7 @@ namespace DeepNestSharp.Ui.Views
       if (this.btnClearAllParts != null) this.btnClearAllParts.Content = Localization.Get("Btn_ClearAll");
       if (this.btnGoToSheets != null) this.btnGoToSheets.Content = Localization.Get("Btn_NextSheets");
       if (this.partsHintText != null) this.partsHintText.Text = Localization.Get("Hint_DragDrop");
-      if (this.partsEmptyTitle != null) this.partsEmptyTitle.Text = Localization.CurrentLanguage == Localization.LangBulgarian
-        ? "В проекта все още няма детайли"
-        : (Localization.CurrentLanguage == Localization.LangEnglish ? "No parts in project yet" : "В проекте пока нет ни одной детали");
+      if (this.partsEmptyTitle != null) this.partsEmptyTitle.Text = Localization.Get("Parts_EmptyTitle");
       if (this.partsEmptySub != null) this.partsEmptySub.Text = Localization.Get("Hint_DragDrop");
       if (this.btnAddPartEmpty != null) this.btnAddPartEmpty.Content = Localization.Get("Btn_AddDxf");
       if (this.colHeaderPartPreview != null) this.colHeaderPartPreview.Header = Localization.Get("Col_Preview");
@@ -1285,9 +1283,7 @@ namespace DeepNestSharp.Ui.Views
       if (this.btnAddSheet != null) this.btnAddSheet.Content = Localization.Get("Btn_AddSheet");
       if (this.btnDeleteSheet != null) this.btnDeleteSheet.Content = Localization.Get("Btn_DeleteSheet");
       if (this.lblSheetEdgeMargin != null) this.lblSheetEdgeMargin.Text = Localization.Get("Lbl_SheetEdgeMargin");
-      if (this.sheetsEmptyTitle != null) this.sheetsEmptyTitle.Text = Localization.CurrentLanguage == Localization.LangBulgarian
-        ? "Няма добавени листове"
-        : (Localization.CurrentLanguage == Localization.LangEnglish ? "No sheets added" : "Листы материала не добавлены");
+      if (this.sheetsEmptyTitle != null) this.sheetsEmptyTitle.Text = Localization.Get("Sheets_EmptyTitle");
       if (this.btnAddSheetEmpty != null) this.btnAddSheetEmpty.Content = Localization.Get("Btn_AddSheet");
       if (this.colHeaderSheetQty != null) this.colHeaderSheetQty.Header = Localization.Get("Col_Quantity");
       if (this.colHeaderSheetUnlimited != null) this.colHeaderSheetUnlimited.Header = Localization.Get("Col_Unlimited");
@@ -2726,11 +2722,7 @@ namespace DeepNestSharp.Ui.Views
 
       if (this.nestPreviewMetricsText != null)
       {
-        this.nestPreviewMetricsText.Text = Localization.CurrentLanguage == Localization.LangBulgarian
-          ? "Преглед на разкроя: изберете вариант от списъка с варианти"
-          : (Localization.CurrentLanguage == Localization.LangEnglish
-            ? "Nesting preview: select a variant from the list of variants"
-            : "Предпросмотр раскладки: выберите вариант в списке вариантов");
+        this.nestPreviewMetricsText.Text = Localization.Get("Nest_PreviewPick");
       }
     }
 
@@ -2963,23 +2955,7 @@ namespace DeepNestSharp.Ui.Views
         }
         if (this.nestPreviewMetricsText != null)
         {
-          string variantWord = Localization.CurrentLanguage == Localization.LangBulgarian
-            ? "Вариант"
-            : (Localization.CurrentLanguage == Localization.LangEnglish ? "Variant" : "Вариант");
-          string utilWord = Localization.CurrentLanguage == Localization.LangBulgarian
-            ? "Утилизация"
-            : (Localization.CurrentLanguage == Localization.LangEnglish ? "Utilization" : "Утилизация");
-          string placedWord = Localization.CurrentLanguage == Localization.LangBulgarian
-            ? "Поставени"
-            : (Localization.CurrentLanguage == Localization.LangEnglish ? "Placed" : "Размещено");
-          string sheetsWord = Localization.CurrentLanguage == Localization.LangBulgarian
-            ? "Листа"
-            : (Localization.CurrentLanguage == Localization.LangEnglish ? "Sheets" : "Листов");
-          string timeWord = Localization.CurrentLanguage == Localization.LangBulgarian
-            ? "време"
-            : (Localization.CurrentLanguage == Localization.LangEnglish ? "time" : "время");
-
-          this.nestPreviewMetricsText.Text = $"{variantWord} #{item.RunNumber}: {utilWord} {item.UtilizationText} | {placedWord} {item.PlacedText} | {sheetsWord}: {item.SheetsText} ({timeWord}: {item.TimeText})";
+          this.nestPreviewMetricsText.Text = Localization.Format("Nest_VariantLine", item.RunNumber, item.UtilizationText, item.PlacedText, item.SheetsText, item.TimeText);
         }
         ViewModel.NestMonitorViewModel.SelectedItem = item.Result;
         this.UpdateNestedInfo(item.Result);

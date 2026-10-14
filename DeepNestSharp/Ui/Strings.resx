@@ -1,0 +1,1607 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_BasedOn" xml:space="preserve">
+    <value>Built on open-source projects</value>
+  </data>
+  <data name="About_Contributors" xml:space="preserve">
+    <value>Contributors</value>
+  </data>
+  <data name="About_DeepNest" xml:space="preserve">
+    <value>the original DeepNest</value>
+  </data>
+  <data name="About_DeepNestPort" xml:space="preserve">
+    <value>the C# (WinForms) port of DeepNest</value>
+  </data>
+  <data name="About_DeepNestSharp" xml:space="preserve">
+    <value>the C# / WPF port of DeepNest that SheetNest grew from</value>
+  </data>
+  <data name="About_Dxf" xml:space="preserve">
+    <value>DXF reading and writing</value>
+  </data>
+  <data name="About_DxfExport" xml:space="preserve">
+    <value>DXF export</value>
+  </data>
+  <data name="About_Engine" xml:space="preserve">
+    <value>the nesting engine (MIT) and its geometry library jagua-rs (MPL-2.0)</value>
+  </data>
+  <data name="About_License" xml:space="preserve">
+    <value>Open source, MIT licensed.</value>
+  </data>
+  <data name="About_NetCore" xml:space="preserve">
+    <value>port to .NET Core</value>
+  </data>
+  <data name="About_Simplify" xml:space="preserve">
+    <value>simplification features</value>
+  </data>
+  <data name="About_Summary" xml:space="preserve">
+    <value>SheetNest is a sheet nesting program: DXF import, automatic nesting of parts onto sheets, manual editing, common-line cutting, DXF export and a production PDF report.</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>About SheetNest {0}</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Btn_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Btn_AddDxf" xml:space="preserve">
+    <value>+ Add DXF...</value>
+  </data>
+  <data name="Btn_AddShape" xml:space="preserve">
+    <value>+ Shape...</value>
+  </data>
+  <data name="Btn_AddSheet" xml:space="preserve">
+    <value>+ Add Sheet...</value>
+  </data>
+  <data name="Btn_BackToNesting" xml:space="preserve">
+    <value>⮜ Back to Nesting</value>
+  </data>
+  <data name="Btn_BackToParts" xml:space="preserve">
+    <value>⮜ Back to Parts</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Btn_ClearAll" xml:space="preserve">
+    <value>Clear all</value>
+  </data>
+  <data name="Btn_ClearRuns" xml:space="preserve">
+    <value>Clear history</value>
+  </data>
+  <data name="Btn_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Btn_CutRenest" xml:space="preserve">
+    <value>✂ Cut — nest the rest</value>
+  </data>
+  <data name="Btn_DeletePart" xml:space="preserve">
+    <value>Delete part</value>
+  </data>
+  <data name="Btn_DeleteSheet" xml:space="preserve">
+    <value>Delete Sheet</value>
+  </data>
+  <data name="Btn_Divide" xml:space="preserve">
+    <value>÷ Divide</value>
+  </data>
+  <data name="Btn_EditDetails" xml:space="preserve">
+    <value>⚙ Details...</value>
+  </data>
+  <data name="Btn_EditSheet" xml:space="preserve">
+    <value>✎ Edit...</value>
+  </data>
+  <data name="Btn_ExportDxf" xml:space="preserve">
+    <value>Export to DXF...</value>
+  </data>
+  <data name="Btn_ExportPdf" xml:space="preserve">
+    <value>Export to PDF...</value>
+  </data>
+  <data name="Btn_GoToLayout" xml:space="preserve">
+    <value>Go to Layout ➔</value>
+  </data>
+  <data name="Btn_GoToNestingShort" xml:space="preserve">
+    <value>Go to nesting</value>
+  </data>
+  <data name="Btn_Multiply" xml:space="preserve">
+    <value>× Multiply</value>
+  </data>
+  <data name="Btn_NestCut" xml:space="preserve">
+    <value>▶ Nest</value>
+  </data>
+  <data name="Btn_NestDraft" xml:space="preserve">
+    <value>⚡ Draft</value>
+  </data>
+  <data name="Btn_New" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="Btn_NextNesting" xml:space="preserve">
+    <value>Next: Nesting ➔</value>
+  </data>
+  <data name="Btn_NextSheets" xml:space="preserve">
+    <value>Next: Sheets ➔</value>
+  </data>
+  <data name="Btn_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Btn_Open" xml:space="preserve">
+    <value>Open...</value>
+  </data>
+  <data name="Btn_PrintReport" xml:space="preserve">
+    <value>🖨 Print Report...</value>
+  </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Btn_StartNest" xml:space="preserve">
+    <value>▶ Start Nesting</value>
+  </data>
+  <data name="Btn_StopNest" xml:space="preserve">
+    <value>⏹ Stop</value>
+  </data>
+  <data name="Btn_ZoomPage" xml:space="preserve">
+    <value>▣ Whole page</value>
+  </data>
+  <data name="Chk_Unlimited" xml:space="preserve">
+    <value>Unlimited</value>
+  </data>
+  <data name="Col_Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Col_AvailableUsed" xml:space="preserve">
+    <value>Available / Used</value>
+  </data>
+  <data name="Col_Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="Col_Dimensions" xml:space="preserve">
+    <value>Dimensions (W × H)</value>
+  </data>
+  <data name="Col_Mirrored" xml:space="preserve">
+    <value>Mirrored</value>
+  </data>
+  <data name="Col_NetArea" xml:space="preserve">
+    <value>Area</value>
+  </data>
+  <data name="Col_PartName" xml:space="preserve">
+    <value>Part (Name / File)</value>
+  </data>
+  <data name="Col_Preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="Col_Priority" xml:space="preserve">
+    <value>Priority</value>
+  </data>
+  <data name="Col_Quantity" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="Col_RunNum" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="Col_RunPlaced" xml:space="preserve">
+    <value>Placed</value>
+  </data>
+  <data name="Col_RunSheets" xml:space="preserve">
+    <value>Sheets</value>
+  </data>
+  <data name="Col_RunTime" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Col_RunUtil" xml:space="preserve">
+    <value>Utilization</value>
+  </data>
+  <data name="Col_SheetPriority" xml:space="preserve">
+    <value>Priority</value>
+  </data>
+  <data name="Col_SheetSize" xml:space="preserve">
+    <value>Sheet size (W × H)</value>
+  </data>
+  <data name="Col_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Col_Unlimited" xml:space="preserve">
+    <value>Unlimited</value>
+  </data>
+  <data name="Crash_Copy" xml:space="preserve">
+    <value>Copy details</value>
+  </data>
+  <data name="Crash_Explain" xml:space="preserve">
+    <value>Reporting this helps fix it. The button below opens your browser with a pre-filled GitHub issue - you can review everything there, and NOTHING is sent unless you submit it yourself.</value>
+  </data>
+  <data name="Crash_Header" xml:space="preserve">
+    <value>SheetNest ran into a problem.</value>
+  </data>
+  <data name="Crash_NoBrowser" xml:space="preserve">
+    <value>Could not open the browser. Use 'Copy details' and paste it into a new issue at github.com/ManuelMRosa/SheetNest/issues.</value>
+  </data>
+  <data name="Crash_NoLog" xml:space="preserve">
+    <value>(the log could not be written)</value>
+  </data>
+  <data name="Crash_Report" xml:space="preserve">
+    <value>Report on GitHub</value>
+  </data>
+  <data name="Crash_SavedTo" xml:space="preserve">
+    <value>A crash report was saved to:</value>
+  </data>
+  <data name="Crash_Title" xml:space="preserve">
+    <value>SheetNest - Problem Report</value>
+  </data>
+  <data name="Cut_Badge" xml:space="preserve">
+    <value>✂ cut</value>
+  </data>
+  <data name="Cut_BadgeN" xml:space="preserve">
+    <value>✂ {0} of {1}</value>
+  </data>
+  <data name="Cut_OfCount" xml:space="preserve">
+    <value>of {0}</value>
+  </data>
+  <data name="Cut_Summary" xml:space="preserve">
+    <value>Ticked: {0} sheets, {1} parts</value>
+  </data>
+  <data name="Dxf_CommonLineLocked" xml:space="preserve">
+    <value>common-line cluster parts are locked  ·  re-nest to change their position</value>
+  </data>
+  <data name="Dxf_Distance" xml:space="preserve">
+    <value>distance: {0}  ·  X: {1}  ·  Y: {2}</value>
+  </data>
+  <data name="Dxf_EditNavHint" xml:space="preserve">
+    <value>drag to move  ·  Alt+drop = slide  ·  arrows = nudge  ·  Esc = drop</value>
+  </data>
+  <data name="Dxf_EditNest" xml:space="preserve">
+    <value>✋ Edit nest</value>
+  </data>
+  <data name="Dxf_EditNestTip" xml:space="preserve">
+    <value>Manual nesting: click a part to select it, drag to move, rotate with the buttons.</value>
+  </data>
+  <data name="Dxf_EmptyHint" xml:space="preserve">
+    <value>Run a nest to see the result here.</value>
+  </data>
+  <data name="Dxf_FullSheet" xml:space="preserve">
+    <value>Full sheet</value>
+  </data>
+  <data name="Dxf_Gap" xml:space="preserve">
+    <value>gap {0}</value>
+  </data>
+  <data name="Dxf_Layout" xml:space="preserve">
+    <value>Layout {0}</value>
+  </data>
+  <data name="Dxf_Measure" xml:space="preserve">
+    <value>Measure</value>
+  </data>
+  <data name="Dxf_MeasureAgain" xml:space="preserve">
+    <value>  ·  click to measure again</value>
+  </data>
+  <data name="Dxf_MeasureTip" xml:space="preserve">
+    <value>Measure distances: click two points on the drawing.</value>
+  </data>
+  <data name="Dxf_Mirror" xml:space="preserve">
+    <value>⇄ Mirror</value>
+  </data>
+  <data name="Dxf_MirrorTip" xml:space="preserve">
+    <value>Mirror the selected part</value>
+  </data>
+  <data name="Dxf_MoveNoRoom" xml:space="preserve">
+    <value>No free spot: the part is red; drag it into place or undo (Ctrl+Z)</value>
+  </data>
+  <data name="Dxf_MoveToSheet" xml:space="preserve">
+    <value>⇄ To sheet…</value>
+  </data>
+  <data name="Dxf_MoveToSheetNone" xml:space="preserve">
+    <value>Parts move only between single sheets without common cutting</value>
+  </data>
+  <data name="Dxf_MoveToSheetTip" xml:space="preserve">
+    <value>Move the selected part to another sheet, into the first free spot</value>
+  </data>
+  <data name="Dxf_NavHint" xml:space="preserve">
+    <value>scroll = zoom  ·  wheel-drag = pan  ·  right-click = fit</value>
+  </data>
+  <data name="Dxf_NestN" xml:space="preserve">
+    <value>Nest {0}/{1}</value>
+  </data>
+  <data name="Dxf_NextLayout" xml:space="preserve">
+    <value>Next layout</value>
+  </data>
+  <data name="Dxf_NotANumber" xml:space="preserve">
+    <value>that is not a number I can read  ·  the part has been left where it was</value>
+  </data>
+  <data name="Dxf_PartStatus" xml:space="preserve">
+    <value>{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}</value>
+  </data>
+  <data name="Dxf_PartsOnSheet" xml:space="preserve">
+    <value>{0} parts</value>
+  </data>
+  <data name="Dxf_PrevLayout" xml:space="preserve">
+    <value>Previous layout</value>
+  </data>
+  <data name="Dxf_RedoTip" xml:space="preserve">
+    <value>Redo (Ctrl+Y)</value>
+  </data>
+  <data name="Dxf_RemainderSheet" xml:space="preserve">
+    <value>Remainder sheet</value>
+  </data>
+  <data name="Dxf_RotateCcw5Tip" xml:space="preserve">
+    <value>Rotate 5° counter-clockwise</value>
+  </data>
+  <data name="Dxf_RotateCcw90Tip" xml:space="preserve">
+    <value>Rotate 90° counter-clockwise</value>
+  </data>
+  <data name="Dxf_RotateCw5Tip" xml:space="preserve">
+    <value>Rotate 5° clockwise</value>
+  </data>
+  <data name="Dxf_RotateCw90Tip" xml:space="preserve">
+    <value>Rotate 90° clockwise</value>
+  </data>
+  <data name="Dxf_UndoTip" xml:space="preserve">
+    <value>Undo (Ctrl+Z)</value>
+  </data>
+  <data name="Effort_Best" xml:space="preserve">
+    <value>Best</value>
+  </data>
+  <data name="Effort_Fast" xml:space="preserve">
+    <value>Fast</value>
+  </data>
+  <data name="Effort_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Hint_DragDrop" xml:space="preserve">
+    <value>💡 You can drag and drop DXF files directly into this table</value>
+  </data>
+  <data name="Hint_MarkCut" xml:space="preserve">
+    <value>Tick the sheets that are already cut</value>
+  </data>
+  <data name="Hint_RunsList" xml:space="preserve">
+    <value>💡 Every press of Draft or Nest adds a finished nest of the whole job (drafts are marked); identical ones are not repeated. The best is on top (★): every part placed, fewest sheets, most material used. Click to preview, double-click for the layout.</value>
+  </data>
+  <data name="Kpi_PartsPlaced" xml:space="preserve">
+    <value>Parts placed:</value>
+  </data>
+  <data name="Kpi_SheetsUsed" xml:space="preserve">
+    <value>Sheets consumed:</value>
+  </data>
+  <data name="Kpi_Unplaced" xml:space="preserve">
+    <value>Unplaced parts:</value>
+  </data>
+  <data name="Kpi_Utilization" xml:space="preserve">
+    <value>Overall utilization:</value>
+  </data>
+  <data name="Lbl_Material" xml:space="preserve">
+    <value>Material:</value>
+  </data>
+  <data name="Lbl_Multiplier" xml:space="preserve">
+    <value>Multiplier (kits):</value>
+  </data>
+  <data name="Lbl_NestingEffort" xml:space="preserve">
+    <value>Nesting effort:</value>
+  </data>
+  <data name="Lbl_RunsList" xml:space="preserve">
+    <value>Layout runs:</value>
+  </data>
+  <data name="Lbl_SheetCut" xml:space="preserve">
+    <value>cut</value>
+  </data>
+  <data name="Lbl_SheetEdgeMargin" xml:space="preserve">
+    <value>Sheet edge margin:</value>
+  </data>
+  <data name="Lbl_SheetsCut" xml:space="preserve">
+    <value>cut</value>
+  </data>
+  <data name="Lbl_Thickness" xml:space="preserve">
+    <value>Thickness:</value>
+  </data>
+  <data name="Mat_None" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="Mat_aluminium" xml:space="preserve">
+    <value>Aluminium</value>
+  </data>
+  <data name="Mat_black" xml:space="preserve">
+    <value>Mild steel</value>
+  </data>
+  <data name="Mat_galvanized" xml:space="preserve">
+    <value>Galvanised steel</value>
+  </data>
+  <data name="Mat_stainless" xml:space="preserve">
+    <value>Stainless steel</value>
+  </data>
+  <data name="Menu_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="Menu_AdvancedSettings" xml:space="preserve">
+    <value>Advanced Settings...</value>
+  </data>
+  <data name="Menu_CheckUpdates" xml:space="preserve">
+    <value>Check for Updates...</value>
+  </data>
+  <data name="Menu_CustomSize" xml:space="preserve">
+    <value>Custom size…</value>
+  </data>
+  <data name="Menu_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="Menu_File" xml:space="preserve">
+    <value>_File</value>
+  </data>
+  <data name="Menu_Help" xml:space="preserve">
+    <value>_Help</value>
+  </data>
+  <data name="Menu_Language" xml:space="preserve">
+    <value>_Language</value>
+  </data>
+  <data name="Menu_MySheets" xml:space="preserve">
+    <value>My sheets</value>
+  </data>
+  <data name="Menu_NewProject" xml:space="preserve">
+    <value>New Project</value>
+  </data>
+  <data name="Menu_Offcut" xml:space="preserve">
+    <value>Offcut...</value>
+  </data>
+  <data name="Menu_OpenProject" xml:space="preserve">
+    <value>Open Project...</value>
+  </data>
+  <data name="Menu_RecentEmpty" xml:space="preserve">
+    <value>(empty)</value>
+  </data>
+  <data name="Menu_RecentProjects" xml:space="preserve">
+    <value>Recent Projects</value>
+  </data>
+  <data name="Menu_RemoveMySheets" xml:space="preserve">
+    <value>Remove from my sheets</value>
+  </data>
+  <data name="Menu_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Menu_SaveAs" xml:space="preserve">
+    <value>Save As...</value>
+  </data>
+  <data name="Menu_SendFeedback" xml:space="preserve">
+    <value>Send Feedback...</value>
+  </data>
+  <data name="Menu_Settings" xml:space="preserve">
+    <value>_Settings</value>
+  </data>
+  <data name="Msg_AddPartsFirst" xml:space="preserve">
+    <value>Open a project and add parts first.</value>
+  </data>
+  <data name="Msg_AddSheetsFirst" xml:space="preserve">
+    <value>Add at least one sheet in the Sheets tab first.</value>
+  </data>
+  <data name="Msg_AllCut" xml:space="preserve">
+    <value>Everything is cut: no parts are left to nest.</value>
+  </data>
+  <data name="Msg_CannotUse" xml:space="preserve">
+    <value>{0} cannot be used:
+
+{1}</value>
+  </data>
+  <data name="Msg_ClearPartsConfirm" xml:space="preserve">
+    <value>Clear the whole parts list?</value>
+  </data>
+  <data name="Msg_CommonLineSkipped" xml:space="preserve">
+    <value>Common-line cutting was skipped for:
+
+{0}
+
+Those parts kept the normal part gap.</value>
+  </data>
+  <data name="Msg_CutRenestConfirm" xml:space="preserve">
+    <value>Ticked as cut: {0} sheets holding {1} parts.
+
+Those parts come off the order (the quantities in the parts table go down), the sheets stay off the stock, and the rest is nested again.
+
+Go ahead?</value>
+  </data>
+  <data name="Msg_EditLeave" xml:space="preserve">
+    <value>Leave anyway?</value>
+  </data>
+  <data name="Msg_EditUndoLeave" xml:space="preserve">
+    <value>Undo your changes and leave anyway?</value>
+  </data>
+  <data name="Msg_EditUnfit" xml:space="preserve">
+    <value>{0} part(s) on this layout are not fit to cut{1}.
+
+They are drawn in red. Move them clear before leaving the editor.
+
+</value>
+  </data>
+  <data name="Msg_ExportOverwrite" xml:space="preserve">
+    <value>These files already exist and will be overwritten:
+
+{0}
+
+Continue?</value>
+  </data>
+  <data name="Msg_FileMissing" xml:space="preserve">
+    <value>Unable to locate {0}.</value>
+  </data>
+  <data name="Msg_FlipFailed" xml:space="preserve">
+    <value>Could not flip {0}: {1}</value>
+  </data>
+  <data name="Msg_MixedSvgDxf" xml:space="preserve">
+    <value>It's not possible to export when your parts were a mix of SVG and DXF.</value>
+  </data>
+  <data name="Msg_NestFirstExport" xml:space="preserve">
+    <value>Run a nest and select a result first, then export.</value>
+  </data>
+  <data name="Msg_NestFirstReport" xml:space="preserve">
+    <value>Run a nest and select a result first, then save the report.</value>
+  </data>
+  <data name="Msg_NestFirstToPrint" xml:space="preserve">
+    <value>Please run nesting and select a result to print.</value>
+  </data>
+  <data name="Msg_NoBrowserFeedback" xml:space="preserve">
+    <value>Could not open the browser. You can send feedback at:
+https://github.com/ManuelMRosa/SheetNest/issues</value>
+  </data>
+  <data name="Msg_NoEngine" xml:space="preserve">
+    <value>The nesting engine (sparrow.exe) was not found. It ships next to the app; reinstall, or set the SHEETNEST_SPARROW environment variable to its path.</value>
+  </data>
+  <data name="Msg_NoResult" xml:space="preserve">
+    <value>Nest produced no result.</value>
+  </data>
+  <data name="Msg_NoShape" xml:space="preserve">
+    <value>{0} holds no shape that can be nested.</value>
+  </data>
+  <data name="Msg_NotEnoughSheets" xml:space="preserve">
+    <value>{0} part(s) did not fit on the {1} available sheet(s).
+
+Increase the sheet Qty in the Sheets tab, tick Unlimited on a size, or add another sheet, and nest again.</value>
+  </data>
+  <data name="Msg_NotReadyToCut" xml:space="preserve">
+    <value>{0} part(s) are not ready to cut:
+
+{1}
+
+They are drawn in red. Move them clear in Edit nest and try again.</value>
+  </data>
+  <data name="Msg_PartsDoNotFit" xml:space="preserve">
+    <value>{0} part(s) do not fit on any of the sheet sizes in the Sheets tab.
+
+Sheets were not the limit — one of the sizes is unlimited. The part is bigger than every sheet it could go on, so add a bigger sheet size (or check the part's spacing and margin).</value>
+  </data>
+  <data name="Msg_PrintError" xml:space="preserve">
+    <value>Print error</value>
+  </data>
+  <data name="Msg_ProfileFileBad" xml:space="preserve">
+    <value>The nest settings file {0} does not read; the defaults are used:
+{1}</value>
+  </data>
+  <data name="Msg_Recover" xml:space="preserve">
+    <value>SheetNest closed unexpectedly with unsaved changes in {0}{1}.
+
+Recover the autosaved project?</value>
+  </data>
+  <data name="Msg_RecoverUnsaved" xml:space="preserve">
+    <value>an unsaved project</value>
+  </data>
+  <data name="Msg_RecoverWhen" xml:space="preserve">
+    <value> (autosaved {0})</value>
+  </data>
+  <data name="Msg_ReportWriteFailed" xml:space="preserve">
+    <value>Could not write the report: {0}</value>
+  </data>
+  <data name="Msg_SaveBeforeClosing" xml:space="preserve">
+    <value>You have a nest result. Save the project before closing?</value>
+  </data>
+  <data name="Msg_SaveFailed" xml:space="preserve">
+    <value>Could not save the project to
+{0}
+
+{1}
+
+The project is not saved. Save it somewhere else (File → Save As).</value>
+  </data>
+  <data name="Msg_SaveFirst" xml:space="preserve">
+    <value>You have a nest result. Save the project first?</value>
+  </data>
+  <data name="Msg_UnfitRow" xml:space="preserve">
+    <value>    {0}: {1} part(s){2}</value>
+  </data>
+  <data name="Msg_UnsupportedFiles" xml:space="preserve">
+    <value>Unable to open {0}.
+SheetNest opens projects (*.dnest) and DXF and SC2000 drawings (*.dxf, *.dfx, *.chf).</value>
+  </data>
+  <data name="Msg_UpToDate" xml:space="preserve">
+    <value>You are up to date (SheetNest {0}).</value>
+  </data>
+  <data name="Msg_UpdateAvailable" xml:space="preserve">
+    <value>SheetNest {0} is available (you have {1}).
+
+Open the download page?</value>
+  </data>
+  <data name="Msg_UpdateFailed" xml:space="preserve">
+    <value>Could not check for updates. Check your internet connection.</value>
+  </data>
+  <data name="Nest_Cancelled" xml:space="preserve">
+    <value>Nest cancelled</value>
+  </data>
+  <data name="Nest_Done" xml:space="preserve">
+    <value>Nested in {0}{1}</value>
+  </data>
+  <data name="Nest_GivenUp" xml:space="preserve">
+    <value>, {0} given up</value>
+  </data>
+  <data name="Nest_KeptNormal" xml:space="preserve">
+    <value>, {0} drawing(s) kept at normal gap</value>
+  </data>
+  <data name="Nest_LivePreview" xml:space="preserve">
+    <value>Searching: {0} of {1} parts, sheets: {2}</value>
+  </data>
+  <data name="Nest_Running" xml:space="preserve">
+    <value>Nesting…  {0}</value>
+  </data>
+  <data name="Nest_SharedCuts" xml:space="preserve">
+    <value>  ·  {0} shared cuts</value>
+  </data>
+  <data name="Nesting_VariantMetrics" xml:space="preserve">
+    <value>Variant #{0}: Utilization {1} | Placed {2} | Sheets: {3} (time: {4})</value>
+  </data>
+  <data name="Off_Auto" xml:space="preserve">
+    <value>Auto (best remnant)</value>
+  </data>
+  <data name="Off_AutoBadge" xml:space="preserve">
+    <value>AUTO</value>
+  </data>
+  <data name="Off_AutoTip" xml:space="preserve">
+    <value>Weighs End, Side and Both against the layout the nest produced and keeps whichever frees the most material.</value>
+  </data>
+  <data name="Off_Both" xml:space="preserve">
+    <value>Both (L-shaped)</value>
+  </data>
+  <data name="Off_BothTip" xml:space="preserve">
+    <value>When the nest left room on both sides, the leftover comes away as two rectangles (guillotine cuts, so no cut ever splits a remnant in two).</value>
+  </data>
+  <data name="Off_Enable" xml:space="preserve">
+    <value>Cut the leftover off as a rectangular offcut</value>
+  </data>
+  <data name="Off_EnableTip" xml:space="preserve">
+    <value>Measures the free area the nest left on the last sheet and adds a cut line so it comes away as a reusable rectangle. It never moves a part: the nest is already finished by the time this is worked out, so turning it on cannot change where anything is placed.</value>
+  </data>
+  <data name="Off_End" xml:space="preserve">
+    <value>End of sheet</value>
+  </data>
+  <data name="Off_EndTip" xml:space="preserve">
+    <value>A full strip at the end of the sheet's long side: the classic remnant.</value>
+  </data>
+  <data name="Off_MaxX" xml:space="preserve">
+    <value>Maximum X size ({0}):</value>
+  </data>
+  <data name="Off_MaxXTip" xml:space="preserve">
+    <value>Widest remnant still worth cutting off. Bigger than this and it is not a remnant but very nearly a sheet, so nothing is cut and the sheet is kept whole. 0 = no limit.</value>
+  </data>
+  <data name="Off_MaxY" xml:space="preserve">
+    <value>Maximum Y size ({0}):</value>
+  </data>
+  <data name="Off_MaxYTip" xml:space="preserve">
+    <value>Tallest remnant still worth cutting off. 0 = no limit.</value>
+  </data>
+  <data name="Off_MinX" xml:space="preserve">
+    <value>Minimum X size ({0}):</value>
+  </data>
+  <data name="Off_MinXTip" xml:space="preserve">
+    <value>Narrowest remnant worth separating. Below this the sheet is left uncut. 0 = automatic (5% of the sheet's side).</value>
+  </data>
+  <data name="Off_MinY" xml:space="preserve">
+    <value>Minimum Y size ({0}):</value>
+  </data>
+  <data name="Off_MinYTip" xml:space="preserve">
+    <value>Shortest remnant worth separating. 0 = automatic (5% of the sheet's side).</value>
+  </data>
+  <data name="Off_Overlap" xml:space="preserve">
+    <value>Edge overlap ({0}):</value>
+  </data>
+  <data name="Off_OverlapTip" xml:space="preserve">
+    <value>How far the cut runs PAST the sheet edge at each end, so the remnant comes away instead of hanging on by a bridge at the corners. 0 = flush with the edge.</value>
+  </data>
+  <data name="Off_Position" xml:space="preserve">
+    <value>Remnant position</value>
+  </data>
+  <data name="Off_Reset" xml:space="preserve">
+    <value>Reset to defaults</value>
+  </data>
+  <data name="Off_ResetTip" xml:space="preserve">
+    <value>Puts the six numbers above back to the recommended figures for this drawing's units. The remnant position and the enable tick are left alone.</value>
+  </data>
+  <data name="Off_Side" xml:space="preserve">
+    <value>Side of sheet</value>
+  </data>
+  <data name="Off_SideTip" xml:space="preserve">
+    <value>A full strip along the sheet's short side.</value>
+  </data>
+  <data name="Off_Spacing" xml:space="preserve">
+    <value>Offcut spacing ({0}):</value>
+  </data>
+  <data name="Off_SpacingTip" xml:space="preserve">
+    <value>Gap kept between the packed parts and the offcut cut line (drawing units).</value>
+  </data>
+  <data name="Off_Title" xml:space="preserve">
+    <value>Offcut</value>
+  </data>
+  <data name="PartColour_Title" xml:space="preserve">
+    <value>Part colour</value>
+  </data>
+  <data name="Part_Cc_None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Part_Cc_SamePart" xml:space="preserve">
+    <value>Same part</value>
+  </data>
+  <data name="Part_Cc_Unrestricted" xml:space="preserve">
+    <value>Unrestricted (compatible parts)</value>
+  </data>
+  <data name="Part_CommonCutting" xml:space="preserve">
+    <value>Common cutting:</value>
+  </data>
+  <data name="Part_CommonCuttingTip" xml:space="preserve">
+    <value>Who this part may share a cut edge with. Full edges stay at the configured Common Line Gap and export as a cluster perimeter plus one midpoint common cut. Part spacing still applies everywhere else. Changing this choice explicitly enables common cutting for this part.</value>
+  </data>
+  <data name="Part_Extra" xml:space="preserve">
+    <value>Extra:</value>
+  </data>
+  <data name="Part_ExtraTip" xml:space="preserve">
+    <value>Spare parts nested on top of the required quantity (e.g. in case one is scrapped).</value>
+  </data>
+  <data name="Part_File" xml:space="preserve">
+    <value>Part file:</value>
+  </data>
+  <data name="Part_FlippedBoth" xml:space="preserve">
+    <value>↔↕ flipped both ways (= turned 180°)</value>
+  </data>
+  <data name="Part_FlippedLeftRight" xml:space="preserve">
+    <value>↔ flipped left to right</value>
+  </data>
+  <data name="Part_FlippedUpDown" xml:space="preserve">
+    <value>↕ flipped top to bottom</value>
+  </data>
+  <data name="Part_FullSheetWarn" xml:space="preserve">
+    <value>⚠ This DXF looks like a FULL NESTED SHEET ({0} shapes inside a {1}×{2} frame), not a single part. SheetNest imports each DXF as ONE part, and the gaps between the inner shapes come from the original drawing. Export each part as its own DXF instead.</value>
+  </data>
+  <data name="Part_LegacyCcHint" xml:space="preserve">
+    <value>A saved legacy common-cutting mode is inactive. Choose a mode to confirm it for this part.</value>
+  </data>
+  <data name="Part_Mirrored" xml:space="preserve">
+    <value>Mirrored:</value>
+  </data>
+  <data name="Part_MirroredTip" xml:space="preserve">
+    <value>Copies nested MIRRORED (X-flipped) on top of the quantities above, for left-hand/right-hand pairs. The exported DXF cuts these mirrored.</value>
+  </data>
+  <data name="Part_Orientations" xml:space="preserve">
+    <value>Orientations permitted:</value>
+  </data>
+  <data name="Part_OrientationsTip" xml:space="preserve">
+    <value>Rotations the nester may apply to THIS part (e.g. restrict for grain direction).</value>
+  </data>
+  <data name="Part_Priority" xml:space="preserve">
+    <value>Priority:</value>
+  </data>
+  <data name="Part_PriorityTip" xml:space="preserve">
+    <value>1 = highest priority. Higher-priority parts are nested first, so they fill the earlier sheets and are never the ones left off when material runs out.</value>
+  </data>
+  <data name="Part_Quantity" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="Part_Required" xml:space="preserve">
+    <value>Required:</value>
+  </data>
+  <data name="Part_RequiredTip" xml:space="preserve">
+    <value>Parts needed for the job.</value>
+  </data>
+  <data name="Part_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Part_Spacing" xml:space="preserve">
+    <value>Part spacing:</value>
+  </data>
+  <data name="Part_SpacingTip" xml:space="preserve">
+    <value>Gap this part keeps to the neighbours it may NOT share a cut with (drawing units). Two parts end up (spacingA + spacingB) / 2 apart.</value>
+  </data>
+  <data name="Part_SymmetricHint" xml:space="preserve">
+    <value>Detected rotation-symmetric shape (circle/square): turning it can't improve the nest, so "As drawn" saves the search.</value>
+  </data>
+  <data name="Part_Title" xml:space="preserve">
+    <value>Edit Part</value>
+  </data>
+  <data name="Part_Units" xml:space="preserve">
+    <value>in the drawing's units</value>
+  </data>
+  <data name="Parts_CountSummary" xml:space="preserve">
+    <value>Parts: {0} (requested: {1} pcs)</value>
+  </data>
+  <data name="Priority_High" xml:space="preserve">
+    <value>High</value>
+  </data>
+  <data name="Priority_Highest" xml:space="preserve">
+    <value>Highest</value>
+  </data>
+  <data name="Priority_Low" xml:space="preserve">
+    <value>Low</value>
+  </data>
+  <data name="Priority_Lowest" xml:space="preserve">
+    <value>Lowest</value>
+  </data>
+  <data name="Priority_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Radio_DxfView" xml:space="preserve">
+    <value>DXF Drawing</value>
+  </data>
+  <data name="Radio_ReportView" xml:space="preserve">
+    <value>Summary Report</value>
+  </data>
+  <data name="Rep_BoxArea" xml:space="preserve">
+    <value>Box Area</value>
+  </data>
+  <data name="Rep_Continued" xml:space="preserve">
+    <value>{0} (continued)</value>
+  </data>
+  <data name="Rep_Cut" xml:space="preserve">
+    <value>Cut</value>
+  </data>
+  <data name="Rep_CutLength" xml:space="preserve">
+    <value>Cut Length</value>
+  </data>
+  <data name="Rep_CutTotal" xml:space="preserve">
+    <value>Cut length</value>
+  </data>
+  <data name="Rep_CuttingPlan" xml:space="preserve">
+    <value>CUTTING PLAN</value>
+  </data>
+  <data name="Rep_DifferentLayouts" xml:space="preserve">
+    <value>Different layouts</value>
+  </data>
+  <data name="Rep_Header" xml:space="preserve">
+    <value>SheetNest - Nest Report</value>
+  </data>
+  <data name="Rep_Kg" xml:space="preserve">
+    <value>kg</value>
+  </data>
+  <data name="Rep_Layout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
+  <data name="Rep_LayoutN" xml:space="preserve">
+    <value>Layout {0}</value>
+  </data>
+  <data name="Rep_LayoutSub" xml:space="preserve">
+    <value>{0} parts   |   {1}% utilization   |   sheet {2} x {3} {4}</value>
+  </data>
+  <data name="Rep_LayoutTitle" xml:space="preserve">
+    <value>Layout {0} of {1}   -   cut x {2}</value>
+  </data>
+  <data name="Rep_M2" xml:space="preserve">
+    <value>m²</value>
+  </data>
+  <data name="Rep_Material" xml:space="preserve">
+    <value>MATERIAL REQUIRED</value>
+  </data>
+  <data name="Rep_MaterialKind" xml:space="preserve">
+    <value>Material</value>
+  </data>
+  <data name="Rep_MaterialUsed" xml:space="preserve">
+    <value>Material used</value>
+  </data>
+  <data name="Rep_Metre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="Rep_More" xml:space="preserve">
+    <value>... and {0} more</value>
+  </data>
+  <data name="Rep_MoreLayouts" xml:space="preserve">
+    <value>... and {0} more layouts (see their pages)</value>
+  </data>
+  <data name="Rep_No" xml:space="preserve">
+    <value>No.</value>
+  </data>
+  <data name="Rep_NotPlaced" xml:space="preserve">
+    <value>Parts NOT placed</value>
+  </data>
+  <data name="Rep_NothingToReport" xml:space="preserve">
+    <value>Nothing to report. Run a nest first.</value>
+  </data>
+  <data name="Rep_Page" xml:space="preserve">
+    <value>Page {0} of {1}</value>
+  </data>
+  <data name="Rep_PageCol" xml:space="preserve">
+    <value>Page</value>
+  </data>
+  <data name="Rep_Part" xml:space="preserve">
+    <value>Part</value>
+  </data>
+  <data name="Rep_PartFallback" xml:space="preserve">
+    <value>(part)</value>
+  </data>
+  <data name="Rep_PartTotals" xml:space="preserve">
+    <value>PART TOTALS</value>
+  </data>
+  <data name="Rep_PartWeight" xml:space="preserve">
+    <value>Part weight</value>
+  </data>
+  <data name="Rep_Parts" xml:space="preserve">
+    <value>Parts</value>
+  </data>
+  <data name="Rep_PartsOnLayout" xml:space="preserve">
+    <value>Parts on this layout</value>
+  </data>
+  <data name="Rep_PartsToCut" xml:space="preserve">
+    <value>Parts to cut</value>
+  </data>
+  <data name="Rep_Pierces" xml:space="preserve">
+    <value>Pierces</value>
+  </data>
+  <data name="Rep_Qty" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="Rep_SheetFew" xml:space="preserve">
+    <value>sheets</value>
+  </data>
+  <data name="Rep_SheetMany" xml:space="preserve">
+    <value>sheets</value>
+  </data>
+  <data name="Rep_SheetOne" xml:space="preserve">
+    <value>sheet</value>
+  </data>
+  <data name="Rep_SheetSize" xml:space="preserve">
+    <value>Sheet size</value>
+  </data>
+  <data name="Rep_SheetWeight" xml:space="preserve">
+    <value>Sheet weight</value>
+  </data>
+  <data name="Rep_SheetsOf" xml:space="preserve">
+    <value>{0} of  {1} x {2} {3}</value>
+  </data>
+  <data name="Rep_SizeCol" xml:space="preserve">
+    <value>Size, {0}</value>
+  </data>
+  <data name="Rep_Sq" xml:space="preserve">
+    <value>sq {0}</value>
+  </data>
+  <data name="Rep_SqFt" xml:space="preserve">
+    <value>sq ft</value>
+  </data>
+  <data name="Rep_Summary" xml:space="preserve">
+    <value>JOB SUMMARY</value>
+  </data>
+  <data name="Rep_Total" xml:space="preserve">
+    <value>Total:  {0} {1}   -   {2}</value>
+  </data>
+  <data name="Rep_Used" xml:space="preserve">
+    <value>Used</value>
+  </data>
+  <data name="Report_ColPartArea" xml:space="preserve">
+    <value>Area (pc)</value>
+  </data>
+  <data name="Report_ColPartDim" xml:space="preserve">
+    <value>Part dimensions</value>
+  </data>
+  <data name="Report_ColPartName" xml:space="preserve">
+    <value>Part / File</value>
+  </data>
+  <data name="Report_ColPartPos" xml:space="preserve">
+    <value>Pos #</value>
+  </data>
+  <data name="Report_ColPartQty" xml:space="preserve">
+    <value>Total pcs</value>
+  </data>
+  <data name="Report_ColSheetFormat" xml:space="preserve">
+    <value>Sheet size</value>
+  </data>
+  <data name="Report_ColSheetNum" xml:space="preserve">
+    <value>Sheet #</value>
+  </data>
+  <data name="Report_ColSheetParts" xml:space="preserve">
+    <value>Parts on sheet</value>
+  </data>
+  <data name="Report_ColSheetRepeat" xml:space="preserve">
+    <value>Sheet count</value>
+  </data>
+  <data name="Report_ColSheetUtil" xml:space="preserve">
+    <value>Utilization</value>
+  </data>
+  <data name="Report_DatePrefix" xml:space="preserve">
+    <value>Date: </value>
+  </data>
+  <data name="Report_EmptySub" xml:space="preserve">
+    <value>Run nesting on screen 3 to view and print the production report with specifications and cutting maps.</value>
+  </data>
+  <data name="Report_EmptyTitle" xml:space="preserve">
+    <value>Nesting report not generated yet</value>
+  </data>
+  <data name="Report_PageXofY" xml:space="preserve">
+    <value>Page {0} of {1}</value>
+  </data>
+  <data name="Report_PartsSpecTitle" xml:space="preserve">
+    <value>2. Cut parts specification</value>
+  </data>
+  <data name="Report_PreviewToolbar_Print" xml:space="preserve">
+    <value>🖨️ Print Report</value>
+  </data>
+  <data name="Report_PreviewToolbar_SavePdf" xml:space="preserve">
+    <value>📄 Save PDF</value>
+  </data>
+  <data name="Report_PreviewToolbar_Summary" xml:space="preserve">
+    <value>Production Nesting Report</value>
+  </data>
+  <data name="Report_PreviewToolbar_ZoomFit" xml:space="preserve">
+    <value>⤢ Fit Width</value>
+  </data>
+  <data name="Report_ProjectPrefix" xml:space="preserve">
+    <value>Project: </value>
+  </data>
+  <data name="Report_SheetsMapTitle" xml:space="preserve">
+    <value>1. Cutting layout by sheets</value>
+  </data>
+  <data name="Report_Title" xml:space="preserve">
+    <value>NESTING SUMMARY REPORT</value>
+  </data>
+  <data name="Report_UnitsPrefix" xml:space="preserve">
+    <value>Units: </value>
+  </data>
+  <data name="Report_UntitledProject" xml:space="preserve">
+    <value>Untitled</value>
+  </data>
+  <data name="Rot_0And180Tip" xml:space="preserve">
+    <value>0° and 180°: respects material grain but can flip.</value>
+  </data>
+  <data name="Rot_0And90Tip" xml:space="preserve">
+    <value>0° and 90° permitted.</value>
+  </data>
+  <data name="Rot_45" xml:space="preserve">
+    <value>45° steps</value>
+  </data>
+  <data name="Rot_45Tip" xml:space="preserve">
+    <value>Eight orientations, 45° apart. The job setting offers this too, and without it here a part could not be shown what it was really set to.</value>
+  </data>
+  <data name="Rot_4Way" xml:space="preserve">
+    <value>4-way</value>
+  </data>
+  <data name="Rot_4WayTip" xml:space="preserve">
+    <value>All four square orientations (0 / 90 / 180 / 270°). The safe first choice on square and L shaped parts: it usually beats free rotation on those, and always costs less to search.</value>
+  </data>
+  <data name="Rot_90And270Tip" xml:space="preserve">
+    <value>90° and 270°: always turned, either way.</value>
+  </data>
+  <data name="Rot_90Only" xml:space="preserve">
+    <value>90° only</value>
+  </data>
+  <data name="Rot_90OnlyTip" xml:space="preserve">
+    <value>Only 90°, so the part is always turned once.</value>
+  </data>
+  <data name="Rot_AsDrawn" xml:space="preserve">
+    <value>As drawn</value>
+  </data>
+  <data name="Rot_AsDrawnTip" xml:space="preserve">
+    <value>Only 0°, so the part stays exactly as drawn (respects grain).</value>
+  </data>
+  <data name="Rot_Free" xml:space="preserve">
+    <value>Free</value>
+  </data>
+  <data name="Rot_FreeTip" xml:space="preserve">
+    <value>Any angle, and NOT automatically the tightest. It wins on parts with slanted or curved edges, and loses on square or L shaped ones, which interlock exactly at right angles and gain nothing from being tilted. Measured on two real jobs: 84.3% of the block filled against 4-way's 81.6% on one, and 69.6% against 73.2% on the other. Costs about twice the search. Ignores grain.</value>
+  </data>
+  <data name="Rot_Job" xml:space="preserve">
+    <value>Job default</value>
+  </data>
+  <data name="Rot_JobTip" xml:space="preserve">
+    <value>Whatever the job is set to, under Settings &gt; Advanced Settings. Change it there and this part follows.</value>
+  </data>
+  <data name="Run_Draft" xml:space="preserve">
+    <value>draft</value>
+  </data>
+  <data name="Run_Saved" xml:space="preserve">
+    <value>Saved</value>
+  </data>
+  <data name="Set_AutosaveMinTip" xml:space="preserve">
+    <value>How often the open project is automatically saved for recovery.</value>
+  </data>
+  <data name="Set_AutosaveTip" xml:space="preserve">
+    <value>Periodically snapshots the open project so unsaved work can be recovered after a crash.</value>
+  </data>
+  <data name="Set_ClusterMaxTip" xml:space="preserve">
+    <value>Hard maximum number of parts in one common-line cluster (2 to 500).</value>
+  </data>
+  <data name="Set_ClusterModeTip" xml:space="preserve">
+    <value>Auto lets SheetNest choose a safe cluster size; Manual applies a hard part-count limit.</value>
+  </data>
+  <data name="Set_EffortTip" xml:space="preserve">
+    <value>How long the nester searches each sheet. It buys a TIGHTER pack, not more parts on the sheet: the parts that fit are found almost at once, and the rest of the search is spent squeezing them together so the material left over comes back as one usable piece.</value>
+  </data>
+  <data name="Set_GapTip" xml:space="preserve">
+    <value>Common-line placements use the configured gap; SheetNest resolves one center cut before DXF export. The value is stored in inches and converted to the selected drawing units for display.</value>
+  </data>
+  <data name="Set_MarginTip" xml:space="preserve">
+    <value>Clear border kept between every part and the sheet edge.</value>
+  </data>
+  <data name="Set_MergeTip" xml:space="preserve">
+    <value>Legacy export option for ordinary geometry: combines coincident DXF entities. Common-line output resolves its single center cut independently before export.</value>
+  </data>
+  <data name="Set_PartNamesTip" xml:space="preserve">
+    <value>Export part file names as text inside each placed part for post-cut identification. PAINT is laser engraving/marking (the same layer as the bend lines); BACKGROUND is visible in CAD/CAM but never processed. Everything cut always goes on the CUT layer.</value>
+  </data>
+  <data name="Set_ResetClusterTip" xml:space="preserve">
+    <value>Restore automatic common-line cluster sizing.</value>
+  </data>
+  <data name="Set_ResetGapTip" xml:space="preserve">
+    <value>Restore the shipped common-line gap.</value>
+  </data>
+  <data name="Set_RotationsTip" xml:space="preserve">
+    <value>Rotations the nester may try for parts that have not been edited. Edit Part's per-part setting always wins.</value>
+  </data>
+  <data name="Set_SpacingTip" xml:space="preserve">
+    <value>Default gap between ordinary parts (drawing units). Edit Part can override it per part; common-line placements use the separate gap below.</value>
+  </data>
+  <data name="Set_UnitsTip" xml:space="preserve">
+    <value>Drawing units for parts, sheets, spacing and margins. Match the units your DXF files are drawn in; the physical common-line gap is converted automatically.</value>
+  </data>
+  <data name="Settings_Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Settings_Autosave" xml:space="preserve">
+    <value>Auto save the open project</value>
+  </data>
+  <data name="Settings_AutosaveTime" xml:space="preserve">
+    <value>Auto Save Time (min):</value>
+  </data>
+  <data name="Settings_CommonLineGap" xml:space="preserve">
+    <value>Common Line Gap</value>
+  </data>
+  <data name="Settings_Concurrency" xml:space="preserve">
+    <value>Parallel searches:</value>
+  </data>
+  <data name="Settings_Concurrency_Auto" xml:space="preserve">
+    <value>Auto ({0})</value>
+  </data>
+  <data name="Settings_Concurrency_Tip" xml:space="preserve">
+    <value>How many nesting searches run at the same time. Fewer keeps a slow computer responsive; more finishes sooner on a fast one. The nest itself comes out the same either way.</value>
+  </data>
+  <data name="Settings_Effort" xml:space="preserve">
+    <value>Nesting effort:</value>
+  </data>
+  <data name="Settings_Effort_Best" xml:space="preserve">
+    <value>Best (slowest)</value>
+  </data>
+  <data name="Settings_Effort_Fast" xml:space="preserve">
+    <value>Fast</value>
+  </data>
+  <data name="Settings_Effort_Normal" xml:space="preserve">
+    <value>Normal (default)</value>
+  </data>
+  <data name="Settings_Group_App" xml:space="preserve">
+    <value>Application</value>
+  </data>
+  <data name="Settings_Group_CommonLine" xml:space="preserve">
+    <value>Common Line Cutting</value>
+  </data>
+  <data name="Settings_Group_Dxf" xml:space="preserve">
+    <value>DXF Export</value>
+  </data>
+  <data name="Settings_Group_Nesting" xml:space="preserve">
+    <value>Nesting</value>
+  </data>
+  <data name="Settings_Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="Settings_Margin" xml:space="preserve">
+    <value>Sheet edge margin</value>
+  </data>
+  <data name="Settings_MaxCluster" xml:space="preserve">
+    <value>Maximum cluster parts:</value>
+  </data>
+  <data name="Settings_MergeLines" xml:space="preserve">
+    <value>Merge coincident cut lines</value>
+  </data>
+  <data name="Settings_PartNames" xml:space="preserve">
+    <value>Part name text:</value>
+  </data>
+  <data name="Settings_PartNames_Background" xml:space="preserve">
+    <value>BACKGROUND — display only</value>
+  </data>
+  <data name="Settings_PartNames_Layer9" xml:space="preserve">
+    <value>PAINT — engraved, with the bend lines</value>
+  </data>
+  <data name="Settings_PartNames_None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Settings_Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Settings_Rot_0_180" xml:space="preserve">
+    <value>0 / 180°</value>
+  </data>
+  <data name="Settings_Rot_45" xml:space="preserve">
+    <value>45° steps</value>
+  </data>
+  <data name="Settings_Rot_90" xml:space="preserve">
+    <value>90° steps</value>
+  </data>
+  <data name="Settings_Rot_AsDrawn" xml:space="preserve">
+    <value>As drawn</value>
+  </data>
+  <data name="Settings_Rot_Free" xml:space="preserve">
+    <value>Free (36 steps)</value>
+  </data>
+  <data name="Settings_Rotations" xml:space="preserve">
+    <value>Default part rotations:</value>
+  </data>
+  <data name="Settings_Spacing" xml:space="preserve">
+    <value>Part spacing</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Advanced Settings</value>
+  </data>
+  <data name="Settings_Units" xml:space="preserve">
+    <value>Units:</value>
+  </data>
+  <data name="Settings_Units_In" xml:space="preserve">
+    <value>Inches (in)</value>
+  </data>
+  <data name="Settings_Units_Mm" xml:space="preserve">
+    <value>Millimeters (mm)</value>
+  </data>
+  <data name="Shape_Circle" xml:space="preserve">
+    <value>Circle</value>
+  </data>
+  <data name="Shape_Diameter" xml:space="preserve">
+    <value>Diameter:</value>
+  </data>
+  <data name="Shape_Height" xml:space="preserve">
+    <value>Height:</value>
+  </data>
+  <data name="Shape_Quantity" xml:space="preserve">
+    <value>Quantity:</value>
+  </data>
+  <data name="Shape_Rectangle" xml:space="preserve">
+    <value>Rectangle</value>
+  </data>
+  <data name="Shape_Square" xml:space="preserve">
+    <value>Square</value>
+  </data>
+  <data name="Shape_Title" xml:space="preserve">
+    <value>Add a shape</value>
+  </data>
+  <data name="Shape_Width" xml:space="preserve">
+    <value>Width:</value>
+  </data>
+  <data name="Sheet_Dlg_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Sheet_Dlg_Header" xml:space="preserve">
+    <value>Sheet size in {0} (width = the long side).</value>
+  </data>
+  <data name="Sheet_Dlg_Height" xml:space="preserve">
+    <value>Height ({0})</value>
+  </data>
+  <data name="Sheet_Dlg_Priority" xml:space="preserve">
+    <value>Priority:</value>
+  </data>
+  <data name="Sheet_Dlg_Qty" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="Sheet_Dlg_Remember" xml:space="preserve">
+    <value>Remember as preset</value>
+  </data>
+  <data name="Sheet_Dlg_Title" xml:space="preserve">
+    <value>Custom sheet size</value>
+  </data>
+  <data name="Sheet_Dlg_Title_Edit" xml:space="preserve">
+    <value>Edit sheet</value>
+  </data>
+  <data name="Sheet_Dlg_Unlimited" xml:space="preserve">
+    <value>Unlimited</value>
+  </data>
+  <data name="Sheet_Dlg_Width" xml:space="preserve">
+    <value>Width ({0})</value>
+  </data>
+  <data name="Sheet_PriorityTip" xml:space="preserve">
+    <value>Sheet consumption priority: sheets with highest priority are consumed first (e.g. offcuts and remnants).</value>
+  </data>
+  <data name="Sheet_RememberTip" xml:space="preserve">
+    <value>Save this size under "My sheets" in the Add Sheet menu.</value>
+  </data>
+  <data name="Sheet_UnlimitedShort" xml:space="preserve">
+    <value>Unlimited</value>
+  </data>
+  <data name="Sheet_UnlimitedTip" xml:space="preserve">
+    <value>There is as much of this size as the job needs, so the nest keeps taking sheets until every part is placed. Quantity is ignored while this is ticked (it keeps its value for when you untick it).</value>
+  </data>
+  <data name="Sheets_CountSummary" xml:space="preserve">
+    <value>Sheet sizes: {0} (sheets: {1})</value>
+  </data>
+  <data name="Sheets_EmptySub" xml:space="preserve">
+    <value>Add a standard sheet size or enter your own</value>
+  </data>
+  <data name="Sheets_UnlimitedNote" xml:space="preserve">
+    <value>unlimited included</value>
+  </data>
+  <data name="Status_Placed" xml:space="preserve">
+    <value>Placed:</value>
+  </data>
+  <data name="Status_Sheets" xml:space="preserve">
+    <value>Sheets:</value>
+  </data>
+  <data name="Status_Unplaced" xml:space="preserve">
+    <value>Unplaced:</value>
+  </data>
+  <data name="Status_Utilization" xml:space="preserve">
+    <value>Utilization:</value>
+  </data>
+  <data name="Tab_Layout" xml:space="preserve">
+    <value>4. Layout &amp; Report</value>
+  </data>
+  <data name="Tab_Nesting" xml:space="preserve">
+    <value>3. Nesting</value>
+  </data>
+  <data name="Tab_Parts" xml:space="preserve">
+    <value>1. Parts (Models)</value>
+  </data>
+  <data name="Tab_Sheets" xml:space="preserve">
+    <value>2. Sheets</value>
+  </data>
+  <data name="Tip_AddPart" xml:space="preserve">
+    <value>Add parts from DXF files</value>
+  </data>
+  <data name="Tip_AddShape" xml:space="preserve">
+    <value>Add a rectangle or a circle without a DXF, in the quantity you need</value>
+  </data>
+  <data name="Tip_AddSheet" xml:space="preserve">
+    <value>Pick a standard size or enter your own</value>
+  </data>
+  <data name="Tip_BackToNesting" xml:space="preserve">
+    <value>Back to the nest variants (Ctrl+3)</value>
+  </data>
+  <data name="Tip_BackToParts" xml:space="preserve">
+    <value>Back to the parts (Ctrl+1)</value>
+  </data>
+  <data name="Tip_CancelNest" xml:space="preserve">
+    <value>Stop the nest</value>
+  </data>
+  <data name="Tip_ClearParts" xml:space="preserve">
+    <value>Clear the whole parts list</value>
+  </data>
+  <data name="Tip_ClearRuns" xml:space="preserve">
+    <value>Clear the list of accumulated nest run variants</value>
+  </data>
+  <data name="Tip_CutRenest" xml:space="preserve">
+    <value>The ticked sheets are cut: their parts come off the order, the sheets off the stock, and the rest is nested again</value>
+  </data>
+  <data name="Tip_DeletePart" xml:space="preserve">
+    <value>Remove the selected part from the project</value>
+  </data>
+  <data name="Tip_DeleteSheet" xml:space="preserve">
+    <value>Remove the selected sheet from the list</value>
+  </data>
+  <data name="Tip_Divide" xml:space="preserve">
+    <value>Divide quantity of all (or selected) parts by this factor</value>
+  </data>
+  <data name="Tip_EdgeMargin" xml:space="preserve">
+    <value>Clear border along the sheet edge (current drawing units)</value>
+  </data>
+  <data name="Tip_EditSheet" xml:space="preserve">
+    <value>Edit the sheet's size and quantity</value>
+  </data>
+  <data name="Tip_ExportDxf" xml:space="preserve">
+    <value>Export the layout's contours to DXF (with a part-name layer)</value>
+  </data>
+  <data name="Tip_ExportPdf" xml:space="preserve">
+    <value>Save the production PDF report with its part list</value>
+  </data>
+  <data name="Tip_Feedback" xml:space="preserve">
+    <value>Open feedback on GitHub</value>
+  </data>
+  <data name="Tip_FlipLeftRight" xml:space="preserve">
+    <value>Flip the part itself left to right (every copy of it). Press again to undo.</value>
+  </data>
+  <data name="Tip_FlipUpDown" xml:space="preserve">
+    <value>Flip the part itself top to bottom (every copy of it). Press again to undo.</value>
+  </data>
+  <data name="Tip_GoToNesting" xml:space="preserve">
+    <value>Go on to nesting (Ctrl+3)</value>
+  </data>
+  <data name="Tip_GoToSheets" xml:space="preserve">
+    <value>Go on to the sheets (Ctrl+2)</value>
+  </data>
+  <data name="Tip_LayoutCard" xml:space="preserve">
+    <value>Click to show this layout</value>
+  </data>
+  <data name="Tip_Material" xml:space="preserve">
+    <value>What the job is cut from. Different metals or gauges are different jobs, nested apart</value>
+  </data>
+  <data name="Tip_Multiplier" xml:space="preserve">
+    <value>Part quantity multiplier (e.g. number of assemblies/kits needed)</value>
+  </data>
+  <data name="Tip_Multiply" xml:space="preserve">
+    <value>Multiply quantity of all (or selected) parts by this factor</value>
+  </data>
+  <data name="Tip_NavLayout" xml:space="preserve">
+    <value>Final cutting drawing, DXF and PDF export, report printing (Ctrl+4)</value>
+  </data>
+  <data name="Tip_NavNesting" xml:space="preserve">
+    <value>Run the nest, compare variants and preview (Ctrl+3)</value>
+  </data>
+  <data name="Tip_NavParts" xml:space="preserve">
+    <value>Parts to nest and their settings (Ctrl+1)</value>
+  </data>
+  <data name="Tip_NavSheets" xml:space="preserve">
+    <value>Sheets in stock and margins (Ctrl+2)</value>
+  </data>
+  <data name="Tip_NestDraft" xml:space="preserve">
+    <value>A quick estimate for a quote: how many sheets, how much area and metres of cut. Rough layout, not for cutting</value>
+  </data>
+  <data name="Tip_New" xml:space="preserve">
+    <value>Create a new nesting project</value>
+  </data>
+  <data name="Tip_NextPage" xml:space="preserve">
+    <value>Next page</value>
+  </data>
+  <data name="Tip_Open" xml:space="preserve">
+    <value>Open a saved project</value>
+  </data>
+  <data name="Tip_OpenLayout" xml:space="preserve">
+    <value>Go on to the final cutting drawing, DXF export and report printing (Ctrl+4)</value>
+  </data>
+  <data name="Tip_PartColor" xml:space="preserve">
+    <value>The part's colour (click to change)</value>
+  </data>
+  <data name="Tip_PartDetails" xml:space="preserve">
+    <value>More about the part: spares, rotations, spacing, common cutting</value>
+  </data>
+  <data name="Tip_PartMirrorQty" xml:space="preserve">
+    <value>Mirrored copies ON TOP of the quantity, for left/right pairs. 2 pcs and 2 mirrored = 4 parts, two of them mirrored.</value>
+  </data>
+  <data name="Tip_PartPriority" xml:space="preserve">
+    <value>The part's nesting priority</value>
+  </data>
+  <data name="Tip_PartQty" xml:space="preserve">
+    <value>How many of this part to nest</value>
+  </data>
+  <data name="Tip_PartRemove" xml:space="preserve">
+    <value>Remove the part from the project</value>
+  </data>
+  <data name="Tip_PartStatus" xml:space="preserve">
+    <value>Placed / total</value>
+  </data>
+  <data name="Tip_PrevPage" xml:space="preserve">
+    <value>Previous page</value>
+  </data>
+  <data name="Tip_PrintReport" xml:space="preserve">
+    <value>Print the report</value>
+  </data>
+  <data name="Tip_RemoveSheet" xml:space="preserve">
+    <value>Remove the sheet</value>
+  </data>
+  <data name="Tip_ReportPrint" xml:space="preserve">
+    <value>Print every page of the report</value>
+  </data>
+  <data name="Tip_Save" xml:space="preserve">
+    <value>Save the project</value>
+  </data>
+  <data name="Tip_SheetPriority" xml:space="preserve">
+    <value>Sheet consumption priority: sheets with the highest priority are used first (e.g. offcuts and remnants)</value>
+  </data>
+  <data name="Tip_SheetQty" xml:space="preserve">
+    <value>How many sheets of this size are in stock</value>
+  </data>
+  <data name="Tip_SheetUnlimited" xml:space="preserve">
+    <value>When ticked, the nest uses as many sheets of this size as it needs</value>
+  </data>
+  <data name="Tip_StartNest" xml:space="preserve">
+    <value>Start the nest</value>
+  </data>
+  <data name="Tip_Thickness" xml:space="preserve">
+    <value>Sheet thickness in mm: pick one or type your own. Used for the weight in the report</value>
+  </data>
+  <data name="Tip_UpdateNotice" xml:space="preserve">
+    <value>A newer SheetNest is available. Click to open the download page.</value>
+  </data>
+  <data name="Tip_Zoom100" xml:space="preserve">
+    <value>Actual size, 100%</value>
+  </data>
+  <data name="Tip_ZoomFit" xml:space="preserve">
+    <value>Fit to the window width</value>
+  </data>
+  <data name="Tip_ZoomIn" xml:space="preserve">
+    <value>Zoom in</value>
+  </data>
+  <data name="Tip_ZoomOut" xml:space="preserve">
+    <value>Zoom out</value>
+  </data>
+  <data name="Tip_ZoomPage" xml:space="preserve">
+    <value>Fit the whole page in the window</value>
+  </data>
+  <data name="Title_AddPart" xml:space="preserve">
+    <value>Add Part</value>
+  </data>
+  <data name="Title_CommonLine" xml:space="preserve">
+    <value>Common line</value>
+  </data>
+  <data name="Title_CutRenest" xml:space="preserve">
+    <value>Nest the rest</value>
+  </data>
+  <data name="Title_EditNest" xml:space="preserve">
+    <value>Edit nest</value>
+  </data>
+  <data name="Title_Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Title_ExportDxf" xml:space="preserve">
+    <value>Export DXF</value>
+  </data>
+  <data name="Title_Feedback" xml:space="preserve">
+    <value>Send Feedback</value>
+  </data>
+  <data name="Title_FileMissing" xml:space="preserve">
+    <value>File Missing</value>
+  </data>
+  <data name="Title_Nest" xml:space="preserve">
+    <value>Nest</value>
+  </data>
+  <data name="Title_NotEnoughSheets" xml:space="preserve">
+    <value>Not enough sheets</value>
+  </data>
+  <data name="Title_PartsDoNotFit" xml:space="preserve">
+    <value>Parts do not fit</value>
+  </data>
+  <data name="Title_PrintReport" xml:space="preserve">
+    <value>Print report</value>
+  </data>
+  <data name="Title_Recovery" xml:space="preserve">
+    <value>Recovery</value>
+  </data>
+  <data name="Title_Report" xml:space="preserve">
+    <value>Nest report</value>
+  </data>
+  <data name="Title_SaveError" xml:space="preserve">
+    <value>Error Saving</value>
+  </data>
+  <data name="Title_SaveFailed" xml:space="preserve">
+    <value>Could not save</value>
+  </data>
+  <data name="Title_Updates" xml:space="preserve">
+    <value>Check for Updates</value>
+  </data>
+  <data name="Unit_In" xml:space="preserve">
+    <value>in</value>
+  </data>
+  <data name="Unit_Mm" xml:space="preserve">
+    <value>mm</value>
+  </data>
+  <data name="Unit_Pcs" xml:space="preserve">
+    <value>pcs</value>
+  </data>
+  <data name="Why_Both" xml:space="preserve">
+    <value>, {0} overlapping a neighbour and {1} inside the sheet edge margin</value>
+  </data>
+  <data name="Why_Margin" xml:space="preserve">
+    <value>, inside the sheet edge margin</value>
+  </data>
+  <data name="Why_Overlap" xml:space="preserve">
+    <value>, overlapping a neighbour</value>
+  </data>
+  <data name="Parts_EmptyTitle" xml:space="preserve">
+    <value>No parts in project yet</value>
+  </data>
+  <data name="Sheets_EmptyTitle" xml:space="preserve">
+    <value>No sheets added</value>
+  </data>
+  <data name="Nest_PreviewPick" xml:space="preserve">
+    <value>Nesting preview: select a variant from the list of variants</value>
+  </data>
+  <data name="Nest_VariantLine" xml:space="preserve">
+    <value>Variant #{0}: Utilization {1} | Placed {2} | Sheets: {3} (time: {4})</value>
+  </data>
+  <data name="Sheet_Dlg_InMm" xml:space="preserve">
+    <value>millimeters</value>
+  </data>
+  <data name="Sheet_Dlg_InInches" xml:space="preserve">
+    <value>inches</value>
+  </data>
+</root>

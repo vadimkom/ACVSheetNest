@@ -55,9 +55,9 @@ namespace DeepNestSharp.Ui.Views
 
     private void ApplyLocalization()
     {
-      string unit = this.isUnitsMm ? "мм" : "in";
+      string unit = this.isUnitsMm ? Localization.Get("Unit_Mm") : Localization.Get("Unit_In");
       this.Title = Localization.Get("Sheet_Dlg_Title");
-      this.headerText.Text = string.Format(Localization.Get("Sheet_Dlg_Header"), this.isUnitsMm ? (Localization.CurrentLanguage == Localization.LangEnglish ? "millimeters" : "миллиметрах") : (Localization.CurrentLanguage == Localization.LangEnglish ? "inches" : "дюймах"));
+      this.headerText.Text = string.Format(Localization.Get("Sheet_Dlg_Header"), Localization.Get(this.isUnitsMm ? "Sheet_Dlg_InMm" : "Sheet_Dlg_InInches"));
       this.widthLabel.Text = string.Format(Localization.Get("Sheet_Dlg_Width"), unit);
       this.heightLabel.Text = string.Format(Localization.Get("Sheet_Dlg_Height"), unit);
       this.qtyLabel.Text = Localization.Get("Sheet_Dlg_Qty");
