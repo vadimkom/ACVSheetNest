@@ -1350,7 +1350,7 @@ Abrir a página de download?</value>
     <value>Adicionar peças de arquivos DXF</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Adicionar um retângulo ou um círculo sem DXF, na quantidade necessária</value>
+    <value>Adicionar um retângulo, um círculo ou uma arruela sem DXF, na quantidade necessária</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Escolher um tamanho padrão ou digitar o seu</value>
@@ -1618,5 +1618,29 @@ Abrir a página de download?</value>
   </data>
   <data name="Card_RotOther" xml:space="preserve">
     <value>rotação: outra</value>
+  </data>
+  <data name="Shape_Washer" xml:space="preserve">
+    <value>Arruela</value>
+  </data>
+  <data name="Shape_WasherWideName" xml:space="preserve">
+    <value>Arruela larga</value>
+  </data>
+  <data name="Shape_WasherKind" xml:space="preserve">
+    <value>Tipo:</value>
+  </data>
+  <data name="Shape_WasherStandard" xml:space="preserve">
+    <value>Normal (DIN 125)</value>
+  </data>
+  <data name="Shape_WasherWide" xml:space="preserve">
+    <value>Larga (DIN 9021)</value>
+  </data>
+  <data name="Shape_WasherCustom" xml:space="preserve">
+    <value>Personalizada</value>
+  </data>
+  <data name="Shape_OuterDiameter" xml:space="preserve">
+    <value>Ø externo:</value>
+  </data>
+  <data name="Shape_HoleDiameter" xml:space="preserve">
+    <value>Ø do furo:</value>
   </data>
 </root>

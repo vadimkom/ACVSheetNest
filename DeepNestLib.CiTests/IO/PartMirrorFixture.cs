@@ -155,6 +155,43 @@ namespace DeepNestLib.CiTests.IO
     {
       PartShapes.SizeText(PartShape.Rectangle, 100, 50.5).Should().Be("100x50.5");
       PartShapes.SizeText(PartShape.Circle, 80, 80).Should().Be("D80");
+      PartShapes.SizeText(PartShape.Washer, 24, 8.4).Should().Be("D24-8.4");
+    }
+
+    [Theory]
+    [InlineData(16, 8.4)]
+    [InlineData(37, 13)]
+    public void AWasherIsADiscWithOneHole(double outer, double hole)
+    {
+      string dir = Directory.CreateTempSubdirectory("sheetnest_shape_test").FullName;
+      string path = PartShapes.Write(dir, "Шайба " + PartShapes.SizeText(PartShape.Washer, outer, hole), PartShape.Washer, outer, hole, millimetres: true);
+
+      var raw = new NestExecutionHelper().LoadRawDetail(new FileInfo(path));
+      raw.TryConvertToNfp(0, out INfp nfp).Should().BeTrue();
+      (nfp.MaxX - nfp.MinX).Should().BeApproximately(outer, 0.1);
+      Math.Abs(nfp.Area).Should().BeApproximately(Math.PI * outer * outer / 4, outer * outer * 0.005);
+      nfp.Children.Should().ContainSingle();
+      var child = nfp.Children[0];
+      (child.MaxX - child.MinX).Should().BeApproximately(hole, 0.1);
+      (child.MinX + child.MaxX).Should().BeApproximately(nfp.MinX + nfp.MaxX, 0.05, "the hole is in the middle");
+      DxfFile.Load(path).Entities.Should().OnlyContain(e => e.Layer == DxfOutputLayers.CutName);
+    }
+
+    [Fact]
+    public void AWasherNeedsItsHoleInsideIt()
+    {
+      string dir = Directory.CreateTempSubdirectory("sheetnest_shape_test").FullName;
+      Action act = () => PartShapes.Write(dir, "bad", PartShape.Washer, 10, 12, millimetres: true);
+      act.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void StandardWashersAreDin125AndDin9021()
+    {
+      PartShapes.Washers.Select(w => w.Thread).Should().Equal("M8", "M10", "M12");
+      PartShapes.Washers.Should().Contain(new WasherSize("M8", 8.4, 16, 24));
+      PartShapes.Washers.Should().Contain(new WasherSize("M10", 10.5, 20, 30));
+      PartShapes.Washers.Should().Contain(new WasherSize("M12", 13, 24, 37));
     }
 
     private static List<(double X, double Y)[]> Contours(string path)

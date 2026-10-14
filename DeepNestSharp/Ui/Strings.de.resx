@@ -1350,7 +1350,7 @@ Downloadseite öffnen?</value>
     <value>Teile aus DXF-Dateien hinzufügen</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Ein Rechteck oder einen Kreis ohne DXF hinzufügen, in der benötigten Anzahl</value>
+    <value>Ein Rechteck, einen Kreis oder eine Unterlegscheibe ohne DXF hinzufügen, in der benötigten Anzahl</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Standardgröße wählen oder eigene eingeben</value>
@@ -1618,5 +1618,29 @@ Downloadseite öffnen?</value>
   </data>
   <data name="Card_RotOther" xml:space="preserve">
     <value>Drehung: andere</value>
+  </data>
+  <data name="Shape_Washer" xml:space="preserve">
+    <value>Unterlegscheibe</value>
+  </data>
+  <data name="Shape_WasherWideName" xml:space="preserve">
+    <value>Unterlegscheibe, groß</value>
+  </data>
+  <data name="Shape_WasherKind" xml:space="preserve">
+    <value>Art:</value>
+  </data>
+  <data name="Shape_WasherStandard" xml:space="preserve">
+    <value>Normal (DIN 125)</value>
+  </data>
+  <data name="Shape_WasherWide" xml:space="preserve">
+    <value>Groß (DIN 9021)</value>
+  </data>
+  <data name="Shape_WasherCustom" xml:space="preserve">
+    <value>Eigene</value>
+  </data>
+  <data name="Shape_OuterDiameter" xml:space="preserve">
+    <value>Außen-Ø:</value>
+  </data>
+  <data name="Shape_HoleDiameter" xml:space="preserve">
+    <value>Loch-Ø:</value>
   </data>
 </root>

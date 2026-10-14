@@ -1744,7 +1744,8 @@ namespace DeepNestSharp.Ui.Views
       this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
     }
 
-    /// <summary>A rectangle or a circle straight from the program: 50 squares 100 x 100 without a CAD trip.</summary>
+    /// <summary>A rectangle, a circle or a washer straight from the program: 50 squares 100 x 100 without a CAD
+    /// trip.</summary>
     private async void OnAddShapeClicked(object sender, RoutedEventArgs e)
     {
       if (ViewModel?.ActiveDocument is not NestProjectViewModel doc)
@@ -1759,9 +1760,16 @@ namespace DeepNestSharp.Ui.Views
       }
 
       var shape = dialog.Shape;
-      string kind = shape == DeepNestLib.IO.PartShape.Circle ? "Shape_Circle"
-        : Math.Abs(dialog.ShapeWidth - dialog.ShapeHeight) < 1e-9 ? "Shape_Square" : "Shape_Rectangle";
-      string name = Localization.Get(kind) + " " + DeepNestLib.IO.PartShapes.SizeText(shape, dialog.ShapeWidth, dialog.ShapeHeight);
+      string kind = shape switch
+      {
+        DeepNestLib.IO.PartShape.Circle => "Shape_Circle",
+        DeepNestLib.IO.PartShape.Washer => dialog.WideWasherChosen ? "Shape_WasherWideName" : "Shape_Washer",
+        _ => Math.Abs(dialog.ShapeWidth - dialog.ShapeHeight) < 1e-9 ? "Shape_Square" : "Shape_Rectangle",
+      };
+
+      // "Washer M8 D16-8.4": the thread first, as the shop asks for it, then the sizes the laser cuts.
+      string thread = dialog.WasherThread is string t ? " " + t : string.Empty;
+      string name = Localization.Get(kind) + thread + " " + DeepNestLib.IO.PartShapes.SizeText(shape, dialog.ShapeWidth, dialog.ShapeHeight);
       string path;
       try
       {

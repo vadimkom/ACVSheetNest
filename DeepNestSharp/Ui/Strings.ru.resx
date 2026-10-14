@@ -1350,7 +1350,7 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
     <value>Добавить детали из файлов DXF</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Добавить прямоугольник или круг без DXF, сразу нужным количеством</value>
+    <value>Добавить прямоугольник, круг или шайбу без DXF, сразу нужным количеством</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Выбрать стандартный размер или ввести свой</value>
@@ -1618,5 +1618,29 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   </data>
   <data name="Card_RotOther" xml:space="preserve">
     <value>поворот: другой</value>
+  </data>
+  <data name="Shape_Washer" xml:space="preserve">
+    <value>Шайба</value>
+  </data>
+  <data name="Shape_WasherWideName" xml:space="preserve">
+    <value>Шайба широкая</value>
+  </data>
+  <data name="Shape_WasherKind" xml:space="preserve">
+    <value>Тип:</value>
+  </data>
+  <data name="Shape_WasherStandard" xml:space="preserve">
+    <value>Обычная (DIN 125)</value>
+  </data>
+  <data name="Shape_WasherWide" xml:space="preserve">
+    <value>Широкая (DIN 9021)</value>
+  </data>
+  <data name="Shape_WasherCustom" xml:space="preserve">
+    <value>Своя</value>
+  </data>
+  <data name="Shape_OuterDiameter" xml:space="preserve">
+    <value>Наружный Ø:</value>
+  </data>
+  <data name="Shape_HoleDiameter" xml:space="preserve">
+    <value>Отверстие Ø:</value>
   </data>
 </root>

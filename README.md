@@ -29,7 +29,7 @@ This is the ACV fork of [ManuelMRosa/SheetNest](https://github.com/ManuelMRosa/S
 
 **Parts and sheets**
 - **Flip** a part left/right or top/bottom, and a **Mirrored** quantity column for left/right pairs.
-- **Shapes without a DXF**: a rectangle, square or circle in any quantity.
+- **Shapes without a DXF**: a rectangle, square, circle or washer in any quantity. Washers M8, M10 and M12 come standard (DIN 125) or wide (DIN 9021), or with any outside and hole.
 - A kit **multiplier**.
 - **Material and thickness** per job.
 - **Sheet priority**: offcuts and remnants are used first and listed first.

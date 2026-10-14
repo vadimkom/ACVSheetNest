@@ -119,7 +119,7 @@ Last verified (2026-10-14): core 1061/1063, app 475/478, 0 failures (skips are t
 **Parts and sheets**
 - Flip ↔/↕ mirrors the part itself (`PartMirror`): a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.
 - The **Mirrored** column holds copies on top of the quantity.
-- Shapes (`AddShapeWindow`, `PartShapes`): rectangle, square or circle written as DXF under `%LOCALAPPDATA%\SheetNest\shapes`. Adding the same shape again adds to that row.
+- Shapes (`AddShapeWindow`, `PartShapes`): rectangle, square, circle or washer written as DXF under `%LOCALAPPDATA%\SheetNest\shapes`. Adding the same shape again adds to that row. Washers: `PartShapes.Washers` holds M8/M10/M12 per DIN 125-A (hole 8.4/10.5/13, outside 16/20/24) and DIN 9021 (outside 24/30/37), converted to inches in inch mode; custom takes any outside and hole.
 - Material and thickness are set per project (`ProjectInfo.Material/Thickness`) and remembered for the next job.
   - Materials: black, galvanized, stainless, aluminium; densities 7.85 / 7.85 / 7.93 / 2.70.
   - Thickness: 0.6, 0.7, 0.8, 1, 1.2, 1.5, 2, 3, 4, 5, or typed.

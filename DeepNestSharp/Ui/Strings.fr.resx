@@ -1350,7 +1350,7 @@ Ouvrir la page de téléchargement ?</value>
     <value>Ajouter des pièces depuis des fichiers DXF</value>
   </data>
   <data name="Tip_AddShape" xml:space="preserve">
-    <value>Ajouter un rectangle ou un cercle sans DXF, dans la quantité voulue</value>
+    <value>Ajouter un rectangle, un cercle ou une rondelle sans DXF, dans la quantité voulue</value>
   </data>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Choisir un format standard ou saisir le vôtre</value>
@@ -1618,5 +1618,29 @@ Ouvrir la page de téléchargement ?</value>
   </data>
   <data name="Card_RotOther" xml:space="preserve">
     <value>rotation : autre</value>
+  </data>
+  <data name="Shape_Washer" xml:space="preserve">
+    <value>Rondelle</value>
+  </data>
+  <data name="Shape_WasherWideName" xml:space="preserve">
+    <value>Rondelle large</value>
+  </data>
+  <data name="Shape_WasherKind" xml:space="preserve">
+    <value>Type :</value>
+  </data>
+  <data name="Shape_WasherStandard" xml:space="preserve">
+    <value>Normale (DIN 125)</value>
+  </data>
+  <data name="Shape_WasherWide" xml:space="preserve">
+    <value>Large (DIN 9021)</value>
+  </data>
+  <data name="Shape_WasherCustom" xml:space="preserve">
+    <value>Personnalisée</value>
+  </data>
+  <data name="Shape_OuterDiameter" xml:space="preserve">
+    <value>Ø extérieur :</value>
+  </data>
+  <data name="Shape_HoleDiameter" xml:space="preserve">
+    <value>Ø du trou :</value>
   </data>
 </root>
