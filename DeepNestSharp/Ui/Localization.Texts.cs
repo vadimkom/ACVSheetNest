@@ -335,6 +335,7 @@ namespace DeepNestSharp.Ui
       ("Rep_SqFt", "кв. фут", "кв. фут", "sq ft"),
       ("Rep_Sq", "кв. {0}", "кв. {0}", "sq {0}"),
       ("Rep_M2", "м²", "м²", "m²"),
+      ("Rep_Metre", "м", "м", "m"),
     };
 
     static Localization()

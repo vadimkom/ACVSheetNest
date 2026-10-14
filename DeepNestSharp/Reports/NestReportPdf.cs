@@ -762,6 +762,12 @@ namespace DeepNestSharp.Reports
         return "-";
       }
 
+      // In millimetres a laser path is metres long, and "44,155 mm" reads like a typo: say "44.16 m".
+      if (IsMillimetres(units))
+      {
+        return FormattableString.Invariant($"{length / 1000.0:0.00} ") + L("Rep_Metre");
+      }
+
       string u = UnitWord(units);
       return length >= 1000
         ? FormattableString.Invariant($"{length:#,0} {u}")
