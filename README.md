@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://sheetnest.io"><img src="https://img.shields.io/badge/Download%20for%20Windows-3aa851?style=for-the-badge&logo=windows&logoColor=white" alt="Download SheetNest for Windows"></a>
+  <a href="https://github.com/vadimkom/ACVSheetNest/releases/latest"><img src="https://img.shields.io/badge/Download%20for%20Windows-3aa851?style=for-the-badge&logo=windows&logoColor=white" alt="Download SheetNest for Windows"></a>
   <a href="https://ko-fi.com/sheetnest"><img src="https://img.shields.io/badge/Support-ff5e5b?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Support SheetNest on Ko-fi"></a>
 </p>
 
@@ -16,6 +16,59 @@
 SheetNest is free nesting software for sheet metal fabrication. It fits your parts onto stock sheets for CNC laser cutting and plasma cutting, on Windows, with no account and no subscription.
 
 If you cut sheet metal, SheetNest helps you get the most parts out of every sheet, buy less material, and hand your machine cut-ready files, all from a simple, one-toolbar app.
+
+## About this fork
+
+This is the ACV fork of [ManuelMRosa/SheetNest](https://github.com/ManuelMRosa/SheetNest), developed for and tested at a working laser-cutting shop. It branched from SheetNest 1.1.10; the installer is on the [releases page](https://github.com/vadimkom/ACVSheetNest/releases/latest). Everything the original does is still here, plus:
+
+**Workflow**
+- Four steps across the top: **Parts → Sheets → Nesting → Layout & Report** (Ctrl+1…4).
+- Two buttons: **⚡ Draft**, a few-second rough nest for a quote (sheets, area, metres of cut), and **▶ Nest** for the layout you cut. Their search settings live in `%LOCALAPPDATA%\SheetNest\nest-profiles.json`.
+- Every press adds a finished nest of the whole job to a list of variants; the best one is starred.
+- **Tick sheets as cut, nest the rest**: their parts come off the order and the sheets off the stock.
+
+**Parts and sheets**
+- **Flip** a part left/right or top/bottom, and a **Mirrored** quantity column for left/right pairs.
+- **Shapes without a DXF**: a rectangle, square or circle in any quantity.
+- A kit **multiplier**.
+- **Material and thickness** per job.
+- **Sheet priority**: offcuts and remnants are used first and listed first.
+- Metric sheets by default.
+
+**Nesting**
+- **Fill-up**: big parts still waiting are offered to each finished sheet before a new one is started. A real three-sheet job now nests on two.
+- **Move a part to another sheet** in manual editing, into the first free spot.
+- Thumbnails of every sheet.
+- Part names drawn on the layout.
+- Click a part to see its size and position.
+
+**Import**
+- **SC2000 `.chf` drawings**, the whole format. Cut and engraving layers are told apart; the background layer is left out.
+- SolidWorks flat patterns: bend lines are kept.
+- DXF reading is up to 200× faster on drawings with many holes (a 1393-hole grid took four minutes to open, now seconds).
+- Elliptical arcs crossing zero are read correctly.
+
+**Export**
+- DXF on three layers your CAM can map: **CUT**, **PAINT** (bend lines and engraved names) and **BACKGROUND**. Cut geometry is written first.
+- One DXF per layout: `name_N_WxH_xRepeats.dxf`.
+
+**Report**
+- Material, thickness, sheet and part weight, cut length in metres, pierce count and part sizes.
+- Unicode PDF, so Cyrillic and other scripts print.
+- Works on PCs without native zlib.
+- On-screen preview with zoom and direct printing.
+
+**Languages**
+- English, Русский, Български, Deutsch, Français, Español, Português, switchable live.
+- The texts are standard `.resx` files in `DeepNestSharp/Ui`, so adding a language means adding a file. Corrections from native speakers are welcome.
+
+**Under the hood**
+- .NET 10.
+- Saved projects about 3× smaller.
+- No crash when a project's flash drive has been pulled.
+- 3D import (FreeCAD) removed, and the installer is smaller.
+
+Bug fixes that apply to the original are offered back upstream as separate pull requests.
 
 ## What SheetNest does
 
