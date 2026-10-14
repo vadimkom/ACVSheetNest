@@ -1089,7 +1089,7 @@ Ouvrir la page de téléchargement ?</value>
     <value>N'importe quel angle, et PAS automatiquement le plus serré. Gagne sur les pièces à bords obliques ou courbes, perd sur les pièces carrées ou en L, qui s'emboîtent exactement à angle droit et ne gagnent rien à être inclinées. Mesuré sur deux vraies commandes : 84,3 % du bloc rempli contre 81,6 % pour 4 sens sur l'une, 69,6 % contre 73,2 % sur l'autre. Coûte environ deux fois plus de recherche. Ignore le sens de laminage.</value>
   </data>
   <data name="Rot_Job" xml:space="preserve">
-    <value>Défaut de la commande</value>
+    <value>Par défaut</value>
   </data>
   <data name="Rot_JobTip" xml:space="preserve">
     <value>Le réglage de la commande, dans Paramètres &gt; Paramètres avancés. Changez-le là et cette pièce suit.</value>

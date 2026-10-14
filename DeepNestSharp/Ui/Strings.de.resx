@@ -1089,7 +1089,7 @@ Downloadseite öffnen?</value>
     <value>Jeder Winkel, und NICHT automatisch am dichtesten. Gewinnt bei Teilen mit schrägen oder gebogenen Kanten und verliert bei quadratischen oder L-förmigen, die genau im rechten Winkel ineinandergreifen und durch Kippen nichts gewinnen. Gemessen an zwei echten Aufträgen: 84,3 % des Blocks gefüllt gegenüber 81,6 % bei 4-fach im einen, 69,6 % gegenüber 73,2 % im anderen. Kostet etwa die doppelte Suche. Ignoriert die Walzrichtung.</value>
   </data>
   <data name="Rot_Job" xml:space="preserve">
-    <value>Auftragsstandard</value>
+    <value>Wie Auftrag</value>
   </data>
   <data name="Rot_JobTip" xml:space="preserve">
     <value>Was im Auftrag eingestellt ist, unter Einstellungen &gt; Erweiterte Einstellungen. Ändern Sie es dort, folgt dieses Teil.</value>
