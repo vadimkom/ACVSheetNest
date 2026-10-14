@@ -94,6 +94,10 @@
             <MenuItem x:Name="langRuItem" Header="🇷🇺 Русский" Click="OnLanguageRuClicked" IsCheckable="True" />
             <MenuItem x:Name="langBgItem" Header="🇧🇬 Български" Click="OnLanguageBgClicked" IsCheckable="True" />
             <MenuItem x:Name="langEnItem" Header="🇬🇧 English" Click="OnLanguageEnClicked" IsCheckable="True" />
+            <MenuItem x:Name="langDeItem" Header="🇩🇪 Deutsch" Click="OnLanguageDeClicked" IsCheckable="True" />
+            <MenuItem x:Name="langFrItem" Header="🇫🇷 Français" Click="OnLanguageFrClicked" IsCheckable="True" />
+            <MenuItem x:Name="langEsItem" Header="🇪🇸 Español" Click="OnLanguageEsClicked" IsCheckable="True" />
+            <MenuItem x:Name="langPtItem" Header="🇵🇹 Português" Click="OnLanguagePtClicked" IsCheckable="True" />
           </MenuItem>
         </MenuItem>
         <MenuItem x:Name="menuHelp" Header="_Справка">

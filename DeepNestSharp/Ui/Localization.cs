@@ -6,13 +6,22 @@ namespace DeepNestSharp.Ui
   using System.Globalization;
 
   /// <summary>
-  /// Multi-language localization support for SheetNest (Russian, Bulgarian, English).
+  /// Multi-language localization support for SheetNest (Russian, Bulgarian, English, German, French, Spanish,
+  /// Portuguese).
   /// </summary>
   public static class Localization
   {
     public const string LangRussian = "ru";
     public const string LangBulgarian = "bg";
     public const string LangEnglish = "en";
+    public const string LangGerman = "de";
+    public const string LangFrench = "fr";
+    public const string LangSpanish = "es";
+    public const string LangPortuguese = "pt";
+
+    /// <summary>Every language the program speaks, in the order the Language menu lists them.</summary>
+    public static readonly string[] Languages =
+      { LangRussian, LangBulgarian, LangEnglish, LangGerman, LangFrench, LangSpanish, LangPortuguese };
 
     private static string currentLanguage = LangRussian;
 
@@ -41,14 +50,12 @@ namespace DeepNestSharp.Ui
       }
 
       string lower = lang.Trim().ToLowerInvariant();
-      if (lower.StartsWith("bg"))
+      foreach (string known in Languages)
       {
-        return LangBulgarian;
-      }
-
-      if (lower.StartsWith("en"))
-      {
-        return LangEnglish;
+        if (lower.StartsWith(known))
+        {
+          return known;
+        }
       }
 
       return LangRussian;
@@ -56,8 +63,8 @@ namespace DeepNestSharp.Ui
 
 
     /// <summary>
-    /// The translations: <c>Ui/Strings.resx</c> (English, the neutral language) with <c>Strings.ru.resx</c>
-    /// and <c>Strings.bg.resx</c> beside it. They used to be dictionaries in this file; as resource files they
+    /// The translations: <c>Ui/Strings.resx</c> (English, the neutral language) with <c>Strings.ru.resx</c>,
+    /// <c>.bg</c>, <c>.de</c>, <c>.fr</c>, <c>.es</c> and <c>.pt</c> beside it. They used to be dictionaries in this file; as resource files they
     /// open in any translation editor (Visual Studio, ResX Resource Manager, Weblate, Crowdin), and another
     /// language is another file, with no code to touch. A key missing from a language falls back to English.
     /// </summary>
@@ -65,12 +72,8 @@ namespace DeepNestSharp.Ui
       new System.Resources.ResourceManager("DeepNestSharp.Ui.Strings", typeof(Localization).Assembly) { IgnoreCase = true };
 
     /// <summary>The language codes the resources are looked up under.</summary>
-    private static CultureInfo CultureOf(string language) => language switch
-    {
-      LangBulgarian => CultureInfo.GetCultureInfo("bg"),
-      LangEnglish => CultureInfo.InvariantCulture,
-      _ => CultureInfo.GetCultureInfo("ru"),
-    };
+    private static CultureInfo CultureOf(string language)
+      => language == LangEnglish ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(language);
 
     /// <summary>The text for <paramref name="key"/> in the current language, or the key itself when there is
     /// none at all, so a missing string shows as its name rather than as nothing.</summary>
@@ -85,7 +88,8 @@ namespace DeepNestSharp.Ui
     }
 
     /// <summary>The form of a counted word that goes with <paramref name="n"/>: Russian has three (1 лист,
-    /// 2 листа, 5 листов, with 11-14 taking the last), Bulgarian and English two.</summary>
+    /// 2 листа, 5 листов, with 11-14 taking the last), the others two. French and Portuguese count 0 as one
+    /// (0 tôle), the rest as many (0 sheets).</summary>
     public static string Plural(long n, string oneKey, string fewKey, string manyKey)
     {
       long abs = Math.Abs(n);
@@ -100,7 +104,8 @@ namespace DeepNestSharp.Ui
         return mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? Get(fewKey) : Get(manyKey);
       }
 
-      return abs == 1 ? Get(oneKey) : Get(fewKey);
+      bool zeroIsOne = currentLanguage == LangFrench || currentLanguage == LangPortuguese;
+      return abs == 1 || (abs == 0 && zeroIsOne) ? Get(oneKey) : Get(fewKey);
     }
 
     /// <summary>The text for <paramref name="key"/> with its {0}, {1}... filled in.</summary>

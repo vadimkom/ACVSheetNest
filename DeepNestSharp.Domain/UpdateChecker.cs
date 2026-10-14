@@ -13,9 +13,9 @@ namespace DeepNestSharp.Domain
   /// </summary>
   public static class UpdateChecker
   {
-    public const string ReleasesPageUrl = "https://github.com/ManuelMRosa/SheetNest/releases";
+    public const string ReleasesPageUrl = "https://github.com/vadimkom/ACVSheetNest/releases";
 
-    private const string LatestReleaseApi = "https://api.github.com/repos/ManuelMRosa/SheetNest/releases/latest";
+    private const string LatestReleaseApi = "https://api.github.com/repos/vadimkom/ACVSheetNest/releases/latest";
 
     /// <summary>Gets the running app version (the exe's, not this library's), normalized to 3 fields.</summary>
     public static Version CurrentVersion

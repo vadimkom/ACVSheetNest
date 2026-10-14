@@ -223,7 +223,7 @@
     <value>В SheetNest възникна проблем.</value>
   </data>
   <data name="Crash_NoBrowser" xml:space="preserve">
-    <value>Браузърът не можа да се отвори. Натиснете „Копирай подробностите“ и ги поставете в нов проблем на github.com/ManuelMRosa/SheetNest/issues.</value>
+    <value>Браузърът не можа да се отвори. Натиснете „Копирай подробностите“ и ги поставете в нов проблем на github.com/vadimkom/ACVSheetNest/issues.</value>
   </data>
   <data name="Crash_NoLog" xml:space="preserve">
     <value>(дневникът не можа да бъде записан)</value>
@@ -542,7 +542,7 @@
   </data>
   <data name="Msg_NoBrowserFeedback" xml:space="preserve">
     <value>Браузърът не можа да се отвори. Можете да изпратите обратна връзка тук:
-https://github.com/ManuelMRosa/SheetNest/issues</value>
+https://github.com/vadimkom/ACVSheetNest/issues</value>
   </data>
   <data name="Msg_NoEngine" xml:space="preserve">
     <value>Двигателят за разкрой (sparrow.exe) не е намерен. Той се доставя с програмата: преинсталирайте я или задайте пътя в променливата на средата SHEETNEST_SPARROW.</value>

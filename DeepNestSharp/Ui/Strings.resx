@@ -223,7 +223,7 @@
     <value>SheetNest ran into a problem.</value>
   </data>
   <data name="Crash_NoBrowser" xml:space="preserve">
-    <value>Could not open the browser. Use 'Copy details' and paste it into a new issue at github.com/ManuelMRosa/SheetNest/issues.</value>
+    <value>Could not open the browser. Use 'Copy details' and paste it into a new issue at github.com/vadimkom/ACVSheetNest/issues.</value>
   </data>
   <data name="Crash_NoLog" xml:space="preserve">
     <value>(the log could not be written)</value>
@@ -542,7 +542,7 @@ Continue?</value>
   </data>
   <data name="Msg_NoBrowserFeedback" xml:space="preserve">
     <value>Could not open the browser. You can send feedback at:
-https://github.com/ManuelMRosa/SheetNest/issues</value>
+https://github.com/vadimkom/ACVSheetNest/issues</value>
   </data>
   <data name="Msg_NoEngine" xml:space="preserve">
     <value>The nesting engine (sparrow.exe) was not found. It ships next to the app; reinstall, or set the SHEETNEST_SPARROW environment variable to its path.</value>

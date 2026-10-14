@@ -38,7 +38,7 @@
 
     <Icon Id="SheetNestIco" SourceFile="$(var.IconPath)" />
     <Property Id="ARPPRODUCTICON" Value="SheetNestIco" />
-    <Property Id="ARPURLINFOABOUT" Value="https://github.com/ManuelMRosa/SheetNest" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/vadimkom/ACVSheetNest" />
 
     <StandardDirectory Id="LocalAppDataFolder">
       <Directory Id="ProgramsFolder" Name="Programs">

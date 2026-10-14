@@ -25,4 +25,4 @@ Corresponding source is available from the upstream projects below.
 
 If you need the corresponding source for any bundled component, it is available from the
 upstream project links above; you may also request it through the
-[SheetNest repository](https://github.com/ManuelMRosa/SheetNest).
+[SheetNest repository](https://github.com/vadimkom/ACVSheetNest).

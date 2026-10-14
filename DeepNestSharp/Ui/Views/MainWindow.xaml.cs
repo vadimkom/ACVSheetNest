@@ -1236,6 +1236,10 @@ namespace DeepNestSharp.Ui.Views
       if (this.langRuItem != null) this.langRuItem.IsChecked = Localization.CurrentLanguage == Localization.LangRussian;
       if (this.langBgItem != null) this.langBgItem.IsChecked = Localization.CurrentLanguage == Localization.LangBulgarian;
       if (this.langEnItem != null) this.langEnItem.IsChecked = Localization.CurrentLanguage == Localization.LangEnglish;
+      if (this.langDeItem != null) this.langDeItem.IsChecked = Localization.CurrentLanguage == Localization.LangGerman;
+      if (this.langFrItem != null) this.langFrItem.IsChecked = Localization.CurrentLanguage == Localization.LangFrench;
+      if (this.langEsItem != null) this.langEsItem.IsChecked = Localization.CurrentLanguage == Localization.LangSpanish;
+      if (this.langPtItem != null) this.langPtItem.IsChecked = Localization.CurrentLanguage == Localization.LangPortuguese;
 
       // Toolbar Buttons
       if (this.btnNew != null) this.btnNew.Content = Localization.Get("Btn_New");
@@ -1338,6 +1342,26 @@ namespace DeepNestSharp.Ui.Views
     private void OnLanguageEnClicked(object sender, RoutedEventArgs e)
     {
       this.SetLanguage(Localization.LangEnglish);
+    }
+
+    private void OnLanguageDeClicked(object sender, RoutedEventArgs e)
+    {
+      this.SetLanguage(Localization.LangGerman);
+    }
+
+    private void OnLanguageFrClicked(object sender, RoutedEventArgs e)
+    {
+      this.SetLanguage(Localization.LangFrench);
+    }
+
+    private void OnLanguageEsClicked(object sender, RoutedEventArgs e)
+    {
+      this.SetLanguage(Localization.LangSpanish);
+    }
+
+    private void OnLanguagePtClicked(object sender, RoutedEventArgs e)
+    {
+      this.SetLanguage(Localization.LangPortuguese);
     }
 
     private void SetLanguage(string lang)

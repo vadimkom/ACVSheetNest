@@ -1,7 +1,7 @@
 # Building SheetNest from source
 
 You only need this if you want to build SheetNest yourself. Most people should just
-download the installer from the [latest release](https://github.com/ManuelMRosa/SheetNest/releases/latest).
+download the installer from the [latest release](https://github.com/vadimkom/ACVSheetNest/releases/latest).
 
 SheetNest is a .NET 6 / WPF desktop app for Windows.
 

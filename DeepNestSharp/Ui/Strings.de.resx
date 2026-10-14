@@ -1,0 +1,1607 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_BasedOn" xml:space="preserve">
+    <value>Aufgebaut auf Open-Source-Projekten</value>
+  </data>
+  <data name="About_Contributors" xml:space="preserve">
+    <value>Mitwirkende</value>
+  </data>
+  <data name="About_DeepNest" xml:space="preserve">
+    <value>das ursprüngliche DeepNest</value>
+  </data>
+  <data name="About_DeepNestPort" xml:space="preserve">
+    <value>die C#-Portierung (WinForms) von DeepNest</value>
+  </data>
+  <data name="About_DeepNestSharp" xml:space="preserve">
+    <value>die C#-/WPF-Portierung von DeepNest, aus der SheetNest entstanden ist</value>
+  </data>
+  <data name="About_Dxf" xml:space="preserve">
+    <value>DXF lesen und schreiben</value>
+  </data>
+  <data name="About_DxfExport" xml:space="preserve">
+    <value>DXF-Export</value>
+  </data>
+  <data name="About_Engine" xml:space="preserve">
+    <value>die Schachtel-Engine (MIT) und ihre Geometriebibliothek jagua-rs (MPL-2.0)</value>
+  </data>
+  <data name="About_License" xml:space="preserve">
+    <value>Open Source, MIT-Lizenz.</value>
+  </data>
+  <data name="About_NetCore" xml:space="preserve">
+    <value>Portierung auf .NET Core</value>
+  </data>
+  <data name="About_Simplify" xml:space="preserve">
+    <value>Vereinfachungsfunktionen</value>
+  </data>
+  <data name="About_Summary" xml:space="preserve">
+    <value>SheetNest ist ein Programm zum Schachteln von Blechteilen: DXF-Import, automatisches Schachteln der Teile auf Bleche, manuelle Bearbeitung, Common-Line-Schnitt, DXF-Export und ein PDF-Fertigungsbericht.</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>Über SheetNest {0}</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Btn_Add" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="Btn_AddDxf" xml:space="preserve">
+    <value>+ DXF hinzufügen...</value>
+  </data>
+  <data name="Btn_AddShape" xml:space="preserve">
+    <value>+ Form...</value>
+  </data>
+  <data name="Btn_AddSheet" xml:space="preserve">
+    <value>+ Blech hinzufügen...</value>
+  </data>
+  <data name="Btn_BackToNesting" xml:space="preserve">
+    <value>⮜ Zurück zum Schachteln</value>
+  </data>
+  <data name="Btn_BackToParts" xml:space="preserve">
+    <value>⮜ Zurück zu den Teilen</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Btn_ClearAll" xml:space="preserve">
+    <value>Alle entfernen</value>
+  </data>
+  <data name="Btn_ClearRuns" xml:space="preserve">
+    <value>Verlauf löschen</value>
+  </data>
+  <data name="Btn_Close" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+  <data name="Btn_CutRenest" xml:space="preserve">
+    <value>✂ Geschnitten — Rest schachteln</value>
+  </data>
+  <data name="Btn_DeletePart" xml:space="preserve">
+    <value>Teil löschen</value>
+  </data>
+  <data name="Btn_DeleteSheet" xml:space="preserve">
+    <value>Blech löschen</value>
+  </data>
+  <data name="Btn_Divide" xml:space="preserve">
+    <value>÷ Teilen</value>
+  </data>
+  <data name="Btn_EditDetails" xml:space="preserve">
+    <value>⚙ Details...</value>
+  </data>
+  <data name="Btn_EditSheet" xml:space="preserve">
+    <value>✎ Bearbeiten...</value>
+  </data>
+  <data name="Btn_ExportDxf" xml:space="preserve">
+    <value>Als DXF exportieren...</value>
+  </data>
+  <data name="Btn_ExportPdf" xml:space="preserve">
+    <value>Als PDF exportieren...</value>
+  </data>
+  <data name="Btn_GoToLayout" xml:space="preserve">
+    <value>Zum Layout ➔</value>
+  </data>
+  <data name="Btn_GoToNestingShort" xml:space="preserve">
+    <value>Zum Schachteln</value>
+  </data>
+  <data name="Btn_Multiply" xml:space="preserve">
+    <value>× Multiplizieren</value>
+  </data>
+  <data name="Btn_NestCut" xml:space="preserve">
+    <value>▶ Schachteln</value>
+  </data>
+  <data name="Btn_NestDraft" xml:space="preserve">
+    <value>⚡ Entwurf</value>
+  </data>
+  <data name="Btn_New" xml:space="preserve">
+    <value>Neu</value>
+  </data>
+  <data name="Btn_NextNesting" xml:space="preserve">
+    <value>Weiter: Schachteln ➔</value>
+  </data>
+  <data name="Btn_NextSheets" xml:space="preserve">
+    <value>Weiter: Bleche ➔</value>
+  </data>
+  <data name="Btn_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Btn_Open" xml:space="preserve">
+    <value>Öffnen...</value>
+  </data>
+  <data name="Btn_PrintReport" xml:space="preserve">
+    <value>🖨 Bericht drucken...</value>
+  </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Btn_StartNest" xml:space="preserve">
+    <value>▶ Schachteln starten</value>
+  </data>
+  <data name="Btn_StopNest" xml:space="preserve">
+    <value>⏹ Stopp</value>
+  </data>
+  <data name="Btn_ZoomPage" xml:space="preserve">
+    <value>▣ Ganze Seite</value>
+  </data>
+  <data name="Chk_Unlimited" xml:space="preserve">
+    <value>Unbegrenzt</value>
+  </data>
+  <data name="Col_Actions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="Col_AvailableUsed" xml:space="preserve">
+    <value>Verfügbar / Verbraucht</value>
+  </data>
+  <data name="Col_Color" xml:space="preserve">
+    <value>Farbe</value>
+  </data>
+  <data name="Col_Dimensions" xml:space="preserve">
+    <value>Abmessungen (B × H)</value>
+  </data>
+  <data name="Col_Mirrored" xml:space="preserve">
+    <value>Gespiegelt</value>
+  </data>
+  <data name="Col_NetArea" xml:space="preserve">
+    <value>Fläche</value>
+  </data>
+  <data name="Col_PartName" xml:space="preserve">
+    <value>Teil (Name / Datei)</value>
+  </data>
+  <data name="Col_Preview" xml:space="preserve">
+    <value>Vorschau</value>
+  </data>
+  <data name="Col_Priority" xml:space="preserve">
+    <value>Priorität</value>
+  </data>
+  <data name="Col_Quantity" xml:space="preserve">
+    <value>Anzahl</value>
+  </data>
+  <data name="Col_RunNum" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="Col_RunPlaced" xml:space="preserve">
+    <value>Platziert</value>
+  </data>
+  <data name="Col_RunSheets" xml:space="preserve">
+    <value>Bleche</value>
+  </data>
+  <data name="Col_RunTime" xml:space="preserve">
+    <value>Zeit</value>
+  </data>
+  <data name="Col_RunUtil" xml:space="preserve">
+    <value>Ausnutzung</value>
+  </data>
+  <data name="Col_SheetPriority" xml:space="preserve">
+    <value>Priorität</value>
+  </data>
+  <data name="Col_SheetSize" xml:space="preserve">
+    <value>Blechgröße (B × H)</value>
+  </data>
+  <data name="Col_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Col_Unlimited" xml:space="preserve">
+    <value>Unbegrenzt</value>
+  </data>
+  <data name="Crash_Copy" xml:space="preserve">
+    <value>Details kopieren</value>
+  </data>
+  <data name="Crash_Explain" xml:space="preserve">
+    <value>Eine Meldung hilft, den Fehler zu beheben. Die Schaltfläche unten öffnet im Browser ein vorausgefülltes GitHub-Issue – dort können Sie alles prüfen, und es wird NICHTS gesendet, solange Sie es nicht selbst absenden.</value>
+  </data>
+  <data name="Crash_Header" xml:space="preserve">
+    <value>In SheetNest ist ein Problem aufgetreten.</value>
+  </data>
+  <data name="Crash_NoBrowser" xml:space="preserve">
+    <value>Der Browser konnte nicht geöffnet werden. Verwenden Sie „Details kopieren“ und fügen Sie sie in ein neues Issue auf github.com/vadimkom/ACVSheetNest/issues ein.</value>
+  </data>
+  <data name="Crash_NoLog" xml:space="preserve">
+    <value>(das Protokoll konnte nicht geschrieben werden)</value>
+  </data>
+  <data name="Crash_Report" xml:space="preserve">
+    <value>Auf GitHub melden</value>
+  </data>
+  <data name="Crash_SavedTo" xml:space="preserve">
+    <value>Ein Absturzbericht wurde gespeichert unter:</value>
+  </data>
+  <data name="Crash_Title" xml:space="preserve">
+    <value>SheetNest – Problembericht</value>
+  </data>
+  <data name="Cut_Badge" xml:space="preserve">
+    <value>✂ geschnitten</value>
+  </data>
+  <data name="Cut_BadgeN" xml:space="preserve">
+    <value>✂ {0} von {1}</value>
+  </data>
+  <data name="Cut_OfCount" xml:space="preserve">
+    <value>von {0}</value>
+  </data>
+  <data name="Cut_Summary" xml:space="preserve">
+    <value>Markiert: {0} Bleche, {1} Teile</value>
+  </data>
+  <data name="Dxf_CommonLineLocked" xml:space="preserve">
+    <value>Teile einer Common-Line-Gruppe sind gesperrt  ·  neu schachteln, um ihre Lage zu ändern</value>
+  </data>
+  <data name="Dxf_Distance" xml:space="preserve">
+    <value>Abstand: {0}  ·  X: {1}  ·  Y: {2}</value>
+  </data>
+  <data name="Dxf_EditNavHint" xml:space="preserve">
+    <value>ziehen = verschieben  ·  Alt+Ablegen = gleiten  ·  Pfeile = schieben  ·  Esc = ablegen</value>
+  </data>
+  <data name="Dxf_EditNest" xml:space="preserve">
+    <value>✋ Layout bearbeiten</value>
+  </data>
+  <data name="Dxf_EditNestTip" xml:space="preserve">
+    <value>Manuelles Schachteln: Teil anklicken zum Auswählen, ziehen zum Verschieben, mit den Schaltflächen drehen.</value>
+  </data>
+  <data name="Dxf_EmptyHint" xml:space="preserve">
+    <value>Starten Sie das Schachteln, um das Ergebnis hier zu sehen.</value>
+  </data>
+  <data name="Dxf_FullSheet" xml:space="preserve">
+    <value>Ganzes Blech</value>
+  </data>
+  <data name="Dxf_Gap" xml:space="preserve">
+    <value>Abstand {0}</value>
+  </data>
+  <data name="Dxf_Layout" xml:space="preserve">
+    <value>Layout {0}</value>
+  </data>
+  <data name="Dxf_Measure" xml:space="preserve">
+    <value>Messen</value>
+  </data>
+  <data name="Dxf_MeasureAgain" xml:space="preserve">
+    <value>  ·  klicken, um erneut zu messen</value>
+  </data>
+  <data name="Dxf_MeasureTip" xml:space="preserve">
+    <value>Abstände messen: zwei Punkte in der Zeichnung anklicken.</value>
+  </data>
+  <data name="Dxf_Mirror" xml:space="preserve">
+    <value>⇄ Spiegeln</value>
+  </data>
+  <data name="Dxf_MirrorTip" xml:space="preserve">
+    <value>Ausgewähltes Teil spiegeln</value>
+  </data>
+  <data name="Dxf_MoveNoRoom" xml:space="preserve">
+    <value>Kein freier Platz: Das Teil ist rot; ziehen Sie es an seinen Platz oder machen Sie es rückgängig (Strg+Z)</value>
+  </data>
+  <data name="Dxf_MoveToSheet" xml:space="preserve">
+    <value>⇄ Auf Blech…</value>
+  </data>
+  <data name="Dxf_MoveToSheetNone" xml:space="preserve">
+    <value>Teile lassen sich nur zwischen Einzelblechen ohne Common-Line-Schnitt verschieben</value>
+  </data>
+  <data name="Dxf_MoveToSheetTip" xml:space="preserve">
+    <value>Ausgewähltes Teil auf ein anderes Blech an die erste freie Stelle verschieben</value>
+  </data>
+  <data name="Dxf_NavHint" xml:space="preserve">
+    <value>Rad = Zoom  ·  Rad gedrückt ziehen = verschieben  ·  Rechtsklick = einpassen</value>
+  </data>
+  <data name="Dxf_NestN" xml:space="preserve">
+    <value>Schachtelung {0}/{1}</value>
+  </data>
+  <data name="Dxf_NextLayout" xml:space="preserve">
+    <value>Nächstes Layout</value>
+  </data>
+  <data name="Dxf_NotANumber" xml:space="preserve">
+    <value>das ist keine lesbare Zahl  ·  das Teil bleibt, wo es war</value>
+  </data>
+  <data name="Dxf_PartStatus" xml:space="preserve">
+    <value>{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}</value>
+  </data>
+  <data name="Dxf_PartsOnSheet" xml:space="preserve">
+    <value>{0} Teile</value>
+  </data>
+  <data name="Dxf_PrevLayout" xml:space="preserve">
+    <value>Vorheriges Layout</value>
+  </data>
+  <data name="Dxf_RedoTip" xml:space="preserve">
+    <value>Wiederholen (Strg+Y)</value>
+  </data>
+  <data name="Dxf_RemainderSheet" xml:space="preserve">
+    <value>Restblech</value>
+  </data>
+  <data name="Dxf_RotateCcw5Tip" xml:space="preserve">
+    <value>5° gegen den Uhrzeigersinn drehen</value>
+  </data>
+  <data name="Dxf_RotateCcw90Tip" xml:space="preserve">
+    <value>90° gegen den Uhrzeigersinn drehen</value>
+  </data>
+  <data name="Dxf_RotateCw5Tip" xml:space="preserve">
+    <value>5° im Uhrzeigersinn drehen</value>
+  </data>
+  <data name="Dxf_RotateCw90Tip" xml:space="preserve">
+    <value>90° im Uhrzeigersinn drehen</value>
+  </data>
+  <data name="Dxf_UndoTip" xml:space="preserve">
+    <value>Rückgängig (Strg+Z)</value>
+  </data>
+  <data name="Effort_Best" xml:space="preserve">
+    <value>Beste</value>
+  </data>
+  <data name="Effort_Fast" xml:space="preserve">
+    <value>Schnell</value>
+  </data>
+  <data name="Effort_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Hint_DragDrop" xml:space="preserve">
+    <value>💡 DXF-Dateien können Sie direkt in diese Tabelle ziehen</value>
+  </data>
+  <data name="Hint_MarkCut" xml:space="preserve">
+    <value>Markieren Sie die bereits geschnittenen Bleche</value>
+  </data>
+  <data name="Hint_RunsList" xml:space="preserve">
+    <value>💡 Jeder Druck auf „Entwurf“ oder „Schachteln“ fügt eine fertige Schachtelung des ganzen Auftrags hinzu (Entwürfe sind markiert); gleiche werden nicht wiederholt. Die beste steht oben (★): alle Teile platziert, wenigste Bleche, höchste Materialausnutzung. Klick = Vorschau, Doppelklick = Layout.</value>
+  </data>
+  <data name="Kpi_PartsPlaced" xml:space="preserve">
+    <value>Platzierte Teile:</value>
+  </data>
+  <data name="Kpi_SheetsUsed" xml:space="preserve">
+    <value>Verbrauchte Bleche:</value>
+  </data>
+  <data name="Kpi_Unplaced" xml:space="preserve">
+    <value>Nicht platzierte Teile:</value>
+  </data>
+  <data name="Kpi_Utilization" xml:space="preserve">
+    <value>Gesamtausnutzung:</value>
+  </data>
+  <data name="Lbl_Material" xml:space="preserve">
+    <value>Material:</value>
+  </data>
+  <data name="Lbl_Multiplier" xml:space="preserve">
+    <value>Multiplikator (Sätze):</value>
+  </data>
+  <data name="Lbl_NestingEffort" xml:space="preserve">
+    <value>Schachtelaufwand:</value>
+  </data>
+  <data name="Lbl_RunsList" xml:space="preserve">
+    <value>Schachtelvarianten:</value>
+  </data>
+  <data name="Lbl_SheetCut" xml:space="preserve">
+    <value>geschnitten</value>
+  </data>
+  <data name="Lbl_SheetEdgeMargin" xml:space="preserve">
+    <value>Randabstand:</value>
+  </data>
+  <data name="Lbl_SheetsCut" xml:space="preserve">
+    <value>geschnitten</value>
+  </data>
+  <data name="Lbl_Thickness" xml:space="preserve">
+    <value>Dicke:</value>
+  </data>
+  <data name="Mat_None" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="Mat_aluminium" xml:space="preserve">
+    <value>Aluminium</value>
+  </data>
+  <data name="Mat_black" xml:space="preserve">
+    <value>Baustahl</value>
+  </data>
+  <data name="Mat_galvanized" xml:space="preserve">
+    <value>Verzinkter Stahl</value>
+  </data>
+  <data name="Mat_stainless" xml:space="preserve">
+    <value>Edelstahl</value>
+  </data>
+  <data name="Menu_About" xml:space="preserve">
+    <value>Über</value>
+  </data>
+  <data name="Menu_AdvancedSettings" xml:space="preserve">
+    <value>Erweiterte Einstellungen...</value>
+  </data>
+  <data name="Menu_CheckUpdates" xml:space="preserve">
+    <value>Nach Updates suchen...</value>
+  </data>
+  <data name="Menu_CustomSize" xml:space="preserve">
+    <value>Eigene Größe…</value>
+  </data>
+  <data name="Menu_Exit" xml:space="preserve">
+    <value>Beenden</value>
+  </data>
+  <data name="Menu_File" xml:space="preserve">
+    <value>_Datei</value>
+  </data>
+  <data name="Menu_Help" xml:space="preserve">
+    <value>_Hilfe</value>
+  </data>
+  <data name="Menu_Language" xml:space="preserve">
+    <value>_Sprache</value>
+  </data>
+  <data name="Menu_MySheets" xml:space="preserve">
+    <value>Meine Bleche</value>
+  </data>
+  <data name="Menu_NewProject" xml:space="preserve">
+    <value>Neues Projekt</value>
+  </data>
+  <data name="Menu_Offcut" xml:space="preserve">
+    <value>Reststück...</value>
+  </data>
+  <data name="Menu_OpenProject" xml:space="preserve">
+    <value>Projekt öffnen...</value>
+  </data>
+  <data name="Menu_RecentEmpty" xml:space="preserve">
+    <value>(leer)</value>
+  </data>
+  <data name="Menu_RecentProjects" xml:space="preserve">
+    <value>Zuletzt geöffnet</value>
+  </data>
+  <data name="Menu_RemoveMySheets" xml:space="preserve">
+    <value>Aus „Meine Bleche“ entfernen</value>
+  </data>
+  <data name="Menu_Save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Menu_SaveAs" xml:space="preserve">
+    <value>Speichern unter...</value>
+  </data>
+  <data name="Menu_SendFeedback" xml:space="preserve">
+    <value>Feedback senden...</value>
+  </data>
+  <data name="Menu_Settings" xml:space="preserve">
+    <value>_Einstellungen</value>
+  </data>
+  <data name="Msg_AddPartsFirst" xml:space="preserve">
+    <value>Öffnen Sie zuerst ein Projekt und fügen Sie Teile hinzu.</value>
+  </data>
+  <data name="Msg_AddSheetsFirst" xml:space="preserve">
+    <value>Fügen Sie zuerst im Schritt „Bleche“ mindestens ein Blech hinzu.</value>
+  </data>
+  <data name="Msg_AllCut" xml:space="preserve">
+    <value>Alles ist geschnitten: Es sind keine Teile mehr zu schachteln.</value>
+  </data>
+  <data name="Msg_CannotUse" xml:space="preserve">
+    <value>{0} kann nicht verwendet werden:
+
+{1}</value>
+  </data>
+  <data name="Msg_ClearPartsConfirm" xml:space="preserve">
+    <value>Die ganze Teileliste leeren?</value>
+  </data>
+  <data name="Msg_CommonLineSkipped" xml:space="preserve">
+    <value>Der Common-Line-Schnitt wurde ausgelassen für:
+
+{0}
+
+Diese Teile behalten den normalen Teileabstand.</value>
+  </data>
+  <data name="Msg_CutRenestConfirm" xml:space="preserve">
+    <value>Als geschnitten markiert: {0} Bleche mit {1} Teilen.
+
+Diese Teile werden vom Auftrag abgezogen (die Mengen in der Teiletabelle sinken), die Bleche bleiben vom Lager abgebucht, und der Rest wird neu geschachtelt.
+
+Fortfahren?</value>
+  </data>
+  <data name="Msg_EditLeave" xml:space="preserve">
+    <value>Trotzdem verlassen?</value>
+  </data>
+  <data name="Msg_EditUndoLeave" xml:space="preserve">
+    <value>Änderungen verwerfen und trotzdem verlassen?</value>
+  </data>
+  <data name="Msg_EditUnfit" xml:space="preserve">
+    <value>{0} Teil(e) in diesem Layout sind nicht schneidbar{1}.
+
+Sie sind rot dargestellt. Schieben Sie sie frei, bevor Sie den Editor verlassen.
+
+</value>
+  </data>
+  <data name="Msg_ExportOverwrite" xml:space="preserve">
+    <value>Diese Dateien existieren bereits und werden überschrieben:
+
+{0}
+
+Fortfahren?</value>
+  </data>
+  <data name="Msg_FileMissing" xml:space="preserve">
+    <value>{0} wurde nicht gefunden.</value>
+  </data>
+  <data name="Msg_FlipFailed" xml:space="preserve">
+    <value>{0} konnte nicht gespiegelt werden: {1}</value>
+  </data>
+  <data name="Msg_MixedSvgDxf" xml:space="preserve">
+    <value>Export ist nicht möglich, wenn die Teile gemischt aus SVG und DXF stammen.</value>
+  </data>
+  <data name="Msg_NestFirstExport" xml:space="preserve">
+    <value>Schachteln Sie zuerst und wählen Sie ein Ergebnis, dann exportieren.</value>
+  </data>
+  <data name="Msg_NestFirstReport" xml:space="preserve">
+    <value>Schachteln Sie zuerst und wählen Sie ein Ergebnis, dann den Bericht speichern.</value>
+  </data>
+  <data name="Msg_NestFirstToPrint" xml:space="preserve">
+    <value>Bitte schachteln Sie zuerst und wählen Sie ein Ergebnis zum Drucken.</value>
+  </data>
+  <data name="Msg_NoBrowserFeedback" xml:space="preserve">
+    <value>Der Browser konnte nicht geöffnet werden. Feedback können Sie hier senden:
+https://github.com/vadimkom/ACVSheetNest/issues</value>
+  </data>
+  <data name="Msg_NoEngine" xml:space="preserve">
+    <value>Die Schachtel-Engine (sparrow.exe) wurde nicht gefunden. Sie wird neben dem Programm installiert; installieren Sie neu oder setzen Sie die Umgebungsvariable SHEETNEST_SPARROW auf ihren Pfad.</value>
+  </data>
+  <data name="Msg_NoResult" xml:space="preserve">
+    <value>Das Schachteln hat kein Ergebnis geliefert.</value>
+  </data>
+  <data name="Msg_NoShape" xml:space="preserve">
+    <value>{0} enthält keine Form, die geschachtelt werden kann.</value>
+  </data>
+  <data name="Msg_NotEnoughSheets" xml:space="preserve">
+    <value>{0} Teil(e) passten nicht auf die {1} verfügbaren Bleche.
+
+Erhöhen Sie die Blechanzahl im Schritt „Bleche“, setzen Sie bei einer Größe „Unbegrenzt“ oder fügen Sie ein weiteres Blech hinzu, und schachteln Sie erneut.</value>
+  </data>
+  <data name="Msg_NotReadyToCut" xml:space="preserve">
+    <value>{0} Teil(e) sind nicht schneidbereit:
+
+{1}
+
+Sie sind rot dargestellt. Schieben Sie sie unter „Layout bearbeiten“ frei und versuchen Sie es erneut.</value>
+  </data>
+  <data name="Msg_PartsDoNotFit" xml:space="preserve">
+    <value>{0} Teil(e) passen auf keine der Blechgrößen im Schritt „Bleche“.
+
+Die Blechanzahl war nicht die Grenze — eine der Größen ist unbegrenzt. Das Teil ist größer als jedes Blech, auf das es kommen könnte; fügen Sie eine größere Blechgröße hinzu (oder prüfen Sie Teileabstand und Randabstand).</value>
+  </data>
+  <data name="Msg_PrintError" xml:space="preserve">
+    <value>Druckfehler</value>
+  </data>
+  <data name="Msg_ProfileFileBad" xml:space="preserve">
+    <value>Die Schachtel-Einstellungsdatei {0} ist nicht lesbar; es werden die Standardwerte verwendet:
+{1}</value>
+  </data>
+  <data name="Msg_Recover" xml:space="preserve">
+    <value>SheetNest wurde unerwartet mit ungespeicherten Änderungen in {0}{1} beendet.
+
+Das automatisch gespeicherte Projekt wiederherstellen?</value>
+  </data>
+  <data name="Msg_RecoverUnsaved" xml:space="preserve">
+    <value>einem ungespeicherten Projekt</value>
+  </data>
+  <data name="Msg_RecoverWhen" xml:space="preserve">
+    <value> (automatisch gespeichert {0})</value>
+  </data>
+  <data name="Msg_ReportWriteFailed" xml:space="preserve">
+    <value>Der Bericht konnte nicht geschrieben werden: {0}</value>
+  </data>
+  <data name="Msg_SaveBeforeClosing" xml:space="preserve">
+    <value>Es gibt ein Schachtelergebnis. Projekt vor dem Schließen speichern?</value>
+  </data>
+  <data name="Msg_SaveFailed" xml:space="preserve">
+    <value>Das Projekt konnte nicht gespeichert werden in
+{0}
+
+{1}
+
+Das Projekt ist nicht gespeichert. Speichern Sie es an einem anderen Ort (Datei → Speichern unter).</value>
+  </data>
+  <data name="Msg_SaveFirst" xml:space="preserve">
+    <value>Es gibt ein Schachtelergebnis. Projekt zuerst speichern?</value>
+  </data>
+  <data name="Msg_UnfitRow" xml:space="preserve">
+    <value>    {0}: {1} Teil(e){2}</value>
+  </data>
+  <data name="Msg_UnsupportedFiles" xml:space="preserve">
+    <value>{0} kann nicht geöffnet werden.
+SheetNest öffnet Projekte (*.dnest) sowie DXF- und SC2000-Zeichnungen (*.dxf, *.dfx, *.chf).</value>
+  </data>
+  <data name="Msg_UpToDate" xml:space="preserve">
+    <value>Sie sind auf dem neuesten Stand (SheetNest {0}).</value>
+  </data>
+  <data name="Msg_UpdateAvailable" xml:space="preserve">
+    <value>SheetNest {0} ist verfügbar (installiert: {1}).
+
+Downloadseite öffnen?</value>
+  </data>
+  <data name="Msg_UpdateFailed" xml:space="preserve">
+    <value>Updates konnten nicht geprüft werden. Prüfen Sie die Internetverbindung.</value>
+  </data>
+  <data name="Nest_Cancelled" xml:space="preserve">
+    <value>Schachteln abgebrochen</value>
+  </data>
+  <data name="Nest_Done" xml:space="preserve">
+    <value>Geschachtelt in {0}{1}</value>
+  </data>
+  <data name="Nest_GivenUp" xml:space="preserve">
+    <value>, {0} aufgegeben</value>
+  </data>
+  <data name="Nest_KeptNormal" xml:space="preserve">
+    <value>, {0} Zeichnung(en) mit normalem Abstand belassen</value>
+  </data>
+  <data name="Nest_LivePreview" xml:space="preserve">
+    <value>Suche: {0} von {1} Teilen, Bleche: {2}</value>
+  </data>
+  <data name="Nest_Running" xml:space="preserve">
+    <value>Schachteln…  {0}</value>
+  </data>
+  <data name="Nest_SharedCuts" xml:space="preserve">
+    <value>  ·  {0} gemeinsame Schnitte</value>
+  </data>
+  <data name="Nesting_VariantMetrics" xml:space="preserve">
+    <value>Variante #{0}: Ausnutzung {1} | Platziert {2} | Bleche: {3} (Zeit: {4})</value>
+  </data>
+  <data name="Off_Auto" xml:space="preserve">
+    <value>Automatisch (bestes Reststück)</value>
+  </data>
+  <data name="Off_AutoBadge" xml:space="preserve">
+    <value>AUTO</value>
+  </data>
+  <data name="Off_AutoTip" xml:space="preserve">
+    <value>Vergleicht Ende, Seite und Beide mit dem erzeugten Layout und nimmt die Variante, die am meisten Material frei lässt.</value>
+  </data>
+  <data name="Off_Both" xml:space="preserve">
+    <value>Beide (L-förmig)</value>
+  </data>
+  <data name="Off_BothTip" xml:space="preserve">
+    <value>Wenn das Layout auf beiden Seiten Platz lässt, fällt der Rest als zwei Rechtecke ab (Guillotineschnitte, kein Schnitt teilt ein Reststück).</value>
+  </data>
+  <data name="Off_Enable" xml:space="preserve">
+    <value>Rest als rechteckiges Reststück abtrennen</value>
+  </data>
+  <data name="Off_EnableTip" xml:space="preserve">
+    <value>Misst die freie Fläche, die das Schachteln auf dem letzten Blech lässt, und fügt eine Schnittlinie hinzu, sodass sie als wiederverwendbares Rechteck abfällt. Es verschiebt nie ein Teil: Das Layout ist bereits fertig, wenn dies berechnet wird, daher ändert das Einschalten keine Platzierung.</value>
+  </data>
+  <data name="Off_End" xml:space="preserve">
+    <value>Blechende</value>
+  </data>
+  <data name="Off_EndTip" xml:space="preserve">
+    <value>Ein voller Streifen am Ende der langen Blechseite: das klassische Reststück.</value>
+  </data>
+  <data name="Off_MaxX" xml:space="preserve">
+    <value>Maximale X-Größe ({0}):</value>
+  </data>
+  <data name="Off_MaxXTip" xml:space="preserve">
+    <value>Breitestes Reststück, das sich noch abzutrennen lohnt. Größer ist es kein Reststück mehr, sondern fast ein Blech; dann wird nichts geschnitten und das Blech bleibt ganz. 0 = keine Grenze.</value>
+  </data>
+  <data name="Off_MaxY" xml:space="preserve">
+    <value>Maximale Y-Größe ({0}):</value>
+  </data>
+  <data name="Off_MaxYTip" xml:space="preserve">
+    <value>Höchstes Reststück, das sich noch abzutrennen lohnt. 0 = keine Grenze.</value>
+  </data>
+  <data name="Off_MinX" xml:space="preserve">
+    <value>Minimale X-Größe ({0}):</value>
+  </data>
+  <data name="Off_MinXTip" xml:space="preserve">
+    <value>Schmalstes Reststück, das sich abzutrennen lohnt. Darunter bleibt das Blech ungeschnitten. 0 = automatisch (5 % der Blechseite).</value>
+  </data>
+  <data name="Off_MinY" xml:space="preserve">
+    <value>Minimale Y-Größe ({0}):</value>
+  </data>
+  <data name="Off_MinYTip" xml:space="preserve">
+    <value>Kürzestes Reststück, das sich abzutrennen lohnt. 0 = automatisch (5 % der Blechseite).</value>
+  </data>
+  <data name="Off_Overlap" xml:space="preserve">
+    <value>Überlauf am Rand ({0}):</value>
+  </data>
+  <data name="Off_OverlapTip" xml:space="preserve">
+    <value>Wie weit der Schnitt an beiden Enden ÜBER den Blechrand hinausläuft, damit das Reststück abfällt und nicht an einem Steg in den Ecken hängen bleibt. 0 = bündig mit dem Rand.</value>
+  </data>
+  <data name="Off_Position" xml:space="preserve">
+    <value>Lage des Reststücks</value>
+  </data>
+  <data name="Off_Reset" xml:space="preserve">
+    <value>Standardwerte</value>
+  </data>
+  <data name="Off_ResetTip" xml:space="preserve">
+    <value>Setzt die sechs Zahlen oben auf die empfohlenen Werte für die Einheiten dieser Zeichnung zurück. Lage des Reststücks und das Häkchen zum Einschalten bleiben unverändert.</value>
+  </data>
+  <data name="Off_Side" xml:space="preserve">
+    <value>Blechseite</value>
+  </data>
+  <data name="Off_SideTip" xml:space="preserve">
+    <value>Ein voller Streifen entlang der kurzen Blechseite.</value>
+  </data>
+  <data name="Off_Spacing" xml:space="preserve">
+    <value>Abstand zum Reststück ({0}):</value>
+  </data>
+  <data name="Off_SpacingTip" xml:space="preserve">
+    <value>Abstand zwischen den geschachtelten Teilen und der Schnittlinie des Reststücks (Zeichnungseinheiten).</value>
+  </data>
+  <data name="Off_Title" xml:space="preserve">
+    <value>Reststück</value>
+  </data>
+  <data name="PartColour_Title" xml:space="preserve">
+    <value>Teilefarbe</value>
+  </data>
+  <data name="Part_Cc_None" xml:space="preserve">
+    <value>Keiner</value>
+  </data>
+  <data name="Part_Cc_SamePart" xml:space="preserve">
+    <value>Gleiches Teil</value>
+  </data>
+  <data name="Part_Cc_Unrestricted" xml:space="preserve">
+    <value>Unbeschränkt (kompatible Teile)</value>
+  </data>
+  <data name="Part_CommonCutting" xml:space="preserve">
+    <value>Common-Line-Schnitt:</value>
+  </data>
+  <data name="Part_CommonCuttingTip" xml:space="preserve">
+    <value>Mit welchen Teilen dieses Teil eine Schnittkante teilen darf. Volle Kanten bleiben im eingestellten Common-Line-Abstand und werden als Umriss der Gruppe plus ein gemeinsamer Mittelschnitt exportiert. Überall sonst gilt weiterhin der Teileabstand. Eine Änderung hier schaltet den Common-Line-Schnitt für dieses Teil ausdrücklich ein.</value>
+  </data>
+  <data name="Part_Extra" xml:space="preserve">
+    <value>Zusätzlich:</value>
+  </data>
+  <data name="Part_ExtraTip" xml:space="preserve">
+    <value>Ersatzteile, die über die benötigte Menge hinaus geschachtelt werden (z. B. falls eines Ausschuss wird).</value>
+  </data>
+  <data name="Part_File" xml:space="preserve">
+    <value>Teiledatei:</value>
+  </data>
+  <data name="Part_FlippedBoth" xml:space="preserve">
+    <value>↔↕ in beide Richtungen gespiegelt (= um 180° gedreht)</value>
+  </data>
+  <data name="Part_FlippedLeftRight" xml:space="preserve">
+    <value>↔ links-rechts gespiegelt</value>
+  </data>
+  <data name="Part_FlippedUpDown" xml:space="preserve">
+    <value>↕ oben-unten gespiegelt</value>
+  </data>
+  <data name="Part_FullSheetWarn" xml:space="preserve">
+    <value>⚠ Diese DXF sieht aus wie ein GANZES GESCHACHTELTES BLECH ({0} Formen in einem {1}×{2}-Rahmen), nicht wie ein einzelnes Teil. SheetNest importiert jede DXF als EIN Teil, und die Abstände zwischen den inneren Formen stammen aus der Originalzeichnung. Exportieren Sie stattdessen jedes Teil als eigene DXF.</value>
+  </data>
+  <data name="Part_LegacyCcHint" xml:space="preserve">
+    <value>Ein gespeicherter alter Common-Line-Modus ist inaktiv. Wählen Sie einen Modus, um ihn für dieses Teil zu bestätigen.</value>
+  </data>
+  <data name="Part_Mirrored" xml:space="preserve">
+    <value>Gespiegelt:</value>
+  </data>
+  <data name="Part_MirroredTip" xml:space="preserve">
+    <value>GESPIEGELTE Kopien (in X gespiegelt) zusätzlich zu den Mengen oben, für linke/rechte Paare. Die exportierte DXF schneidet diese gespiegelt.</value>
+  </data>
+  <data name="Part_Orientations" xml:space="preserve">
+    <value>Erlaubte Ausrichtungen:</value>
+  </data>
+  <data name="Part_OrientationsTip" xml:space="preserve">
+    <value>Drehungen, die das Schachteln auf DIESES Teil anwenden darf (z. B. einschränken wegen Walzrichtung).</value>
+  </data>
+  <data name="Part_Priority" xml:space="preserve">
+    <value>Priorität:</value>
+  </data>
+  <data name="Part_PriorityTip" xml:space="preserve">
+    <value>1 = höchste Priorität. Teile mit höherer Priorität werden zuerst geschachtelt, füllen also die ersten Bleche und bleiben nie übrig, wenn das Material ausgeht.</value>
+  </data>
+  <data name="Part_Quantity" xml:space="preserve">
+    <value>Menge</value>
+  </data>
+  <data name="Part_Required" xml:space="preserve">
+    <value>Benötigt:</value>
+  </data>
+  <data name="Part_RequiredTip" xml:space="preserve">
+    <value>Für den Auftrag benötigte Teile.</value>
+  </data>
+  <data name="Part_Settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="Part_Spacing" xml:space="preserve">
+    <value>Teileabstand:</value>
+  </data>
+  <data name="Part_SpacingTip" xml:space="preserve">
+    <value>Abstand dieses Teils zu Nachbarn, mit denen es KEINEN Schnitt teilen darf (Zeichnungseinheiten). Zwei Teile liegen (AbstandA + AbstandB) / 2 auseinander.</value>
+  </data>
+  <data name="Part_SymmetricHint" xml:space="preserve">
+    <value>Rotationssymmetrische Form erkannt (Kreis/Quadrat): Drehen kann das Layout nicht verbessern, daher spart „Wie gezeichnet“ die Suche.</value>
+  </data>
+  <data name="Part_Title" xml:space="preserve">
+    <value>Teil bearbeiten</value>
+  </data>
+  <data name="Part_Units" xml:space="preserve">
+    <value>in den Einheiten der Zeichnung</value>
+  </data>
+  <data name="Parts_CountSummary" xml:space="preserve">
+    <value>Teile: {0} (angefordert: {1} Stk.)</value>
+  </data>
+  <data name="Priority_High" xml:space="preserve">
+    <value>Hoch</value>
+  </data>
+  <data name="Priority_Highest" xml:space="preserve">
+    <value>Höchste</value>
+  </data>
+  <data name="Priority_Low" xml:space="preserve">
+    <value>Niedrig</value>
+  </data>
+  <data name="Priority_Lowest" xml:space="preserve">
+    <value>Niedrigste</value>
+  </data>
+  <data name="Priority_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Radio_DxfView" xml:space="preserve">
+    <value>DXF-Zeichnung</value>
+  </data>
+  <data name="Radio_ReportView" xml:space="preserve">
+    <value>Zusammenfassung</value>
+  </data>
+  <data name="Rep_BoxArea" xml:space="preserve">
+    <value>Rechteckfläche</value>
+  </data>
+  <data name="Rep_Continued" xml:space="preserve">
+    <value>{0} (Fortsetzung)</value>
+  </data>
+  <data name="Rep_Cut" xml:space="preserve">
+    <value>Schneiden</value>
+  </data>
+  <data name="Rep_CutLength" xml:space="preserve">
+    <value>Schnittlänge</value>
+  </data>
+  <data name="Rep_CutTotal" xml:space="preserve">
+    <value>Schnittlänge</value>
+  </data>
+  <data name="Rep_CuttingPlan" xml:space="preserve">
+    <value>SCHNEIDPLAN</value>
+  </data>
+  <data name="Rep_DifferentLayouts" xml:space="preserve">
+    <value>Verschiedene Layouts</value>
+  </data>
+  <data name="Rep_Header" xml:space="preserve">
+    <value>SheetNest – Schachtelbericht</value>
+  </data>
+  <data name="Rep_Kg" xml:space="preserve">
+    <value>kg</value>
+  </data>
+  <data name="Rep_Layout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
+  <data name="Rep_LayoutN" xml:space="preserve">
+    <value>Layout {0}</value>
+  </data>
+  <data name="Rep_LayoutSub" xml:space="preserve">
+    <value>{0} Teile   |   {1}% Ausnutzung   |   Blech {2} x {3} {4}</value>
+  </data>
+  <data name="Rep_LayoutTitle" xml:space="preserve">
+    <value>Layout {0} von {1}   -   schneiden x {2}</value>
+  </data>
+  <data name="Rep_M2" xml:space="preserve">
+    <value>m²</value>
+  </data>
+  <data name="Rep_Material" xml:space="preserve">
+    <value>MATERIALBEDARF</value>
+  </data>
+  <data name="Rep_MaterialKind" xml:space="preserve">
+    <value>Material</value>
+  </data>
+  <data name="Rep_MaterialUsed" xml:space="preserve">
+    <value>Verbrauchtes Material</value>
+  </data>
+  <data name="Rep_Metre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="Rep_More" xml:space="preserve">
+    <value>... und {0} weitere</value>
+  </data>
+  <data name="Rep_MoreLayouts" xml:space="preserve">
+    <value>... und {0} weitere Layouts (siehe deren Seiten)</value>
+  </data>
+  <data name="Rep_No" xml:space="preserve">
+    <value>Nr.</value>
+  </data>
+  <data name="Rep_NotPlaced" xml:space="preserve">
+    <value>NICHT platzierte Teile</value>
+  </data>
+  <data name="Rep_NothingToReport" xml:space="preserve">
+    <value>Nichts zu berichten. Schachteln Sie zuerst.</value>
+  </data>
+  <data name="Rep_Page" xml:space="preserve">
+    <value>Seite {0} von {1}</value>
+  </data>
+  <data name="Rep_PageCol" xml:space="preserve">
+    <value>Seite</value>
+  </data>
+  <data name="Rep_Part" xml:space="preserve">
+    <value>Teil</value>
+  </data>
+  <data name="Rep_PartFallback" xml:space="preserve">
+    <value>(Teil)</value>
+  </data>
+  <data name="Rep_PartTotals" xml:space="preserve">
+    <value>TEILE GESAMT</value>
+  </data>
+  <data name="Rep_PartWeight" xml:space="preserve">
+    <value>Teilegewicht</value>
+  </data>
+  <data name="Rep_Parts" xml:space="preserve">
+    <value>Teile</value>
+  </data>
+  <data name="Rep_PartsOnLayout" xml:space="preserve">
+    <value>Teile in diesem Layout</value>
+  </data>
+  <data name="Rep_PartsToCut" xml:space="preserve">
+    <value>Zu schneidende Teile</value>
+  </data>
+  <data name="Rep_Pierces" xml:space="preserve">
+    <value>Einstiche</value>
+  </data>
+  <data name="Rep_Qty" xml:space="preserve">
+    <value>Anz.</value>
+  </data>
+  <data name="Rep_SheetFew" xml:space="preserve">
+    <value>Bleche</value>
+  </data>
+  <data name="Rep_SheetMany" xml:space="preserve">
+    <value>Bleche</value>
+  </data>
+  <data name="Rep_SheetOne" xml:space="preserve">
+    <value>Blech</value>
+  </data>
+  <data name="Rep_SheetSize" xml:space="preserve">
+    <value>Blechgröße</value>
+  </data>
+  <data name="Rep_SheetWeight" xml:space="preserve">
+    <value>Blechgewicht</value>
+  </data>
+  <data name="Rep_SheetsOf" xml:space="preserve">
+    <value>{0} zu  {1} x {2} {3}</value>
+  </data>
+  <data name="Rep_SizeCol" xml:space="preserve">
+    <value>Größe, {0}</value>
+  </data>
+  <data name="Rep_Sq" xml:space="preserve">
+    <value>{0}²</value>
+  </data>
+  <data name="Rep_SqFt" xml:space="preserve">
+    <value>sq ft</value>
+  </data>
+  <data name="Rep_Summary" xml:space="preserve">
+    <value>AUFTRAGSÜBERSICHT</value>
+  </data>
+  <data name="Rep_Total" xml:space="preserve">
+    <value>Gesamt:  {0} {1}   -   {2}</value>
+  </data>
+  <data name="Rep_Used" xml:space="preserve">
+    <value>Verbraucht</value>
+  </data>
+  <data name="Report_ColPartArea" xml:space="preserve">
+    <value>Fläche (Stk.)</value>
+  </data>
+  <data name="Report_ColPartDim" xml:space="preserve">
+    <value>Teileabmessungen</value>
+  </data>
+  <data name="Report_ColPartName" xml:space="preserve">
+    <value>Teil / Datei</value>
+  </data>
+  <data name="Report_ColPartPos" xml:space="preserve">
+    <value>Pos.</value>
+  </data>
+  <data name="Report_ColPartQty" xml:space="preserve">
+    <value>Gesamt Stk.</value>
+  </data>
+  <data name="Report_ColSheetFormat" xml:space="preserve">
+    <value>Blechgröße</value>
+  </data>
+  <data name="Report_ColSheetNum" xml:space="preserve">
+    <value>Blech Nr.</value>
+  </data>
+  <data name="Report_ColSheetParts" xml:space="preserve">
+    <value>Teile auf dem Blech</value>
+  </data>
+  <data name="Report_ColSheetRepeat" xml:space="preserve">
+    <value>Blechanzahl</value>
+  </data>
+  <data name="Report_ColSheetUtil" xml:space="preserve">
+    <value>Ausnutzung</value>
+  </data>
+  <data name="Report_DatePrefix" xml:space="preserve">
+    <value>Datum: </value>
+  </data>
+  <data name="Report_EmptySub" xml:space="preserve">
+    <value>Schachteln Sie im Schritt 3, um den Fertigungsbericht mit Stückliste und Schneidplänen anzusehen und zu drucken.</value>
+  </data>
+  <data name="Report_EmptyTitle" xml:space="preserve">
+    <value>Schachtelbericht noch nicht erstellt</value>
+  </data>
+  <data name="Report_PageXofY" xml:space="preserve">
+    <value>Seite {0} von {1}</value>
+  </data>
+  <data name="Report_PartsSpecTitle" xml:space="preserve">
+    <value>2. Stückliste der geschnittenen Teile</value>
+  </data>
+  <data name="Report_PreviewToolbar_Print" xml:space="preserve">
+    <value>🖨️ Bericht drucken</value>
+  </data>
+  <data name="Report_PreviewToolbar_SavePdf" xml:space="preserve">
+    <value>📄 PDF speichern</value>
+  </data>
+  <data name="Report_PreviewToolbar_Summary" xml:space="preserve">
+    <value>Fertigungs-Schachtelbericht</value>
+  </data>
+  <data name="Report_PreviewToolbar_ZoomFit" xml:space="preserve">
+    <value>⤢ Seitenbreite</value>
+  </data>
+  <data name="Report_ProjectPrefix" xml:space="preserve">
+    <value>Projekt: </value>
+  </data>
+  <data name="Report_SheetsMapTitle" xml:space="preserve">
+    <value>1. Schneidplan nach Blechen</value>
+  </data>
+  <data name="Report_Title" xml:space="preserve">
+    <value>SCHACHTEL-ÜBERSICHTSBERICHT</value>
+  </data>
+  <data name="Report_UnitsPrefix" xml:space="preserve">
+    <value>Einheiten: </value>
+  </data>
+  <data name="Report_UntitledProject" xml:space="preserve">
+    <value>Unbenannt</value>
+  </data>
+  <data name="Rot_0And180Tip" xml:space="preserve">
+    <value>0° und 180°: beachtet die Walzrichtung, kann aber wenden.</value>
+  </data>
+  <data name="Rot_0And90Tip" xml:space="preserve">
+    <value>0° und 90° erlaubt.</value>
+  </data>
+  <data name="Rot_45" xml:space="preserve">
+    <value>45°-Schritte</value>
+  </data>
+  <data name="Rot_45Tip" xml:space="preserve">
+    <value>Acht Ausrichtungen im Abstand von 45°. Die Auftragseinstellung bietet das auch an, und ohne diese Option hier könnte einem Teil nicht angezeigt werden, worauf es wirklich eingestellt war.</value>
+  </data>
+  <data name="Rot_4Way" xml:space="preserve">
+    <value>4-fach</value>
+  </data>
+  <data name="Rot_4WayTip" xml:space="preserve">
+    <value>Alle vier rechtwinkligen Ausrichtungen (0 / 90 / 180 / 270°). Die sichere erste Wahl für quadratische und L-förmige Teile: dort meist besser als freie Drehung und immer günstiger in der Suche.</value>
+  </data>
+  <data name="Rot_90And270Tip" xml:space="preserve">
+    <value>90° und 270°: immer gedreht, in beide Richtungen.</value>
+  </data>
+  <data name="Rot_90Only" xml:space="preserve">
+    <value>Nur 90°</value>
+  </data>
+  <data name="Rot_90OnlyTip" xml:space="preserve">
+    <value>Nur 90°, das Teil wird also immer einmal gedreht.</value>
+  </data>
+  <data name="Rot_AsDrawn" xml:space="preserve">
+    <value>Wie gezeichnet</value>
+  </data>
+  <data name="Rot_AsDrawnTip" xml:space="preserve">
+    <value>Nur 0°, das Teil bleibt genau wie gezeichnet (beachtet die Walzrichtung).</value>
+  </data>
+  <data name="Rot_Free" xml:space="preserve">
+    <value>Frei</value>
+  </data>
+  <data name="Rot_FreeTip" xml:space="preserve">
+    <value>Jeder Winkel, und NICHT automatisch am dichtesten. Gewinnt bei Teilen mit schrägen oder gebogenen Kanten und verliert bei quadratischen oder L-förmigen, die genau im rechten Winkel ineinandergreifen und durch Kippen nichts gewinnen. Gemessen an zwei echten Aufträgen: 84,3 % des Blocks gefüllt gegenüber 81,6 % bei 4-fach im einen, 69,6 % gegenüber 73,2 % im anderen. Kostet etwa die doppelte Suche. Ignoriert die Walzrichtung.</value>
+  </data>
+  <data name="Rot_Job" xml:space="preserve">
+    <value>Auftragsstandard</value>
+  </data>
+  <data name="Rot_JobTip" xml:space="preserve">
+    <value>Was im Auftrag eingestellt ist, unter Einstellungen &gt; Erweiterte Einstellungen. Ändern Sie es dort, folgt dieses Teil.</value>
+  </data>
+  <data name="Run_Draft" xml:space="preserve">
+    <value>Entwurf</value>
+  </data>
+  <data name="Run_Saved" xml:space="preserve">
+    <value>Gespeichert</value>
+  </data>
+  <data name="Set_AutosaveMinTip" xml:space="preserve">
+    <value>Wie oft das offene Projekt zur Wiederherstellung automatisch gespeichert wird.</value>
+  </data>
+  <data name="Set_AutosaveTip" xml:space="preserve">
+    <value>Speichert das offene Projekt regelmäßig, damit ungespeicherte Arbeit nach einem Absturz wiederhergestellt werden kann.</value>
+  </data>
+  <data name="Set_ClusterMaxTip" xml:space="preserve">
+    <value>Feste Höchstzahl von Teilen in einer Common-Line-Gruppe (2 bis 500).</value>
+  </data>
+  <data name="Set_ClusterModeTip" xml:space="preserve">
+    <value>Automatisch lässt SheetNest eine sichere Gruppengröße wählen; Manuell setzt eine feste Teileanzahl als Grenze.</value>
+  </data>
+  <data name="Set_EffortTip" xml:space="preserve">
+    <value>Wie lange das Schachteln jedes Blech durchsucht. Das ergibt ein DICHTERES Layout, nicht mehr Teile auf dem Blech: Die passenden Teile werden fast sofort gefunden, der Rest der Suche schiebt sie zusammen, damit das übrige Material als ein nutzbares Stück zurückkommt.</value>
+  </data>
+  <data name="Set_GapTip" xml:space="preserve">
+    <value>Common-Line-Platzierungen verwenden den eingestellten Abstand; SheetNest bildet vor dem DXF-Export einen Mittelschnitt. Der Wert wird in Zoll gespeichert und zur Anzeige in die gewählten Zeichnungseinheiten umgerechnet.</value>
+  </data>
+  <data name="Set_MarginTip" xml:space="preserve">
+    <value>Freier Rand zwischen jedem Teil und dem Blechrand.</value>
+  </data>
+  <data name="Set_MergeTip" xml:space="preserve">
+    <value>Alte Exportoption für normale Geometrie: fasst deckungsgleiche DXF-Elemente zusammen. Die Common-Line-Ausgabe bildet ihren einzelnen Mittelschnitt unabhängig davon vor dem Export.</value>
+  </data>
+  <data name="Set_PartNamesTip" xml:space="preserve">
+    <value>Teiledateinamen als Text in jedes platzierte Teil exportieren, zur Erkennung nach dem Schneiden. PAINT ist Lasergravur/-markierung (dieselbe Ebene wie die Biegelinien); BACKGROUND ist im CAD/CAM sichtbar, wird aber nie bearbeitet. Alles Geschnittene liegt immer auf der Ebene CUT.</value>
+  </data>
+  <data name="Set_ResetClusterTip" xml:space="preserve">
+    <value>Automatische Größe der Common-Line-Gruppen wiederherstellen.</value>
+  </data>
+  <data name="Set_ResetGapTip" xml:space="preserve">
+    <value>Den mitgelieferten Common-Line-Abstand wiederherstellen.</value>
+  </data>
+  <data name="Set_RotationsTip" xml:space="preserve">
+    <value>Drehungen, die das Schachteln bei nicht bearbeiteten Teilen ausprobieren darf. Die Einstellung je Teil unter „Teil bearbeiten“ hat immer Vorrang.</value>
+  </data>
+  <data name="Set_SpacingTip" xml:space="preserve">
+    <value>Standardabstand zwischen normalen Teilen (Zeichnungseinheiten). „Teil bearbeiten“ kann ihn je Teil überschreiben; Common-Line-Platzierungen verwenden den separaten Abstand unten.</value>
+  </data>
+  <data name="Set_UnitsTip" xml:space="preserve">
+    <value>Zeichnungseinheiten für Teile, Bleche, Abstände und Ränder. Wählen Sie die Einheiten Ihrer DXF-Dateien; der physische Common-Line-Abstand wird automatisch umgerechnet.</value>
+  </data>
+  <data name="Settings_Auto" xml:space="preserve">
+    <value>Automatisch</value>
+  </data>
+  <data name="Settings_Autosave" xml:space="preserve">
+    <value>Offenes Projekt automatisch speichern</value>
+  </data>
+  <data name="Settings_AutosaveTime" xml:space="preserve">
+    <value>Speicherintervall (min):</value>
+  </data>
+  <data name="Settings_CommonLineGap" xml:space="preserve">
+    <value>Common-Line-Abstand</value>
+  </data>
+  <data name="Settings_Concurrency" xml:space="preserve">
+    <value>Parallele Suchen:</value>
+  </data>
+  <data name="Settings_Concurrency_Auto" xml:space="preserve">
+    <value>Automatisch ({0})</value>
+  </data>
+  <data name="Settings_Concurrency_Tip" xml:space="preserve">
+    <value>Wie viele Schachtelsuchen gleichzeitig laufen. Weniger hält einen langsamen Rechner reaktionsfähig; mehr ist auf einem schnellen eher fertig. Das Layout selbst ist in beiden Fällen gleich.</value>
+  </data>
+  <data name="Settings_Effort" xml:space="preserve">
+    <value>Schachtelaufwand:</value>
+  </data>
+  <data name="Settings_Effort_Best" xml:space="preserve">
+    <value>Beste (am langsamsten)</value>
+  </data>
+  <data name="Settings_Effort_Fast" xml:space="preserve">
+    <value>Schnell</value>
+  </data>
+  <data name="Settings_Effort_Normal" xml:space="preserve">
+    <value>Normal (Standard)</value>
+  </data>
+  <data name="Settings_Group_App" xml:space="preserve">
+    <value>Anwendung</value>
+  </data>
+  <data name="Settings_Group_CommonLine" xml:space="preserve">
+    <value>Common-Line-Schnitt</value>
+  </data>
+  <data name="Settings_Group_Dxf" xml:space="preserve">
+    <value>DXF-Export</value>
+  </data>
+  <data name="Settings_Group_Nesting" xml:space="preserve">
+    <value>Schachteln</value>
+  </data>
+  <data name="Settings_Manual" xml:space="preserve">
+    <value>Manuell</value>
+  </data>
+  <data name="Settings_Margin" xml:space="preserve">
+    <value>Randabstand</value>
+  </data>
+  <data name="Settings_MaxCluster" xml:space="preserve">
+    <value>Max. Teile je Gruppe:</value>
+  </data>
+  <data name="Settings_MergeLines" xml:space="preserve">
+    <value>Deckungsgleiche Schnittlinien zusammenfassen</value>
+  </data>
+  <data name="Settings_PartNames" xml:space="preserve">
+    <value>Teilenamen als Text:</value>
+  </data>
+  <data name="Settings_PartNames_Background" xml:space="preserve">
+    <value>BACKGROUND — nur Anzeige</value>
+  </data>
+  <data name="Settings_PartNames_Layer9" xml:space="preserve">
+    <value>PAINT — graviert, mit den Biegelinien</value>
+  </data>
+  <data name="Settings_PartNames_None" xml:space="preserve">
+    <value>Keine</value>
+  </data>
+  <data name="Settings_Reset" xml:space="preserve">
+    <value>Zurücksetzen</value>
+  </data>
+  <data name="Settings_Rot_0_180" xml:space="preserve">
+    <value>0 / 180°</value>
+  </data>
+  <data name="Settings_Rot_45" xml:space="preserve">
+    <value>45°-Schritte</value>
+  </data>
+  <data name="Settings_Rot_90" xml:space="preserve">
+    <value>90°-Schritte</value>
+  </data>
+  <data name="Settings_Rot_AsDrawn" xml:space="preserve">
+    <value>Wie gezeichnet</value>
+  </data>
+  <data name="Settings_Rot_Free" xml:space="preserve">
+    <value>Frei (36 Schritte)</value>
+  </data>
+  <data name="Settings_Rotations" xml:space="preserve">
+    <value>Standard-Drehungen der Teile:</value>
+  </data>
+  <data name="Settings_Spacing" xml:space="preserve">
+    <value>Teileabstand</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Erweiterte Einstellungen</value>
+  </data>
+  <data name="Settings_Units" xml:space="preserve">
+    <value>Einheiten:</value>
+  </data>
+  <data name="Settings_Units_In" xml:space="preserve">
+    <value>Zoll (in)</value>
+  </data>
+  <data name="Settings_Units_Mm" xml:space="preserve">
+    <value>Millimeter (mm)</value>
+  </data>
+  <data name="Shape_Circle" xml:space="preserve">
+    <value>Kreis</value>
+  </data>
+  <data name="Shape_Diameter" xml:space="preserve">
+    <value>Durchmesser:</value>
+  </data>
+  <data name="Shape_Height" xml:space="preserve">
+    <value>Höhe:</value>
+  </data>
+  <data name="Shape_Quantity" xml:space="preserve">
+    <value>Anzahl:</value>
+  </data>
+  <data name="Shape_Rectangle" xml:space="preserve">
+    <value>Rechteck</value>
+  </data>
+  <data name="Shape_Square" xml:space="preserve">
+    <value>Quadrat</value>
+  </data>
+  <data name="Shape_Title" xml:space="preserve">
+    <value>Form hinzufügen</value>
+  </data>
+  <data name="Shape_Width" xml:space="preserve">
+    <value>Breite:</value>
+  </data>
+  <data name="Sheet_Dlg_Add" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="Sheet_Dlg_Header" xml:space="preserve">
+    <value>Blechgröße in {0} (Breite = die lange Seite).</value>
+  </data>
+  <data name="Sheet_Dlg_Height" xml:space="preserve">
+    <value>Höhe ({0})</value>
+  </data>
+  <data name="Sheet_Dlg_Priority" xml:space="preserve">
+    <value>Priorität:</value>
+  </data>
+  <data name="Sheet_Dlg_Qty" xml:space="preserve">
+    <value>Anzahl</value>
+  </data>
+  <data name="Sheet_Dlg_Remember" xml:space="preserve">
+    <value>Als Vorlage merken</value>
+  </data>
+  <data name="Sheet_Dlg_Title" xml:space="preserve">
+    <value>Eigene Blechgröße</value>
+  </data>
+  <data name="Sheet_Dlg_Title_Edit" xml:space="preserve">
+    <value>Blech bearbeiten</value>
+  </data>
+  <data name="Sheet_Dlg_Unlimited" xml:space="preserve">
+    <value>Unbegrenzt</value>
+  </data>
+  <data name="Sheet_Dlg_Width" xml:space="preserve">
+    <value>Breite ({0})</value>
+  </data>
+  <data name="Sheet_PriorityTip" xml:space="preserve">
+    <value>Verbrauchspriorität: Bleche mit der höchsten Priorität werden zuerst verbraucht (z. B. Reste und Reststücke).</value>
+  </data>
+  <data name="Sheet_RememberTip" xml:space="preserve">
+    <value>Diese Größe unter „Meine Bleche“ im Menü „Blech hinzufügen“ speichern.</value>
+  </data>
+  <data name="Sheet_UnlimitedShort" xml:space="preserve">
+    <value>Unbegrenzt</value>
+  </data>
+  <data name="Sheet_UnlimitedTip" xml:space="preserve">
+    <value>Von dieser Größe gibt es so viel, wie der Auftrag braucht; das Schachteln nimmt also Bleche, bis jedes Teil platziert ist. Die Anzahl wird ignoriert, solange dies angehakt ist (sie behält ihren Wert für später).</value>
+  </data>
+  <data name="Sheets_CountSummary" xml:space="preserve">
+    <value>Blechgrößen: {0} (Bleche: {1})</value>
+  </data>
+  <data name="Sheets_EmptySub" xml:space="preserve">
+    <value>Fügen Sie eine Standardgröße hinzu oder geben Sie eine eigene ein</value>
+  </data>
+  <data name="Sheets_UnlimitedNote" xml:space="preserve">
+    <value>inkl. unbegrenzter</value>
+  </data>
+  <data name="Status_Placed" xml:space="preserve">
+    <value>Platziert:</value>
+  </data>
+  <data name="Status_Sheets" xml:space="preserve">
+    <value>Bleche:</value>
+  </data>
+  <data name="Status_Unplaced" xml:space="preserve">
+    <value>Nicht platziert:</value>
+  </data>
+  <data name="Status_Utilization" xml:space="preserve">
+    <value>Ausnutzung:</value>
+  </data>
+  <data name="Tab_Layout" xml:space="preserve">
+    <value>4. Layout &amp; Bericht</value>
+  </data>
+  <data name="Tab_Nesting" xml:space="preserve">
+    <value>3. Schachteln</value>
+  </data>
+  <data name="Tab_Parts" xml:space="preserve">
+    <value>1. Teile (Modelle)</value>
+  </data>
+  <data name="Tab_Sheets" xml:space="preserve">
+    <value>2. Bleche</value>
+  </data>
+  <data name="Tip_AddPart" xml:space="preserve">
+    <value>Teile aus DXF-Dateien hinzufügen</value>
+  </data>
+  <data name="Tip_AddShape" xml:space="preserve">
+    <value>Ein Rechteck oder einen Kreis ohne DXF hinzufügen, in der benötigten Anzahl</value>
+  </data>
+  <data name="Tip_AddSheet" xml:space="preserve">
+    <value>Standardgröße wählen oder eigene eingeben</value>
+  </data>
+  <data name="Tip_BackToNesting" xml:space="preserve">
+    <value>Zurück zu den Schachtelvarianten (Strg+3)</value>
+  </data>
+  <data name="Tip_BackToParts" xml:space="preserve">
+    <value>Zurück zu den Teilen (Strg+1)</value>
+  </data>
+  <data name="Tip_CancelNest" xml:space="preserve">
+    <value>Schachteln stoppen</value>
+  </data>
+  <data name="Tip_ClearParts" xml:space="preserve">
+    <value>Die ganze Teileliste leeren</value>
+  </data>
+  <data name="Tip_ClearRuns" xml:space="preserve">
+    <value>Die Liste der gesammelten Schachtelvarianten leeren</value>
+  </data>
+  <data name="Tip_CutRenest" xml:space="preserve">
+    <value>Die markierten Bleche sind geschnitten: Ihre Teile werden vom Auftrag abgezogen, die Bleche vom Lager, und der Rest wird neu geschachtelt</value>
+  </data>
+  <data name="Tip_DeletePart" xml:space="preserve">
+    <value>Ausgewähltes Teil aus dem Projekt entfernen</value>
+  </data>
+  <data name="Tip_DeleteSheet" xml:space="preserve">
+    <value>Ausgewähltes Blech aus der Liste entfernen</value>
+  </data>
+  <data name="Tip_Divide" xml:space="preserve">
+    <value>Menge aller (oder ausgewählter) Teile durch diesen Faktor teilen</value>
+  </data>
+  <data name="Tip_EdgeMargin" xml:space="preserve">
+    <value>Freier Rand entlang des Blechrands (aktuelle Zeichnungseinheiten)</value>
+  </data>
+  <data name="Tip_EditSheet" xml:space="preserve">
+    <value>Größe und Anzahl des Blechs bearbeiten</value>
+  </data>
+  <data name="Tip_ExportDxf" xml:space="preserve">
+    <value>Konturen des Layouts als DXF exportieren (mit Ebene für Teilenamen)</value>
+  </data>
+  <data name="Tip_ExportPdf" xml:space="preserve">
+    <value>PDF-Fertigungsbericht mit Teileliste speichern</value>
+  </data>
+  <data name="Tip_Feedback" xml:space="preserve">
+    <value>Feedback auf GitHub öffnen</value>
+  </data>
+  <data name="Tip_FlipLeftRight" xml:space="preserve">
+    <value>Das Teil selbst links-rechts spiegeln (jede Kopie davon). Nochmals drücken macht es rückgängig.</value>
+  </data>
+  <data name="Tip_FlipUpDown" xml:space="preserve">
+    <value>Das Teil selbst oben-unten spiegeln (jede Kopie davon). Nochmals drücken macht es rückgängig.</value>
+  </data>
+  <data name="Tip_GoToNesting" xml:space="preserve">
+    <value>Weiter zum Schachteln (Strg+3)</value>
+  </data>
+  <data name="Tip_GoToSheets" xml:space="preserve">
+    <value>Weiter zu den Blechen (Strg+2)</value>
+  </data>
+  <data name="Tip_LayoutCard" xml:space="preserve">
+    <value>Klicken, um dieses Layout anzuzeigen</value>
+  </data>
+  <data name="Tip_Material" xml:space="preserve">
+    <value>Woraus der Auftrag geschnitten wird. Verschiedene Metalle oder Dicken sind verschiedene Aufträge und werden getrennt geschachtelt</value>
+  </data>
+  <data name="Tip_Multiplier" xml:space="preserve">
+    <value>Mengenmultiplikator (z. B. Anzahl benötigter Baugruppen/Sätze)</value>
+  </data>
+  <data name="Tip_Multiply" xml:space="preserve">
+    <value>Menge aller (oder ausgewählter) Teile mit diesem Faktor multiplizieren</value>
+  </data>
+  <data name="Tip_NavLayout" xml:space="preserve">
+    <value>Endgültige Schneidzeichnung, DXF- und PDF-Export, Berichtsdruck (Strg+4)</value>
+  </data>
+  <data name="Tip_NavNesting" xml:space="preserve">
+    <value>Schachteln starten, Varianten vergleichen und ansehen (Strg+3)</value>
+  </data>
+  <data name="Tip_NavParts" xml:space="preserve">
+    <value>Zu schachtelnde Teile und ihre Einstellungen (Strg+1)</value>
+  </data>
+  <data name="Tip_NavSheets" xml:space="preserve">
+    <value>Bleche auf Lager und Ränder (Strg+2)</value>
+  </data>
+  <data name="Tip_NestDraft" xml:space="preserve">
+    <value>Schnelle Schätzung für ein Angebot: wie viele Bleche, wie viel Fläche und Meter Schnitt. Grobes Layout, nicht zum Schneiden</value>
+  </data>
+  <data name="Tip_New" xml:space="preserve">
+    <value>Neues Schachtelprojekt anlegen</value>
+  </data>
+  <data name="Tip_NextPage" xml:space="preserve">
+    <value>Nächste Seite</value>
+  </data>
+  <data name="Tip_Open" xml:space="preserve">
+    <value>Gespeichertes Projekt öffnen</value>
+  </data>
+  <data name="Tip_OpenLayout" xml:space="preserve">
+    <value>Weiter zur endgültigen Schneidzeichnung, zum DXF-Export und zum Berichtsdruck (Strg+4)</value>
+  </data>
+  <data name="Tip_PartColor" xml:space="preserve">
+    <value>Farbe des Teils (zum Ändern klicken)</value>
+  </data>
+  <data name="Tip_PartDetails" xml:space="preserve">
+    <value>Mehr zum Teil: Ersatzteile, Drehungen, Abstand, Common-Line-Schnitt</value>
+  </data>
+  <data name="Tip_PartMirrorQty" xml:space="preserve">
+    <value>Gespiegelte Kopien ZUSÄTZLICH zur Menge, für linke/rechte Paare. 2 Stk. und 2 gespiegelt = 4 Teile, davon zwei gespiegelt.</value>
+  </data>
+  <data name="Tip_PartPriority" xml:space="preserve">
+    <value>Schachtelpriorität des Teils</value>
+  </data>
+  <data name="Tip_PartQty" xml:space="preserve">
+    <value>Wie viele dieses Teils geschachtelt werden</value>
+  </data>
+  <data name="Tip_PartRemove" xml:space="preserve">
+    <value>Teil aus dem Projekt entfernen</value>
+  </data>
+  <data name="Tip_PartStatus" xml:space="preserve">
+    <value>Platziert / gesamt</value>
+  </data>
+  <data name="Tip_PrevPage" xml:space="preserve">
+    <value>Vorherige Seite</value>
+  </data>
+  <data name="Tip_PrintReport" xml:space="preserve">
+    <value>Bericht drucken</value>
+  </data>
+  <data name="Tip_RemoveSheet" xml:space="preserve">
+    <value>Blech entfernen</value>
+  </data>
+  <data name="Tip_ReportPrint" xml:space="preserve">
+    <value>Alle Seiten des Berichts drucken</value>
+  </data>
+  <data name="Tip_Save" xml:space="preserve">
+    <value>Projekt speichern</value>
+  </data>
+  <data name="Tip_SheetPriority" xml:space="preserve">
+    <value>Verbrauchspriorität: Bleche mit der höchsten Priorität werden zuerst verwendet (z. B. Reste und Reststücke)</value>
+  </data>
+  <data name="Tip_SheetQty" xml:space="preserve">
+    <value>Wie viele Bleche dieser Größe auf Lager sind</value>
+  </data>
+  <data name="Tip_SheetUnlimited" xml:space="preserve">
+    <value>Wenn angehakt, verwendet das Schachteln so viele Bleche dieser Größe wie nötig</value>
+  </data>
+  <data name="Tip_StartNest" xml:space="preserve">
+    <value>Schachteln starten</value>
+  </data>
+  <data name="Tip_Thickness" xml:space="preserve">
+    <value>Blechdicke in mm: auswählen oder eigene eingeben. Wird für das Gewicht im Bericht verwendet</value>
+  </data>
+  <data name="Tip_UpdateNotice" xml:space="preserve">
+    <value>Eine neuere SheetNest-Version ist verfügbar. Klicken, um die Downloadseite zu öffnen.</value>
+  </data>
+  <data name="Tip_Zoom100" xml:space="preserve">
+    <value>Originalgröße, 100 %</value>
+  </data>
+  <data name="Tip_ZoomFit" xml:space="preserve">
+    <value>An Fensterbreite anpassen</value>
+  </data>
+  <data name="Tip_ZoomIn" xml:space="preserve">
+    <value>Vergrößern</value>
+  </data>
+  <data name="Tip_ZoomOut" xml:space="preserve">
+    <value>Verkleinern</value>
+  </data>
+  <data name="Tip_ZoomPage" xml:space="preserve">
+    <value>Ganze Seite ins Fenster einpassen</value>
+  </data>
+  <data name="Title_AddPart" xml:space="preserve">
+    <value>Teil hinzufügen</value>
+  </data>
+  <data name="Title_CommonLine" xml:space="preserve">
+    <value>Common-Line</value>
+  </data>
+  <data name="Title_CutRenest" xml:space="preserve">
+    <value>Rest schachteln</value>
+  </data>
+  <data name="Title_EditNest" xml:space="preserve">
+    <value>Layout bearbeiten</value>
+  </data>
+  <data name="Title_Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Title_ExportDxf" xml:space="preserve">
+    <value>DXF exportieren</value>
+  </data>
+  <data name="Title_Feedback" xml:space="preserve">
+    <value>Feedback senden</value>
+  </data>
+  <data name="Title_FileMissing" xml:space="preserve">
+    <value>Datei fehlt</value>
+  </data>
+  <data name="Title_Nest" xml:space="preserve">
+    <value>Schachteln</value>
+  </data>
+  <data name="Title_NotEnoughSheets" xml:space="preserve">
+    <value>Nicht genug Bleche</value>
+  </data>
+  <data name="Title_PartsDoNotFit" xml:space="preserve">
+    <value>Teile passen nicht</value>
+  </data>
+  <data name="Title_PrintReport" xml:space="preserve">
+    <value>Bericht drucken</value>
+  </data>
+  <data name="Title_Recovery" xml:space="preserve">
+    <value>Wiederherstellung</value>
+  </data>
+  <data name="Title_Report" xml:space="preserve">
+    <value>Schachtelbericht</value>
+  </data>
+  <data name="Title_SaveError" xml:space="preserve">
+    <value>Fehler beim Speichern</value>
+  </data>
+  <data name="Title_SaveFailed" xml:space="preserve">
+    <value>Speichern fehlgeschlagen</value>
+  </data>
+  <data name="Title_Updates" xml:space="preserve">
+    <value>Nach Updates suchen</value>
+  </data>
+  <data name="Unit_In" xml:space="preserve">
+    <value>in</value>
+  </data>
+  <data name="Unit_Mm" xml:space="preserve">
+    <value>mm</value>
+  </data>
+  <data name="Unit_Pcs" xml:space="preserve">
+    <value>Stk.</value>
+  </data>
+  <data name="Why_Both" xml:space="preserve">
+    <value>, {0} überlappen einen Nachbarn und {1} liegen im Randabstand</value>
+  </data>
+  <data name="Why_Margin" xml:space="preserve">
+    <value>, im Randabstand</value>
+  </data>
+  <data name="Why_Overlap" xml:space="preserve">
+    <value>, überlappt einen Nachbarn</value>
+  </data>
+  <data name="Parts_EmptyTitle" xml:space="preserve">
+    <value>Noch keine Teile im Projekt</value>
+  </data>
+  <data name="Sheets_EmptyTitle" xml:space="preserve">
+    <value>Keine Bleche hinzugefügt</value>
+  </data>
+  <data name="Nest_PreviewPick" xml:space="preserve">
+    <value>Schachtelvorschau: Wählen Sie eine Variante aus der Liste</value>
+  </data>
+  <data name="Nest_VariantLine" xml:space="preserve">
+    <value>Variante #{0}: Ausnutzung {1} | Platziert {2} | Bleche: {3} (Zeit: {4})</value>
+  </data>
+  <data name="Sheet_Dlg_InMm" xml:space="preserve">
+    <value>Millimetern</value>
+  </data>
+  <data name="Sheet_Dlg_InInches" xml:space="preserve">
+    <value>Zoll</value>
+  </data>
+</root>

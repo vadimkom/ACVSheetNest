@@ -1,0 +1,1607 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_BasedOn" xml:space="preserve">
+    <value>Construit sur des projets open source</value>
+  </data>
+  <data name="About_Contributors" xml:space="preserve">
+    <value>Contributeurs</value>
+  </data>
+  <data name="About_DeepNest" xml:space="preserve">
+    <value>le DeepNest d'origine</value>
+  </data>
+  <data name="About_DeepNestPort" xml:space="preserve">
+    <value>le portage C# (WinForms) de DeepNest</value>
+  </data>
+  <data name="About_DeepNestSharp" xml:space="preserve">
+    <value>le portage C# / WPF de DeepNest dont SheetNest est issu</value>
+  </data>
+  <data name="About_Dxf" xml:space="preserve">
+    <value>lecture et écriture DXF</value>
+  </data>
+  <data name="About_DxfExport" xml:space="preserve">
+    <value>export DXF</value>
+  </data>
+  <data name="About_Engine" xml:space="preserve">
+    <value>le moteur d'imbrication (MIT) et sa bibliothèque géométrique jagua-rs (MPL-2.0)</value>
+  </data>
+  <data name="About_License" xml:space="preserve">
+    <value>Open source, sous licence MIT.</value>
+  </data>
+  <data name="About_NetCore" xml:space="preserve">
+    <value>portage vers .NET Core</value>
+  </data>
+  <data name="About_Simplify" xml:space="preserve">
+    <value>fonctions de simplification</value>
+  </data>
+  <data name="About_Summary" xml:space="preserve">
+    <value>SheetNest est un logiciel d'imbrication de tôles : import DXF, imbrication automatique des pièces sur les tôles, édition manuelle, coupe commune, export DXF et rapport de production PDF.</value>
+  </data>
+  <data name="About_Title" xml:space="preserve">
+    <value>À propos de SheetNest {0}</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="Btn_Add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="Btn_AddDxf" xml:space="preserve">
+    <value>+ Ajouter un DXF...</value>
+  </data>
+  <data name="Btn_AddShape" xml:space="preserve">
+    <value>+ Forme...</value>
+  </data>
+  <data name="Btn_AddSheet" xml:space="preserve">
+    <value>+ Ajouter une tôle...</value>
+  </data>
+  <data name="Btn_BackToNesting" xml:space="preserve">
+    <value>⮜ Retour à l'imbrication</value>
+  </data>
+  <data name="Btn_BackToParts" xml:space="preserve">
+    <value>⮜ Retour aux pièces</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="Btn_ClearAll" xml:space="preserve">
+    <value>Tout effacer</value>
+  </data>
+  <data name="Btn_ClearRuns" xml:space="preserve">
+    <value>Effacer l'historique</value>
+  </data>
+  <data name="Btn_Close" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="Btn_CutRenest" xml:space="preserve">
+    <value>✂ Découpé — imbriquer le reste</value>
+  </data>
+  <data name="Btn_DeletePart" xml:space="preserve">
+    <value>Supprimer la pièce</value>
+  </data>
+  <data name="Btn_DeleteSheet" xml:space="preserve">
+    <value>Supprimer la tôle</value>
+  </data>
+  <data name="Btn_Divide" xml:space="preserve">
+    <value>÷ Diviser</value>
+  </data>
+  <data name="Btn_EditDetails" xml:space="preserve">
+    <value>⚙ Détails...</value>
+  </data>
+  <data name="Btn_EditSheet" xml:space="preserve">
+    <value>✎ Modifier...</value>
+  </data>
+  <data name="Btn_ExportDxf" xml:space="preserve">
+    <value>Exporter en DXF...</value>
+  </data>
+  <data name="Btn_ExportPdf" xml:space="preserve">
+    <value>Exporter en PDF...</value>
+  </data>
+  <data name="Btn_GoToLayout" xml:space="preserve">
+    <value>Vers le placement ➔</value>
+  </data>
+  <data name="Btn_GoToNestingShort" xml:space="preserve">
+    <value>Vers l'imbrication</value>
+  </data>
+  <data name="Btn_Multiply" xml:space="preserve">
+    <value>× Multiplier</value>
+  </data>
+  <data name="Btn_NestCut" xml:space="preserve">
+    <value>▶ Imbriquer</value>
+  </data>
+  <data name="Btn_NestDraft" xml:space="preserve">
+    <value>⚡ Brouillon</value>
+  </data>
+  <data name="Btn_New" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
+  <data name="Btn_NextNesting" xml:space="preserve">
+    <value>Suivant : Imbrication ➔</value>
+  </data>
+  <data name="Btn_NextSheets" xml:space="preserve">
+    <value>Suivant : Tôles ➔</value>
+  </data>
+  <data name="Btn_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Btn_Open" xml:space="preserve">
+    <value>Ouvrir...</value>
+  </data>
+  <data name="Btn_PrintReport" xml:space="preserve">
+    <value>🖨 Imprimer le rapport...</value>
+  </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="Btn_StartNest" xml:space="preserve">
+    <value>▶ Lancer l'imbrication</value>
+  </data>
+  <data name="Btn_StopNest" xml:space="preserve">
+    <value>⏹ Arrêter</value>
+  </data>
+  <data name="Btn_ZoomPage" xml:space="preserve">
+    <value>▣ Page entière</value>
+  </data>
+  <data name="Chk_Unlimited" xml:space="preserve">
+    <value>Illimité</value>
+  </data>
+  <data name="Col_Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Col_AvailableUsed" xml:space="preserve">
+    <value>Disponible / Utilisé</value>
+  </data>
+  <data name="Col_Color" xml:space="preserve">
+    <value>Couleur</value>
+  </data>
+  <data name="Col_Dimensions" xml:space="preserve">
+    <value>Dimensions (L × H)</value>
+  </data>
+  <data name="Col_Mirrored" xml:space="preserve">
+    <value>Symétriques</value>
+  </data>
+  <data name="Col_NetArea" xml:space="preserve">
+    <value>Surface</value>
+  </data>
+  <data name="Col_PartName" xml:space="preserve">
+    <value>Pièce (nom / fichier)</value>
+  </data>
+  <data name="Col_Preview" xml:space="preserve">
+    <value>Aperçu</value>
+  </data>
+  <data name="Col_Priority" xml:space="preserve">
+    <value>Priorité</value>
+  </data>
+  <data name="Col_Quantity" xml:space="preserve">
+    <value>Quantité</value>
+  </data>
+  <data name="Col_RunNum" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="Col_RunPlaced" xml:space="preserve">
+    <value>Placées</value>
+  </data>
+  <data name="Col_RunSheets" xml:space="preserve">
+    <value>Tôles</value>
+  </data>
+  <data name="Col_RunTime" xml:space="preserve">
+    <value>Temps</value>
+  </data>
+  <data name="Col_RunUtil" xml:space="preserve">
+    <value>Utilisation</value>
+  </data>
+  <data name="Col_SheetPriority" xml:space="preserve">
+    <value>Priorité</value>
+  </data>
+  <data name="Col_SheetSize" xml:space="preserve">
+    <value>Format de tôle (L × H)</value>
+  </data>
+  <data name="Col_Status" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="Col_Unlimited" xml:space="preserve">
+    <value>Illimité</value>
+  </data>
+  <data name="Crash_Copy" xml:space="preserve">
+    <value>Copier les détails</value>
+  </data>
+  <data name="Crash_Explain" xml:space="preserve">
+    <value>Le signaler aide à corriger le problème. Le bouton ci-dessous ouvre votre navigateur avec un ticket GitHub prérempli : vous pouvez tout y vérifier, et RIEN n'est envoyé tant que vous ne le soumettez pas vous-même.</value>
+  </data>
+  <data name="Crash_Header" xml:space="preserve">
+    <value>SheetNest a rencontré un problème.</value>
+  </data>
+  <data name="Crash_NoBrowser" xml:space="preserve">
+    <value>Impossible d'ouvrir le navigateur. Utilisez « Copier les détails » et collez-les dans un nouveau ticket sur github.com/vadimkom/ACVSheetNest/issues.</value>
+  </data>
+  <data name="Crash_NoLog" xml:space="preserve">
+    <value>(le journal n'a pas pu être écrit)</value>
+  </data>
+  <data name="Crash_Report" xml:space="preserve">
+    <value>Signaler sur GitHub</value>
+  </data>
+  <data name="Crash_SavedTo" xml:space="preserve">
+    <value>Un rapport de plantage a été enregistré dans :</value>
+  </data>
+  <data name="Crash_Title" xml:space="preserve">
+    <value>SheetNest - Rapport de problème</value>
+  </data>
+  <data name="Cut_Badge" xml:space="preserve">
+    <value>✂ découpée</value>
+  </data>
+  <data name="Cut_BadgeN" xml:space="preserve">
+    <value>✂ {0} sur {1}</value>
+  </data>
+  <data name="Cut_OfCount" xml:space="preserve">
+    <value>sur {0}</value>
+  </data>
+  <data name="Cut_Summary" xml:space="preserve">
+    <value>Cochées : {0} tôles, {1} pièces</value>
+  </data>
+  <data name="Dxf_CommonLineLocked" xml:space="preserve">
+    <value>les pièces d'un groupe à coupe commune sont verrouillées  ·  réimbriquez pour changer leur position</value>
+  </data>
+  <data name="Dxf_Distance" xml:space="preserve">
+    <value>distance : {0}  ·  X : {1}  ·  Y : {2}</value>
+  </data>
+  <data name="Dxf_EditNavHint" xml:space="preserve">
+    <value>glisser = déplacer  ·  Alt+déposer = faire glisser  ·  flèches = décaler  ·  Échap = déposer</value>
+  </data>
+  <data name="Dxf_EditNest" xml:space="preserve">
+    <value>✋ Modifier le placement</value>
+  </data>
+  <data name="Dxf_EditNestTip" xml:space="preserve">
+    <value>Imbrication manuelle : cliquez sur une pièce pour la sélectionner, faites-la glisser pour la déplacer, tournez-la avec les boutons.</value>
+  </data>
+  <data name="Dxf_EmptyHint" xml:space="preserve">
+    <value>Lancez une imbrication pour voir le résultat ici.</value>
+  </data>
+  <data name="Dxf_FullSheet" xml:space="preserve">
+    <value>Tôle entière</value>
+  </data>
+  <data name="Dxf_Gap" xml:space="preserve">
+    <value>écart {0}</value>
+  </data>
+  <data name="Dxf_Layout" xml:space="preserve">
+    <value>Placement {0}</value>
+  </data>
+  <data name="Dxf_Measure" xml:space="preserve">
+    <value>Mesurer</value>
+  </data>
+  <data name="Dxf_MeasureAgain" xml:space="preserve">
+    <value>  ·  cliquez pour mesurer à nouveau</value>
+  </data>
+  <data name="Dxf_MeasureTip" xml:space="preserve">
+    <value>Mesurer des distances : cliquez sur deux points du dessin.</value>
+  </data>
+  <data name="Dxf_Mirror" xml:space="preserve">
+    <value>⇄ Symétrie</value>
+  </data>
+  <data name="Dxf_MirrorTip" xml:space="preserve">
+    <value>Retourner la pièce sélectionnée en miroir</value>
+  </data>
+  <data name="Dxf_MoveNoRoom" xml:space="preserve">
+    <value>Pas de place libre : la pièce est rouge ; faites-la glisser à sa place ou annulez (Ctrl+Z)</value>
+  </data>
+  <data name="Dxf_MoveToSheet" xml:space="preserve">
+    <value>⇄ Vers la tôle…</value>
+  </data>
+  <data name="Dxf_MoveToSheetNone" xml:space="preserve">
+    <value>Les pièces ne se déplacent qu'entre tôles uniques sans coupe commune</value>
+  </data>
+  <data name="Dxf_MoveToSheetTip" xml:space="preserve">
+    <value>Déplacer la pièce sélectionnée sur une autre tôle, à la première place libre</value>
+  </data>
+  <data name="Dxf_NavHint" xml:space="preserve">
+    <value>molette = zoom  ·  glisser avec la molette = déplacer  ·  clic droit = ajuster</value>
+  </data>
+  <data name="Dxf_NestN" xml:space="preserve">
+    <value>Imbrication {0}/{1}</value>
+  </data>
+  <data name="Dxf_NextLayout" xml:space="preserve">
+    <value>Placement suivant</value>
+  </data>
+  <data name="Dxf_NotANumber" xml:space="preserve">
+    <value>ce n'est pas un nombre lisible  ·  la pièce est restée à sa place</value>
+  </data>
+  <data name="Dxf_PartStatus" xml:space="preserve">
+    <value>{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}</value>
+  </data>
+  <data name="Dxf_PartsOnSheet" xml:space="preserve">
+    <value>{0} pièces</value>
+  </data>
+  <data name="Dxf_PrevLayout" xml:space="preserve">
+    <value>Placement précédent</value>
+  </data>
+  <data name="Dxf_RedoTip" xml:space="preserve">
+    <value>Rétablir (Ctrl+Y)</value>
+  </data>
+  <data name="Dxf_RemainderSheet" xml:space="preserve">
+    <value>Tôle de chute</value>
+  </data>
+  <data name="Dxf_RotateCcw5Tip" xml:space="preserve">
+    <value>Tourner de 5° dans le sens antihoraire</value>
+  </data>
+  <data name="Dxf_RotateCcw90Tip" xml:space="preserve">
+    <value>Tourner de 90° dans le sens antihoraire</value>
+  </data>
+  <data name="Dxf_RotateCw5Tip" xml:space="preserve">
+    <value>Tourner de 5° dans le sens horaire</value>
+  </data>
+  <data name="Dxf_RotateCw90Tip" xml:space="preserve">
+    <value>Tourner de 90° dans le sens horaire</value>
+  </data>
+  <data name="Dxf_UndoTip" xml:space="preserve">
+    <value>Annuler (Ctrl+Z)</value>
+  </data>
+  <data name="Effort_Best" xml:space="preserve">
+    <value>Meilleur</value>
+  </data>
+  <data name="Effort_Fast" xml:space="preserve">
+    <value>Rapide</value>
+  </data>
+  <data name="Effort_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Hint_DragDrop" xml:space="preserve">
+    <value>💡 Vous pouvez glisser-déposer des fichiers DXF directement dans ce tableau</value>
+  </data>
+  <data name="Hint_MarkCut" xml:space="preserve">
+    <value>Cochez les tôles déjà découpées</value>
+  </data>
+  <data name="Hint_RunsList" xml:space="preserve">
+    <value>💡 Chaque clic sur Brouillon ou Imbriquer ajoute une imbrication complète de toute la commande (les brouillons sont marqués) ; les doublons ne sont pas répétés. La meilleure est en haut (★) : toutes les pièces placées, le moins de tôles, la meilleure utilisation de la matière. Clic = aperçu, double-clic = placement.</value>
+  </data>
+  <data name="Kpi_PartsPlaced" xml:space="preserve">
+    <value>Pièces placées :</value>
+  </data>
+  <data name="Kpi_SheetsUsed" xml:space="preserve">
+    <value>Tôles consommées :</value>
+  </data>
+  <data name="Kpi_Unplaced" xml:space="preserve">
+    <value>Pièces non placées :</value>
+  </data>
+  <data name="Kpi_Utilization" xml:space="preserve">
+    <value>Utilisation globale :</value>
+  </data>
+  <data name="Lbl_Material" xml:space="preserve">
+    <value>Matière :</value>
+  </data>
+  <data name="Lbl_Multiplier" xml:space="preserve">
+    <value>Multiplicateur (kits) :</value>
+  </data>
+  <data name="Lbl_NestingEffort" xml:space="preserve">
+    <value>Effort d'imbrication :</value>
+  </data>
+  <data name="Lbl_RunsList" xml:space="preserve">
+    <value>Variantes d'imbrication :</value>
+  </data>
+  <data name="Lbl_SheetCut" xml:space="preserve">
+    <value>découpée</value>
+  </data>
+  <data name="Lbl_SheetEdgeMargin" xml:space="preserve">
+    <value>Marge de bord de tôle :</value>
+  </data>
+  <data name="Lbl_SheetsCut" xml:space="preserve">
+    <value>découpées</value>
+  </data>
+  <data name="Lbl_Thickness" xml:space="preserve">
+    <value>Épaisseur :</value>
+  </data>
+  <data name="Mat_None" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="Mat_aluminium" xml:space="preserve">
+    <value>Aluminium</value>
+  </data>
+  <data name="Mat_black" xml:space="preserve">
+    <value>Acier noir</value>
+  </data>
+  <data name="Mat_galvanized" xml:space="preserve">
+    <value>Acier galvanisé</value>
+  </data>
+  <data name="Mat_stainless" xml:space="preserve">
+    <value>Inox</value>
+  </data>
+  <data name="Menu_About" xml:space="preserve">
+    <value>À propos</value>
+  </data>
+  <data name="Menu_AdvancedSettings" xml:space="preserve">
+    <value>Paramètres avancés...</value>
+  </data>
+  <data name="Menu_CheckUpdates" xml:space="preserve">
+    <value>Rechercher des mises à jour...</value>
+  </data>
+  <data name="Menu_CustomSize" xml:space="preserve">
+    <value>Format personnalisé…</value>
+  </data>
+  <data name="Menu_Exit" xml:space="preserve">
+    <value>Quitter</value>
+  </data>
+  <data name="Menu_File" xml:space="preserve">
+    <value>_Fichier</value>
+  </data>
+  <data name="Menu_Help" xml:space="preserve">
+    <value>_Aide</value>
+  </data>
+  <data name="Menu_Language" xml:space="preserve">
+    <value>_Langue</value>
+  </data>
+  <data name="Menu_MySheets" xml:space="preserve">
+    <value>Mes tôles</value>
+  </data>
+  <data name="Menu_NewProject" xml:space="preserve">
+    <value>Nouveau projet</value>
+  </data>
+  <data name="Menu_Offcut" xml:space="preserve">
+    <value>Chute...</value>
+  </data>
+  <data name="Menu_OpenProject" xml:space="preserve">
+    <value>Ouvrir un projet...</value>
+  </data>
+  <data name="Menu_RecentEmpty" xml:space="preserve">
+    <value>(vide)</value>
+  </data>
+  <data name="Menu_RecentProjects" xml:space="preserve">
+    <value>Projets récents</value>
+  </data>
+  <data name="Menu_RemoveMySheets" xml:space="preserve">
+    <value>Retirer de mes tôles</value>
+  </data>
+  <data name="Menu_Save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="Menu_SaveAs" xml:space="preserve">
+    <value>Enregistrer sous...</value>
+  </data>
+  <data name="Menu_SendFeedback" xml:space="preserve">
+    <value>Envoyer un avis...</value>
+  </data>
+  <data name="Menu_Settings" xml:space="preserve">
+    <value>_Paramètres</value>
+  </data>
+  <data name="Msg_AddPartsFirst" xml:space="preserve">
+    <value>Ouvrez d'abord un projet et ajoutez des pièces.</value>
+  </data>
+  <data name="Msg_AddSheetsFirst" xml:space="preserve">
+    <value>Ajoutez d'abord au moins une tôle dans l'étape Tôles.</value>
+  </data>
+  <data name="Msg_AllCut" xml:space="preserve">
+    <value>Tout est découpé : il ne reste aucune pièce à imbriquer.</value>
+  </data>
+  <data name="Msg_CannotUse" xml:space="preserve">
+    <value>{0} ne peut pas être utilisé :
+
+{1}</value>
+  </data>
+  <data name="Msg_ClearPartsConfirm" xml:space="preserve">
+    <value>Effacer toute la liste des pièces ?</value>
+  </data>
+  <data name="Msg_CommonLineSkipped" xml:space="preserve">
+    <value>La coupe commune a été ignorée pour :
+
+{0}
+
+Ces pièces gardent l'écart normal entre pièces.</value>
+  </data>
+  <data name="Msg_CutRenestConfirm" xml:space="preserve">
+    <value>Cochées comme découpées : {0} tôles portant {1} pièces.
+
+Ces pièces sont retirées de la commande (les quantités du tableau des pièces diminuent), les tôles restent sorties du stock, et le reste est imbriqué à nouveau.
+
+Continuer ?</value>
+  </data>
+  <data name="Msg_EditLeave" xml:space="preserve">
+    <value>Quitter quand même ?</value>
+  </data>
+  <data name="Msg_EditUndoLeave" xml:space="preserve">
+    <value>Annuler vos modifications et quitter quand même ?</value>
+  </data>
+  <data name="Msg_EditUnfit" xml:space="preserve">
+    <value>{0} pièce(s) de ce placement ne peuvent pas être découpées{1}.
+
+Elles sont dessinées en rouge. Dégagez-les avant de quitter l'éditeur.
+
+</value>
+  </data>
+  <data name="Msg_ExportOverwrite" xml:space="preserve">
+    <value>Ces fichiers existent déjà et seront écrasés :
+
+{0}
+
+Continuer ?</value>
+  </data>
+  <data name="Msg_FileMissing" xml:space="preserve">
+    <value>Impossible de trouver {0}.</value>
+  </data>
+  <data name="Msg_FlipFailed" xml:space="preserve">
+    <value>Impossible de retourner {0} : {1}</value>
+  </data>
+  <data name="Msg_MixedSvgDxf" xml:space="preserve">
+    <value>L'export est impossible lorsque les pièces mélangent SVG et DXF.</value>
+  </data>
+  <data name="Msg_NestFirstExport" xml:space="preserve">
+    <value>Lancez une imbrication et choisissez un résultat, puis exportez.</value>
+  </data>
+  <data name="Msg_NestFirstReport" xml:space="preserve">
+    <value>Lancez une imbrication et choisissez un résultat, puis enregistrez le rapport.</value>
+  </data>
+  <data name="Msg_NestFirstToPrint" xml:space="preserve">
+    <value>Lancez une imbrication et choisissez un résultat à imprimer.</value>
+  </data>
+  <data name="Msg_NoBrowserFeedback" xml:space="preserve">
+    <value>Impossible d'ouvrir le navigateur. Vous pouvez envoyer votre avis à :
+https://github.com/vadimkom/ACVSheetNest/issues</value>
+  </data>
+  <data name="Msg_NoEngine" xml:space="preserve">
+    <value>Le moteur d'imbrication (sparrow.exe) est introuvable. Il est installé à côté du programme ; réinstallez, ou définissez la variable d'environnement SHEETNEST_SPARROW avec son chemin.</value>
+  </data>
+  <data name="Msg_NoResult" xml:space="preserve">
+    <value>L'imbrication n'a produit aucun résultat.</value>
+  </data>
+  <data name="Msg_NoShape" xml:space="preserve">
+    <value>{0} ne contient aucune forme imbricable.</value>
+  </data>
+  <data name="Msg_NotEnoughSheets" xml:space="preserve">
+    <value>{0} pièce(s) n'ont pas tenu sur les {1} tôle(s) disponibles.
+
+Augmentez la quantité de tôles dans l'étape Tôles, cochez Illimité sur un format ou ajoutez une autre tôle, puis relancez l'imbrication.</value>
+  </data>
+  <data name="Msg_NotReadyToCut" xml:space="preserve">
+    <value>{0} pièce(s) ne sont pas prêtes à découper :
+
+{1}
+
+Elles sont dessinées en rouge. Dégagez-les dans Modifier le placement et réessayez.</value>
+  </data>
+  <data name="Msg_PartsDoNotFit" xml:space="preserve">
+    <value>{0} pièce(s) ne tiennent sur aucun format de tôle de l'étape Tôles.
+
+La quantité de tôles n'était pas la limite — un des formats est illimité. La pièce est plus grande que toutes les tôles possibles : ajoutez un format plus grand (ou vérifiez l'écart et la marge de la pièce).</value>
+  </data>
+  <data name="Msg_PrintError" xml:space="preserve">
+    <value>Erreur d'impression</value>
+  </data>
+  <data name="Msg_ProfileFileBad" xml:space="preserve">
+    <value>Le fichier de réglages d'imbrication {0} est illisible ; les valeurs par défaut sont utilisées :
+{1}</value>
+  </data>
+  <data name="Msg_Recover" xml:space="preserve">
+    <value>SheetNest s'est fermé de façon inattendue avec des modifications non enregistrées dans {0}{1}.
+
+Récupérer le projet enregistré automatiquement ?</value>
+  </data>
+  <data name="Msg_RecoverUnsaved" xml:space="preserve">
+    <value>un projet non enregistré</value>
+  </data>
+  <data name="Msg_RecoverWhen" xml:space="preserve">
+    <value> (enregistré automatiquement {0})</value>
+  </data>
+  <data name="Msg_ReportWriteFailed" xml:space="preserve">
+    <value>Impossible d'écrire le rapport : {0}</value>
+  </data>
+  <data name="Msg_SaveBeforeClosing" xml:space="preserve">
+    <value>Vous avez un résultat d'imbrication. Enregistrer le projet avant de fermer ?</value>
+  </data>
+  <data name="Msg_SaveFailed" xml:space="preserve">
+    <value>Impossible d'enregistrer le projet dans
+{0}
+
+{1}
+
+Le projet n'est pas enregistré. Enregistrez-le ailleurs (Fichier → Enregistrer sous).</value>
+  </data>
+  <data name="Msg_SaveFirst" xml:space="preserve">
+    <value>Vous avez un résultat d'imbrication. Enregistrer d'abord le projet ?</value>
+  </data>
+  <data name="Msg_UnfitRow" xml:space="preserve">
+    <value>    {0} : {1} pièce(s){2}</value>
+  </data>
+  <data name="Msg_UnsupportedFiles" xml:space="preserve">
+    <value>Impossible d'ouvrir {0}.
+SheetNest ouvre les projets (*.dnest) et les dessins DXF et SC2000 (*.dxf, *.dfx, *.chf).</value>
+  </data>
+  <data name="Msg_UpToDate" xml:space="preserve">
+    <value>Vous êtes à jour (SheetNest {0}).</value>
+  </data>
+  <data name="Msg_UpdateAvailable" xml:space="preserve">
+    <value>SheetNest {0} est disponible (vous avez {1}).
+
+Ouvrir la page de téléchargement ?</value>
+  </data>
+  <data name="Msg_UpdateFailed" xml:space="preserve">
+    <value>Impossible de rechercher les mises à jour. Vérifiez votre connexion Internet.</value>
+  </data>
+  <data name="Nest_Cancelled" xml:space="preserve">
+    <value>Imbrication annulée</value>
+  </data>
+  <data name="Nest_Done" xml:space="preserve">
+    <value>Imbriqué en {0}{1}</value>
+  </data>
+  <data name="Nest_GivenUp" xml:space="preserve">
+    <value>, {0} abandonnée(s)</value>
+  </data>
+  <data name="Nest_KeptNormal" xml:space="preserve">
+    <value>, {0} dessin(s) gardés à l'écart normal</value>
+  </data>
+  <data name="Nest_LivePreview" xml:space="preserve">
+    <value>Recherche : {0} sur {1} pièces, tôles : {2}</value>
+  </data>
+  <data name="Nest_Running" xml:space="preserve">
+    <value>Imbrication…  {0}</value>
+  </data>
+  <data name="Nest_SharedCuts" xml:space="preserve">
+    <value>  ·  {0} coupes communes</value>
+  </data>
+  <data name="Nesting_VariantMetrics" xml:space="preserve">
+    <value>Variante n°{0} : Utilisation {1} | Placées {2} | Tôles : {3} (temps : {4})</value>
+  </data>
+  <data name="Off_Auto" xml:space="preserve">
+    <value>Auto (meilleure chute)</value>
+  </data>
+  <data name="Off_AutoBadge" xml:space="preserve">
+    <value>AUTO</value>
+  </data>
+  <data name="Off_AutoTip" xml:space="preserve">
+    <value>Compare Bout, Côté et Les deux sur le placement obtenu et garde celle qui libère le plus de matière.</value>
+  </data>
+  <data name="Off_Both" xml:space="preserve">
+    <value>Les deux (en L)</value>
+  </data>
+  <data name="Off_BothTip" xml:space="preserve">
+    <value>Quand l'imbrication laisse de la place des deux côtés, le reste se détache en deux rectangles (coupes de type guillotine, aucune coupe ne partage une chute en deux).</value>
+  </data>
+  <data name="Off_Enable" xml:space="preserve">
+    <value>Détacher le reste comme chute rectangulaire</value>
+  </data>
+  <data name="Off_EnableTip" xml:space="preserve">
+    <value>Mesure la zone libre laissée sur la dernière tôle et ajoute une ligne de coupe pour qu'elle se détache en rectangle réutilisable. Ne déplace jamais une pièce : l'imbrication est déjà terminée quand ce calcul est fait, l'activer ne change donc aucun placement.</value>
+  </data>
+  <data name="Off_End" xml:space="preserve">
+    <value>Bout de tôle</value>
+  </data>
+  <data name="Off_EndTip" xml:space="preserve">
+    <value>Une bande complète au bout du grand côté de la tôle : la chute classique.</value>
+  </data>
+  <data name="Off_MaxX" xml:space="preserve">
+    <value>Taille X maximale ({0}) :</value>
+  </data>
+  <data name="Off_MaxXTip" xml:space="preserve">
+    <value>Chute la plus large qui vaut encore la peine d'être détachée. Au-delà, ce n'est plus une chute mais presque une tôle : rien n'est coupé et la tôle reste entière. 0 = sans limite.</value>
+  </data>
+  <data name="Off_MaxY" xml:space="preserve">
+    <value>Taille Y maximale ({0}) :</value>
+  </data>
+  <data name="Off_MaxYTip" xml:space="preserve">
+    <value>Chute la plus haute qui vaut encore la peine d'être détachée. 0 = sans limite.</value>
+  </data>
+  <data name="Off_MinX" xml:space="preserve">
+    <value>Taille X minimale ({0}) :</value>
+  </data>
+  <data name="Off_MinXTip" xml:space="preserve">
+    <value>Chute la plus étroite qui vaut la peine d'être séparée. En dessous, la tôle n'est pas coupée. 0 = automatique (5 % du côté de la tôle).</value>
+  </data>
+  <data name="Off_MinY" xml:space="preserve">
+    <value>Taille Y minimale ({0}) :</value>
+  </data>
+  <data name="Off_MinYTip" xml:space="preserve">
+    <value>Chute la plus courte qui vaut la peine d'être séparée. 0 = automatique (5 % du côté de la tôle).</value>
+  </data>
+  <data name="Off_Overlap" xml:space="preserve">
+    <value>Dépassement du bord ({0}) :</value>
+  </data>
+  <data name="Off_OverlapTip" xml:space="preserve">
+    <value>De combien la coupe DÉPASSE le bord de la tôle à chaque extrémité, pour que la chute se détache au lieu de rester tenue par un pont aux coins. 0 = au ras du bord.</value>
+  </data>
+  <data name="Off_Position" xml:space="preserve">
+    <value>Position de la chute</value>
+  </data>
+  <data name="Off_Reset" xml:space="preserve">
+    <value>Valeurs par défaut</value>
+  </data>
+  <data name="Off_ResetTip" xml:space="preserve">
+    <value>Remet les six nombres ci-dessus aux valeurs recommandées pour les unités de ce dessin. La position de la chute et la case d'activation ne changent pas.</value>
+  </data>
+  <data name="Off_Side" xml:space="preserve">
+    <value>Côté de tôle</value>
+  </data>
+  <data name="Off_SideTip" xml:space="preserve">
+    <value>Une bande complète le long du petit côté de la tôle.</value>
+  </data>
+  <data name="Off_Spacing" xml:space="preserve">
+    <value>Écart de la chute ({0}) :</value>
+  </data>
+  <data name="Off_SpacingTip" xml:space="preserve">
+    <value>Écart entre les pièces imbriquées et la ligne de coupe de la chute (unités du dessin).</value>
+  </data>
+  <data name="Off_Title" xml:space="preserve">
+    <value>Chute</value>
+  </data>
+  <data name="PartColour_Title" xml:space="preserve">
+    <value>Couleur de la pièce</value>
+  </data>
+  <data name="Part_Cc_None" xml:space="preserve">
+    <value>Aucune</value>
+  </data>
+  <data name="Part_Cc_SamePart" xml:space="preserve">
+    <value>Même pièce</value>
+  </data>
+  <data name="Part_Cc_Unrestricted" xml:space="preserve">
+    <value>Sans restriction (pièces compatibles)</value>
+  </data>
+  <data name="Part_CommonCutting" xml:space="preserve">
+    <value>Coupe commune :</value>
+  </data>
+  <data name="Part_CommonCuttingTip" xml:space="preserve">
+    <value>Avec quelles pièces celle-ci peut partager un bord de coupe. Les bords entiers restent à l'écart de coupe commune configuré et sont exportés comme un contour de groupe plus une coupe commune médiane. L'écart entre pièces s'applique partout ailleurs. Changer ce choix active explicitement la coupe commune pour cette pièce.</value>
+  </data>
+  <data name="Part_Extra" xml:space="preserve">
+    <value>En plus :</value>
+  </data>
+  <data name="Part_ExtraTip" xml:space="preserve">
+    <value>Pièces de réserve imbriquées en plus de la quantité requise (par ex. en cas de rebut).</value>
+  </data>
+  <data name="Part_File" xml:space="preserve">
+    <value>Fichier de pièce :</value>
+  </data>
+  <data name="Part_FlippedBoth" xml:space="preserve">
+    <value>↔↕ retournée dans les deux sens (= tournée de 180°)</value>
+  </data>
+  <data name="Part_FlippedLeftRight" xml:space="preserve">
+    <value>↔ retournée gauche-droite</value>
+  </data>
+  <data name="Part_FlippedUpDown" xml:space="preserve">
+    <value>↕ retournée haut-bas</value>
+  </data>
+  <data name="Part_FullSheetWarn" xml:space="preserve">
+    <value>⚠ Ce DXF ressemble à une TÔLE IMBRIQUÉE COMPLÈTE ({0} formes dans un cadre de {1}×{2}), pas à une pièce seule. SheetNest importe chaque DXF comme UNE pièce, et les écarts entre les formes intérieures viennent du dessin d'origine. Exportez plutôt chaque pièce dans son propre DXF.</value>
+  </data>
+  <data name="Part_LegacyCcHint" xml:space="preserve">
+    <value>Un ancien mode de coupe commune enregistré est inactif. Choisissez un mode pour le confirmer pour cette pièce.</value>
+  </data>
+  <data name="Part_Mirrored" xml:space="preserve">
+    <value>Symétriques :</value>
+  </data>
+  <data name="Part_MirroredTip" xml:space="preserve">
+    <value>Copies imbriquées EN MIROIR (retournées en X) en plus des quantités ci-dessus, pour les paires gauche/droite. Le DXF exporté les découpe en miroir.</value>
+  </data>
+  <data name="Part_Orientations" xml:space="preserve">
+    <value>Orientations autorisées :</value>
+  </data>
+  <data name="Part_OrientationsTip" xml:space="preserve">
+    <value>Rotations que l'imbrication peut appliquer à CETTE pièce (par ex. restreindre pour le sens de laminage).</value>
+  </data>
+  <data name="Part_Priority" xml:space="preserve">
+    <value>Priorité :</value>
+  </data>
+  <data name="Part_PriorityTip" xml:space="preserve">
+    <value>1 = priorité la plus haute. Les pièces prioritaires sont imbriquées en premier : elles remplissent les premières tôles et ne sont jamais celles qui restent quand la matière manque.</value>
+  </data>
+  <data name="Part_Quantity" xml:space="preserve">
+    <value>Quantité</value>
+  </data>
+  <data name="Part_Required" xml:space="preserve">
+    <value>Requises :</value>
+  </data>
+  <data name="Part_RequiredTip" xml:space="preserve">
+    <value>Pièces nécessaires pour la commande.</value>
+  </data>
+  <data name="Part_Settings" xml:space="preserve">
+    <value>Réglages</value>
+  </data>
+  <data name="Part_Spacing" xml:space="preserve">
+    <value>Écart entre pièces :</value>
+  </data>
+  <data name="Part_SpacingTip" xml:space="preserve">
+    <value>Écart que cette pièce garde avec les voisines avec lesquelles elle NE peut PAS partager une coupe (unités du dessin). Deux pièces sont à (écartA + écartB) / 2 l'une de l'autre.</value>
+  </data>
+  <data name="Part_SymmetricHint" xml:space="preserve">
+    <value>Forme à symétrie de rotation détectée (cercle/carré) : la tourner ne peut pas améliorer l'imbrication, donc « Comme dessiné » économise la recherche.</value>
+  </data>
+  <data name="Part_Title" xml:space="preserve">
+    <value>Modifier la pièce</value>
+  </data>
+  <data name="Part_Units" xml:space="preserve">
+    <value>dans les unités du dessin</value>
+  </data>
+  <data name="Parts_CountSummary" xml:space="preserve">
+    <value>Pièces : {0} (demandées : {1} pcs)</value>
+  </data>
+  <data name="Priority_High" xml:space="preserve">
+    <value>Haute</value>
+  </data>
+  <data name="Priority_Highest" xml:space="preserve">
+    <value>La plus haute</value>
+  </data>
+  <data name="Priority_Low" xml:space="preserve">
+    <value>Basse</value>
+  </data>
+  <data name="Priority_Lowest" xml:space="preserve">
+    <value>La plus basse</value>
+  </data>
+  <data name="Priority_Normal" xml:space="preserve">
+    <value>Normale</value>
+  </data>
+  <data name="Radio_DxfView" xml:space="preserve">
+    <value>Dessin DXF</value>
+  </data>
+  <data name="Radio_ReportView" xml:space="preserve">
+    <value>Rapport de synthèse</value>
+  </data>
+  <data name="Rep_BoxArea" xml:space="preserve">
+    <value>Surface du rectangle</value>
+  </data>
+  <data name="Rep_Continued" xml:space="preserve">
+    <value>{0} (suite)</value>
+  </data>
+  <data name="Rep_Cut" xml:space="preserve">
+    <value>Découper</value>
+  </data>
+  <data name="Rep_CutLength" xml:space="preserve">
+    <value>Longueur de coupe</value>
+  </data>
+  <data name="Rep_CutTotal" xml:space="preserve">
+    <value>Longueur de coupe</value>
+  </data>
+  <data name="Rep_CuttingPlan" xml:space="preserve">
+    <value>PLAN DE DÉCOUPE</value>
+  </data>
+  <data name="Rep_DifferentLayouts" xml:space="preserve">
+    <value>Placements différents</value>
+  </data>
+  <data name="Rep_Header" xml:space="preserve">
+    <value>SheetNest - Rapport d'imbrication</value>
+  </data>
+  <data name="Rep_Kg" xml:space="preserve">
+    <value>kg</value>
+  </data>
+  <data name="Rep_Layout" xml:space="preserve">
+    <value>Placement</value>
+  </data>
+  <data name="Rep_LayoutN" xml:space="preserve">
+    <value>Placement {0}</value>
+  </data>
+  <data name="Rep_LayoutSub" xml:space="preserve">
+    <value>{0} pièces   |   {1}% d'utilisation   |   tôle {2} x {3} {4}</value>
+  </data>
+  <data name="Rep_LayoutTitle" xml:space="preserve">
+    <value>Placement {0} sur {1}   -   découper x {2}</value>
+  </data>
+  <data name="Rep_M2" xml:space="preserve">
+    <value>m²</value>
+  </data>
+  <data name="Rep_Material" xml:space="preserve">
+    <value>MATIÈRE NÉCESSAIRE</value>
+  </data>
+  <data name="Rep_MaterialKind" xml:space="preserve">
+    <value>Matière</value>
+  </data>
+  <data name="Rep_MaterialUsed" xml:space="preserve">
+    <value>Matière utilisée</value>
+  </data>
+  <data name="Rep_Metre" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="Rep_More" xml:space="preserve">
+    <value>... et {0} de plus</value>
+  </data>
+  <data name="Rep_MoreLayouts" xml:space="preserve">
+    <value>... et {0} placements de plus (voir leurs pages)</value>
+  </data>
+  <data name="Rep_No" xml:space="preserve">
+    <value>N°</value>
+  </data>
+  <data name="Rep_NotPlaced" xml:space="preserve">
+    <value>Pièces NON placées</value>
+  </data>
+  <data name="Rep_NothingToReport" xml:space="preserve">
+    <value>Rien à afficher. Lancez d'abord une imbrication.</value>
+  </data>
+  <data name="Rep_Page" xml:space="preserve">
+    <value>Page {0} sur {1}</value>
+  </data>
+  <data name="Rep_PageCol" xml:space="preserve">
+    <value>Page</value>
+  </data>
+  <data name="Rep_Part" xml:space="preserve">
+    <value>Pièce</value>
+  </data>
+  <data name="Rep_PartFallback" xml:space="preserve">
+    <value>(pièce)</value>
+  </data>
+  <data name="Rep_PartTotals" xml:space="preserve">
+    <value>TOTAL DES PIÈCES</value>
+  </data>
+  <data name="Rep_PartWeight" xml:space="preserve">
+    <value>Poids des pièces</value>
+  </data>
+  <data name="Rep_Parts" xml:space="preserve">
+    <value>Pièces</value>
+  </data>
+  <data name="Rep_PartsOnLayout" xml:space="preserve">
+    <value>Pièces de ce placement</value>
+  </data>
+  <data name="Rep_PartsToCut" xml:space="preserve">
+    <value>Pièces à découper</value>
+  </data>
+  <data name="Rep_Pierces" xml:space="preserve">
+    <value>Amorçages</value>
+  </data>
+  <data name="Rep_Qty" xml:space="preserve">
+    <value>Qté</value>
+  </data>
+  <data name="Rep_SheetFew" xml:space="preserve">
+    <value>tôles</value>
+  </data>
+  <data name="Rep_SheetMany" xml:space="preserve">
+    <value>tôles</value>
+  </data>
+  <data name="Rep_SheetOne" xml:space="preserve">
+    <value>tôle</value>
+  </data>
+  <data name="Rep_SheetSize" xml:space="preserve">
+    <value>Format de tôle</value>
+  </data>
+  <data name="Rep_SheetWeight" xml:space="preserve">
+    <value>Poids des tôles</value>
+  </data>
+  <data name="Rep_SheetsOf" xml:space="preserve">
+    <value>{0} de  {1} x {2} {3}</value>
+  </data>
+  <data name="Rep_SizeCol" xml:space="preserve">
+    <value>Dimensions, {0}</value>
+  </data>
+  <data name="Rep_Sq" xml:space="preserve">
+    <value>{0}²</value>
+  </data>
+  <data name="Rep_SqFt" xml:space="preserve">
+    <value>sq ft</value>
+  </data>
+  <data name="Rep_Summary" xml:space="preserve">
+    <value>RÉSUMÉ DE LA COMMANDE</value>
+  </data>
+  <data name="Rep_Total" xml:space="preserve">
+    <value>Total :  {0} {1}   -   {2}</value>
+  </data>
+  <data name="Rep_Used" xml:space="preserve">
+    <value>Utilisé</value>
+  </data>
+  <data name="Report_ColPartArea" xml:space="preserve">
+    <value>Surface (pc)</value>
+  </data>
+  <data name="Report_ColPartDim" xml:space="preserve">
+    <value>Dimensions de la pièce</value>
+  </data>
+  <data name="Report_ColPartName" xml:space="preserve">
+    <value>Pièce / Fichier</value>
+  </data>
+  <data name="Report_ColPartPos" xml:space="preserve">
+    <value>Rep.</value>
+  </data>
+  <data name="Report_ColPartQty" xml:space="preserve">
+    <value>Total pcs</value>
+  </data>
+  <data name="Report_ColSheetFormat" xml:space="preserve">
+    <value>Format de tôle</value>
+  </data>
+  <data name="Report_ColSheetNum" xml:space="preserve">
+    <value>Tôle n°</value>
+  </data>
+  <data name="Report_ColSheetParts" xml:space="preserve">
+    <value>Pièces sur la tôle</value>
+  </data>
+  <data name="Report_ColSheetRepeat" xml:space="preserve">
+    <value>Nombre de tôles</value>
+  </data>
+  <data name="Report_ColSheetUtil" xml:space="preserve">
+    <value>Utilisation</value>
+  </data>
+  <data name="Report_DatePrefix" xml:space="preserve">
+    <value>Date : </value>
+  </data>
+  <data name="Report_EmptySub" xml:space="preserve">
+    <value>Lancez l'imbrication à l'étape 3 pour voir et imprimer le rapport de production avec la nomenclature et les plans de découpe.</value>
+  </data>
+  <data name="Report_EmptyTitle" xml:space="preserve">
+    <value>Rapport d'imbrication pas encore généré</value>
+  </data>
+  <data name="Report_PageXofY" xml:space="preserve">
+    <value>Page {0} sur {1}</value>
+  </data>
+  <data name="Report_PartsSpecTitle" xml:space="preserve">
+    <value>2. Nomenclature des pièces découpées</value>
+  </data>
+  <data name="Report_PreviewToolbar_Print" xml:space="preserve">
+    <value>🖨️ Imprimer le rapport</value>
+  </data>
+  <data name="Report_PreviewToolbar_SavePdf" xml:space="preserve">
+    <value>📄 Enregistrer en PDF</value>
+  </data>
+  <data name="Report_PreviewToolbar_Summary" xml:space="preserve">
+    <value>Rapport d'imbrication de production</value>
+  </data>
+  <data name="Report_PreviewToolbar_ZoomFit" xml:space="preserve">
+    <value>⤢ Pleine largeur</value>
+  </data>
+  <data name="Report_ProjectPrefix" xml:space="preserve">
+    <value>Projet : </value>
+  </data>
+  <data name="Report_SheetsMapTitle" xml:space="preserve">
+    <value>1. Plan de découpe par tôle</value>
+  </data>
+  <data name="Report_Title" xml:space="preserve">
+    <value>RAPPORT DE SYNTHÈSE D'IMBRICATION</value>
+  </data>
+  <data name="Report_UnitsPrefix" xml:space="preserve">
+    <value>Unités : </value>
+  </data>
+  <data name="Report_UntitledProject" xml:space="preserve">
+    <value>Sans titre</value>
+  </data>
+  <data name="Rot_0And180Tip" xml:space="preserve">
+    <value>0° et 180° : respecte le sens de laminage mais peut retourner.</value>
+  </data>
+  <data name="Rot_0And90Tip" xml:space="preserve">
+    <value>0° et 90° autorisés.</value>
+  </data>
+  <data name="Rot_45" xml:space="preserve">
+    <value>Pas de 45°</value>
+  </data>
+  <data name="Rot_45Tip" xml:space="preserve">
+    <value>Huit orientations espacées de 45°. Le réglage de la commande le propose aussi, et sans cette option ici une pièce ne pourrait pas montrer ce qu'elle avait vraiment comme réglage.</value>
+  </data>
+  <data name="Rot_4Way" xml:space="preserve">
+    <value>4 sens</value>
+  </data>
+  <data name="Rot_4WayTip" xml:space="preserve">
+    <value>Les quatre orientations à angle droit (0 / 90 / 180 / 270°). Le premier choix sûr pour les pièces carrées et en L : il bat généralement la rotation libre sur ces pièces et coûte toujours moins de recherche.</value>
+  </data>
+  <data name="Rot_90And270Tip" xml:space="preserve">
+    <value>90° et 270° : toujours tournée, dans un sens ou l'autre.</value>
+  </data>
+  <data name="Rot_90Only" xml:space="preserve">
+    <value>90° seulement</value>
+  </data>
+  <data name="Rot_90OnlyTip" xml:space="preserve">
+    <value>Seulement 90°, la pièce est donc toujours tournée une fois.</value>
+  </data>
+  <data name="Rot_AsDrawn" xml:space="preserve">
+    <value>Comme dessiné</value>
+  </data>
+  <data name="Rot_AsDrawnTip" xml:space="preserve">
+    <value>Seulement 0°, la pièce reste exactement comme dessinée (respecte le sens de laminage).</value>
+  </data>
+  <data name="Rot_Free" xml:space="preserve">
+    <value>Libre</value>
+  </data>
+  <data name="Rot_FreeTip" xml:space="preserve">
+    <value>N'importe quel angle, et PAS automatiquement le plus serré. Gagne sur les pièces à bords obliques ou courbes, perd sur les pièces carrées ou en L, qui s'emboîtent exactement à angle droit et ne gagnent rien à être inclinées. Mesuré sur deux vraies commandes : 84,3 % du bloc rempli contre 81,6 % pour 4 sens sur l'une, 69,6 % contre 73,2 % sur l'autre. Coûte environ deux fois plus de recherche. Ignore le sens de laminage.</value>
+  </data>
+  <data name="Rot_Job" xml:space="preserve">
+    <value>Défaut de la commande</value>
+  </data>
+  <data name="Rot_JobTip" xml:space="preserve">
+    <value>Le réglage de la commande, dans Paramètres &gt; Paramètres avancés. Changez-le là et cette pièce suit.</value>
+  </data>
+  <data name="Run_Draft" xml:space="preserve">
+    <value>brouillon</value>
+  </data>
+  <data name="Run_Saved" xml:space="preserve">
+    <value>Enregistrée</value>
+  </data>
+  <data name="Set_AutosaveMinTip" xml:space="preserve">
+    <value>Fréquence d'enregistrement automatique du projet ouvert pour la récupération.</value>
+  </data>
+  <data name="Set_AutosaveTip" xml:space="preserve">
+    <value>Enregistre régulièrement le projet ouvert pour pouvoir récupérer le travail non enregistré après un plantage.</value>
+  </data>
+  <data name="Set_ClusterMaxTip" xml:space="preserve">
+    <value>Nombre maximal strict de pièces dans un groupe à coupe commune (2 à 500).</value>
+  </data>
+  <data name="Set_ClusterModeTip" xml:space="preserve">
+    <value>Auto laisse SheetNest choisir une taille de groupe sûre ; Manuel applique une limite stricte du nombre de pièces.</value>
+  </data>
+  <data name="Set_EffortTip" xml:space="preserve">
+    <value>Durée de recherche sur chaque tôle. Elle donne un placement plus SERRÉ, pas plus de pièces par tôle : les pièces qui tiennent sont trouvées presque tout de suite, le reste de la recherche sert à les rapprocher pour que la matière restante revienne d'un seul morceau utilisable.</value>
+  </data>
+  <data name="Set_GapTip" xml:space="preserve">
+    <value>Les placements à coupe commune utilisent l'écart configuré ; SheetNest calcule une coupe médiane unique avant l'export DXF. La valeur est stockée en pouces et convertie dans les unités choisies pour l'affichage.</value>
+  </data>
+  <data name="Set_MarginTip" xml:space="preserve">
+    <value>Bordure libre gardée entre chaque pièce et le bord de la tôle.</value>
+  </data>
+  <data name="Set_MergeTip" xml:space="preserve">
+    <value>Ancienne option d'export pour la géométrie ordinaire : fusionne les entités DXF superposées. La coupe commune calcule sa coupe médiane unique indépendamment avant l'export.</value>
+  </data>
+  <data name="Set_PartNamesTip" xml:space="preserve">
+    <value>Exporter le nom de fichier de chaque pièce comme texte à l'intérieur de la pièce placée, pour l'identifier après découpe. PAINT est la gravure/marquage laser (le même calque que les lignes de pliage) ; BACKGROUND est visible en CAO/FAO mais jamais usiné. Tout ce qui est découpé va toujours sur le calque CUT.</value>
+  </data>
+  <data name="Set_ResetClusterTip" xml:space="preserve">
+    <value>Rétablir la taille automatique des groupes à coupe commune.</value>
+  </data>
+  <data name="Set_ResetGapTip" xml:space="preserve">
+    <value>Rétablir l'écart de coupe commune d'origine.</value>
+  </data>
+  <data name="Set_RotationsTip" xml:space="preserve">
+    <value>Rotations que l'imbrication peut essayer pour les pièces non modifiées. Le réglage par pièce de Modifier la pièce l'emporte toujours.</value>
+  </data>
+  <data name="Set_SpacingTip" xml:space="preserve">
+    <value>Écart par défaut entre pièces ordinaires (unités du dessin). Modifier la pièce peut le changer par pièce ; les placements à coupe commune utilisent l'écart séparé ci-dessous.</value>
+  </data>
+  <data name="Set_UnitsTip" xml:space="preserve">
+    <value>Unités de dessin des pièces, tôles, écarts et marges. Choisissez les unités de vos fichiers DXF ; l'écart physique de coupe commune est converti automatiquement.</value>
+  </data>
+  <data name="Settings_Auto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Settings_Autosave" xml:space="preserve">
+    <value>Enregistrer automatiquement le projet ouvert</value>
+  </data>
+  <data name="Settings_AutosaveTime" xml:space="preserve">
+    <value>Intervalle d'enregistrement (min) :</value>
+  </data>
+  <data name="Settings_CommonLineGap" xml:space="preserve">
+    <value>Écart de coupe commune</value>
+  </data>
+  <data name="Settings_Concurrency" xml:space="preserve">
+    <value>Recherches parallèles :</value>
+  </data>
+  <data name="Settings_Concurrency_Auto" xml:space="preserve">
+    <value>Auto ({0})</value>
+  </data>
+  <data name="Settings_Concurrency_Tip" xml:space="preserve">
+    <value>Nombre de recherches d'imbrication lancées en même temps. Moins garde un ordinateur lent réactif ; plus finit plus tôt sur un ordinateur rapide. L'imbrication obtenue est la même dans les deux cas.</value>
+  </data>
+  <data name="Settings_Effort" xml:space="preserve">
+    <value>Effort d'imbrication :</value>
+  </data>
+  <data name="Settings_Effort_Best" xml:space="preserve">
+    <value>Meilleur (le plus lent)</value>
+  </data>
+  <data name="Settings_Effort_Fast" xml:space="preserve">
+    <value>Rapide</value>
+  </data>
+  <data name="Settings_Effort_Normal" xml:space="preserve">
+    <value>Normal (par défaut)</value>
+  </data>
+  <data name="Settings_Group_App" xml:space="preserve">
+    <value>Application</value>
+  </data>
+  <data name="Settings_Group_CommonLine" xml:space="preserve">
+    <value>Coupe commune</value>
+  </data>
+  <data name="Settings_Group_Dxf" xml:space="preserve">
+    <value>Export DXF</value>
+  </data>
+  <data name="Settings_Group_Nesting" xml:space="preserve">
+    <value>Imbrication</value>
+  </data>
+  <data name="Settings_Manual" xml:space="preserve">
+    <value>Manuel</value>
+  </data>
+  <data name="Settings_Margin" xml:space="preserve">
+    <value>Marge de bord de tôle</value>
+  </data>
+  <data name="Settings_MaxCluster" xml:space="preserve">
+    <value>Pièces max. par groupe :</value>
+  </data>
+  <data name="Settings_MergeLines" xml:space="preserve">
+    <value>Fusionner les lignes de coupe superposées</value>
+  </data>
+  <data name="Settings_PartNames" xml:space="preserve">
+    <value>Texte du nom de pièce :</value>
+  </data>
+  <data name="Settings_PartNames_Background" xml:space="preserve">
+    <value>BACKGROUND — affichage seulement</value>
+  </data>
+  <data name="Settings_PartNames_Layer9" xml:space="preserve">
+    <value>PAINT — gravé, avec les lignes de pliage</value>
+  </data>
+  <data name="Settings_PartNames_None" xml:space="preserve">
+    <value>Aucun</value>
+  </data>
+  <data name="Settings_Reset" xml:space="preserve">
+    <value>Réinitialiser</value>
+  </data>
+  <data name="Settings_Rot_0_180" xml:space="preserve">
+    <value>0 / 180°</value>
+  </data>
+  <data name="Settings_Rot_45" xml:space="preserve">
+    <value>Pas de 45°</value>
+  </data>
+  <data name="Settings_Rot_90" xml:space="preserve">
+    <value>Pas de 90°</value>
+  </data>
+  <data name="Settings_Rot_AsDrawn" xml:space="preserve">
+    <value>Comme dessiné</value>
+  </data>
+  <data name="Settings_Rot_Free" xml:space="preserve">
+    <value>Libre (36 pas)</value>
+  </data>
+  <data name="Settings_Rotations" xml:space="preserve">
+    <value>Rotations des pièces par défaut :</value>
+  </data>
+  <data name="Settings_Spacing" xml:space="preserve">
+    <value>Écart entre pièces</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Paramètres avancés</value>
+  </data>
+  <data name="Settings_Units" xml:space="preserve">
+    <value>Unités :</value>
+  </data>
+  <data name="Settings_Units_In" xml:space="preserve">
+    <value>Pouces (in)</value>
+  </data>
+  <data name="Settings_Units_Mm" xml:space="preserve">
+    <value>Millimètres (mm)</value>
+  </data>
+  <data name="Shape_Circle" xml:space="preserve">
+    <value>Cercle</value>
+  </data>
+  <data name="Shape_Diameter" xml:space="preserve">
+    <value>Diamètre :</value>
+  </data>
+  <data name="Shape_Height" xml:space="preserve">
+    <value>Hauteur :</value>
+  </data>
+  <data name="Shape_Quantity" xml:space="preserve">
+    <value>Quantité :</value>
+  </data>
+  <data name="Shape_Rectangle" xml:space="preserve">
+    <value>Rectangle</value>
+  </data>
+  <data name="Shape_Square" xml:space="preserve">
+    <value>Carré</value>
+  </data>
+  <data name="Shape_Title" xml:space="preserve">
+    <value>Ajouter une forme</value>
+  </data>
+  <data name="Shape_Width" xml:space="preserve">
+    <value>Largeur :</value>
+  </data>
+  <data name="Sheet_Dlg_Add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="Sheet_Dlg_Header" xml:space="preserve">
+    <value>Format de tôle en {0} (largeur = le grand côté).</value>
+  </data>
+  <data name="Sheet_Dlg_Height" xml:space="preserve">
+    <value>Hauteur ({0})</value>
+  </data>
+  <data name="Sheet_Dlg_Priority" xml:space="preserve">
+    <value>Priorité :</value>
+  </data>
+  <data name="Sheet_Dlg_Qty" xml:space="preserve">
+    <value>Quantité</value>
+  </data>
+  <data name="Sheet_Dlg_Remember" xml:space="preserve">
+    <value>Mémoriser comme modèle</value>
+  </data>
+  <data name="Sheet_Dlg_Title" xml:space="preserve">
+    <value>Format de tôle personnalisé</value>
+  </data>
+  <data name="Sheet_Dlg_Title_Edit" xml:space="preserve">
+    <value>Modifier la tôle</value>
+  </data>
+  <data name="Sheet_Dlg_Unlimited" xml:space="preserve">
+    <value>Illimité</value>
+  </data>
+  <data name="Sheet_Dlg_Width" xml:space="preserve">
+    <value>Largeur ({0})</value>
+  </data>
+  <data name="Sheet_PriorityTip" xml:space="preserve">
+    <value>Priorité de consommation : les tôles de plus haute priorité sont consommées en premier (par ex. chutes et restes).</value>
+  </data>
+  <data name="Sheet_RememberTip" xml:space="preserve">
+    <value>Enregistrer ce format sous « Mes tôles » dans le menu Ajouter une tôle.</value>
+  </data>
+  <data name="Sheet_UnlimitedShort" xml:space="preserve">
+    <value>Illimité</value>
+  </data>
+  <data name="Sheet_UnlimitedTip" xml:space="preserve">
+    <value>Il y a autant de ce format que la commande en demande : l'imbrication prend des tôles jusqu'à ce que chaque pièce soit placée. La quantité est ignorée tant que c'est coché (elle garde sa valeur pour quand vous décochez).</value>
+  </data>
+  <data name="Sheets_CountSummary" xml:space="preserve">
+    <value>Formats de tôle : {0} (tôles : {1})</value>
+  </data>
+  <data name="Sheets_EmptySub" xml:space="preserve">
+    <value>Ajoutez un format standard ou saisissez le vôtre</value>
+  </data>
+  <data name="Sheets_UnlimitedNote" xml:space="preserve">
+    <value>dont illimités</value>
+  </data>
+  <data name="Status_Placed" xml:space="preserve">
+    <value>Placées :</value>
+  </data>
+  <data name="Status_Sheets" xml:space="preserve">
+    <value>Tôles :</value>
+  </data>
+  <data name="Status_Unplaced" xml:space="preserve">
+    <value>Non placées :</value>
+  </data>
+  <data name="Status_Utilization" xml:space="preserve">
+    <value>Utilisation :</value>
+  </data>
+  <data name="Tab_Layout" xml:space="preserve">
+    <value>4. Placement et rapport</value>
+  </data>
+  <data name="Tab_Nesting" xml:space="preserve">
+    <value>3. Imbrication</value>
+  </data>
+  <data name="Tab_Parts" xml:space="preserve">
+    <value>1. Pièces (modèles)</value>
+  </data>
+  <data name="Tab_Sheets" xml:space="preserve">
+    <value>2. Tôles</value>
+  </data>
+  <data name="Tip_AddPart" xml:space="preserve">
+    <value>Ajouter des pièces depuis des fichiers DXF</value>
+  </data>
+  <data name="Tip_AddShape" xml:space="preserve">
+    <value>Ajouter un rectangle ou un cercle sans DXF, dans la quantité voulue</value>
+  </data>
+  <data name="Tip_AddSheet" xml:space="preserve">
+    <value>Choisir un format standard ou saisir le vôtre</value>
+  </data>
+  <data name="Tip_BackToNesting" xml:space="preserve">
+    <value>Retour aux variantes d'imbrication (Ctrl+3)</value>
+  </data>
+  <data name="Tip_BackToParts" xml:space="preserve">
+    <value>Retour aux pièces (Ctrl+1)</value>
+  </data>
+  <data name="Tip_CancelNest" xml:space="preserve">
+    <value>Arrêter l'imbrication</value>
+  </data>
+  <data name="Tip_ClearParts" xml:space="preserve">
+    <value>Effacer toute la liste des pièces</value>
+  </data>
+  <data name="Tip_ClearRuns" xml:space="preserve">
+    <value>Effacer la liste des variantes d'imbrication accumulées</value>
+  </data>
+  <data name="Tip_CutRenest" xml:space="preserve">
+    <value>Les tôles cochées sont découpées : leurs pièces sont retirées de la commande, les tôles du stock, et le reste est imbriqué à nouveau</value>
+  </data>
+  <data name="Tip_DeletePart" xml:space="preserve">
+    <value>Retirer la pièce sélectionnée du projet</value>
+  </data>
+  <data name="Tip_DeleteSheet" xml:space="preserve">
+    <value>Retirer la tôle sélectionnée de la liste</value>
+  </data>
+  <data name="Tip_Divide" xml:space="preserve">
+    <value>Diviser la quantité de toutes les pièces (ou des sélectionnées) par ce facteur</value>
+  </data>
+  <data name="Tip_EdgeMargin" xml:space="preserve">
+    <value>Bordure libre le long du bord de la tôle (unités du dessin actuelles)</value>
+  </data>
+  <data name="Tip_EditSheet" xml:space="preserve">
+    <value>Modifier le format et la quantité de la tôle</value>
+  </data>
+  <data name="Tip_ExportDxf" xml:space="preserve">
+    <value>Exporter les contours du placement en DXF (avec un calque pour les noms de pièces)</value>
+  </data>
+  <data name="Tip_ExportPdf" xml:space="preserve">
+    <value>Enregistrer le rapport de production PDF avec la liste des pièces</value>
+  </data>
+  <data name="Tip_Feedback" xml:space="preserve">
+    <value>Ouvrir les avis sur GitHub</value>
+  </data>
+  <data name="Tip_FlipLeftRight" xml:space="preserve">
+    <value>Retourner la pièce elle-même gauche-droite (toutes ses copies). Cliquez à nouveau pour annuler.</value>
+  </data>
+  <data name="Tip_FlipUpDown" xml:space="preserve">
+    <value>Retourner la pièce elle-même haut-bas (toutes ses copies). Cliquez à nouveau pour annuler.</value>
+  </data>
+  <data name="Tip_GoToNesting" xml:space="preserve">
+    <value>Passer à l'imbrication (Ctrl+3)</value>
+  </data>
+  <data name="Tip_GoToSheets" xml:space="preserve">
+    <value>Passer aux tôles (Ctrl+2)</value>
+  </data>
+  <data name="Tip_LayoutCard" xml:space="preserve">
+    <value>Cliquez pour afficher ce placement</value>
+  </data>
+  <data name="Tip_Material" xml:space="preserve">
+    <value>Matière de la commande. Des métaux ou épaisseurs différents sont des commandes différentes, imbriquées séparément</value>
+  </data>
+  <data name="Tip_Multiplier" xml:space="preserve">
+    <value>Multiplicateur de quantité (par ex. nombre d'ensembles/kits nécessaires)</value>
+  </data>
+  <data name="Tip_Multiply" xml:space="preserve">
+    <value>Multiplier la quantité de toutes les pièces (ou des sélectionnées) par ce facteur</value>
+  </data>
+  <data name="Tip_NavLayout" xml:space="preserve">
+    <value>Plan de découpe final, export DXF et PDF, impression du rapport (Ctrl+4)</value>
+  </data>
+  <data name="Tip_NavNesting" xml:space="preserve">
+    <value>Lancer l'imbrication, comparer les variantes et les prévisualiser (Ctrl+3)</value>
+  </data>
+  <data name="Tip_NavParts" xml:space="preserve">
+    <value>Pièces à imbriquer et leurs réglages (Ctrl+1)</value>
+  </data>
+  <data name="Tip_NavSheets" xml:space="preserve">
+    <value>Tôles en stock et marges (Ctrl+2)</value>
+  </data>
+  <data name="Tip_NestDraft" xml:space="preserve">
+    <value>Estimation rapide pour un devis : combien de tôles, quelle surface et combien de mètres de coupe. Placement approximatif, pas pour la découpe</value>
+  </data>
+  <data name="Tip_New" xml:space="preserve">
+    <value>Créer un nouveau projet d'imbrication</value>
+  </data>
+  <data name="Tip_NextPage" xml:space="preserve">
+    <value>Page suivante</value>
+  </data>
+  <data name="Tip_Open" xml:space="preserve">
+    <value>Ouvrir un projet enregistré</value>
+  </data>
+  <data name="Tip_OpenLayout" xml:space="preserve">
+    <value>Passer au plan de découpe final, à l'export DXF et à l'impression du rapport (Ctrl+4)</value>
+  </data>
+  <data name="Tip_PartColor" xml:space="preserve">
+    <value>Couleur de la pièce (cliquez pour changer)</value>
+  </data>
+  <data name="Tip_PartDetails" xml:space="preserve">
+    <value>Plus sur la pièce : réserve, rotations, écart, coupe commune</value>
+  </data>
+  <data name="Tip_PartMirrorQty" xml:space="preserve">
+    <value>Copies en miroir EN PLUS de la quantité, pour les paires gauche/droite. 2 pcs et 2 symétriques = 4 pièces, dont deux en miroir.</value>
+  </data>
+  <data name="Tip_PartPriority" xml:space="preserve">
+    <value>Priorité d'imbrication de la pièce</value>
+  </data>
+  <data name="Tip_PartQty" xml:space="preserve">
+    <value>Combien de cette pièce imbriquer</value>
+  </data>
+  <data name="Tip_PartRemove" xml:space="preserve">
+    <value>Retirer la pièce du projet</value>
+  </data>
+  <data name="Tip_PartStatus" xml:space="preserve">
+    <value>Placées / total</value>
+  </data>
+  <data name="Tip_PrevPage" xml:space="preserve">
+    <value>Page précédente</value>
+  </data>
+  <data name="Tip_PrintReport" xml:space="preserve">
+    <value>Imprimer le rapport</value>
+  </data>
+  <data name="Tip_RemoveSheet" xml:space="preserve">
+    <value>Retirer la tôle</value>
+  </data>
+  <data name="Tip_ReportPrint" xml:space="preserve">
+    <value>Imprimer toutes les pages du rapport</value>
+  </data>
+  <data name="Tip_Save" xml:space="preserve">
+    <value>Enregistrer le projet</value>
+  </data>
+  <data name="Tip_SheetPriority" xml:space="preserve">
+    <value>Priorité de consommation : les tôles de plus haute priorité sont utilisées en premier (par ex. chutes et restes)</value>
+  </data>
+  <data name="Tip_SheetQty" xml:space="preserve">
+    <value>Combien de tôles de ce format sont en stock</value>
+  </data>
+  <data name="Tip_SheetUnlimited" xml:space="preserve">
+    <value>Coché, l'imbrication utilise autant de tôles de ce format que nécessaire</value>
+  </data>
+  <data name="Tip_StartNest" xml:space="preserve">
+    <value>Lancer l'imbrication</value>
+  </data>
+  <data name="Tip_Thickness" xml:space="preserve">
+    <value>Épaisseur de tôle en mm : choisissez-la ou saisissez la vôtre. Sert au poids dans le rapport</value>
+  </data>
+  <data name="Tip_UpdateNotice" xml:space="preserve">
+    <value>Une version plus récente de SheetNest est disponible. Cliquez pour ouvrir la page de téléchargement.</value>
+  </data>
+  <data name="Tip_Zoom100" xml:space="preserve">
+    <value>Taille réelle, 100 %</value>
+  </data>
+  <data name="Tip_ZoomFit" xml:space="preserve">
+    <value>Ajuster à la largeur de la fenêtre</value>
+  </data>
+  <data name="Tip_ZoomIn" xml:space="preserve">
+    <value>Zoom avant</value>
+  </data>
+  <data name="Tip_ZoomOut" xml:space="preserve">
+    <value>Zoom arrière</value>
+  </data>
+  <data name="Tip_ZoomPage" xml:space="preserve">
+    <value>Afficher la page entière dans la fenêtre</value>
+  </data>
+  <data name="Title_AddPart" xml:space="preserve">
+    <value>Ajouter une pièce</value>
+  </data>
+  <data name="Title_CommonLine" xml:space="preserve">
+    <value>Coupe commune</value>
+  </data>
+  <data name="Title_CutRenest" xml:space="preserve">
+    <value>Imbriquer le reste</value>
+  </data>
+  <data name="Title_EditNest" xml:space="preserve">
+    <value>Modifier le placement</value>
+  </data>
+  <data name="Title_Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Title_ExportDxf" xml:space="preserve">
+    <value>Exporter en DXF</value>
+  </data>
+  <data name="Title_Feedback" xml:space="preserve">
+    <value>Envoyer un avis</value>
+  </data>
+  <data name="Title_FileMissing" xml:space="preserve">
+    <value>Fichier introuvable</value>
+  </data>
+  <data name="Title_Nest" xml:space="preserve">
+    <value>Imbrication</value>
+  </data>
+  <data name="Title_NotEnoughSheets" xml:space="preserve">
+    <value>Pas assez de tôles</value>
+  </data>
+  <data name="Title_PartsDoNotFit" xml:space="preserve">
+    <value>Les pièces ne tiennent pas</value>
+  </data>
+  <data name="Title_PrintReport" xml:space="preserve">
+    <value>Imprimer le rapport</value>
+  </data>
+  <data name="Title_Recovery" xml:space="preserve">
+    <value>Récupération</value>
+  </data>
+  <data name="Title_Report" xml:space="preserve">
+    <value>Rapport d'imbrication</value>
+  </data>
+  <data name="Title_SaveError" xml:space="preserve">
+    <value>Erreur d'enregistrement</value>
+  </data>
+  <data name="Title_SaveFailed" xml:space="preserve">
+    <value>Enregistrement impossible</value>
+  </data>
+  <data name="Title_Updates" xml:space="preserve">
+    <value>Rechercher des mises à jour</value>
+  </data>
+  <data name="Unit_In" xml:space="preserve">
+    <value>in</value>
+  </data>
+  <data name="Unit_Mm" xml:space="preserve">
+    <value>mm</value>
+  </data>
+  <data name="Unit_Pcs" xml:space="preserve">
+    <value>pcs</value>
+  </data>
+  <data name="Why_Both" xml:space="preserve">
+    <value>, {0} chevauchant une voisine et {1} dans la marge de bord de tôle</value>
+  </data>
+  <data name="Why_Margin" xml:space="preserve">
+    <value>, dans la marge de bord de tôle</value>
+  </data>
+  <data name="Why_Overlap" xml:space="preserve">
+    <value>, chevauchant une voisine</value>
+  </data>
+  <data name="Parts_EmptyTitle" xml:space="preserve">
+    <value>Aucune pièce dans le projet pour l'instant</value>
+  </data>
+  <data name="Sheets_EmptyTitle" xml:space="preserve">
+    <value>Aucune tôle ajoutée</value>
+  </data>
+  <data name="Nest_PreviewPick" xml:space="preserve">
+    <value>Aperçu de l'imbrication : choisissez une variante dans la liste</value>
+  </data>
+  <data name="Nest_VariantLine" xml:space="preserve">
+    <value>Variante n°{0} : Utilisation {1} | Placées {2} | Tôles : {3} (temps : {4})</value>
+  </data>
+  <data name="Sheet_Dlg_InMm" xml:space="preserve">
+    <value>millimètres</value>
+  </data>
+  <data name="Sheet_Dlg_InInches" xml:space="preserve">
+    <value>pouces</value>
+  </data>
+</root>

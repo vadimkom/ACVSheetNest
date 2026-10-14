@@ -108,7 +108,7 @@ Both distribution channels resolve GitHub's `releases/latest` endpoint, which **
 pre-releases and drafts by design**:
 
 - **In-app updater**: `DeepNestSharp.Domain\UpdateChecker.cs:18` queries
-  `https://api.github.com/repos/ManuelMRosa/SheetNest/releases/latest`.
+  `https://api.github.com/repos/vadimkom/ACVSheetNest/releases/latest`.
 - **sheetnest.io/download**: the droplet cron (`/usr/local/bin/sheetnest-download-url.sh`,
   hourly) regenerates the nginx 302 from the same `releases/latest` endpoint. Verified
   2026-07-19.

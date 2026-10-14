@@ -17,11 +17,7 @@ namespace DeepNestSharp.Ui.Views
     public AddShapeWindow(bool millimetres)
     {
       InitializeComponent();
-      string units = millimetres ? "mm" : "in";
-      if (Localization.CurrentLanguage != Localization.LangEnglish)
-      {
-        units = millimetres ? "мм" : "in";
-      }
+      string units = Localization.Get(millimetres ? "Unit_Mm" : "Unit_In");
 
       this.widthUnits.Text = units;
       this.heightUnits.Text = units;

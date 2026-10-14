@@ -223,7 +223,7 @@
     <value>В SheetNest произошла ошибка.</value>
   </data>
   <data name="Crash_NoBrowser" xml:space="preserve">
-    <value>Не удалось открыть браузер. Нажмите «Скопировать подробности» и вставьте их в новую задачу на github.com/ManuelMRosa/SheetNest/issues.</value>
+    <value>Не удалось открыть браузер. Нажмите «Скопировать подробности» и вставьте их в новую задачу на github.com/vadimkom/ACVSheetNest/issues.</value>
   </data>
   <data name="Crash_NoLog" xml:space="preserve">
     <value>(журнал записать не удалось)</value>
@@ -542,7 +542,7 @@
   </data>
   <data name="Msg_NoBrowserFeedback" xml:space="preserve">
     <value>Не удалось открыть браузер. Отправить отзыв можно здесь:
-https://github.com/ManuelMRosa/SheetNest/issues</value>
+https://github.com/vadimkom/ACVSheetNest/issues</value>
   </data>
   <data name="Msg_NoEngine" xml:space="preserve">
     <value>Не найден движок раскладки (sparrow.exe). Он поставляется вместе с программой: переустановите её или укажите путь в переменной окружения SHEETNEST_SPARROW.</value>

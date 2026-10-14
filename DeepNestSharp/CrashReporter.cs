@@ -12,7 +12,7 @@ namespace DeepNestSharp
   /// </summary>
   public static class CrashReporter
   {
-    private const string IssuesUrl = "https://github.com/ManuelMRosa/SheetNest/issues/new";
+    private const string IssuesUrl = "https://github.com/vadimkom/ACVSheetNest/issues/new";
 
     /// <summary>App version, 3 fields (matches the window title).</summary>
     public static string Version =>
