@@ -86,6 +86,7 @@ namespace DeepNestSharp.Ui.Views
     private int sessionCommonLineMaxClusterParts = CommonLineDefaults.DefaultMaxClusterParts;
 
     private DeepNestSharp.RasterNest.NestEffort nestEffort = DeepNestSharp.RasterNest.NestEffortDefaults.Default; // how hard the nester searches (SessionState)
+    private bool lastRunWasDraft; // the variant being added came from the Draft button, and is labelled so
     private bool preferRectOffcut; // cut the last sheet's leftover off as a rectangular offcut (SessionState)
     private int offcutDirection; // 0 = end, 1 = side, 2 = both (SessionState.OffcutDirection)
     private double offcutSpacing = -1; // gap parts→offcut cut line; -1 = default to part spacing (SessionState)
@@ -266,7 +267,6 @@ namespace DeepNestSharp.Ui.Views
         }
 
         this.nestEffort = DeepNestSharp.RasterNest.NestEffortDefaults.FromPersisted(session.NestEffort);
-        this.RefreshNestEffortMenu();
         SparrowNestService.ConcurrencyLimit = System.Math.Clamp(session.NestConcurrency, 0, SparrowNestService.MaxConcurrencyLimit);
 
         // Global default rotations (plain in-memory config property — resets to 4 without this).
@@ -615,74 +615,6 @@ namespace DeepNestSharp.Ui.Views
       SparrowNestService.ConcurrencyLimit = dialog.ConcurrencyLimit;
       session.NestConcurrency = dialog.ConcurrencyLimit;
       session.Save();
-
-      // Two places set the same preference, so the toolbar is rebuilt from the field rather than left
-      // showing whatever it showed before the dialog was opened.
-      this.RefreshNestEffortMenu();
-    }
-
-    /// <summary>The arrow half of the NEST split button. Anchored under the button so the menu reads as
-    /// belonging to it rather than appearing at the pointer.</summary>
-    private void OnNestEffortMenu(object sender, RoutedEventArgs e)
-    {
-      if (this.nestEffortButton.ContextMenu is System.Windows.Controls.ContextMenu menu)
-      {
-        menu.PlacementTarget = this.nestEffortButton;
-        menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
-        menu.IsOpen = true;
-      }
-    }
-
-    private void OnNestEffortChosen(object sender, RoutedEventArgs e)
-    {
-      if (sender is System.Windows.Controls.MenuItem item
-          && item.Tag is string tag
-          && int.TryParse(tag, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int chosen))
-      {
-        this.nestEffort = DeepNestSharp.RasterNest.NestEffortDefaults.FromPersisted(chosen);
-        var session = SessionState.Load() ?? new SessionState();
-        session.NestEffort = (int)this.nestEffort;
-        session.Save();
-      }
-
-      // Unconditionally: a checkable MenuItem toggles itself on click, so even the item that was already
-      // ticked has to be put back the way the field says, or clicking the current effort unticks it.
-      this.RefreshNestEffortMenu();
-    }
-
-    /// <summary>
-    /// Rebuilds the ticks and the tooltip from <see cref="nestEffort"/>, never from whichever control was
-    /// clicked, so the toolbar and Advanced Settings cannot drift apart.
-    /// </summary>
-    private void RefreshNestEffortMenu()
-    {
-      if (this.effortFastItem == null)
-      {
-        return; // called before the toolbar exists
-      }
-
-      this.effortFastItem.Header = Localization.Get("Effort_Fast");
-      this.effortNormalItem.Header = Localization.Get("Effort_Normal");
-      this.effortBestItem.Header = Localization.Get("Effort_Best");
-
-      this.effortFastItem.IsChecked = this.nestEffort == DeepNestSharp.RasterNest.NestEffort.Fast;
-      this.effortNormalItem.IsChecked = this.nestEffort == DeepNestSharp.RasterNest.NestEffort.Normal;
-      this.effortBestItem.IsChecked = this.nestEffort == DeepNestSharp.RasterNest.NestEffort.Best;
-
-      string name = this.nestEffort switch
-      {
-        DeepNestSharp.RasterNest.NestEffort.Normal => "Normal",
-        DeepNestSharp.RasterNest.NestEffort.Best => "Best",
-        _ => "Fast",
-      };
-
-      // Says what it actually buys. It reads as "how long you wait", but what it changes is how TIGHTLY
-      // the parts end up packed — and on a common-line job that tightness is what decides whether the
-      // last part of a row gets to share its cut or sits on its own at the normal gap.
-      this.nestEffortButton.ToolTip =
-        $"Nesting effort: {name}. It buys a TIGHTER pack, not more parts: the parts that fit are found "
-        + "almost at once and the rest of the search squeezes them together. On a common-line job that is "
-        + "what lets the last part of a row share its cut instead of standing alone.";
     }
 
     private void OnOffcutSettings(object sender, RoutedEventArgs e)
@@ -1224,7 +1156,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderSheetActions != null) this.colHeaderSheetActions.Header = Localization.Get("Col_Actions");
 
       // Screen 3: Nesting
-      if (this.btnStartNest != null) this.btnStartNest.Content = Localization.Get("Btn_StartNest");
       if (this.cancelNestButton != null) this.cancelNestButton.Content = Localization.Get("Btn_StopNest");
       if (this.btnOpenLayoutFromNesting != null) this.btnOpenLayoutFromNesting.Content = Localization.Get("Btn_GoToLayout");
       if (this.runsListTitle != null) this.runsListTitle.Text = Localization.Get("Lbl_RunsList");
@@ -1234,7 +1165,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderRunPlaced != null) this.colHeaderRunPlaced.Header = Localization.Get("Col_RunPlaced");
       if (this.colHeaderRunSheets != null) this.colHeaderRunSheets.Header = Localization.Get("Col_RunSheets");
       if (this.colHeaderRunTime != null) this.colHeaderRunTime.Header = Localization.Get("Col_RunTime");
-      this.RefreshNestEffortMenu();
 
       // Screen 4: Layout & Report
       if (this.btnBackToNesting != null) this.btnBackToNesting.Content = Localization.Get("Btn_BackToNesting");
@@ -1751,6 +1681,23 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
+      // The button pressed says what kind of nest this is: a draft for a quote, or the layout to cut. Both
+      // are read from the operator's profile file now, so an edit to it counts from this press on.
+      var runEffort = ReferenceEquals(sender, this.btnNestDraft)
+        ? DeepNestSharp.RasterNest.NestEffort.Draft
+        : DeepNestSharp.RasterNest.NestEffort.Fast;
+      string profileError = DeepNestSharp.RasterNest.NestProfiles.Load(
+        System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "SheetNest"));
+      if (profileError != null)
+      {
+        ViewModel.MessageService.DisplayMessageBox(
+          Localization.Format("Msg_ProfileFileBad", DeepNestSharp.RasterNest.NestProfiles.FileName, profileError),
+          Localization.Get("Title_Nest"),
+          DeepNestLib.MessageBoxIcon.Warning);
+      }
+
+      this.lastRunWasDraft = runEffort == DeepNestSharp.RasterNest.NestEffort.Draft;
+
       // If there is already a nest result, discard it and return the sheets it used to the stock
       // before recalculating from scratch.
       if (!ViewModel.NestMonitorViewModel.TopNestResults.IsEmpty || lastNestConsumed != null)
@@ -1845,11 +1792,9 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
-      var button = sender as Button;
-      if (button != null)
-      {
-        button.IsEnabled = false;
-      }
+      // Both buttons rest while a nest runs: either would only start a second one.
+      this.btnStartNest.IsEnabled = false;
+      this.btnNestDraft.IsEnabled = false;
 
       nestCts = new System.Threading.CancellationTokenSource();
       this.cancelNestButton.Content = "■  Cancel";
@@ -1947,7 +1892,7 @@ namespace DeepNestSharp.Ui.Views
             nestProgress,
             geometryTolerance: CommonLineDefaults.DefaultGeometryToleranceInches * unitScale,
             commonLineGap: config.CommonLineGapInches * unitScale,
-            effort: this.nestEffort,
+            effort: runEffort,
             commonLineMaxClusterParts: config.CommonLineMaxClusterParts,
             candidateCallback: candidateCallback,
             seedOffset: this.runSeedOffset);
@@ -2080,10 +2025,8 @@ namespace DeepNestSharp.Ui.Views
 
         nestCts.Dispose();
         nestCts = null;
-        if (button != null)
-        {
-          button.IsEnabled = true;
-        }
+        this.btnStartNest.IsEnabled = true;
+        this.btnNestDraft.IsEnabled = true;
       }
     }
 
@@ -2847,7 +2790,7 @@ namespace DeepNestSharp.Ui.Views
         UtilizationText = util,
         PlacedText = placed,
         SheetsText = sheets,
-        TimeText = NestElapsed(),
+        TimeText = this.lastRunWasDraft ? NestElapsed() + " · " + Localization.Get("Run_Draft") : NestElapsed(),
       };
 
       static (int Placed, int Sheets, double Util) Rank(INestResult r)

@@ -46,45 +46,32 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\DeepNestLib.CiTests\OneSquare.dxf" Link="Dxfs\OneSquare.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\DeepNestLib.CiTests\Dxfs\_10.dxf" Link="Dxfs\_10.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_1.dxf" Link="Dxfs\_1.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_11.dxf" Link="Dxfs\_11.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_12.dxf" Link="Dxfs\_12.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_2.dxf" Link="Dxfs\_2.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_3.dxf" Link="Dxfs\_3.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_4.dxf" Link="Dxfs\_4.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_5.dxf" Link="Dxfs\_5.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_6.dxf" Link="Dxfs\_6.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_7.dxf" Link="Dxfs\_7.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_8.dxf" Link="Dxfs\_8.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="..\DeepNestPort\dxfs\_9.dxf" Link="Dxfs\_9.dxf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
 </Project>

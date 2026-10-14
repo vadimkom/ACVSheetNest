@@ -511,18 +511,12 @@
 
             <!-- Left / Center: Controls & Progress -->
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-              <Button x:Name="btnStartNest" Style="{DynamicResource PrimaryButton}" Content="▶  ЗАПУСК НЕСТИНГА" Click="OnNest"
-                      MinWidth="160" ToolTip="{ui:Tr Tip_StartNest}" Margin="2,0,0,0" />
-              <Button x:Name="nestEffortButton" Style="{DynamicResource PrimaryButton}" Margin="0,0,4,0"
-                      MinWidth="24" Padding="6,4" Content="&#9662;" Click="OnNestEffortMenu">
-                <Button.ContextMenu>
-                  <ContextMenu>
-                    <MenuItem x:Name="effortFastItem" Header="Fast (Быстрый)" IsCheckable="True" Tag="0" Click="OnNestEffortChosen" />
-                    <MenuItem x:Name="effortNormalItem" Header="Normal (Стандартный)" IsCheckable="True" Tag="1" Click="OnNestEffortChosen" />
-                    <MenuItem x:Name="effortBestItem" Header="Best (Глубокий поиск)" IsCheckable="True" Tag="2" Click="OnNestEffortChosen" />
-                  </ContextMenu>
-                </Button.ContextMenu>
-              </Button>
+              <!-- Two buttons, two jobs: a draft in seconds for a quote, and the layout that gets cut.
+                   Both are tuned in %LOCALAPPDATA%\SheetNest\nest-profiles.json. -->
+              <Button x:Name="btnNestDraft" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_NestDraft}" Click="OnNest"
+                      Padding="10,4" ToolTip="{ui:Tr Tip_NestDraft}" Margin="2,0,4,0" />
+              <Button x:Name="btnStartNest" Style="{DynamicResource PrimaryButton}" Content="{ui:Tr Btn_NestCut}" Click="OnNest"
+                      Padding="12,4" ToolTip="{ui:Tr Tip_StartNest}" Margin="0,0,4,0" />
               <Button x:Name="cancelNestButton" Style="{DynamicResource DangerButton}" Margin="4,0" Content="■  Остановить"
                       Click="OnCancelNest" Visibility="Collapsed" ToolTip="{ui:Tr Tip_CancelNest}" />
               <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />

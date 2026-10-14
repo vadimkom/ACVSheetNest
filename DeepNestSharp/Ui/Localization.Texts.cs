@@ -272,7 +272,7 @@ namespace DeepNestSharp.Ui
       ("Dxf_NotANumber", "это не число  ·  деталь осталась на месте", "това не е число  ·  детайлът остана на мястото си", "that is not a number I can read  ·  the part has been left where it was"),
       ("Dxf_Distance", "расстояние: {0}  ·  X: {1}  ·  Y: {2}", "разстояние: {0}  ·  X: {1}  ·  Y: {2}", "distance: {0}  ·  X: {1}  ·  Y: {2}"),
       ("Dxf_PartStatus", "{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}", "{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}", "{0}  ·  {1} × {2} {3}  ·  X {4}  ·  Y {5}"),
-      ("Hint_RunsList", "💡 Каждый «Пуск» добавляет готовую раскладку всего заказа; одинаковые не повторяются. Сверху — лучшая (★): все детали, меньше листов, больше металла в деле. Щелчок — просмотр, двойной щелчок — к раскладке.", "💡 Всеки „Старт“ добавя готов разкрой на цялата поръчка; еднаквите не се повтарят. Отгоре е най-добрият (★): всички детайли, по-малко листове, повече използван метал. Щракване — преглед, двойно — към разкроя.", "💡 Every Nest adds a finished nest of the whole job; identical ones are not repeated. The best is on top (★): every part placed, fewest sheets, most material used. Click to preview, double-click for the layout."),
+      ("Hint_RunsList", "💡 Каждое нажатие «Черновик» или «Раскладка» добавляет готовую раскладку всего заказа (черновики помечены); одинаковые не повторяются. Сверху — лучшая (★): все детали, меньше листов, больше металла в деле. Щелчок — просмотр, двойной щелчок — к раскладке.", "💡 Всяко натискане на „Чернова“ или „Разкрой“ добавя готов разкрой на цялата поръчка (черновите са отбелязани); еднаквите не се повтарят. Отгоре е най-добрият (★): всички детайли, по-малко листове, повече използван метал. Щракване — преглед, двойно — към разкроя.", "💡 Every press of Draft or Nest adds a finished nest of the whole job (drafts are marked); identical ones are not repeated. The best is on top (★): every part placed, fewest sheets, most material used. Click to preview, double-click for the layout."),
       ("Nest_LivePreview", "Идёт поиск: {0} из {1} деталей, листов: {2}", "Търсене: {0} от {1} детайла, листове: {2}", "Searching: {0} of {1} parts, sheets: {2}"),
       ("Dxf_MeasureAgain", "  ·  щёлкните, чтобы измерить снова", "  ·  щракнете, за да измерите отново", "  ·  click to measure again"),
       ("Dxf_Gap", "зазор {0}", "разстояние {0}", "gap {0}"),
@@ -336,6 +336,11 @@ namespace DeepNestSharp.Ui
       ("Rep_Sq", "кв. {0}", "кв. {0}", "sq {0}"),
       ("Rep_M2", "м²", "м²", "m²"),
       ("Rep_Metre", "м", "м", "m"),
+      ("Btn_NestDraft", "⚡ Черновик", "⚡ Чернова", "⚡ Draft"),
+      ("Tip_NestDraft", "Быстрая прикидка для коммерческого предложения: сколько листов, площади и метров реза. Раскладка грубая, резать её не стоит", "Бърза прикидка за оферта: колко листа, площ и метри рязане. Разкроят е груб, не е за рязане", "A quick estimate for a quote: how many sheets, how much area and metres of cut. Rough layout, not for cutting"),
+      ("Btn_NestCut", "▶ Раскладка", "▶ Разкрой", "▶ Nest"),
+      ("Run_Draft", "черновик", "чернова", "draft"),
+      ("Msg_ProfileFileBad", "Файл настроек раскладки {0} не читается, взяты значения по умолчанию:\n{1}", "Файлът с настройки на разкроя {0} не се чете, взети са стойностите по подразбиране:\n{1}", "The nest settings file {0} does not read; the defaults are used:\n{1}"),
     };
 
     static Localization()

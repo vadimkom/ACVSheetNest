@@ -651,7 +651,7 @@ namespace DeepNestSharp.RasterNest
           // no second chance at all, while one that seats 13 of 14 gets one. It was there to keep the cost
           // down when a single budget served everybody; the operator picks the effort now, and giving parts
           // back uncut is worth more seconds than any of them.
-          if (placements != null && packedHere > 0 && leftOver > 0 && IsLastChanceFor(size, sizes))
+          if (placements != null && packedHere > 0 && leftOver > 0 && IsLastChanceFor(size, sizes) && LastChanceBudget(effort) > 0)
           {
             var (retryPl, retryBy, retryW, retryH, retrySeamsSnapped, retrySeamsGivenUp, retryCommonEdges, retryCommonLineFallbacks) = PackOneSheet(
               loaded,
@@ -742,7 +742,7 @@ namespace DeepNestSharp.RasterNest
         // A sheet of big parts can come back half empty with parts still waiting that would fit in the gap:
         // the engine packs a strip and the sheet keeps what lands inside it, so which parts those are is
         // decided by the order along the strip, not by what fits. Offer the waiting ones one at a time.
-        if (FillUpEnabled && !cancel.IsCancellationRequested)
+        if (FillUpEnabled && (NestProfiles.For(effort)?.FillUp ?? true) && !cancel.IsCancellationRequested)
         {
           var fill = FillUp(
             loaded, loadedById, pool, bestPlacements, bestPlacedBySrc, bestW, bestH, margin,
@@ -1260,7 +1260,7 @@ namespace DeepNestSharp.RasterNest
       var candidates = pool.Keys
         .Where(k => Waiting(k, current) > 0
           && !loadedById[k].RequiresMergedLines
-          && Area(k) >= BigPartShare * usable
+          && Area(k) >= (NestProfiles.For(effort)?.FillUpMinShare ?? BigPartShare) * usable
           && FitsOnSheet(loadedById[k], w, h, margin))
         .OrderByDescending(Area)
         .ThenBy(k => k)
@@ -1269,7 +1269,7 @@ namespace DeepNestSharp.RasterNest
       int attempts = 0;
       foreach (int src in candidates)
       {
-        while (attempts < MaxFillAttempts && !cancel.IsCancellationRequested && Waiting(src, current) > 0 && used + Area(src) <= usable)
+        while (attempts < (NestProfiles.For(effort)?.FillUpMaxAttempts ?? MaxFillAttempts) && !cancel.IsCancellationRequested && Waiting(src, current) > 0 && used + Area(src) <= usable)
         {
           attempts++;
           Interlocked.Increment(ref DiagFillAttempts);
@@ -5478,7 +5478,7 @@ namespace DeepNestSharp.RasterNest
         return Math.Min(n, 8);
       }
 
-      return effort == NestEffort.Fast ? 1 : 2;
+      return NestProfiles.For(effort)?.WorkersPerSearch ?? 2;
     }
 
     /// <summary>How hard a sheet is searched, in sparrow iterations, for each <see cref="NestEffort"/>.
@@ -5523,13 +5523,11 @@ namespace DeepNestSharp.RasterNest
     /// The offcut on the last sheet moves both ways, as it already did between seed sets. Normal and Best keep
     /// the engine's defaults: they are the settings for when the time is there.</para>
     /// </remarks>
-    internal static string[] EngineSearchFlags(NestEffort effort) => effort == NestEffort.Fast
-      ? new[] { "--shrink-step", "0.005", "--max-fails", "3", "--compress-share", "0", "--no-improve-limit", "50" }
-      : Array.Empty<string>();
+    internal static string[] EngineSearchFlags(NestEffort effort)
+      => NestProfiles.For(effort)?.EngineFlags ?? Array.Empty<string>();
 
-    private static int BudgetFor(NestEffort effort) => effort switch
+    private static int BudgetFor(NestEffort effort) => NestProfiles.For(effort)?.Iterations ?? effort switch
     {
-      NestEffort.Fast => 300,
       NestEffort.Best => 800,
       _ => 600,
     };
@@ -5596,7 +5594,7 @@ namespace DeepNestSharp.RasterNest
     /// <summary>The budget for the last-chance re-pack: one notch harder than the operator asked for, because
     /// by then the alternative is handing back parts that will not be cut at all.</summary>
     private static int LastChanceBudget(NestEffort effort)
-      => BudgetFor(effort == NestEffort.Fast ? NestEffort.Normal : NestEffort.Best);
+      => NestProfiles.For(effort) is NestProfile p ? p.LastChanceIterations : BudgetFor(NestEffort.Best);
 
     /// <summary>How long a single engine process may run before it is killed. A WATCHDOG, not a budget: a
     /// search must end because it ran out of iterations, never because it ran out of seconds.</summary>
@@ -5632,7 +5630,7 @@ namespace DeepNestSharp.RasterNest
         return Math.Min(n, 8);
       }
 
-      return effort == NestEffort.Fast ? 2 : 3;
+      return NestProfiles.For(effort)?.Tries ?? 3;
     }
 
     /// <summary>The fewest races a one-off sheet gets at each effort.</summary>
@@ -5644,7 +5642,7 @@ namespace DeepNestSharp.RasterNest
     /// the Best budget: eight races returned a 2249 mm block in 106 s, sixteen returned the SAME 2249 mm in
     /// 210 s. What Best buys is iterations.
     /// </remarks>
-    private static int RaceFloor(NestEffort effort) => effort == NestEffort.Fast ? 4 : 8;
+    private static int RaceFloor(NestEffort effort) => NestProfiles.For(effort)?.LastSheetTries ?? 8;
 
     /// <summary>Best-of-K count for a batch that will pattern-replicate onto `replicas` identical sheets.
     /// A one-off sheet uses the base <see cref="NestTries"/>; a template governing many clones gets more

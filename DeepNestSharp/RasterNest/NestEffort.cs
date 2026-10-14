@@ -35,6 +35,10 @@ namespace DeepNestSharp.RasterNest
     /// <summary>For expensive material, where waiting is cheaper than the offcut. Buys the tail of the
     /// curve, which costs many times what the rest of it did.</summary>
     Best = 2,
+
+    /// <summary>The quick look for a quote: how much area, how many metres of cut, how many sheets. Driven by
+    /// <see cref="NestProfiles.Draft"/>; never stored as the operator's choice.</summary>
+    Draft = 3,
   }
 
   /// <summary>One source of truth for a new install and for a session with no saved choice.</summary>

@@ -47,8 +47,8 @@
                            Minimum="0" Increment="0.05" FormatString="0.###"
                            ToolTip="{ui:Tr Set_MarginTip}" />
 
-        <TextBlock x:Name="effortLabel" Grid.Row="3" Grid.Column="0" Text="Nesting effort:" VerticalAlignment="Center" Margin="0,0,10,0" />
-        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="effortCombo" Width="200" HorizontalAlignment="Left"
+        <TextBlock x:Name="effortLabel" Grid.Row="3" Grid.Column="0" Text="Nesting effort:" VerticalAlignment="Center" Margin="0,0,10,0" Visibility="Collapsed" />
+        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="effortCombo" Width="200" HorizontalAlignment="Left" Visibility="Collapsed"
                   SelectionChanged="OnEffortChanged"
                   ToolTip="{ui:Tr Set_EffortTip}">
           <ComboBoxItem x:Name="effortItem0" Tag="0">Fast</ComboBoxItem>

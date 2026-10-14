@@ -8,10 +8,14 @@
     <PublishSingleFile>false</PublishSingleFile>
     <ApplicationIcon>Branding\sheetnest.ico</ApplicationIcon>
     <DebugType>embedded</DebugType>
-    <AssemblyVersion>1.1.29.0</AssemblyVersion>
-    <FileVersion>1.1.29.0</FileVersion>
-    <InformationalVersion>1.1.29</InformationalVersion>
-    <Version>1.1.29</Version>
+    <AssemblyVersion>1.1.30.0</AssemblyVersion>
+    <FileVersion>1.1.30.0</FileVersion>
+    <InformationalVersion>1.1.30</InformationalVersion>
+    <Version>1.1.30</Version>
+    <!-- The program's own three languages live in code. Of the .NET runtime's translated system messages, keep
+         Russian and Bulgarian (English is built in; .NET ships no Bulgarian, so that one costs nothing): the other
+         twelve were 8 MB nobody read. -->
+    <SatelliteResourceLanguages>ru;bg</SatelliteResourceLanguages>
     <Product>SheetNest</Product>
     <AssemblyTitle>SheetNest</AssemblyTitle>
     <AssemblyName>SheetNest</AssemblyName>
