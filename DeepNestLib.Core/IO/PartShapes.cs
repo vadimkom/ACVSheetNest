@@ -239,8 +239,8 @@ namespace DeepNestLib.IO
       new ShapeParameter("Shape_StripWidth", 25),
       new ShapeParameter("Shape_BigHole", 8),
       new ShapeParameter("Shape_SmallHole", 3.2),
-      new ShapeParameter("Shape_Pitch", 15),
-      new ShapeParameter("Shape_RowGap", 8),
+      new ShapeParameter("Shape_Pitch", 20),
+      new ShapeParameter("Shape_RowGap", 10),
       new ShapeParameter("Shape_SmallOffset", 5),
       new ShapeParameter("Shape_Bridge", 0.5),
       new ShapeParameter("Shape_BridgeEvery", 400),
@@ -248,8 +248,11 @@ namespace DeepNestLib.IO
 
     public override IReadOnlyList<ShapePreset> Presets { get; } = new[]
     {
-      Tape(25, 8),
-      Tape(17, 6.2),
+      // B25: the shop's tape. The small holes sit on a 10 mm square round the big one and the groups repeat every
+      // 20 mm, so along each row there is a small hole every 10 mm for a screw wherever it lands; 1.5 mm of metal
+      // between big and small, 5.9 mm to the edge. B17 is the drawing the shop sent: 10 x 8 round it, every 15.
+      Tape(25, 8, pitch: 20, rowGap: 10),
+      Tape(17, 6.2, pitch: 15, rowGap: 8),
     };
 
     public override string Problem(IReadOnlyList<double> v)
@@ -357,14 +360,14 @@ namespace DeepNestLib.IO
       return room < 0 ? 0 : (int)Math.Floor((room / v[Pitch]) + 1e-9) + 1;
     }
 
-    private static ShapePreset Tape(double strip, double bigHole)
+    private static ShapePreset Tape(double strip, double bigHole, double pitch, double rowGap)
       => new ShapePreset("Shape_TapePreset", "B" + N(strip) + ", Ø" + N(bigHole) + " + 4×Ø3.2", new Dictionary<int, double>
       {
         [Strip] = strip,
         [BigHole] = bigHole,
         [SmallHole] = 3.2,
-        [Pitch] = 15,
-        [RowGap] = 8,
+        [Pitch] = pitch,
+        [RowGap] = rowGap,
         [SmallOffset] = 5,
       });
   }

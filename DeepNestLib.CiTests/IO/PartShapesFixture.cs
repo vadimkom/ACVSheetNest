@@ -120,7 +120,7 @@ namespace DeepNestLib.CiTests.IO
       var v = Tape();
       PerforatedTapeShape.Strips(v).Should().Be(10);
       int groups = PerforatedTapeShape.Groups(v);
-      groups.Should().Be(66, "15 mm apart along 1000 mm, the end groups clear of the ends");
+      groups.Should().Be(50, "20 mm apart along 1000 mm, the end groups clear of the ends");
 
       string path = Write(PartShapes.PerforatedTape, v);
       var nfp = Load(path);
@@ -131,7 +131,7 @@ namespace DeepNestLib.CiTests.IO
       {
         double y = (hole.MinY + hole.MaxY) / 2;
         double inStrip = y - (Math.Floor(y / 25) * 25);
-        inStrip.Should().BeInRange(25 / 2.0 - 4 - 0.01, 25 / 2.0 + 4 + 0.01, "every hole sits in the middle band of its strip");
+        inStrip.Should().BeInRange(25 / 2.0 - 5 - 0.01, 25 / 2.0 + 5 + 0.01, "every hole sits in the middle band of its strip");
       }
 
       // Nine shared cuts, each broken by two 0.5 mm bridges (about every 400 mm of 1000).
@@ -141,6 +141,25 @@ namespace DeepNestLib.CiTests.IO
       var (length, pieces) = DxfInnerCuts.Measure(path);
       pieces.Should().Be(27);
       length.Should().BeApproximately(9 * (1000 - (2 * 0.5)), 1e-6);
+    }
+
+    /// <summary>B25: the small holes on a 10 mm square round each big one, the groups every 20 mm, so each row
+    /// of small holes is an even 10 mm apart for a screw wherever it lands.</summary>
+    [Fact]
+    public void TheB25TapeHasASmallHoleEveryTenMillimetresAlongEachRow()
+    {
+      var nfp = Load(Write(PartShapes.PerforatedTape, Tape(200, 25)));
+      var small = nfp.Children.Where(h => h.MaxX - h.MinX < 4).ToList();
+      var big = nfp.Children.Where(h => h.MaxX - h.MinX > 4).ToList();
+      big.Should().HaveCount(PerforatedTapeShape.Groups(Tape(200, 25)));
+      small.Should().HaveCount(4 * big.Count);
+
+      foreach (var row in small.GroupBy(h => Math.Round((h.MinY + h.MaxY) / 2, 2)))
+      {
+        row.Key.Should().BeOneOf(new[] { 12.5 - 5, 12.5 + 5 }, "the rows are 10 mm apart, centred on the strip");
+        var xs = row.Select(h => (h.MinX + h.MaxX) / 2).OrderBy(x => x).ToList();
+        xs.Zip(xs.Skip(1), (a, b) => b - a).Should().OnlyContain(d => Math.Abs(d - 10) < 0.05);
+      }
     }
 
     [Theory]
