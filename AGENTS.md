@@ -1,136 +1,203 @@
-# SheetNest — contexto para agentes
+# SheetNest (ACV fork): notes for coding agents
 
-## Inicio rápido
+## Quick start
 
-SheetNest es una aplicación Windows de nesting para chapa metálica, derivada de DeepNestSharp. Importa DXF, distribuye piezas, permite edición manual y exporta DXF y reportes PDF. C# / .NET 6 / WPF, motor Sparrow y geometría administrada/nativa.
+SheetNest is a Windows nesting program for sheet metal, grown out of DeepNestSharp. It imports DXF and SC2000 CHF drawings, nests parts onto stock sheets with the Sparrow engine, allows manual editing, and exports DXF and a PDF production report. C# / .NET 10 / WPF.
 
-Al retomar:
-1. Ejecutar `git status --short --branch` y `git log -5 --oneline` en este repositorio.
-2. Leer este archivo y abrir documentación adicional solo según la tarea.
-3. Conservar cambios existentes y trabajar sobre la rama actual.
-4. Si el usuario solo pide trabajar en SheetNest, resumir el estado y preguntar qué quiere hacer. Los commits previos no son tareas pendientes.
+This repository is the ACV fork, used at a laser-cutting shop. The shop PC is usually a Ryzen 5600, occasionally a Celeron J4125. The operator nests almost always with the fast setting (now the **▶ Nest** button) and works in millimetres.
 
-## Rutas de esta estación
+When resuming:
+1. Run `git status --short --branch` and `git log -5 --oneline`.
+2. Read this file; open other documents only as the task needs them.
+3. Keep existing changes and work on the current branch (`main`).
+4. If the user only asks to work on SheetNest, summarise the state and ask what they want. Earlier commits are not pending tasks.
 
-- Código: C:/Users/rosam/source/repos/DeepNestSharp
-- Origin: https://github.com/ManuelMRosa/SheetNest.git (чужой, не пушим)
-- Форк пользователя: https://github.com/vadimkom/ACVSheetNest (remote `fork`; пушить только с явного «да» пользователя)
-- Upstream histórico: https://github.com/9swampy/DeepNestSharp.git
-- Sitio web (repositorio separado): C:/Users/rosam/sheetnest-website
-- Archivos de trabajo: C:/Users/rosam/SheetNest (projects/*.dnest, test-data/dxf, reports, releases, diagnostics).
-- App instalada: C:/Users/rosam/AppData/Local/Programs/SheetNest/SheetNest.exe
-- Datos de ejecución: C:/Users/rosam/AppData/Local/SheetNest
-- SheetNest/backups contiene copias históricas, no el código activo.
-- Las notas de junio/julio en SheetNest/docs y LEEME.txt son históricas; no determinan la rama, versión ni arquitectura actuales.
+## Remotes and publishing
 
-## Mapa del código
+- `fork` = https://github.com/vadimkom/ACVSheetNest. This is ours: push `main` there and publish releases with `gh release create`.
+  - GitHub CLI: `C:/Program Files/GitHub CLI/gh.exe`, signed in as `vadimkom`.
+  - Ask the user before overwriting published history.
+- `origin` = https://github.com/ManuelMRosa/SheetNest. Not ours: never push there.
+  - Upstream has ~30 commits we do not have (colour marking, names from labels, common-cut seams); they were never merged.
+  - Fixes worth sharing go there as focused pull requests from `pr/*` branches on the fork. Ask the user before opening one.
+  - Build those branches in the worktree `C:/src/sn-upstream`, based on `origin/main`.
+  - Upstream targets .NET 6. Build it with the SDK 10 here and run its tests with `DOTNET_ROLL_FORWARD=Major`.
+  - Baseline: core 1034/1037; the app suite fails `PartCardSizeFixture` on upstream main too.
+  - Open pull requests: #12 DXF endpoint grid, #13 elliptical arcs, #14 file dialog on a pulled drive, #15 smaller `.dnest`. Fill-up was not offered: `SparrowNestService` has diverged too far.
+- Historic upstream: https://github.com/9swampy/DeepNestSharp.
+- Commit identity: `git -c user.name="vadim" -c user.email="komarov.v@gmail.com" commit ...`. No global identity is configured.
+- Every MSI handed to the user gets a new version number. Releases on the fork feed the in-app update check (`UpdateChecker`, `releases/latest`).
 
-- DeepNestSharp/: app WPF; MainWindow.xaml.cs (4 pantallas), Ui/Themes/SheetNestTheme.xaml (paleta; controles estándar de WPF, sin tema Classic), Ui/UserControls/DxfViewer, SessionState.cs.
-- DeepNestSharp/RasterNest/: SparrowNestService.cs, CommonEdgeClearance.cs, RasterCompact.cs.
-- DeepNestLib.Core/: IO/ para DXF, Placement/ para geometría y CommonEdge, NestProject/ para persistencia.
-- DeepNestSharp.Domain/: modelos y configuración observable.
-- SparrowEngine/: sparrow.exe y sheetnest-sparrow.patch.
-- DeepNestSharp.CiTests/ y DeepNestLib.CiTests/: pruebas de aplicación y núcleo.
-- NestBench/ y GpuNestLab/: benchmarks y laboratorio.
-- installer/: empaquetado y política de versiones.
+## Paths on this machine
 
-## Documentos según la tarea
+- Code: `C:/src/SheetNest`. Installers land in the repo root as `SheetNest-x.y.z-win-x64.msi`; publish output goes to `publish-x.y.z/`.
+- Runtime data: `%LOCALAPPDATA%/SheetNest`:
+  - `session.json` (language, recent projects, last material);
+  - `nest-profiles.json` (Draft/Nest engine settings);
+  - `shapes/`, `autosave/`, crash logs.
+- The user's CHF drawings: `E:/chf` (578 files, used to verify the CHF reader).
+- Rust toolchain for rebuilding Sparrow: `%USERPROFILE%/.cargo`. See BUILDING.md.
+- Do not kill the user's running SheetNest without asking. Test instances started from `bin/` are fine to stop.
 
-- README.md: funciones del producto.
-- BUILDING.md: requisitos y compilación.
-- COMMON_LINE_IMPLEMENTATION.md: arquitectura, invariantes, límites y pruebas del corte por línea común. Leer antes de modificar esta función.
-- installer/RELEASING.md: pruebas y publicación. Betas como ZIP portable; estables como MSI.
-- DeepNestSharp/DeepNestSharp.csproj: versión declarada del código. No inferir la versión publicada por nombres de MSI o carpetas publish-*.
+## Code map
 
-## Comandos desde la raíz del repositorio
+- `DeepNestSharp/`: the WPF app.
+  - `Ui/Views/MainWindow.xaml(.cs)`: four steps — Parts, Sheets, Nesting, Layout & Report.
+  - `Ui/UserControls/DxfViewer`: layout view, manual editing, thumbnails, move between sheets.
+  - `Ui/Themes/SheetNestTheme.xaml`: palette; standard WPF controls, Segoe UI.
+  - `SessionState.cs`.
+- `DeepNestSharp/RasterNest/`:
+  - `SparrowNestService.cs`: sheet-by-sheet packing, fill-up, races.
+  - `NestProfiles.cs`: Draft/Nest settings file.
+  - `CommonEdgeClearance.cs`, `RasterCompact.cs`.
+- `DeepNestSharp/Reports/`:
+  - `NestReportPdf.cs`: PDF, on-screen preview and print from one `IReportCanvas`.
+  - `PdfTrueTypeFont.cs`: embedded Arial as Unicode; works without native zlib.
+  - `ReportMaterial.cs`.
+- `DeepNestSharp/Ui/Strings*.resx` + `Ui/Localization.cs`: translations (see Languages).
+- `DeepNestLib.Core/`:
+  - `IO/`: DXF reading/writing, `ChfReader.cs`, `DrawingFile.Load`, `PartMirror.cs`, `PartShapes.cs`, `DxfOutputLayers.cs`, `FlatDxfJoiner.cs`.
+  - `Placement/`: geometry and common line.
+  - `NestProject/`: persistence, `SheetMaterials.cs`.
+- `DeepNestSharp.Domain/`: observable models and configuration. `Services/UiText` routes Domain texts to `Localization`.
+- `SparrowEngine/`: `sparrow.exe` and `sheetnest-sparrow.patch`.
+- `DeepNestSharp.CiTests/` (app) and `DeepNestLib.CiTests/` (core): tests. `NestBench/`, `GpuNestLab/`: benchmarks and lab.
+- `installer/`: WiX MSI (`build-msi-x.y.z.ps1`, `SheetNest.wxs`), release policy in `RELEASING.md`.
+- `test-data/`:
+  - `dxf/`: SolidWorks flat patterns of duct parts, `test2`, `Hodgson`, `inhole` for the common-line benches;
+  - `chf/sides.chf`;
+  - `test1/`: a real three-sheet order with a 1048-hole front, used by `SavedNestSizeFixture` and the speed bench.
 
-Usar PowerShell. PowerShell 5.1 no admite && y ||.
+## Documents by task
+
+- README.md: product features. The "About this fork" section lists what the fork adds.
+- BUILDING.md: requirements, build, rebuilding Sparrow.
+- COMMON_LINE_IMPLEMENTATION.md: architecture, invariants, limits and tests of common-line cutting. Read it before touching that feature.
+- installer/RELEASING.md: testing and publishing.
+- DeepNestSharp/DeepNestSharp.csproj: the declared version. Do not infer the published version from MSI or publish folder names.
+
+## Commands (repository root, PowerShell)
 
 ```powershell
 dotnet build .\DeepNestSharp\DeepNestSharp.csproj -c Release
 dotnet test .\DeepNestSharp.CiTests\DeepNestSharp.CiTests.csproj -c Release
 dotnet test .\DeepNestLib.CiTests\DeepNestLib.CiTests.csproj -c Release
 & '.\DeepNestSharp\bin\Release\net10.0-windows\SheetNest.exe'
+& .\installer\build-msi-x.y.z.ps1   # copy the previous script and bump the version
 ```
 
-Ejecutar las suites por proyecto: installer/RELEASING.md documenta que dotnet test sobre toda la solución puede quedarse en restore. Elegir pruebas relacionadas con el cambio; no compilar ni ejecutar suites solo para recuperar contexto.
+Run the suites per project: `dotnet test` on the whole solution can hang in restore. Pick the tests related to a change; do not build or run suites just to regain context.
 
-Para pruebas nativas de Hodgson/rendimiento seguir COMMON_LINE_IMPLEMENTATION.md y comprobar las rutas del motor/DXF. SPARROW_EXE y SHEETNEST_REQUIRE_SPARROW controlan la ejecución nativa. No presentar pruebas omitidas como verificadas.
+Engine tests:
+- They need `SPARROW_EXE` (and `SHEETNEST_MIXED_COMMON_LINE_DXF_DIR=test-data\dxf` for the benches). **Without `SPARROW_EXE` the native tests are SKIPPED and look exactly like passes**; five stayed broken for a day that way.
+- With the engine, the app suite takes about 5.5 min.
+- Long measurements and Normal-effort searches run only with `SHEETNEST_SLOW_TESTS=1` (`DeepNestSharp.CiTests/SlowTests.cs`). Run them before a release that changes the search.
 
-## Estado observado el 2026-09-26
+Other switches:
+- `SHEETNEST_FILL_UP=0` turns fill-up off.
+- `SHEETNEST_MAX_CONC` overrides parallel searches.
+- `SHEETNEST_NEST_*` overrides the profile file.
+- `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Verificar con Git al iniciar; esta sección es una referencia fechada.
-- Rama: `main`.
-- **Hay mucho trabajo SIN COMITEAR sobre HEAD.** `git status` antes de tocar nada.
-- Rediseño completo de la interfaz de usuario (WPF) con flujo de trabajo en 4 pantallas:
-  1. Модели (Детали): таблица во весь экран, inline-счетчик количества, Drag & Drop (DXF, .dnest), кнопка "⚙ Подробности...", множитель комплектов (× / ÷ с шагом).
-  2. Листы: таблица листового материала, размеры, количество, безлимитный режим, приоритет листа (обрезки/остатки расходуются первыми), отступ от края.
-  3. Нестинг: панель запуска и остановки, выбор усилий, список вариантов/прогонов с метриками и интерактивный предпросмотр выбранного варианта.
-  4. Раскладка и отчёт: переключение чертежа DXF и сводного отчета раскроя, прямой вывод на печать, экспорт в DXF (со слоем имен деталей) и PDF.
-- Платформа: решение полностью переведено на **.NET 10.0** (`net10.0` / `net10.0-windows`). Все 10 проектов обновлены, устранены зависимости от устаревшего пакета `System.Text.Json 6.0.5`.
-- Suites: 1004 (núcleo), 422 (aplicación), 5 (minkowski), cero fallos на .NET 10.
-- Correcciones y mejoras:
-  - Множитель деталей: поле ввода с шагом по умолчанию = 1, кнопка "× Применить" (умножение количества и зеркальных копий для выделенных или всех деталей). Кнопка деления удалена по запросу.
-  - Поддержка новых образцов DXF разверток тройников воздуховодов из `test-data/dxf` (`Flat-Pattern - bottoms/side/top^Tr_...`).
-  - Приоритет листов: листы с наивысшим приоритетом (деловые отходы) утилизируются алгоритмом Sparrow в первую очередь.
-  - Потоковая передача промежуточных вариантов нестинга в таблицу (`runsListView`): каждый seed добавляется в список с метриками (утилизация, размещено, листов, время) и доступен для интерактивного предпросмотра и перехода к раскладке.
-  - Векторный интерактивный просмотр отчёта раскроя PDF на экране: единая абстракция `IReportCanvas` (`WpfPageCanvas` и `NestReportPdf.PageContent`), формирующая идентичные векторные страницы A4 альбомной ориентации (842×595 пт) с тенями, таблицами, деталями с заливками по цветам и номерами позиций.
-  - Полнофункциональная панель управления просмотром отчёта на 4-м экране: зум (кнопки + / -, 100%, «По ширине», Ctrl+колесо мыши), навигация по страницам (Стр. X из Y), сохранение в PDF в 1 клик, прямая многостраничная печать отчета на принтер через `System.Windows.Documents.FixedDocument` в векторном режиме (`PageOrientation.Landscape`).
-  - NRE в `OnOffcutSettings` решен; mm по умолчанию в приложении (`unitsMm = true`, `EffectiveUnitsMm`).
-- Версия 1.1.33 (последний тег `v1.1.10`; 1.1.11–1.1.32 собирались только локально, MSI 1.1.11 ещё с FreeCAD). `installer/build-msi-1.1.33.ps1` → `SheetNest-1.1.33-win-x64.msi` (52 MB). Origin (`ManuelMRosa/SheetNest`) чужой: туда не пушим (наш путь — форк `vadimkom/ACVSheetNest`); там 30 коммитов сверх нашего HEAD (маркировка по цветам, имена из надписей, швы общего реза) — не влиты.
-- 2026-09-27: FreeCAD и 3D-импорт (STEP/IGES, K-фактор) убраны из проекта полностью: код, 3D-поля `DetailLoadInfo` (старые .dnest с ними грузятся — неизвестные поля игнорируются), скрипты установщика, `SheetNest.wxs`, README/BUILDING/RELEASING, THIRD_PARTY_NOTICES. `build-msi-1.1.11-lite.ps1` удалён как дубль, `build-msi-1.1.11.ps1` переименован в 1.1.12.
-- 2026-09-27: «Параллельных поисков» в расширенных настройках (Авто / 1–8, `SessionState.NestConcurrency`, `SparrowNestService.ConcurrencyLimit`; `SHEETNEST_MAX_CONC` по-прежнему главнее). Авто = (логич. ядра − 1) / потоков на поиск (Fast 1, Normal/Best 2), не больше 8: Celeron на 4 потока → 1 поиск на Normal, 3 на Fast. `sparrow.exe` идёт с приоритетом BelowNormal. Раскладка от этого не меняется: оба банка дали те же цифры и с автозначением, и с `SHEETNEST_MAX_CONC=1`.
-- 2026-09-27: убран мёртвый UI от DeepNestSharp: AvalonDock (пакет, Ui/Docking, панели-инструменты), 12 старых UserControl (осталось DxfViewer, RotationSelector), VM невидимых документов (Preview/Properties/NestResult/SheetPlacement/PartEditor/NfpCandidateList), старый путь раскладки через NestMonitorViewModel (ExecuteNestCommand/TryStartAsync/NestWorker; NestMonitorViewModel теперь только держит результаты), Observable-обёртки NFP/размещений, неиспользуемые поведения, конвертеры и сервисы, пакеты Xaml.Behaviors и Light.GuardClauses в приложении. Ретро-тема Windows Classic и Tahoma 11 убраны: стандартные контролы WPF, Segoe UI, светлая палитра с синим акцентом Windows. Командная строка открывает .dnest и DXF тем же путём, что и перетаскивание (в очереди диспетчера, иначе await продолжался в пуле потоков). Шаги навигации и вид «Чертёж/Отчёт» переключаются по Checked (клавиатура/диктор). В «О программе» починены ссылки (Process.Start без UseShellExecute падал).
-- 2026-09-27: весь интерфейс переведён (ru/bg/en): в XAML `{ui:Tr Ключ}` (Ui/TrExtension.cs, живое переключение языка); с 1.1.32 строки — в `Ui/Strings.resx` (en, нейтральный) + `Strings.ru.resx` + `Strings.bg.resx`, `Localization.Format/Plural`; тексты Domain — через `Domain/Services/UiText` (App подключает). Отчёт PDF переведён и пишется встроенным Arial как Unicode (Type0/Identity-H, `Reports/PdfTrueTypeFont.cs`; без Arial — прежний Helvetica): раньше кириллица в PDF выходила «?». Исправлено: предпросмотр и печать отчёта передавали единицы «мм» вместо "mm", и отчёт считал в дюймах (`NestReportPdf.IsMillimetres`). Тесты, проверяющие переведённый текст, — в коллекции `UiLanguageCollection`.
-- 2026-09-27: экспорт DXF — один диалог сохранения, файлы `имя_N_ШxВ_xПовторы.dxf` по плану раскроя (`MainViewModel.ExportLayoutsAsync/LayoutFileName`, тест `LayoutExportFixture`). `App` вызывает `InitializeComponent` в начале конструктора: иначе окна, созданные до загрузки темы, падали на `StaticResource` (так падал «О программе» в сборке 1.1.14).
-- 2026-09-26: исправлено — DXF, брошенный на таблицу деталей, добавлялся дважды (Drop всплывал до окна) и без проверки загрузки; превью-кандидаты нестинга делили объекты с победителем, которого `DeferUnfit` мутирует в фоне; кэш габаритов `NoFitPolygon` сбрасывается после мутаций точек на месте. Размеры листов с худшим приоритетом больше не прогоняются через Sparrow, если лист лучшего приоритета уже упакован.
-- 2026-09-27 проверено: núcleo 1001/1004 и aplicación 422/425 (0 fallos, 3+3 omitidos); с `SPARROW_EXE` + Fast оба банка: test2 совпадает с таблицей ниже полностью; **mixto даёт 30 colocadas, 31 aristas вместо 21** — и на коде без правок этого дня тоже, т.е. сдвиг внесён более ранней незакоммиченной работой. Решить: обновить эталон или искать причину. Полный нативный прогон всей suite не завершён (`MixedStockUtilizationFixture` ~11 мин).
+Last verified (2026-10-14): core 1061/1063, app 475/478, 0 failures (skips are the engine tests).
 
-- 2026-09-28: подписи деталей в раскладке DXF (`DxfExporter.GetPartNameLabel`) без префикса «Flat-Pattern - ». Линии сгиба из файлов развёрток (слой 0, цвет 8, либо слой 9) выходят в слой 9 с поворотом детали — проверено на `test-data/dxf/Flat-Pattern - *` (`DxfPartNameExportFixture`). Сгибы берутся из исходного DXF при экспорте.
+## How things work (decisions worth knowing)
 
-- 2026-09-28 (1.1.17): PDF больше не зависит от нативного zlib (на ПК в цеху «The underlying compression routine could not be loaded correctly» — шрифт тогда пишется без сжатия, `PdfTrueTypeFont.FontFileStream`). Таблицы деталей в отчёте в одну колонку с полными именами, не влезшее переносится на страницы «(продолжение)»; номера страниц и колонка «Стр.» в плане считаются пробным проходом (`NestReportPdf.Render` дважды). Окно под вертикальный монитор 1080×1920: имя детали тянется, «Площадь» прячется при узкой таблице; на шаге «Нестинг» при портретном окне варианты над просмотром; просмотр DXF вписывает лист, когда получает размер (раньше скрытый шаг 4 открывался с неверным масштабом), пока пользователь не двигал вид.
-- 2026-09-28: `.git\objects` был удалён при уборке; восстановлено `git fetch` + один коммит fa6abb6 со всей работой (прежние локальные коммиты потеряны).
-- 2026-09-28 (1.1.18): **слои выгрузки DXF — только три, `DeepNestLib.Core/IO/DxfOutputLayers.cs`**: CUT (всё, что режется: контуры, отверстия, общие резы, линия остатка), PAINT (линии сгиба + имена для гравировки), BACKGROUND (имена для просмотра). Все сущности ByLayer, рез первым (`DxfExporter.Finish`). Сейчас CUT=«0»/7, PAINT=«9»/1, BACKGROUND=«Background»/8 — как SolidWorks/Solid Edge Nesting. Настройка «Выделять цветом отверстия» (`DifferentiateChildren`) удалена вместе с параметром из API экспорта. Тесты, проверяющие роли геометрии общего реза, пишут `RoleLayers = true` / `ExportDxf(..., roleLayers: true)`. **Проверено в SC2000 (2026-09-29):** верен вариант C (отверстия без своего цвета) — текущие слои правильные, оставляем.
-- 2026-09-28 (скорость, для J4125 у лазера): **чтение DXF** — `DxfParser.ConnectElements` был O(n²) (сетка скруббера 1393 отверстия/88k сегментов = 4 мин при добавлении, раскладке и экспорте); теперь сетка концов (`EndpointGrid`) с тем же правилом выбора — на 324 чертежах с E: контуры побайтно те же, 280 с → 1,4 с (`DxfChainingSpeedFixture`, опционально `DumpChainedContours`). `FlatDxfJoiner` (склейка листа при экспорте) — то же. `RasterCompact.Intersects` берёт только контуры, чей габарит задевает габарит соседа (точно). Fast/Normal: поисков = ядра / потоки на поиск (раньше ядра−1: на 4 ядрах 4 гонки последнего листа шли как 3+1). **Sparrow пересобран** (Rust в `%USERPROFILE%\.cargo`, исходник `961ec31` + 2 патча в `SparrowEngine/sheetnest-sparrow.patch`, см. BUILDING.md): флаги усилия поиска; без флагов вывод побайтно прежний. Fast передаёт `--shrink-step 0.005 --max-fails 3 --compress-share 0 --no-improve-limit 50` (`SparrowNestService.EngineSearchFlags`), кроме листов с деталями общего реза (там прежний поиск — эталоны общего реза сняты на нём). Замер 4 задачи × 2 набора seed, 4 ядра: 421 с → 100 с, листов 47 → 46. Замер проекта: `NestSpeedBenchFixture` (SHEETNEST_BENCH_PROJECT, SHEETNEST_SPARROW_ARGS, SHEETNEST_DUMP_JOBS). Проверено: весь набор приложения с SPARROW_EXE 451/453 (2 пропуска — банки), банки общего реза на Fast совпали с таблицей ниже (mixed 30/31, как и до этой работы). Открыто: уплотнение сетки скруббера всё ещё ~20–40 с суммарно.
-- 2026-09-29 (1.1.20): стандартные листы (мм) — только 2000×1000, 2500×1250, 1250×500, остальное через «Свой размер»; в диалоге листа фокус сразу в «Ширину». Дубли кнопок PDF/печати в панели просмотра отчёта убраны. В просмотре DXF (шаги 3 и 4) на деталях подписи — имя как в DXF (`DxfExporter.GetPartNameLabel`, центр на металле `ComputePartCentroid`, перенос по «^»), щелчок по детали вне ручной правки подсвечивает её и пишет в строке состояния имя, габариты и X/Y левого нижнего угла (`DxfViewer.PartInspected` → `statusPartInfo`). Normal оставлен как есть: замер 3 наборов seed — Normal 7 листов на 72 деталях 1 раз из 3 при ×15–20 времени Fast, на скруббере хуже Fast; мягкие варианты не дают выигрыша. Перепаковка хвоста (`SparrowNestService.ShrinkTail`) написана, но **выключена** (`TailRepackEnabled = false`) — не замерена; арифметика: срабатывает только при маленьком хвосте.
-- 2026-09-29 (1.1.21): таблица «Варианты раскладки» — только готовые раскладки всего заказа (как в Solid Edge Nesting): одна строка на «Пуск», одинаковые не повторяются, сверху лучшая ★ (все детали → меньше листов → больше использование), MainWindow.AddFinishedNest. Промежуточные попытки по листам только рисуются в превью («Идёт поиск: N из M»), в список больше не попадают (раньше неполный первый лист с «68%» стоял рядом с готовой раскладкой).
+**Nesting**
+- Two buttons:
+  - **⚡ Draft** (`NestEffort.Draft`): a rough nest for a quote. 100 iterations, 1 try, no last-chance pass, coarse engine flags, fill-up up to 2 packs. Its variants are marked "draft".
+  - **▶ Nest** (`NestEffort.Fast`, the old Fast numbers).
+  - Both read `nest-profiles.json` on every press. The file is written with defaults on first run; nonsense values fall back to defaults; an unreadable file gives defaults plus a message.
+  - Normal/Best still exist in code for tests but are not in the UI.
+- **Fill-up** (`SparrowNestService.FillUp`): after the best sheet size is chosen, it offers waiting large parts (≥5% of the sheet, area permitting) one at a time, largest first, up to 4 packs. A part stays only if the whole set still fits. Sheets with common-line parts are left alone. It took `test1` from 3 sheets to 2.
+- Sheet priority: higher-priority stock (offcuts) is consumed first, listed first, and shown first in the viewer, report and export. A worse-priority size is not run through Sparrow once a better one has packed.
+- Parallel searches: Auto = cores / threads per search, at most 8. `sparrow.exe` runs at BelowNormal priority. The result does not depend on concurrency.
+- The variants list holds only finished nests of the whole job, one per press, no duplicates. The best is starred: all parts placed, then fewest sheets, then highest utilisation. Per-sheet attempts only draw in the preview.
+- **Cut sheets, nest the rest** (`CutSheets.DeductParts/KeepConsumed`): ticked sheets' parts come off the order (mirrored from the mirrored count, others from quantity, then from spares) and the sheets stay consumed. A part quantity may be 0; such rows are not sent to the engine.
+- **Move a part between sheets** (`DxfViewer.MoveSelectedTo`): only between single-copy sheets without common cutting. The part goes to the first free spot bottom-left, or stays red in place. An emptied sheet returns to stock (`SheetRemoved`). One undo step.
 
-- 2026-09-29 (1.1.22): **CHF (формат SC2000) как входной чертёж** — `DeepNestLib.Core/IO/ChfReader.cs` (текст `scFlie`: graph → Gly тип 2 отрезок, 4 окружность, 7 B-сплайн; после `<End Glyphs>` слой CAM (0 = рез → слой `0`, иначе → `9`) и внешний/внутренний контур; неизвестный тип — ошибка с номером). Все чтения исходников деталей идут через `DrawingFile.Load` (узнаёт CHF по содержимому), `IsDxf` принимает `.chf`. Образец `test-data/chf/sides.chf`, тест `ChfReaderFixture`. Линия отреза остатка больше не пишется в DXF (контур остатка в просмотре остался).
-- 2026-09-29 (1.1.23): таблица деталей — колонка «Площадь» убрана, вместо неё «Зеркальные» (`MirrorQuantity` прямо в строке); «Подробности…» стали «…»; кнопки ↔/↕ отражают саму деталь (`DeepNestLib.Core/IO/PartMirror.cs`: копия чертежа в `%TEMP%\sheetnest_flip`, то же имя файла; `DetailLoadInfo.Flip`/`UnflippedPath` сохраняются, при открытии проекта копия пишется заново, повторное нажатие возвращает исходный путь). «+ Фигура…» (`AddShapeWindow`, `PartShapes`): прямоугольник/квадрат Ш×В или круг Ø с количеством, DXF в `%LOCALAPPDATA%\SheetNest\shapes\Квадрат 100x100.dxf`, повтор той же фигуры добавляет количество в ту же строку. Исправлено попутно: DXF-читатель брал дугу эллипса с концом < начала за целый эллипс; экспорт зеркальных копий не менял концы дуги эллипса; CHF теперь в мм (`$INSUNITS`). «Габариты» теперь сами запускают загрузку геометрии (раньше это делала колонка площади). Тест `PartMirrorFixture` (отражение 6 чертежей × 3 варианта, дуги/эллипс/сплайн, возврат, восстановление, фигуры). Ядро 1046/1048, приложение 448/451; проверено вручную в опубликованной сборке.
-- 2026-09-29 (1.1.24): габариты в таблице деталей пропадали у части строк — `DxfParser.LoadDxfFile` синхронен, пока файл не занят, и уведомление о загрузке приходило изнутри геттера `SizeLabel` (WPF его теряет); теперь `ObservableDetailLoadInfo.Nfp` грузит в `Task.Run` один раз, результат для старого пути (отражение во время загрузки) отбрасывается. Колонки «Действия» 180, «Приоритет» 135, «Зеркальные» 100 (при 150/125 обрезались ✕ и стрелка). Отчёт: кнопка «▣ Страница целиком», она же масштаб по умолчанию; вписывание (страница/ширина) держится при изменении размера окна, ручной масштаб его снимает (`ReportFit`). Проверено вручную на наборе пользователя + sides.chf; ядро 1046/1048, приложение 448/451.
-- 2026-09-30 (1.1.25): **CHF — весь формат по 578 файлам пользователя (`E:\chf`)**: виды graph 8 контур / 9 группа (деталь на раскладке листа, после членов 2 числа) / 10 текст (буквы контурами); элементы 2 отрезок, 3 дуга (центр, R, углы от/до в радианах; до > от — против часовой), 4 окружность, 6 полилиния (флаг 1 = замкнута, 0/128 открыта; вершина + bulge как в DXF), 7 сплайн (2 первых числа — мусор из памяти CAM, степень = узлов − точек − 1). Прочтение сверено с длиной, которую CAM пишет над каждым контуром (py-скрипты в scratchpad). **Слои SC2000 (со слов пользователя, 10 слоёв с разными режимами)**: 0 зелёный — рез; 1 голубой (сгибы) и 8 красный (надписи) — гравировка → слой 9; 2–7, 9 — рез другими режимами (металлы); 10 — background (рамка листа, номера деталей от CAM) — не читается вовсе (`ChfReader.LayerFor`). Пустой файл — понятная ошибка (`DrawingFile.Load`). Тест `ChfReaderFixture.EveryChfInAFolderImports` (SHEETNEST_CHF_DIR, SHEETNEST_CHF_REPORT): 572/572 импортируются, 6 пустых. Ядро 1056/1058, приложение 448/451.
-- 2026-09-30 (1.1.26): данные щёлкнутой детали — крупно в верхней панели просмотра (`DxfViewer.partInfoPanel`), из строки состояния убраны. Приоритетный запас первым: таблица листов сортируется по приоритету с сохранением порядка добавления (`SortSheetsByPriority`, live), раскрои в просмотре/отчёте/экспорте — по приоритету листа (`DxfViewer.SheetPriority` ← `MainWindow.StockPriorityOf` по размеру). **«Вырезаны — разложить остальное»**: на шаге 4 под чертежом полоса миниатюр раскроев (`DxfViewer.GetLayouts/LayoutsChanged/SheetIndexChanged`, `MainWindow.LayoutCutItem`), у каждого «вырезан» / «вырезано N из M»; кнопка снимает детали вырезанных листов с заказа (`CutSheets.DeductParts`: зеркальные — с «Зеркальных», прочие — с количества, затем с запаса) и оставляет листы списанными (`CutSheets.KeepConsumed` из `lastNestConsumed`), чистит список вариантов и запускает раскладку. Количество детали может быть 0 (такие строки не идут в движок). Тест `CutSheetsFixture`. Проверено вручную: 32 детали на 2 листа, приоритетный 1250×500 первым, отмечен вырезанным → 28/28 на 2500×1250, bottoms 10→6, 1250×500 остаток 0. Приложение 453/456.
-- 2026-10-06 (1.1.27): падение у лазера при закрытии («сохранить?» → Save As) — диалог открывался в папке проекта на вынутой флешке, оболочка бросает Win32Exception «cannot find the drive». `FileIoService.UsableFolder` отбрасывает несуществующую папку, `Show` при отказе оболочки открывает диалог заново без неё; `MainViewModel.Save` при пропавшей папке проекта спрашивает куда сохранить, ошибка записи — сообщение `Msg_SaveFailed` вместо падения (закрытие тогда отменяется). Предупреждение «похоже на готовую раскладку» в «Подробностях» ложно срабатывало на панно (прямоугольник с орнаментом): теперь нужно ещё ≥2 контура внутри рамки, держащих другие контуры (детали со своими отверстиями) — `EditPartWindow.ContoursHoldingContours`. Тесты `NestedSheetWarningFixture`, `FileDialogFolderFixture`. Приложение 458/461. MSI не скопирован на флешку (не подключена).
-- 2026-10-13 (1.1.28), заказ `test-data/test1` (до 1.1.33 — папка с именем заказчика) (front 1354×1210 c 1048 отверстиями, top 1354×688, side 649×1209 + зеркальная, лист 2500×1250): было 3 листа, одинаково при каждом «Пуске». Причина — лист берёт из полосы Sparrow то, что легло в его длину, порядок в полосе решал, front остался один. **`SparrowNestService.FillUp`**: после выбора лучшего листа предлагает ему ждущие крупные детали (≥5% листа, если по площади влезают) по одной, от большей, до 4 паков на лист; деталь остаётся, только если лег весь набор; листы с общим резом не трогает (эталоны общего реза прошли все). `SHEETNEST_FILL_UP=0` выключает. Стало 2 листа (стенд `NestSpeedBenchFixture` теперь учитывает зеркальные). Время «Нормального» теста плотности одинаково с и без (27/23 мин при параллельных прогонах) — он просто долгий, теперь только с `SHEETNEST_SLOW_TESTS=1`. Отчёт: колонка «Размеры, мм» (габарит, большая × меньшая). Перенос детали между листами: «⇄ На лист…» в ручной правке (`DxfViewer.MoveSelectedTo`, только листы с одним экземпляром без общего реза; первое свободное место снизу слева, иначе красная на месте; опустевший лист уходит из результата и возвращается на склад через `SheetRemoved`; отмена одним шагом; второй просмотр перестраивается `ReloadLayouts`). Миниатюры всех листов на шаге «Нестинг». Подписи деталей полужирные с обводкой. Новая иконка (`Branding/sheetnest.ico` + png, рисуется скриптом из scratchpad). `.dnest`: результат писался через интерфейс листа — в файл шли `PolygonsForExport` (вторая копия всей геометрии), `Hull`, `Simplify`; теперь лист пишется как класс, `SvgPoint.Marked=false` не пишется: 4,4 → ~1,1 МБ (`SavedNestSizeFixture`). Сжатие (zip дал бы ~75 КБ) не делали: на цеховом ПК не грузился нативный zlib (см. 1.1.17). Размеры в таблице деталей: уведомление шлётся в контекст спросившего потока, без `JoinableTaskContext` (у пользователя пусто, воспроизвести не удалось). Тесты `MovePartBetweenSheetsFixture` (STA), `PartSizeLabelFixture`.
-- 2026-10-13 (после сборки 1.1.28): **набор тестов с движком сокращён 46 → 5,5 мин** (`SPARROW_EXE`, 471/471). Долгие — замеры и «Нормальный» поиск — идут только с `SHEETNEST_SLOW_TESTS=1` (`DeepNestSharp.CiTests/SlowTests.cs`): `SamePartDensity` Measure×2 и Normal×2, `MixedStockUtilization` (12 мин), `NestExtent` Normal, `ChamferedTest2...Consistently`; проверки правил (`ProducesRenderableOverlapFree`, `NestsPartsIntoHoles`, `ZeroAnd90`, `FreeRotation`) переведены на Fast. Перед релизом, меняющим поиск, гонять со `SHEETNEST_SLOW_TESTS=1`. Из `test-data/dxf` убраны похожие `Tr_200_200_400x200`×3 и `small^R2p`. `SvgPoint.Marked` снова пишется всегда (пропуск ломал эталонные JSON в `NfpJsonFixture`/`BoundingBoxFitnessFixture`; 1.1.28 его не пишет — чтению не мешает); проект ~1,4 МБ. Статические кисти `DxfViewer` создаются замороженными (`Frozen`): раньше их замораживал первый созданный просмотрщик, и просмотрщик в другом потоке (тест) падал. Ядро 1057/1059, приложение 461/464 (без движка).
-- 2026-10-14 (1.1.29): пользователь проверил перенос детали на другой лист — работает. Длина реза в отчёте для мм — в метрах «44.16 м» (NestReportPdf.FormatLength, Rep_Metre, тест ReportLengthFixture). Приложение 464/467.
-- 2026-10-14 (1.1.30): **две кнопки вместо «Пуск ▾»**: «⚡ Черновик» (NestEffort.Draft, для коммерческого предложения: листы, площадь, метры реза; 100 итераций, 1 попытка, без «последнего шанса», грубые флаги, дозаполнение до 2 паков; варианты помечены «черновик») и «▶ Раскладка» (NestEffort.Fast, числа прежнего Fast). Числа обоих — в %LOCALAPPDATA%\SheetNest\nest-profiles.json (RasterNest/NestProfiles.cs: Iterations, Tries, LastSheetTries, WorkersPerSearch, LastChanceIterations, FillUp/MinShare/MaxAttempts, EngineFlags; файл пишется с умолчаниями при первом запуске, перечитывается при каждом нажатии, бессмысленные значения → умолчание, нечитаемый файл → умолчания + сообщение). Normal/Best остались в коде (тесты), из меню и «Расширенных настроек» убраны. Переменные SHEETNEST_NEST_* по-прежнему главнее. test1: черновик 0,9 с / раскладка 1,5 с, оба 2 листа. Дистрибутив: из 13 языковых папок рантайма .NET оставлены ru;bg (SatelliteResourceLanguages; bg у .NET нет), образцы DXF DeepNest (Dxfs, встроены в ядро для тестов) больше не копируются в вывод: 151 → 142 МБ, MSI 54 → 52. Тест NestProfilesFixture. Ядро 1057/1059, приложение 469/472.
-- 2026-10-14 (1.1.31): **материал и толщина — на проект** (`ProjectInfo.Material` = ключ `SheetMaterials` black/galvanized/stainless/aluminium, плотности 7.85/7.85/7.93/2.70; `Thickness` мм, ряд 0.6…5 + 1.2, можно вписать свою; в .dnest только если заданы). Выбор — вторая строка панели шага «Листы» (в одну не влезало на 1340/1080); новый проект берёт последние (`SessionState.LastMaterial/LastThickness`). Отчёт, «Сводка задания»: материал+толщина, длина реза (сумма по деталям), врезок (контуров), вес листов и деталей (только при материале и мм; `Reports/ReportMaterial`, параметр `material` во всех точках входа `NestReportPdf`). **Разделитель тысяч в отчёте убран везде** (у пользователя не принят: «1,913» и «44,155 мм» читались как дроби). Проверено вручную на test1: Оцинковка 1.5 → 3 листа 110.4 кг, детали 34.6 кг, рез 203 м. Тесты `SheetMaterialsFixture`, отчётные в `NestReportPartNumbersFixture`. Ядро 1061/1063, приложение 471/474.
-- 2026-10-14 (1.1.32): **переводы — в стандартных .resx**: `DeepNestSharp/Ui/Strings.resx` (английский, нейтральный), `Strings.ru.resx`, `Strings.bg.resx`, 518 ключей; `Localization.Get` читает `ResourceManager` (IgnoreCase, нет перевода → английский, нет ключа → сам ключ); словари в коде и `Localization.Texts.cs` удалены (738+394 строк → 110). Новая строка = запись во все три файла; новый язык = ещё один `Strings.xx.resx` + код в `Localization.Languages` + пункт меню (`SatelliteResourceLanguages` фильтрует только системные сообщения .NET, свои переводы собираются всегда). Вынесены и последние тексты, выбиравшиеся по языку в коде (пустые таблицы, строка варианта, единицы); попутно исправлено: болгарский диалог листа писал «миллиметрах». Тест `TranslationsFixture`. Сборка: `ru\SheetNest.resources.dll`, `bg\SheetNest.resources.dll`. Ядро 1061/1063, приложение 473/476.
-- 2026-10-14 (1.1.33): **ещё 4 языка — de, fr, es, pt** (`Strings.de/fr/es/pt.resx`, 518 ключей, перевод машинный — носителям проверить; pt ближе к бразильскому; термины: Schachteln/Blech, imbrication/tôle, anidado/chapa, encaixe/chapa). `Localization.Languages` — список языков (меню, `NormalizeLanguage`); `CultureOf` берёт культуру по коду; `Plural`: fr/pt считают 0 как один. Диалог фигуры брал «мм» для любого не английского языка — теперь `Unit_Mm`. `TranslationsFixture`: ключи во всех языках, те же `{n}`, что в английском. Немецкие подписи длиннее — обрезку кнопок не проверяли глазами. **Ссылки переведены на форк** `vadimkom/ACVSheetNest`: `UpdateChecker` (релизы), `CrashReporter` (issues/new), тексты `Crash_NoBrowser`/`Msg_NoBrowserFeedback`, `SheetNest.wxs` ARPURLINFOABOUT, BUILDING/RELEASING/THIRD_PARTY_NOTICES. Пока в форке нет релизов, проверка обновлений молчит; в форке по умолчанию выключены Issues. Приложение 475/478. MSI 1.1.33 собран, 52 МБ.
-- 2026-10-14 (форк и релиз): основная ветка форка `vadimkom/ACVSheetNest` заменена нашей (у ManuelMRosa ничего не тронуто). Заказ с именем клиента переименован в `test-data/test1` (`test1.dnest`, пути внутри тоже); в старых коммитах прежнее имя осталось — пользователь согласен, секретного нет. README: раздел «About this fork», кнопка скачивания ведёт на релизы форка. **Релиз `v1.1.33`** с MSI выпущен (`gh release create`), в форке включены Issues и задано описание. GitHub CLI стоит в `C:/Program Files/GitHub CLI/gh.exe`, вход как `vadimkom`. **Pull requests в ManuelMRosa/SheetNest** — ветки `pr/*` в форке, сделаны на `origin/main` в рабочей копии `C:/src/sn-upstream` (git worktree): #12 сетка концов при чтении DXF и в `FlatDxfJoiner`, #13 дуги эллипса (чтение через ноль, зеркальный экспорт; `OffsetToNest` стал internal ради теста), #14 диалог файла на вынутой флешке (`FileIoService`), #15 `.dnest` без вычисляемых полей. Его код (.NET 6) собирается нашим SDK 10, тесты идут с `DOTNET_ROLL_FORWARD=Major`: у него без правок ядро 1034/1037, приложение падает в `PartCardSizeFixture` (на его main тоже). Дозаполнение (FillUp) не предлагали: код `SparrowNestService` слишком разошёлся.
+**Parts and sheets**
+- Flip ↔/↕ mirrors the part itself (`PartMirror`): a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.
+- The **Mirrored** column holds copies on top of the quantity.
+- Shapes (`AddShapeWindow`, `PartShapes`): rectangle, square or circle written as DXF under `%LOCALAPPDATA%\SheetNest\shapes`. Adding the same shape again adds to that row.
+- Material and thickness are set per project (`ProjectInfo.Material/Thickness`) and remembered for the next job.
+  - Materials: black, galvanized, stainless, aluminium; densities 7.85 / 7.85 / 7.93 / 2.70.
+  - Thickness: 0.6, 0.7, 0.8, 1, 1.2, 1.5, 2, 3, 4, 5, or typed.
+- Standard metric sheets: 2000×1000, 2500×1250, 1250×500. Anything else via "Custom size".
+- Part sizes load in `Task.Run` once, and the notification goes back to the asking thread's context. A report of missing sizes on the user's PC could not be reproduced; ask for a screenshot if it recurs.
 
-### El corte común se valida contra DOS bancos, nunca uno
+**Import**
+- `DrawingFile.Load` recognises CHF by content. An empty file gives a clear error.
+- **CHF (SC2000)**: the whole format, verified against `E:/chf` (572/572 import, 6 empty).
+  - Graph kinds: 8 contour, 9 group, 10 text.
+  - Elements: 2 line, 3 arc, 4 circle, 6 polyline with bulges, 7 spline.
+  - Layers per the user: 0 green = cut; 1 blue (bends) and 8 red (labels) = engrave → layer 9; 2–7 and 9 = cut with other modes; 10 = background, not read (`ChfReader.LayerFor`).
+- **DXF chaining**: an endpoint grid, not a scan of every segment. Same choices as before, verified byte-identical on 324 drawings; 280 s → 1.4 s. `FlatDxfJoiner` uses the same grid.
+- Elliptical arcs whose sweep crosses zero are short arcs, not whole ellipses. Mirrored ellipse arcs swap and negate their parameters.
+- SolidWorks flat patterns: bend lines (layer 0 colour 8, or layer 9) are exported on PAINT, rotated with the part. Part labels drop the "Flat-Pattern - " prefix.
 
-Es la lección más cara de esta rama. `Test2SamePartDirectRegressionFixture` usa **una sola pieza** y
-`MixedCommonLineRegressionFixture` usa **piezas distintas**, y miden cosas diferentes: un cambio puede
-dejar el primero clavado y vaciar el segundo. Quitar el desplazamiento de vecinos hizo exactamente eso,
-y se publicó un MSI con trabajos mixtos dando cero cortes compartidos.
+**Export and report**
+- DXF layers are only three (`DxfOutputLayers`), all entities ByLayer, cut geometry first. Confirmed correct in SC2000 on 2026-09-29.
+  - CUT = "0"/7: everything cut.
+  - PAINT = "9"/1: bend lines and engraved names.
+  - BACKGROUND = "Background"/8: display-only names.
+- One file per layout, `name_N_WxH_xRepeats.dxf`. The offcut line is not written to DXF.
+- Report:
+  - job summary with material and thickness, cut length in metres, pierces, and sheet and part weight (material + mm only);
+  - a size column;
+  - part tables in one column, continued on following pages;
+  - page numbers from a trial render pass.
+- **No thousands separators anywhere**: the shop reads "1,913" as a decimal.
+- The PDF embeds Arial as Unicode (Type0/Identity-H). If native zlib is missing, as on the shop PC, the font is written uncompressed.
+- Report preview: "Whole page" is the default zoom; a fit mode holds on resize until the user zooms by hand.
 
-Valores que no deben moverse (con `SHEETNEST_BENCH_EFFORT=Fast`):
+**Saving**
+- `.dnest` writes sheets through `SheetPlacementJsonConverter`, so computed members (PolygonsForExport, Hull, Simplify) are not saved: 4.4 MB → ~1.4 MB. `SvgPoint.Marked` is still written, because the golden JSON tests need it.
+- Projects are not zipped (native zlib is unreliable on the shop PC).
+- File dialogs skip a folder that no longer exists, such as a pulled flash drive, and retry without it if the shell refuses. A failed save shows a message instead of crashing.
 
-| banco | valor |
+**Languages**
+- Seven: ru (default), bg, en, de, fr, es, pt. Texts live in `DeepNestSharp/Ui/Strings.resx` (English, neutral) and `Strings.xx.resx`.
+  - `Localization.Get` uses a `ResourceManager`: a missing translation falls back to English; a missing key shows the key.
+  - XAML uses `{ui:Tr Key}`, which follows live language changes.
+- To add a text: add the key to every resx (`TranslationsFixture` checks keys and `{n}` placeholders). To add a language: a new resx, an entry in `Localization.Languages`, and a menu item.
+- `Plural`: Russian has three forms, the others two; fr/pt count 0 as one.
+- de/fr/es/pt are machine translations (pt leans Brazilian); native speakers should review them. Terms used:
+  - de: Schachteln / Blech
+  - fr: imbrication / tôle
+  - es: anidado / chapa
+  - pt: encaixe / chapa
+- Long-label checks were done by screenshotting all four steps and the main dialogs in de/fr/es/pt.
+- `SatelliteResourceLanguages=ru;bg` only filters the .NET runtime's own messages; our satellites are always built.
+
+**Installer**
+- Self-contained publish, WiX harvests the whole publish folder. About 52 MB.
+- FreeCAD / 3D import was removed entirely; old projects with 3D fields still load.
+
+## Common-line cutting is validated against TWO benches, never one
+
+`Test2SamePartDirectRegressionFixture` uses **one part**; `MixedCommonLineRegressionFixture` uses **different parts**. They measure different things: a change can leave the first unchanged and empty the second. Removing the neighbour shift did exactly that, and an MSI shipped with mixed jobs producing zero shared cuts.
+
+Values that must not move (with `SHEETNEST_BENCH_EFFORT=Fast`):
+
+| bench | value |
 |---|---|
-| test2, 16/17/24/25 copias | 16/16 · 17/17 · 24/26 · 25/27 |
-| test2, 26 copias | 26 colocadas, 27 aristas, `isolated=1`, cadena 16 |
-| test2, 27 copias | 26 colocadas, 28 aristas |
-| mixto | 30 colocadas, 21 aristas |
-| todos | `unsafePairs=0`, `minUnrecordedGap=0.24998` |
+| test2, 16/17/24/25 copies | 16/16 · 17/17 · 24/26 · 25/27 |
+| test2, 26 copies | 26 placed, 27 edges, `isolated=1`, chain 16 |
+| test2, 27 copies | 26 placed, 28 edges |
+| mixed | 30 placed, 21 edges (the branch has shown 31 since 2026-09-27; cause not found) |
+| all | `unsafePairs=0`, `minUnrecordedGap=0.24998` |
 
-Necesitan `SPARROW_EXE` y `SHEETNEST_MIXED_COMMON_LINE_DXF_DIR` con `test2.dxf`, `Hodgson.dxf` e
-`inhole.dxf`. **Sin `SPARROW_EXE` las pruebas nativas se SALTAN y se ven exactamente igual que
-verdes**; así estuvieron cinco rotas un día entero en esta misma rama.
+They need `SPARROW_EXE` and `SHEETNEST_MIXED_COMMON_LINE_DXF_DIR` with `test2.dxf`, `Hodgson.dxf` and `inhole.dxf`. The user has hardly used common cutting and has no feedback on it.
 
-## Mantener el contexto
+## Open items
 
-Al terminar trabajo relevante, actualizar el estado con fecha, cambios, validación realmente ejecutada y pendientes concretos. Mantenerlo breve y guardar detalles técnicos en el documento correspondiente. No almacenar credenciales ni conversaciones completas. Buscar primero con rg en el módulo relevante; evitar recorrer backups, bin, obj, publish-* y todo el perfil para orientarse.
+- The mixed common-line bench gives 31 edges instead of the reference 21. Decide whether to update the reference or find the cause.
+- Tail repack (`SparrowNestService.ShrinkTail`) is written but off (`TailRepackEnabled = false`) and has not been measured.
+- Grid compaction on very perforated parts still takes about 20–40 s in total.
+- Native speakers' review of the de/fr/es/pt texts.
+- Suggested to the user, not requested: price per metre / m² / sheet in the report.
+
+## Keeping this file current
+
+After relevant work, update the sections above in place (what changed, what was actually verified, what is still open) rather than appending a diary. Keep it short and put technical detail in the matching document. Never store credentials or whole conversations. Search with rg in the relevant module first; avoid walking `bin`, `obj`, `publish-*` and the whole profile.
