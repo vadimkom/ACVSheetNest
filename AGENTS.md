@@ -9,8 +9,12 @@ This repository is the ACV fork, used at a laser-cutting shop. The shop PC is us
 When resuming:
 1. Run `git status --short --branch` and `git log -5 --oneline`.
 2. Read this file; open other documents only as the task needs them.
-3. Keep existing changes and work on the current branch (`main`).
-4. If the user only asks to work on SheetNest, summarise the state and ask what they want. Earlier commits are not pending tasks.
+3. The user asked to keep an eye on the originals. Check, and mention anything worth taking:
+   - `git fetch origin` and `git log 9d9c1cd..origin/main` for ManuelMRosa/SheetNest (9d9c1cd was its head on 2026-10-14);
+   - our pull requests #12–#15 there (`gh pr list --repo ManuelMRosa/SheetNest --author vadimkom --state all`);
+   - `git ls-remote https://github.com/JeroenGar/sparrow.git HEAD` for the engine (we build on `961ec31`; its head was `1fe3e31` on 2026-10-14).
+4. Keep existing changes and work on the current branch (`main`).
+5. If the user only asks to work on SheetNest, summarise the state and ask what they want. Earlier commits are not pending tasks.
 
 ## Remotes and publishing
 
