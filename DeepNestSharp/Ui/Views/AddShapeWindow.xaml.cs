@@ -201,6 +201,61 @@ namespace DeepNestSharp.Ui.Views
       this.addButton.IsEnabled = problem == null;
     }
 
+    /// <summary>The parts library to save into; no button without one.</summary>
+    public string LibraryFolder { get; set; }
+
+    private static string lastLibraryGroup;
+
+    /// <summary>
+    /// Keeps the shape in the parts library. A shape drawn to the metal it is cut from (tape) goes in as a
+    /// pattern without its length and width, so an offcut it fills draws it to its own size; any other shape
+    /// goes in as the drawing of the size typed.
+    /// </summary>
+    private void OnSaveToLibrary(object sender, RoutedEventArgs e)
+    {
+      var values = this.Read();
+      var kind = this.CurrentKind;
+      if (kind.Problem(values) != null || string.IsNullOrWhiteSpace(this.LibraryFolder))
+      {
+        this.ShowSummary();
+        return;
+      }
+
+      PartLibrary.CreateIfMissing(this.LibraryFolder, Localization.Get);
+      var groups = PartLibrary.Groups(this.LibraryFolder, string.Empty).Select(g => g.Name).Where(g => g.Length > 0).ToList();
+      bool pattern = kind.Fit != null;
+      string group = lastLibraryGroup ?? (pattern ? Localization.Get("Library_TapeGroup") : groups.FirstOrDefault() ?? Localization.Get("Library_DefaultGroup"));
+      var preset = this.CurrentPreset;
+      string name = pattern ? kind.PatternName(values, Localization.Get) : kind.PartName(values, preset, Localization.Get);
+      var dialog = new LibrarySaveWindow(groups, group, name, Localization.Get(pattern ? "Library_PatternNote" : "Library_DrawingNote")) { Owner = this };
+      if (dialog.ShowDialog() != true)
+      {
+        return;
+      }
+
+      string folder = System.IO.Path.Combine(this.LibraryFolder, PartLibrary.SafeName(dialog.GroupName));
+      try
+      {
+        if (pattern)
+        {
+          PartLibrary.SavePattern(folder, dialog.ItemName, ShapePattern.Of(kind, values, this.millimetres));
+        }
+        else
+        {
+          PartShapes.Write(folder, dialog.ItemName, kind, values, this.millimetres);
+        }
+      }
+      catch (Exception ex)
+      {
+        System.Windows.MessageBox.Show(this, ex.GetBaseException().Message, "SheetNest", MessageBoxButton.OK, MessageBoxImage.Warning);
+        return;
+      }
+
+      lastLibraryGroup = dialog.GroupName;
+      this.summaryText.Text = Localization.Format("Library_Saved", dialog.GroupName, dialog.ItemName);
+      this.summaryText.Visibility = Visibility.Visible;
+    }
+
     private void OnOk(object sender, RoutedEventArgs e)
     {
       // Typed text only reaches Value on focus loss, and Enter presses this button without one.

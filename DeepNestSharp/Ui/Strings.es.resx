@@ -1703,4 +1703,85 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
   <data name="Shape_TapeHolesTouch" xml:space="preserve">
     <value>Los agujeros se tocarían.</value>
   </data>
+  <data name="Btn_FillRemnant" xml:space="preserve">
+    <value>▦ De un retal...</value>
+  </data>
+  <data name="Tip_FillRemnant" xml:space="preserve">
+    <value>¿Qué se puede sacar de este retal? Lo llena con piezas de la biblioteca, las más grandes primero</value>
+  </data>
+  <data name="Fill_Title" xml:space="preserve">
+    <value>Llenar un retal</value>
+  </data>
+  <data name="Fill_Intro" xml:space="preserve">
+    <value>Primero van las piezas más grandes de los grupos elegidos, tantas como quepan, luego las más pequeñas. El fleje y otros patrones se dibujan al tamaño del retal. El resultado es un pedido nuevo.</value>
+  </data>
+  <data name="Fill_Pieces" xml:space="preserve">
+    <value>Cuántos retales:</value>
+  </data>
+  <data name="Fill_MinShare" xml:space="preserve">
+    <value>Omitir piezas menores de:</value>
+  </data>
+  <data name="Fill_MinShareTip" xml:space="preserve">
+    <value>Las piezas por debajo de esta parte del retal no se prueban: tardan en colocarse y aportan poco.</value>
+  </data>
+  <data name="Fill_Groups" xml:space="preserve">
+    <value>Llenar con:</value>
+  </data>
+  <data name="Fill_GroupLine" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="Fill_Loose" xml:space="preserve">
+    <value>Sin grupo</value>
+  </data>
+  <data name="Fill_Empty" xml:space="preserve">
+    <value>La biblioteca está vacía. Ponga dibujos (DXF) en {0}: cada subcarpeta es un grupo.</value>
+  </data>
+  <data name="Fill_PickGroup" xml:space="preserve">
+    <value>Marque al menos un grupo.</value>
+  </data>
+  <data name="Fill_OpenFolder" xml:space="preserve">
+    <value>Abrir carpeta de la biblioteca</value>
+  </data>
+  <data name="Fill_Start" xml:space="preserve">
+    <value>Llenar</value>
+  </data>
+  <data name="Msg_FillNothing" xml:space="preserve">
+    <value>Ninguna pieza de los grupos elegidos cabe en un retal de {0} × {1}.</value>
+  </data>
+  <data name="Library_TapeGroup" xml:space="preserve">
+    <value>Fleje perforado</value>
+  </data>
+  <data name="Library_DefaultGroup" xml:space="preserve">
+    <value>Piezas</value>
+  </data>
+  <data name="Library_SaveButton" xml:space="preserve">
+    <value>A la biblioteca...</value>
+  </data>
+  <data name="Library_SaveTip" xml:space="preserve">
+    <value>Guardar esta forma en la biblioteca para llenar retales</value>
+  </data>
+  <data name="Library_SaveTitle" xml:space="preserve">
+    <value>Guardar en la biblioteca</value>
+  </data>
+  <data name="Library_Group" xml:space="preserve">
+    <value>Grupo:</value>
+  </data>
+  <data name="Library_Name" xml:space="preserve">
+    <value>Nombre:</value>
+  </data>
+  <data name="Library_PatternNote" xml:space="preserve">
+    <value>Se guarda como patrón sin largo ni ancho: en un retal se dibuja a su tamaño.</value>
+  </data>
+  <data name="Library_DrawingNote" xml:space="preserve">
+    <value>Se guarda como dibujo del tamaño indicado.</value>
+  </data>
+  <data name="Library_Saved" xml:space="preserve">
+    <value>Guardado en la biblioteca: {0} / {1}</value>
+  </data>
+  <data name="Settings_Library" xml:space="preserve">
+    <value>Biblioteca de piezas:</value>
+  </data>
+  <data name="Set_LibraryTip" xml:space="preserve">
+    <value>Carpeta de la biblioteca; cada subcarpeta es un grupo. Una carpeta compartida da una biblioteca para todos los PC.</value>
+  </data>
 </root>

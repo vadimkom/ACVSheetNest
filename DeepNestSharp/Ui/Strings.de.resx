@@ -1703,4 +1703,85 @@ Downloadseite öffnen?</value>
   <data name="Shape_TapeHolesTouch" xml:space="preserve">
     <value>Die Löcher würden sich berühren.</value>
   </data>
+  <data name="Btn_FillRemnant" xml:space="preserve">
+    <value>▦ Aus Reststück...</value>
+  </data>
+  <data name="Tip_FillRemnant" xml:space="preserve">
+    <value>Was lässt sich aus diesem Reststück machen? Füllt es mit Teilen aus der Bibliothek, die größten zuerst</value>
+  </data>
+  <data name="Fill_Title" xml:space="preserve">
+    <value>Reststück füllen</value>
+  </data>
+  <data name="Fill_Intro" xml:space="preserve">
+    <value>Zuerst kommen die größten Teile der gewählten Gruppen, so viele wie passen, dann kleinere. Lochband und andere Muster werden auf die Größe des Reststücks gezeichnet. Das Ergebnis ist ein neuer Auftrag.</value>
+  </data>
+  <data name="Fill_Pieces" xml:space="preserve">
+    <value>Anzahl Stücke:</value>
+  </data>
+  <data name="Fill_MinShare" xml:space="preserve">
+    <value>Teile kleiner als … auslassen:</value>
+  </data>
+  <data name="Fill_MinShareTip" xml:space="preserve">
+    <value>Teile unter diesem Anteil des Reststücks werden nicht versucht: Sie kosten viel Zeit und bringen wenig.</value>
+  </data>
+  <data name="Fill_Groups" xml:space="preserve">
+    <value>Füllen mit:</value>
+  </data>
+  <data name="Fill_GroupLine" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="Fill_Loose" xml:space="preserve">
+    <value>Ohne Gruppe</value>
+  </data>
+  <data name="Fill_Empty" xml:space="preserve">
+    <value>Die Bibliothek ist leer. Legen Sie Zeichnungen (DXF) in {0} ab: jeder Unterordner ist eine Gruppe.</value>
+  </data>
+  <data name="Fill_PickGroup" xml:space="preserve">
+    <value>Mindestens eine Gruppe ankreuzen.</value>
+  </data>
+  <data name="Fill_OpenFolder" xml:space="preserve">
+    <value>Bibliotheksordner öffnen</value>
+  </data>
+  <data name="Fill_Start" xml:space="preserve">
+    <value>Füllen</value>
+  </data>
+  <data name="Msg_FillNothing" xml:space="preserve">
+    <value>Kein Teil der gewählten Gruppen passt auf ein Stück {0} × {1}.</value>
+  </data>
+  <data name="Library_TapeGroup" xml:space="preserve">
+    <value>Lochband</value>
+  </data>
+  <data name="Library_DefaultGroup" xml:space="preserve">
+    <value>Teile</value>
+  </data>
+  <data name="Library_SaveButton" xml:space="preserve">
+    <value>In Bibliothek...</value>
+  </data>
+  <data name="Library_SaveTip" xml:space="preserve">
+    <value>Diese Form in der Teilebibliothek ablegen, um Reststücke damit zu füllen</value>
+  </data>
+  <data name="Library_SaveTitle" xml:space="preserve">
+    <value>In der Bibliothek speichern</value>
+  </data>
+  <data name="Library_Group" xml:space="preserve">
+    <value>Gruppe:</value>
+  </data>
+  <data name="Library_Name" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="Library_PatternNote" xml:space="preserve">
+    <value>Wird als Muster ohne Länge und Breite gespeichert: auf einem Reststück wird es auf dessen Größe gezeichnet.</value>
+  </data>
+  <data name="Library_DrawingNote" xml:space="preserve">
+    <value>Wird als Zeichnung in der eingegebenen Größe gespeichert.</value>
+  </data>
+  <data name="Library_Saved" xml:space="preserve">
+    <value>In der Bibliothek gespeichert: {0} / {1}</value>
+  </data>
+  <data name="Settings_Library" xml:space="preserve">
+    <value>Teilebibliothek:</value>
+  </data>
+  <data name="Set_LibraryTip" xml:space="preserve">
+    <value>Ordner der Teilebibliothek; jeder Unterordner ist eine Gruppe. Ein freigegebener Ordner ergibt eine Bibliothek für alle PCs.</value>
+  </data>
 </root>

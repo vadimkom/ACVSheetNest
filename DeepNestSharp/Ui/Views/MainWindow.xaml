@@ -157,6 +157,7 @@
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
               <Button x:Name="btnAddPart" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddPart}" />
               <Button x:Name="btnAddShape" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_AddShape}" Click="OnAddShapeClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddShape}" />
+              <Button x:Name="btnFillRemnant" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_FillRemnant}" Click="OnFillRemnantClicked" Margin="3,0" ToolTip="{ui:Tr Tip_FillRemnant}" />
               <Button x:Name="btnDeletePart" Style="{DynamicResource ModernButton}" Content="Удалить деталь" Click="OnRemoveSelectedPart" Margin="6,0,3,0" ToolTip="{ui:Tr Tip_DeletePart}" />
               <Button x:Name="btnClearAllParts" Style="{DynamicResource ModernButton}" Content="Очистить всё" Click="OnClearAllParts" Margin="3,0" ToolTip="{ui:Tr Tip_ClearParts}" />
               <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
@@ -340,6 +341,7 @@
               <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button x:Name="btnAddPartEmpty" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="4,0" />
                 <Button Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_AddShape}" Click="OnAddShapeClicked" Margin="4,0" ToolTip="{ui:Tr Tip_AddShape}" />
+                <Button Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_FillRemnant}" Click="OnFillRemnantClicked" Margin="4,0" ToolTip="{ui:Tr Tip_FillRemnant}" />
               </StackPanel>
             </StackPanel>
           </Border>

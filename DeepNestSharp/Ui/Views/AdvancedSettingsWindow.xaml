@@ -133,6 +133,7 @@
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="unitsLabel" Grid.Row="0" Grid.Column="0" Text="Units:" VerticalAlignment="Center" Margin="0,0,10,8" />
@@ -152,6 +153,12 @@
         <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" x:Name="minutesUpDown" Width="70" HorizontalAlignment="Left"
                             Minimum="1" Maximum="60" Value="5"
                             ToolTip="{ui:Tr Set_AutosaveMinTip}" />
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="{ui:Tr Settings_Library}" VerticalAlignment="Center" Margin="0,8,10,0" />
+        <DockPanel Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" ToolTip="{ui:Tr Set_LibraryTip}">
+          <Button DockPanel.Dock="Right" Style="{StaticResource ModernButton}" Content="…" Margin="4,0,0,0" Click="OnBrowseLibrary" />
+          <TextBox x:Name="libraryText" MinWidth="200" VerticalContentAlignment="Center" />
+        </DockPanel>
       </Grid>
     </GroupBox>
 

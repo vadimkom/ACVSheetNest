@@ -25,8 +25,17 @@ namespace DeepNestLib.IO
   /// </summary>
   public abstract class ShapeKind
   {
+    /// <summary>Never shown and never translated: what a saved pattern calls the shape.</summary>
+    public abstract string Id { get; }
+
     /// <summary>Text key of the shape's name.</summary>
     public abstract string NameKey { get; }
+
+    /// <summary>
+    /// The parameters that take a piece of metal's length and width when the shape is cut from it, for a shape
+    /// that is drawn to whatever it is cut from (tape, strips); null for a shape of a size of its own.
+    /// </summary>
+    public virtual (int Length, int Width)? Fit => null;
 
     public abstract IReadOnlyList<ShapeParameter> Parameters { get; }
 
@@ -38,6 +47,9 @@ namespace DeepNestLib.IO
 
     /// <summary>A line telling what will be made, such as how many strips; null for none.</summary>
     public virtual string Describe(IReadOnlyList<double> values, Func<string, string> text, string unit) => null;
+
+    /// <summary>A pattern's name in the library: the shape and what it keeps, not the size it is drawn to.</summary>
+    public virtual string PatternName(IReadOnlyList<double> values, Func<string, string> text) => text(this.NameKey);
 
     /// <summary>The part's name, which is also its file's name.</summary>
     public abstract string PartName(IReadOnlyList<double> values, ShapePreset preset, Func<string, string> text);
@@ -109,31 +121,17 @@ namespace DeepNestLib.IO
       }
 
       Directory.CreateDirectory(folder);
-      string path = Path.Combine(folder, Sanitise(name) + ".dxf");
+      string path = Path.Combine(folder, PartLibrary.SafeName(name) + ".dxf");
       file.Save(path);
       return path;
-    }
-
-    private static string Sanitise(string name)
-    {
-      var invalid = Path.GetInvalidFileNameChars();
-      var chars = name.Trim().ToCharArray();
-      for (int i = 0; i < chars.Length; i++)
-      {
-        if (Array.IndexOf(invalid, chars[i]) >= 0)
-        {
-          chars[i] = '_';
-        }
-      }
-
-      string cleaned = new string(chars).Trim('.', ' ');
-      return cleaned.Length == 0 ? "shape" : cleaned;
     }
   }
 
   /// <summary>Width × height; a square when they are equal.</summary>
   public sealed class RectangleShape : ShapeKind
   {
+    public override string Id => "rectangle";
+
     public override string NameKey => "Shape_Rectangle";
 
     public override IReadOnlyList<ShapeParameter> Parameters { get; } = new[]
@@ -154,6 +152,8 @@ namespace DeepNestLib.IO
   /// <summary>A disc of a diameter.</summary>
   public sealed class CircleShape : ShapeKind
   {
+    public override string Id => "circle";
+
     public override string NameKey => "Shape_Circle";
 
     public override IReadOnlyList<ShapeParameter> Parameters { get; } = new[] { new ShapeParameter("Shape_Diameter", 100) };
@@ -170,6 +170,8 @@ namespace DeepNestLib.IO
   /// <summary>A flat washer: a disc with a hole in the middle. The thickness is the sheet's.</summary>
   public sealed class WasherShape : ShapeKind
   {
+    public override string Id => "washer";
+
     public override string NameKey => "Shape_Washer";
 
     public override IReadOnlyList<ShapeParameter> Parameters { get; } = new[]
@@ -230,7 +232,12 @@ namespace DeepNestLib.IO
     public const int Bridge = 8;
     public const int BridgeEvery = 9;
 
+    public override string Id => "perforated-tape";
+
     public override string NameKey => "Shape_Tape";
+
+    /// <summary>A blank of tape is as long and as wide as the piece of metal it is cut from.</summary>
+    public override (int Length, int Width)? Fit => (Length, Width);
 
     public override IReadOnlyList<ShapeParameter> Parameters { get; } = new[]
     {
@@ -308,6 +315,13 @@ namespace DeepNestLib.IO
     public override string PartName(IReadOnlyList<double> v, ShapePreset preset, Func<string, string> text)
       => text("Shape_Tape") + " B" + N(v[Strip]) + " " + N(v[Length]) + "x" + N(Strips(v) * v[Strip]);
 
+    public override string PatternName(IReadOnlyList<double> v, Func<string, string> text)
+      => text("Shape_Tape") + " " + Section(v[Strip], v[BigHole], v[SmallHole]);
+
+    /// <summary>"B25, Ø8 + 4×Ø3.2": what tells one tape from another.</summary>
+    private static string Section(double strip, double bigHole, double smallHole)
+      => "B" + N(strip) + ", Ø" + N(bigHole) + " + 4×Ø" + N(smallHole);
+
     public override IEnumerable<DxfEntity> Draw(IReadOnlyList<double> v)
     {
       int strips = Strips(v);
@@ -361,7 +375,7 @@ namespace DeepNestLib.IO
     }
 
     private static ShapePreset Tape(double strip, double bigHole, double pitch, double rowGap)
-      => new ShapePreset("Shape_TapePreset", "B" + N(strip) + ", Ø" + N(bigHole) + " + 4×Ø3.2", new Dictionary<int, double>
+      => new ShapePreset("Shape_TapePreset", Section(strip, bigHole, 3.2), new Dictionary<int, double>
       {
         [Strip] = strip,
         [BigHole] = bigHole,

@@ -341,6 +341,27 @@ namespace DeepNestSharp.Ui.Views
           ?? DeepNestLib.Placement.CommonLineDefaults.MinimumMaxClusterParts);
     }
 
+    /// <summary>The folder the parts library is read from: each subfolder a group of parts.</summary>
+    public string LibraryFolder
+    {
+      get => this.libraryText.Text?.Trim() ?? string.Empty;
+      set => this.libraryText.Text = value ?? string.Empty;
+    }
+
+    private void OnBrowseLibrary(object sender, RoutedEventArgs e)
+    {
+      var dialog = new Microsoft.Win32.OpenFolderDialog();
+      if (System.IO.Directory.Exists(this.LibraryFolder))
+      {
+        dialog.InitialDirectory = this.LibraryFolder;
+      }
+
+      if (dialog.ShowDialog(this) == true)
+      {
+        this.LibraryFolder = dialog.FolderName;
+      }
+    }
+
     private void OnOk(object sender, RoutedEventArgs e)
     {
       // Xceed up/downs commit typed text on focus loss; Enter (OK is IsDefault) would keep stale values.

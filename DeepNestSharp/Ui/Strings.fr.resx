@@ -1703,4 +1703,85 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Shape_TapeHolesTouch" xml:space="preserve">
     <value>Les trous se toucheraient.</value>
   </data>
+  <data name="Btn_FillRemnant" xml:space="preserve">
+    <value>▦ D'une chute...</value>
+  </data>
+  <data name="Tip_FillRemnant" xml:space="preserve">
+    <value>Que tirer de cette chute ? La remplit de pièces de la bibliothèque, les plus grandes d'abord</value>
+  </data>
+  <data name="Fill_Title" xml:space="preserve">
+    <value>Remplir une chute</value>
+  </data>
+  <data name="Fill_Intro" xml:space="preserve">
+    <value>Les plus grandes pièces des groupes choisis passent d'abord, autant qu'il en tient, puis les plus petites. Le feuillard et les autres modèles sont dessinés à la taille de la chute. Le résultat est une nouvelle commande.</value>
+  </data>
+  <data name="Fill_Pieces" xml:space="preserve">
+    <value>Nombre de chutes :</value>
+  </data>
+  <data name="Fill_MinShare" xml:space="preserve">
+    <value>Ignorer les pièces de moins de :</value>
+  </data>
+  <data name="Fill_MinShareTip" xml:space="preserve">
+    <value>Les pièces sous cette part de la chute ne sont pas essayées : longues à placer, elles apportent peu.</value>
+  </data>
+  <data name="Fill_Groups" xml:space="preserve">
+    <value>Remplir avec :</value>
+  </data>
+  <data name="Fill_GroupLine" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="Fill_Loose" xml:space="preserve">
+    <value>Sans groupe</value>
+  </data>
+  <data name="Fill_Empty" xml:space="preserve">
+    <value>La bibliothèque est vide. Placez des dessins (DXF) dans {0} : chaque sous-dossier est un groupe.</value>
+  </data>
+  <data name="Fill_PickGroup" xml:space="preserve">
+    <value>Cochez au moins un groupe.</value>
+  </data>
+  <data name="Fill_OpenFolder" xml:space="preserve">
+    <value>Ouvrir le dossier de la bibliothèque</value>
+  </data>
+  <data name="Fill_Start" xml:space="preserve">
+    <value>Remplir</value>
+  </data>
+  <data name="Msg_FillNothing" xml:space="preserve">
+    <value>Aucune pièce des groupes choisis ne tient sur une chute {0} × {1}.</value>
+  </data>
+  <data name="Library_TapeGroup" xml:space="preserve">
+    <value>Feuillard perforé</value>
+  </data>
+  <data name="Library_DefaultGroup" xml:space="preserve">
+    <value>Pièces</value>
+  </data>
+  <data name="Library_SaveButton" xml:space="preserve">
+    <value>Dans la bibliothèque...</value>
+  </data>
+  <data name="Library_SaveTip" xml:space="preserve">
+    <value>Garder cette forme dans la bibliothèque, pour remplir des chutes</value>
+  </data>
+  <data name="Library_SaveTitle" xml:space="preserve">
+    <value>Enregistrer dans la bibliothèque</value>
+  </data>
+  <data name="Library_Group" xml:space="preserve">
+    <value>Groupe :</value>
+  </data>
+  <data name="Library_Name" xml:space="preserve">
+    <value>Nom :</value>
+  </data>
+  <data name="Library_PatternNote" xml:space="preserve">
+    <value>Enregistré comme modèle sans longueur ni largeur : sur une chute, il est dessiné à sa taille.</value>
+  </data>
+  <data name="Library_DrawingNote" xml:space="preserve">
+    <value>Enregistré comme dessin à la taille saisie.</value>
+  </data>
+  <data name="Library_Saved" xml:space="preserve">
+    <value>Enregistré dans la bibliothèque : {0} / {1}</value>
+  </data>
+  <data name="Settings_Library" xml:space="preserve">
+    <value>Bibliothèque de pièces :</value>
+  </data>
+  <data name="Set_LibraryTip" xml:space="preserve">
+    <value>Dossier de la bibliothèque ; chaque sous-dossier est un groupe. Un dossier partagé donne une bibliothèque pour tous les PC.</value>
+  </data>
 </root>

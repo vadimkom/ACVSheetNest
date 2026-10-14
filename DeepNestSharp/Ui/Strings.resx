@@ -1703,4 +1703,85 @@ Open the download page?</value>
   <data name="Shape_TapeHolesTouch" xml:space="preserve">
     <value>The holes would touch each other.</value>
   </data>
+  <data name="Btn_FillRemnant" xml:space="preserve">
+    <value>▦ From offcut...</value>
+  </data>
+  <data name="Tip_FillRemnant" xml:space="preserve">
+    <value>What can this offcut make? Fills an offcut with parts from the library, biggest first</value>
+  </data>
+  <data name="Fill_Title" xml:space="preserve">
+    <value>Fill an offcut</value>
+  </data>
+  <data name="Fill_Intro" xml:space="preserve">
+    <value>The biggest parts of the chosen groups go on first, as many as fit, then smaller ones. Tape and other patterns are drawn to the offcut's size. The result is a new job.</value>
+  </data>
+  <data name="Fill_Pieces" xml:space="preserve">
+    <value>How many pieces:</value>
+  </data>
+  <data name="Fill_MinShare" xml:space="preserve">
+    <value>Skip parts smaller than:</value>
+  </data>
+  <data name="Fill_MinShareTip" xml:space="preserve">
+    <value>Parts smaller than this share of the offcut are not tried: they would take long to place and add little.</value>
+  </data>
+  <data name="Fill_Groups" xml:space="preserve">
+    <value>Fill with:</value>
+  </data>
+  <data name="Fill_GroupLine" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="Fill_Loose" xml:space="preserve">
+    <value>Without a group</value>
+  </data>
+  <data name="Fill_Empty" xml:space="preserve">
+    <value>The library is empty. Put drawings (DXF) in {0}: each subfolder is a group.</value>
+  </data>
+  <data name="Fill_PickGroup" xml:space="preserve">
+    <value>Tick at least one group.</value>
+  </data>
+  <data name="Fill_OpenFolder" xml:space="preserve">
+    <value>Open library folder</value>
+  </data>
+  <data name="Fill_Start" xml:space="preserve">
+    <value>Fill</value>
+  </data>
+  <data name="Msg_FillNothing" xml:space="preserve">
+    <value>Nothing from the chosen groups fits on a {0} × {1} piece.</value>
+  </data>
+  <data name="Library_TapeGroup" xml:space="preserve">
+    <value>Perforated tape</value>
+  </data>
+  <data name="Library_DefaultGroup" xml:space="preserve">
+    <value>Parts</value>
+  </data>
+  <data name="Library_SaveButton" xml:space="preserve">
+    <value>To library...</value>
+  </data>
+  <data name="Library_SaveTip" xml:space="preserve">
+    <value>Keep this shape in the parts library, to fill offcuts with</value>
+  </data>
+  <data name="Library_SaveTitle" xml:space="preserve">
+    <value>Save to the library</value>
+  </data>
+  <data name="Library_Group" xml:space="preserve">
+    <value>Group:</value>
+  </data>
+  <data name="Library_Name" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="Library_PatternNote" xml:space="preserve">
+    <value>Saved as a pattern without its length and width: on an offcut it is drawn to the offcut's size.</value>
+  </data>
+  <data name="Library_DrawingNote" xml:space="preserve">
+    <value>Saved as a drawing of the size typed.</value>
+  </data>
+  <data name="Library_Saved" xml:space="preserve">
+    <value>Saved to the library: {0} / {1}</value>
+  </data>
+  <data name="Settings_Library" xml:space="preserve">
+    <value>Parts library:</value>
+  </data>
+  <data name="Set_LibraryTip" xml:space="preserve">
+    <value>The folder the parts library is read from; each subfolder is a group. A shared folder makes one library for every PC.</value>
+  </data>
 </root>

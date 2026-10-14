@@ -574,6 +574,7 @@ namespace DeepNestSharp.Ui.Views
         concurrencyLimit: SparrowNestService.ConcurrencyLimit)
       {
         Owner = this,
+        LibraryFolder = session.EffectiveLibraryFolder,
       };
       if (dialog.ShowDialog() != true)
       {
@@ -614,6 +615,8 @@ namespace DeepNestSharp.Ui.Views
       session.NestEffort = (int)this.nestEffort;
       SparrowNestService.ConcurrencyLimit = dialog.ConcurrencyLimit;
       session.NestConcurrency = dialog.ConcurrencyLimit;
+      string library = dialog.LibraryFolder;
+      session.LibraryFolder = string.IsNullOrWhiteSpace(library) || string.Equals(library, DeepNestLib.IO.PartLibrary.DefaultFolder, StringComparison.OrdinalIgnoreCase) ? null : library;
       session.Save();
     }
 
@@ -1744,6 +1747,143 @@ namespace DeepNestSharp.Ui.Views
       this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
     }
 
+    /// <summary>
+    /// After a fill the job asks for what the offcuts make: each row's quantity is how many of it went on,
+    /// and the rows none of went on leave the job, so the parts table, the report and "cut, nest the rest"
+    /// all count the same parts.
+    /// </summary>
+    private void TakeFillQuantities(IProjectInfo project, INestResult result)
+    {
+      var placed = result.UsedSheets
+        .SelectMany(s => s.PartPlacements)
+        .GroupBy(p => (Path: p.Part?.Name ?? string.Empty, p.IsMirrored))
+        .ToDictionary(g => g.Key, g => g.Count());
+      foreach (var row in project.DetailLoadInfos.ToList())
+      {
+        int count = placed.Where(kv => string.Equals(kv.Key.Path, row.Path, StringComparison.OrdinalIgnoreCase) && !kv.Key.IsMirrored).Sum(kv => kv.Value);
+        if (count == 0)
+        {
+          project.DetailLoadInfos.Remove(row);
+        }
+        else
+        {
+          row.Quantity = count;
+          row.Extra = 0;
+          row.MirrorQuantity = 0;
+        }
+      }
+
+      this.UpdateSummaryBadges();
+    }
+
+    /// <summary>The share of the offcut under which a part is not tried, while a fill is on its way to
+    /// <see cref="OnNest"/>; null for an ordinary nest.</summary>
+    private double? pendingFillMinShare;
+
+    /// <summary>
+    /// "What can this offcut make?": a new job with the offcut as its only stock and the chosen library
+    /// groups as its parts, nested as a fill (biggest part first, as many as go on) instead of to a count.
+    /// Patterns (tape) are drawn to the offcut's size first. What came out becomes the job's quantities, so
+    /// from there it is a job like any other: edited, exported, reported, ticked as cut.
+    /// </summary>
+    private async void OnFillRemnantClicked(object sender, RoutedEventArgs e)
+    {
+      if (this.nestCts != null)
+      {
+        return;
+      }
+
+      string folder = (SessionState.Load() ?? new SessionState()).EffectiveLibraryFolder;
+      try
+      {
+        DeepNestLib.IO.PartLibrary.CreateIfMissing(folder, Localization.Get);
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show(this, ex.GetBaseException().Message, "SheetNest", MessageBoxButton.OK, MessageBoxImage.Warning);
+        return;
+      }
+
+      var dialog = new FillRemnantWindow(this.unitsMm, folder) { Owner = this };
+      if (dialog.ShowDialog() != true)
+      {
+        return;
+      }
+
+      // A job of its own: the open one (asked about first if it has an unsaved nest) is not mixed with it.
+      var before = ViewModel.ActiveDocument;
+      if (ViewModel.CreateNestProjectCommand.CanExecute(null))
+      {
+        ViewModel.CreateNestProjectCommand.Execute(null);
+      }
+
+      if (ReferenceEquals(before, ViewModel.ActiveDocument) || ViewModel.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      // The tape is drawn to what is left of the offcut inside the edge margin and one part gap, its
+      // length along the offcut's long side, in whole millimetres (or inches) and a little short of the
+      // room so it is never refused for touching it.
+      var config = ViewModel.SvgNestConfigViewModel.SvgNestConfig;
+      double inset = (2 * Math.Max(0, config.SheetSpacing)) + Math.Max(0, config.Spacing);
+      double slack = this.unitsMm ? 0.5 : 0.02;
+      double whole = this.unitsMm ? 1 : 0.1;
+      double Room(double side) => Math.Floor((side - inset - slack) / whole) * whole;
+      double longSide = Room(Math.Max(dialog.PieceWidth, dialog.PieceLength));
+      double shortSide = Room(Math.Min(dialog.PieceWidth, dialog.PieceLength));
+      var paths = new List<string>();
+      foreach (var item in dialog.ChosenGroups.SelectMany(g => g.Items))
+      {
+        if (item.Pattern == null)
+        {
+          paths.Add(item.Path);
+          continue;
+        }
+
+        var kind = item.Pattern.Kind;
+        var values = item.Pattern.Realize(longSide, shortSide, this.unitsMm);
+        if (values == null || kind.Problem(values) != null)
+        {
+          continue; // this offcut is too small for this tape
+        }
+
+        try
+        {
+          paths.Add(DeepNestLib.IO.PartShapes.Write(DeepNestLib.IO.PartShapes.DefaultFolder, kind.PartName(values, null, Localization.Get), kind, values, this.unitsMm));
+        }
+        catch (Exception ex)
+        {
+          MessageBox.Show(this, ex.GetBaseException().Message, "SheetNest", MessageBoxButton.OK, MessageBoxImage.Warning);
+          return;
+        }
+      }
+
+      paths = paths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+      if (paths.Count == 0)
+      {
+        ViewModel.MessageService.DisplayMessageBox(
+          Localization.Format("Msg_FillNothing", dialog.PieceWidth.ToString("0.##", System.Globalization.CultureInfo.CurrentCulture), dialog.PieceLength.ToString("0.##", System.Globalization.CultureInfo.CurrentCulture)),
+          Localization.Get("Fill_Title"),
+          DeepNestLib.MessageBoxIcon.Information);
+        return;
+      }
+
+      await doc.AddPartFilesAsync(paths);
+      if (this.isClosed || !this.IsLoaded || !ReferenceEquals(ViewModel.ActiveDocument, doc))
+      {
+        return;
+      }
+
+      this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+      this.AddSheetOfSize((int)Math.Round(dialog.PieceWidth), (int)Math.Round(dialog.PieceLength), dialog.Pieces, unlimited: false, priority: 1);
+      this.UpdateSummaryBadges();
+
+      this.pendingFillMinShare = dialog.MinShare;
+      this.SetCurrentMode(WorkflowMode.Nesting);
+      this.OnNest(this.btnStartNest, e);
+    }
+
     /// <summary>A part the program draws (a rectangle, washers, perforated tape...): 50 squares 100 x 100
     /// without a CAD trip.</summary>
     private async void OnAddShapeClicked(object sender, RoutedEventArgs e)
@@ -1753,7 +1893,11 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
-      var dialog = new AddShapeWindow(this.unitsMm) { Owner = this };
+      var dialog = new AddShapeWindow(this.unitsMm)
+      {
+        Owner = this,
+        LibraryFolder = (SessionState.Load() ?? new SessionState()).EffectiveLibraryFolder,
+      };
       if (dialog.ShowDialog() != true)
       {
         return;
@@ -1846,6 +1990,10 @@ namespace DeepNestSharp.Ui.Views
       {
         return;
       }
+
+      // Set by "fill an offcut" for this one run: fill the stock with the parts instead of nesting a count.
+      double? fillMinShare = this.pendingFillMinShare;
+      this.pendingFillMinShare = null;
 
       // The button pressed says what kind of nest this is: a draft for a quote, or the layout to cut. Both
       // are read from the operator's profile file now, so an edit to it counts from this press on.
@@ -2045,6 +2193,34 @@ namespace DeepNestSharp.Ui.Views
           // survives here is the scale for the watchdog that kills a hung engine process.
           // Common cutting rides along on each part's own mode; there is no job-wide flag to keep in step.
           double unitScale = this.unitsMm ? CommonLineDefaults.InchesToMillimeters : 1.0;
+          if (fillMinShare is double minShare)
+          {
+            var piece = sheetStock[0];
+            var filled = SparrowNestService.Fill(
+              parts,
+              piece.Width,
+              piece.Height,
+              piece.Quantity,
+              rotations,
+              spacing,
+              margin,
+              minShare,
+              5,
+              sparrowExe,
+              out string fillError,
+              token,
+              nestProgress,
+              runEffort,
+              geometryTolerance: CommonLineDefaults.DefaultGeometryToleranceInches * unitScale,
+              commonLineGap: config.CommonLineGapInches * unitScale,
+              commonLineMaxClusterParts: config.CommonLineMaxClusterParts,
+              candidateCallback: candidateCallback,
+              seedOffset: this.runSeedOffset);
+            return (filled, fillError == SparrowNestService.NothingFits
+              ? Localization.Format("Msg_FillNothing", piece.Width, piece.Height)
+              : fillError);
+          }
+
           var r = SparrowNestService.Nest(
             parts,
             sheetStock,
@@ -2074,6 +2250,11 @@ namespace DeepNestSharp.Ui.Views
         }
 
         nestSucceeded = true;
+
+        if (fillMinShare != null)
+        {
+          this.TakeFillQuantities(project, result);
+        }
 
         // Show it in the results list + viewer + status bar so utilization / placed / sheets / fitness /
         // time all appear. The result must be IN TopNestResults first, otherwise the list's two-way

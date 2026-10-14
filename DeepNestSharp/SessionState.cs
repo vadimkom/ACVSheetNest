@@ -125,6 +125,14 @@ namespace DeepNestSharp
     /// <summary>The thickness, in millimetres, the last job was set to; 0 when never set.</summary>
     public double LastThickness { get; set; }
 
+    /// <summary>Where the parts library is; null for the default (Documents\SheetNest\Library). A shared or
+    /// network folder makes one library for every PC that points at it.</summary>
+    public string? LibraryFolder { get; set; }
+
+    /// <summary>The library folder in use.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string EffectiveLibraryFolder => string.IsNullOrWhiteSpace(this.LibraryFolder) ? DeepNestLib.IO.PartLibrary.DefaultFolder : this.LibraryFolder;
+
     /// <summary>
     /// Records the values owned by the running application when it closes. Called on an already-loaded
     /// session so preferences written by their own dialogs (including offcuts) survive.

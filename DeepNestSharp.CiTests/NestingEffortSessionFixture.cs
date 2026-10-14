@@ -114,7 +114,7 @@ namespace DeepNestSharp.CiTests
         .Where(parameter => parameter.Name == "effort" && parameter.IsOptional)
         .ToList();
 
-      effortParameters.Should().HaveCount(8);
+      effortParameters.Should().HaveCount(9, "Fill is the ninth entry point with an effort to default");
       effortParameters.Should().OnlyContain(parameter =>
         object.Equals(parameter.DefaultValue, NestEffortDefaults.Default));
     }

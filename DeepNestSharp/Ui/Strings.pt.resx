@@ -1703,4 +1703,85 @@ Abrir a página de download?</value>
   <data name="Shape_TapeHolesTouch" xml:space="preserve">
     <value>Os furos se tocariam.</value>
   </data>
+  <data name="Btn_FillRemnant" xml:space="preserve">
+    <value>▦ De um retalho...</value>
+  </data>
+  <data name="Tip_FillRemnant" xml:space="preserve">
+    <value>O que dá para fazer com este retalho? Preenche-o com peças da biblioteca, as maiores primeiro</value>
+  </data>
+  <data name="Fill_Title" xml:space="preserve">
+    <value>Preencher um retalho</value>
+  </data>
+  <data name="Fill_Intro" xml:space="preserve">
+    <value>Primeiro entram as maiores peças dos grupos escolhidos, quantas couberem, depois as menores. A fita e outros modelos são desenhados no tamanho do retalho. O resultado é um pedido novo.</value>
+  </data>
+  <data name="Fill_Pieces" xml:space="preserve">
+    <value>Quantos retalhos:</value>
+  </data>
+  <data name="Fill_MinShare" xml:space="preserve">
+    <value>Ignorar peças menores que:</value>
+  </data>
+  <data name="Fill_MinShareTip" xml:space="preserve">
+    <value>Peças abaixo desta parte do retalho não são testadas: demoram a encaixar e acrescentam pouco.</value>
+  </data>
+  <data name="Fill_Groups" xml:space="preserve">
+    <value>Preencher com:</value>
+  </data>
+  <data name="Fill_GroupLine" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="Fill_Loose" xml:space="preserve">
+    <value>Sem grupo</value>
+  </data>
+  <data name="Fill_Empty" xml:space="preserve">
+    <value>A biblioteca está vazia. Coloque desenhos (DXF) em {0}: cada subpasta é um grupo.</value>
+  </data>
+  <data name="Fill_PickGroup" xml:space="preserve">
+    <value>Marque pelo menos um grupo.</value>
+  </data>
+  <data name="Fill_OpenFolder" xml:space="preserve">
+    <value>Abrir pasta da biblioteca</value>
+  </data>
+  <data name="Fill_Start" xml:space="preserve">
+    <value>Preencher</value>
+  </data>
+  <data name="Msg_FillNothing" xml:space="preserve">
+    <value>Nenhuma peça dos grupos escolhidos cabe num retalho de {0} × {1}.</value>
+  </data>
+  <data name="Library_TapeGroup" xml:space="preserve">
+    <value>Fita perfurada</value>
+  </data>
+  <data name="Library_DefaultGroup" xml:space="preserve">
+    <value>Peças</value>
+  </data>
+  <data name="Library_SaveButton" xml:space="preserve">
+    <value>Para a biblioteca...</value>
+  </data>
+  <data name="Library_SaveTip" xml:space="preserve">
+    <value>Guardar esta forma na biblioteca para preencher retalhos</value>
+  </data>
+  <data name="Library_SaveTitle" xml:space="preserve">
+    <value>Salvar na biblioteca</value>
+  </data>
+  <data name="Library_Group" xml:space="preserve">
+    <value>Grupo:</value>
+  </data>
+  <data name="Library_Name" xml:space="preserve">
+    <value>Nome:</value>
+  </data>
+  <data name="Library_PatternNote" xml:space="preserve">
+    <value>Salvo como modelo sem comprimento nem largura: num retalho é desenhado no tamanho dele.</value>
+  </data>
+  <data name="Library_DrawingNote" xml:space="preserve">
+    <value>Salvo como desenho do tamanho indicado.</value>
+  </data>
+  <data name="Library_Saved" xml:space="preserve">
+    <value>Salvo na biblioteca: {0} / {1}</value>
+  </data>
+  <data name="Settings_Library" xml:space="preserve">
+    <value>Biblioteca de peças:</value>
+  </data>
+  <data name="Set_LibraryTip" xml:space="preserve">
+    <value>Pasta da biblioteca; cada subpasta é um grupo. Uma pasta compartilhada dá uma biblioteca para todos os PCs.</value>
+  </data>
 </root>

@@ -1703,4 +1703,85 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Shape_TapeHolesTouch" xml:space="preserve">
     <value>Отверстия касаются друг друга.</value>
   </data>
+  <data name="Btn_FillRemnant" xml:space="preserve">
+    <value>▦ Из остатка...</value>
+  </data>
+  <data name="Tip_FillRemnant" xml:space="preserve">
+    <value>Что можно сделать из этого остатка? Заполняет остаток деталями из библиотеки, начиная с крупных</value>
+  </data>
+  <data name="Fill_Title" xml:space="preserve">
+    <value>Заполнить остаток</value>
+  </data>
+  <data name="Fill_Intro" xml:space="preserve">
+    <value>Сначала ставятся самые крупные детали выбранных групп, сколько влезет, потом всё меньше. Перфолента и другие образцы рисуются под размер остатка. Результат — новый проект.</value>
+  </data>
+  <data name="Fill_Pieces" xml:space="preserve">
+    <value>Сколько кусков:</value>
+  </data>
+  <data name="Fill_MinShare" xml:space="preserve">
+    <value>Не брать детали меньше:</value>
+  </data>
+  <data name="Fill_MinShareTip" xml:space="preserve">
+    <value>Детали меньше этой доли остатка не пробуются: подбирать их долго, а пользы мало.</value>
+  </data>
+  <data name="Fill_Groups" xml:space="preserve">
+    <value>Чем заполнять:</value>
+  </data>
+  <data name="Fill_GroupLine" xml:space="preserve">
+    <value>{0} ({1})</value>
+  </data>
+  <data name="Fill_Loose" xml:space="preserve">
+    <value>Без группы</value>
+  </data>
+  <data name="Fill_Empty" xml:space="preserve">
+    <value>Библиотека пуста. Положите чертежи (DXF) в {0}: каждая подпапка — группа.</value>
+  </data>
+  <data name="Fill_PickGroup" xml:space="preserve">
+    <value>Отметьте хотя бы одну группу.</value>
+  </data>
+  <data name="Fill_OpenFolder" xml:space="preserve">
+    <value>Открыть папку библиотеки</value>
+  </data>
+  <data name="Fill_Start" xml:space="preserve">
+    <value>Подобрать</value>
+  </data>
+  <data name="Msg_FillNothing" xml:space="preserve">
+    <value>Ни одна деталь из выбранных групп не помещается на кусок {0} × {1}.</value>
+  </data>
+  <data name="Library_TapeGroup" xml:space="preserve">
+    <value>Перфолента</value>
+  </data>
+  <data name="Library_DefaultGroup" xml:space="preserve">
+    <value>Детали</value>
+  </data>
+  <data name="Library_SaveButton" xml:space="preserve">
+    <value>В библиотеку...</value>
+  </data>
+  <data name="Library_SaveTip" xml:space="preserve">
+    <value>Сохранить фигуру в библиотеку деталей, чтобы заполнять ей остатки</value>
+  </data>
+  <data name="Library_SaveTitle" xml:space="preserve">
+    <value>Сохранить в библиотеку</value>
+  </data>
+  <data name="Library_Group" xml:space="preserve">
+    <value>Группа:</value>
+  </data>
+  <data name="Library_Name" xml:space="preserve">
+    <value>Имя:</value>
+  </data>
+  <data name="Library_PatternNote" xml:space="preserve">
+    <value>Сохраняется как образец без длины и ширины: на остатке он рисуется под размер остатка.</value>
+  </data>
+  <data name="Library_DrawingNote" xml:space="preserve">
+    <value>Сохраняется как чертёж введённого размера.</value>
+  </data>
+  <data name="Library_Saved" xml:space="preserve">
+    <value>Сохранено в библиотеку: {0} / {1}</value>
+  </data>
+  <data name="Settings_Library" xml:space="preserve">
+    <value>Библиотека деталей:</value>
+  </data>
+  <data name="Set_LibraryTip" xml:space="preserve">
+    <value>Папка библиотеки деталей; каждая подпапка — группа. Общая сетевая папка даёт одну библиотеку на все компьютеры.</value>
+  </data>
 </root>

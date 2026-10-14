@@ -99,7 +99,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-10-14): core 1061/1063, app 475/478, 0 failures (skips are the engine tests).
+Last verified (2026-10-14, 1.1.38): core 1078/1080; app 487/487 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
@@ -122,6 +122,13 @@ Last verified (2026-10-14): core 1061/1063, app 475/478, 0 failures (skips are t
 - Shapes (`AddShapeWindow`, `PartShapes`): a catalogue of `ShapeKind`s (rectangle, circle, washer, perforated tape), each with its parameters (label key + default in mm), optional presets (values they set and lock) and `Draw`. The dialog builds its fields from the kind, so a new shape is one class plus its texts. Files go to `%LOCALAPPDATA%\SheetNest\shapes`; adding the same shape again adds to that row. Values are in drawing units; defaults and presets are converted from mm in inch mode.
   - Washers: DIN 125-A M8/M10/M12 (hole 8.4/10.5/13, outside 16/20/24) and DIN 9021 (outside 24/30/37), or custom.
   - Perforated tape (`PerforatedTapeShape`): blank L × W cut into whole strips of width B; per strip a big hole every pitch with four small ones at ±offset along and ±rowGap/2 across, the groups centred along the length. Presets: B25 Ø8 (the shop's tape: small holes on a 10 mm square round each big one, groups every 20 mm, so a small hole every 10 mm along each row; the exact spacing was ours to choose, the user said any square-ish layout serves the fitters) and B17 Ø6.2 (the drawing the user sent: 10 × 8 round it, every 15). Small holes Ø3.2 in both. Shared cuts between strips get 0.5 mm bridges about every 400 mm (both editable).
+- **Parts library and filling offcuts** (`DeepNestLib.Core/IO/PartLibrary.cs`, `FillRemnantWindow`, `SparrowNestService.Fill`).
+  - The library is a folder (`SessionState.LibraryFolder`, default `Documents\SheetNest\Library`, set in Advanced Settings). Each subfolder is a group; loose files form a group of their own.
+  - Items are DXF/CHF parts, or `*.pattern.json` patterns: a `ShapeKind` id plus its values in mm, keyed by label key, without the fitted length/width (`ShapeKind.Fit`).
+  - A new library is seeded with the two tape presets. "To library..." in + Shape saves a pattern (fit kinds) or a DXF (others).
+  - **▦ From offcut...** creates a new job: the offcut W×L × pieces as the only stock (priority 1), the ticked groups' parts, patterns realized to the offcut (inside 2×margin + spacing, floored to whole mm). Then `OnNest` runs in fill mode (`pendingFillMinShare`).
+  - `Fill`: one `PackOneSheet` per part, biggest first. It offers as many as the area left allows and keeps the result if everything chosen before still goes on. Parts under the min share (default 2%) are skipped. The chosen counts × pieces then go through `RunNestBody`, so compaction, holes and replication are the normal ones, and unplaced parts are dropped.
+  - `TakeFillQuantities` then sets the rows to what went on and removes the rest.
 - **Cuts inside a part that enclose nothing** live on the source layer `SHEETNEST_INNER_CUT` (`DxfOutputLayers.InnerCutSourceName`).
   - The parser ignores them, so nesting sees the outline and holes.
   - The export writes them on CUT, turned with the part (`PartBendInfo.InnerCutEntities`); other open lines stay bends on PAINT.

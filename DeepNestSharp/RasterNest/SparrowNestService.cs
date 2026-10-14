@@ -415,6 +415,157 @@ namespace DeepNestSharp.RasterNest
         seedOffset);
     }
 
+    /// <summary>What <see cref="Fill"/> says when not one of the parts goes on the piece.</summary>
+    internal const string NothingFits = "Nothing fits on the piece.";
+
+    /// <summary>
+    /// Fills <paramref name="pieces"/> identical pieces of metal (offcuts cut square) with whatever of
+    /// <paramref name="parts"/> goes on them, rather than nesting a set number of each: the operator's rule,
+    /// the biggest part first, as many as fit, then the next smaller, and parts under
+    /// <paramref name="minShare"/> of the piece not tried at all. The choice is made on one piece, a search
+    /// per part; the parts chosen are then nested as an ordinary job, so the layout is tidied, its holes
+    /// filled and repeated onto every piece the same way any nest is. The parts' quantities are ignored.
+    /// </summary>
+    internal static INestResult Fill(
+      IReadOnlyList<RasterPartInfo> parts,
+      int pieceW,
+      int pieceH,
+      int pieces,
+      int rotations,
+      double spacing,
+      double margin,
+      double minShare,
+      int perSheetBudgetSec,
+      string sparrowExePath,
+      out string error,
+      CancellationToken cancel = default,
+      System.IProgress<(int Placed, int Total, int Sheet, double Density)> progress = null,
+      NestEffort effort = NestEffortDefaults.Default,
+      double commonLineGap = CommonLineDefaults.DefaultGapInches,
+      double geometryTolerance = CommonLineDefaults.DefaultGeometryToleranceInches,
+      int commonLineMaxClusterParts = CommonLineDefaults.AutoMaxClusterParts,
+      Action<INestResult>? candidateCallback = null,
+      int seedOffset = 0)
+    {
+      error = null;
+      if (!double.IsFinite(commonLineGap) || commonLineGap <= 0D || !double.IsFinite(geometryTolerance)
+          || geometryTolerance <= 0D || commonLineGap <= geometryTolerance)
+      {
+        error = "Common Line Gap and GeometryTolerance must be finite, positive, and the tolerance smaller.";
+        return null;
+      }
+
+      if (string.IsNullOrWhiteSpace(sparrowExePath) || !File.Exists(sparrowExePath))
+      {
+        error = "Nesting engine (sparrow.exe) was not found.";
+        return null;
+      }
+
+      if (pieceW <= 0 || pieceH <= 0 || pieces <= 0)
+      {
+        error = "Add a sheet size first.";
+        return null;
+      }
+
+      var loaded = LoadAll(parts?.Select(p => p.Quantity > 0 ? p : WithQuantity(p, 1)).ToList(), rotations, spacing, out error);
+      if (loaded == null || loaded.Count == 0)
+      {
+        error ??= "No valid parts to nest.";
+        return null;
+      }
+
+      double usable = Math.Max(0, pieceW - (2 * margin)) * Math.Max(0, pieceH - (2 * margin));
+      double Area(Loaded l) => Math.Abs(l.Nfp.Area);
+      var candidates = loaded
+        .Where(l => Area(l) >= minShare * usable && FitsOnSheet(l, pieceW, pieceH, margin))
+        .OrderByDescending(Area)
+        .ThenBy(l => l.Source)
+        .ToList();
+
+      // One search per part, biggest first: offer as many as its area allows in what is left, and keep what
+      // the engine sets down as long as everything kept before still goes on too.
+      var chosen = new Dictionary<int, int>();
+      double used = 0;
+      int tried = 0;
+      foreach (var part in candidates)
+      {
+        if (cancel.IsCancellationRequested)
+        {
+          break;
+        }
+
+        progress?.Report((tried++, candidates.Count, 1, used / Math.Max(1, usable)));
+        int offer = (int)Math.Floor((usable - used) / Math.Max(1e-9, Area(part)));
+        if (offer < 1)
+        {
+          continue;
+        }
+
+        var batch = new Dictionary<int, int>(chosen) { [part.Source] = offer };
+        var (placements, placedBySource, _, _, _, _, _, _) = PackOneSheet(
+          loaded,
+          batch,
+          pieceW,
+          pieceH,
+          margin,
+          IterationBudget(effort),
+          SearchWorkers(effort),
+          perSheetBudgetSec,
+          TriesFor(1, true, effort),
+          sparrowExePath,
+          cancel,
+          null,
+          commonLineGap,
+          geometryTolerance,
+          effort,
+          commonLineMaxClusterParts,
+          out _,
+          seedOffset: seedOffset);
+        if (placements == null || placedBySource == null
+          || !placedBySource.TryGetValue(part.Source, out int got) || got <= 0
+          || chosen.Any(kv => !placedBySource.TryGetValue(kv.Key, out int n) || n < kv.Value))
+        {
+          continue; // it does not go on with what is already there; a smaller one still might
+        }
+
+        chosen = placedBySource.Where(kv => kv.Value > 0).ToDictionary(kv => kv.Key, kv => kv.Value);
+        used = chosen.Sum(kv => kv.Value * Area(loaded.First(l => l.Source == kv.Key)));
+      }
+
+      cancel.ThrowIfCancellationRequested();
+      if (chosen.Count == 0)
+      {
+        error = NothingFits;
+        return null;
+      }
+
+      var job = loaded.Where(l => chosen.ContainsKey(l.Source)).Select(l => l.WithQty(chosen[l.Source] * pieces)).ToList();
+      var stock = new List<StockSize> { new StockSize { W = pieceW, H = pieceH, Remaining = pieces, Priority = 1 } };
+      var result = RunNestBody(
+        job, stock, margin, perSheetBudgetSec, sparrowExePath, cancel, progress, effort, commonLineGap, geometryTolerance, commonLineMaxClusterParts, out error, candidateCallback, seedOffset);
+      if (result == null || result.UnplacedParts.Count == 0)
+      {
+        return result;
+      }
+
+      // A fill has no order to fall short of: what the final nest did not set down was never asked for.
+      return new NestResult(result.TotalPlacedCount, (SheetPlacementCollection)result.UsedSheets, new List<INfp>(), PlacementTypeEnum.BoundingBox, 0, 0);
+    }
+
+    private static RasterPartInfo WithQuantity(RasterPartInfo part, int quantity)
+      => new RasterPartInfo
+      {
+        Path = part.Path,
+        Quantity = quantity,
+        Rotations = part.Rotations,
+        Priority = part.Priority,
+        Spacing = part.Spacing,
+        Cc = part.Cc,
+        CommonCuttingDomain = part.CommonCuttingDomain,
+        RequiresMergedLines = part.RequiresMergedLines,
+        Mirrored = part.Mirrored,
+      };
+
     /// <summary>One size of stock and how much of it is left. An unlimited size never runs down, so its
     /// <see cref="Remaining"/> is only the number the operator happened to leave in the box.</summary>
     private sealed class StockSize

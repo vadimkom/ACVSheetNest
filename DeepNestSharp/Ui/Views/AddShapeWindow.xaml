@@ -22,11 +22,15 @@
     <TextBlock x:Name="summaryText" Margin="0,6,0,0" TextWrapping="Wrap" MaxWidth="360" HorizontalAlignment="Left"
                Foreground="{StaticResource Brush.TextMuted}" Visibility="Collapsed" />
     <TextBlock x:Name="problemText" Margin="0,6,0,0" TextWrapping="Wrap" MaxWidth="360" HorizontalAlignment="Left"
-               Foreground="#C62828" Visibility="Collapsed" />
+               Foreground="{StaticResource Brush.Danger}" Visibility="Collapsed" />
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-      <Button x:Name="addButton" Style="{StaticResource PrimaryButton}" Content="{ui:Tr Btn_Add}" MinWidth="96" FontSize="13" Padding="18,6" Margin="0,0,8,0" IsDefault="True" Click="OnOk" />
-      <Button Style="{StaticResource ModernButton}" Content="{ui:Tr Btn_Cancel}" MinWidth="84" IsCancel="True" />
-    </StackPanel>
+    <DockPanel Margin="0,12,0,0">
+      <Button x:Name="libraryButton" DockPanel.Dock="Left" Style="{StaticResource ModernButton}" Content="{ui:Tr Library_SaveButton}"
+              ToolTip="{ui:Tr Library_SaveTip}" Click="OnSaveToLibrary" Margin="0,0,16,0" />
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button x:Name="addButton" Style="{StaticResource PrimaryButton}" Content="{ui:Tr Btn_Add}" MinWidth="96" FontSize="13" Padding="18,6" Margin="0,0,8,0" IsDefault="True" Click="OnOk" />
+        <Button Style="{StaticResource ModernButton}" Content="{ui:Tr Btn_Cancel}" MinWidth="84" IsCancel="True" />
+      </StackPanel>
+    </DockPanel>
   </StackPanel>
 </Window>

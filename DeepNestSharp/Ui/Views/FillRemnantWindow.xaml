@@ -1,0 +1,57 @@
+<Window x:Class="DeepNestSharp.Ui.Views.FillRemnantWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:ui="clr-namespace:DeepNestSharp.Ui"
+        Title="{ui:Tr Fill_Title}"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Background="{StaticResource Brush.Panel}">
+  <StackPanel Margin="14" MinWidth="380">
+    <TextBlock Text="{ui:Tr Fill_Intro}" TextWrapping="Wrap" MaxWidth="400" HorizontalAlignment="Left" Margin="0,0,0,10"
+               Foreground="{StaticResource Brush.TextMuted}" />
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="110" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <TextBlock Text="{ui:Tr Shape_Width}" VerticalAlignment="Center" Margin="0,0,10,6" />
+      <xctk:DoubleUpDown x:Name="widthUpDown" Grid.Column="1" Minimum="1" Maximum="25000" FormatString="0.##" Margin="0,0,0,6" />
+      <TextBlock x:Name="widthUnits" Grid.Column="2" VerticalAlignment="Center" Margin="6,0,0,6" Foreground="{StaticResource Brush.TextMuted}" />
+      <TextBlock Grid.Row="1" Text="{ui:Tr Shape_Length}" VerticalAlignment="Center" Margin="0,0,10,6" />
+      <xctk:DoubleUpDown x:Name="lengthUpDown" Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="25000" FormatString="0.##" Margin="0,0,0,6" />
+      <TextBlock x:Name="lengthUnits" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="6,0,0,6" Foreground="{StaticResource Brush.TextMuted}" />
+      <TextBlock Grid.Row="2" Text="{ui:Tr Fill_Pieces}" VerticalAlignment="Center" Margin="0,0,10,6" />
+      <xctk:IntegerUpDown x:Name="piecesUpDown" Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="1000" Margin="0,0,0,6" />
+      <TextBlock Grid.Row="3" Text="{ui:Tr Fill_MinShare}" VerticalAlignment="Center" Margin="0,0,10,6" ToolTip="{ui:Tr Fill_MinShareTip}" />
+      <xctk:DoubleUpDown x:Name="minShareUpDown" Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="50" FormatString="0.#" Margin="0,0,0,6" ToolTip="{ui:Tr Fill_MinShareTip}" />
+      <TextBlock Grid.Row="3" Grid.Column="2" Text="%" VerticalAlignment="Center" Margin="6,0,0,6" Foreground="{StaticResource Brush.TextMuted}" />
+    </Grid>
+
+    <TextBlock Text="{ui:Tr Fill_Groups}" Margin="0,8,0,4" />
+    <Border BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Padding="8,6" MaxHeight="220">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="groupsPanel" />
+      </ScrollViewer>
+    </Border>
+    <TextBlock x:Name="emptyText" Margin="0,6,0,0" TextWrapping="Wrap" MaxWidth="400" HorizontalAlignment="Left" Foreground="{StaticResource Brush.Danger}" Visibility="Collapsed" />
+    <DockPanel Margin="0,6,0,0">
+      <Button DockPanel.Dock="Right" Style="{StaticResource ModernButton}" Content="{ui:Tr Fill_OpenFolder}" Click="OnOpenFolder" Margin="8,0,0,0" />
+      <TextBlock x:Name="folderText" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="300" Foreground="{StaticResource Brush.TextMuted}" />
+    </DockPanel>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+      <Button x:Name="fillButton" Style="{StaticResource PrimaryButton}" Content="{ui:Tr Fill_Start}" MinWidth="96" FontSize="13" Padding="18,6" Margin="0,0,8,0" IsDefault="True" Click="OnOk" />
+      <Button Style="{StaticResource ModernButton}" Content="{ui:Tr Btn_Cancel}" MinWidth="84" IsCancel="True" />
+    </StackPanel>
+  </StackPanel>
+</Window>
