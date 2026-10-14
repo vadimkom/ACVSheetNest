@@ -14,7 +14,7 @@ namespace DeepNestLib.CiTests.NestProject
   public class SavedNestSizeFixture
   {
     private static string Project([System.Runtime.CompilerServices.CallerFilePath] string here = "")
-      => Path.GetFullPath(Path.Combine(Path.GetDirectoryName(here), "..", "..", "test-data", "2026.10.12-Alexi.Valeni", "valeni.dnest"));
+      => Path.GetFullPath(Path.Combine(Path.GetDirectoryName(here), "..", "..", "test-data", "test1", "test1.dnest"));
 
     [Fact]
     public void ASavedNestIsHalfTheSizeAndReadsBackTheSame()
