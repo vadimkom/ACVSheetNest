@@ -166,7 +166,7 @@
     <value>Color</value>
   </data>
   <data name="Col_Dimensions" xml:space="preserve">
-    <value>Dimensiones (An × Al)</value>
+    <value>Medidas (An × Al)</value>
   </data>
   <data name="Col_Mirrored" xml:space="preserve">
     <value>Simétricas</value>
@@ -178,7 +178,7 @@
     <value>Pieza (nombre / archivo)</value>
   </data>
   <data name="Col_Preview" xml:space="preserve">
-    <value>Vista previa</value>
+    <value>Vista</value>
   </data>
   <data name="Col_Priority" xml:space="preserve">
     <value>Prioridad</value>
@@ -199,7 +199,7 @@
     <value>Tiempo</value>
   </data>
   <data name="Col_RunUtil" xml:space="preserve">
-    <value>Aprovechamiento</value>
+    <value>Aprov.</value>
   </data>
   <data name="Col_SheetPriority" xml:space="preserve">
     <value>Prioridad</value>
@@ -1603,5 +1603,20 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
   </data>
   <data name="Sheet_Dlg_InInches" xml:space="preserve">
     <value>pulgadas</value>
+  </data>
+  <data name="Card_CommonLine" xml:space="preserve">
+    <value>corte común</value>
+  </data>
+  <data name="Card_CommonLineSame" xml:space="preserve">
+    <value>corte común (misma pieza)</value>
+  </data>
+  <data name="Card_SpacingDefault" xml:space="preserve">
+    <value>separación: predeterminada</value>
+  </data>
+  <data name="Card_Spacing" xml:space="preserve">
+    <value>separación {0}</value>
+  </data>
+  <data name="Card_RotOther" xml:space="preserve">
+    <value>giro: otro</value>
   </data>
 </root>

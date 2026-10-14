@@ -2,6 +2,7 @@ namespace DeepNestSharp.CiTests
 {
   using DeepNestLib.NestProject;
   using DeepNestSharp.Domain.Models;
+  using DeepNestSharp.Domain.Services;
   using DeepNestSharp.Domain.ViewModels;
   using FluentAssertions;
   using Xunit;
@@ -21,13 +22,13 @@ namespace DeepNestSharp.CiTests
         CommonCutting = CommonCuttingMode.Unrestricted, // as a 1.1.7 project would bring it back
       });
 
-      sut.NestingLabel.Should().NotContain("common line", "the saved legacy mode has not been confirmed for direct cutting");
+      sut.NestingLabel.Should().NotContain(UiText.Get("Card_CommonLine"), "the saved legacy mode has not been confirmed for direct cutting");
     }
 
     [Theory]
-    [InlineData(CommonCuttingMode.Unrestricted, "common line · ")]
-    [InlineData(CommonCuttingMode.SamePart, "common line (same part) · ")]
-    public void AConfirmedDirectPartSaysWhatItShares(CommonCuttingMode stored, string expected)
+    [InlineData(CommonCuttingMode.Unrestricted, "Card_CommonLine")]
+    [InlineData(CommonCuttingMode.SamePart, "Card_CommonLineSame")]
+    public void AConfirmedDirectPartSaysWhatItShares(CommonCuttingMode stored, string expectedKey)
     {
       var sut = new ObservableDetailLoadInfo(new DetailLoadInfo
       {
@@ -36,7 +37,7 @@ namespace DeepNestSharp.CiTests
         DirectCommonCuttingEnabled = true,
       });
 
-      sut.NestingLabel.Should().StartWith(expected);
+      sut.NestingLabel.Should().StartWith(UiText.Get(expectedKey) + " · ");
     }
 
     [Fact]
@@ -51,7 +52,7 @@ namespace DeepNestSharp.CiTests
 
       sut.SupportsCommonCutting.Should().BeFalse();
       sut.EffectiveCommonCutting.Should().Be(CommonCuttingMode.None);
-      sut.NestingLabel.Should().NotContain("common line");
+      sut.NestingLabel.Should().NotContain(UiText.Get("Card_CommonLine"));
     }
 
     [Fact]
@@ -67,13 +68,13 @@ namespace DeepNestSharp.CiTests
 
       sut.DirectCommonCuttingEnabled.Should().BeTrue();
       sut.EffectiveCommonCutting.Should().Be(CommonCuttingMode.Unrestricted);
-      sut.NestingLabel.Should().Contain("common line");
+      sut.NestingLabel.Should().Contain(UiText.Get("Card_CommonLine"));
 
       sut.CommonLine = false;
 
       sut.DirectCommonCuttingEnabled.Should().BeFalse();
       sut.EffectiveCommonCutting.Should().Be(CommonCuttingMode.None);
-      sut.NestingLabel.Should().NotContain("common line");
+      sut.NestingLabel.Should().NotContain(UiText.Get("Card_CommonLine"));
     }
   }
 }

@@ -166,7 +166,7 @@
     <value>Farbe</value>
   </data>
   <data name="Col_Dimensions" xml:space="preserve">
-    <value>Abmessungen (B × H)</value>
+    <value>Maße (B × H)</value>
   </data>
   <data name="Col_Mirrored" xml:space="preserve">
     <value>Gespiegelt</value>
@@ -1143,7 +1143,7 @@ Downloadseite öffnen?</value>
     <value>Zeichnungseinheiten für Teile, Bleche, Abstände und Ränder. Wählen Sie die Einheiten Ihrer DXF-Dateien; der physische Common-Line-Abstand wird automatisch umgerechnet.</value>
   </data>
   <data name="Settings_Auto" xml:space="preserve">
-    <value>Automatisch</value>
+    <value>Auto</value>
   </data>
   <data name="Settings_Autosave" xml:space="preserve">
     <value>Offenes Projekt automatisch speichern</value>
@@ -1603,5 +1603,20 @@ Downloadseite öffnen?</value>
   </data>
   <data name="Sheet_Dlg_InInches" xml:space="preserve">
     <value>Zoll</value>
+  </data>
+  <data name="Card_CommonLine" xml:space="preserve">
+    <value>Common-Line</value>
+  </data>
+  <data name="Card_CommonLineSame" xml:space="preserve">
+    <value>Common-Line (gleiches Teil)</value>
+  </data>
+  <data name="Card_SpacingDefault" xml:space="preserve">
+    <value>Abstand: Standard</value>
+  </data>
+  <data name="Card_Spacing" xml:space="preserve">
+    <value>Abstand {0}</value>
+  </data>
+  <data name="Card_RotOther" xml:space="preserve">
+    <value>Drehung: andere</value>
   </data>
 </root>

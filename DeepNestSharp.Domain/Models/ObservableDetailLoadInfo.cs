@@ -8,6 +8,7 @@ namespace DeepNestSharp.Domain.Models
   using DeepNestLib;
   using DeepNestLib.IO;
   using DeepNestLib.NestProject;
+  using DeepNestSharp.Domain.Services;
 
   public class ObservableDetailLoadInfo : ObservablePropertyObject, IWrapper<IDetailLoadInfo, DetailLoadInfo>, IDetailLoadInfo
   {
@@ -112,6 +113,13 @@ namespace DeepNestSharp.Domain.Models
       PartFlip.LeftRight | PartFlip.UpDown => DeepNestSharp.Domain.Services.UiText.Get("Part_FlippedBoth"),
       _ => string.Empty,
     };
+
+    /// <summary>Asks the row to read its words again, after the program's language has changed.</summary>
+    public void RefreshTexts()
+    {
+      OnPropertyChanged(nameof(FlipLabel));
+      OnPropertyChanged(nameof(NestingLabel));
+    }
 
     public int Quantity
     {
@@ -289,25 +297,26 @@ namespace DeepNestSharp.Domain.Models
         // unconfirmed legacy value stays quiet.
         string cc = detailLoadInfo.EffectiveCommonCutting switch
         {
-          CommonCuttingMode.Unrestricted => "common line · ",
-          CommonCuttingMode.SamePart => "common line (same part) · ",
+          CommonCuttingMode.Unrestricted => UiText.Get("Card_CommonLine") + " · ",
+          CommonCuttingMode.SamePart => UiText.Get("Card_CommonLineSame") + " · ",
           _ => string.Empty,
         };
-        string spacing = cc + (detailLoadInfo.Spacing < 0 ? "spacing: default"
-          : $"spacing {detailLoadInfo.Spacing:0.###}");
+        string spacing = cc + (detailLoadInfo.Spacing < 0 ? UiText.Get("Card_SpacingDefault")
+          : UiText.Format("Card_Spacing", detailLoadInfo.Spacing.ToString("0.###", System.Globalization.CultureInfo.CurrentCulture)));
         string rot = detailLoadInfo.Rotations switch
         {
-          1 => "as drawn",
-          2 => "0/180°",
-          4 => "4-way",
-          1001 => "90° only",   // orientation permission codes (see RotationCodes.PermittedSet)
+          1 => UiText.Get("Settings_Rot_AsDrawn"),
+          2 => UiText.Get("Settings_Rot_0_180"),
+          4 => UiText.Get("Rot_4Way"),
+          1001 => UiText.Get("Rot_90Only"),   // orientation permission codes (see RotationCodes.PermittedSet)
           1002 => "0°+90°",
           1003 => "90°+270°",
-          8 => "45° steps",     // NOT free: the engine gets eight discrete angles, and calling this "free"
-                                // here and in the picker is how a user came to report free rotation broken
-          36 => "free",
-          > 4 => "rot: other",
-          _ => "job default",   // -1, and it follows Settings > Advanced Settings
+          8 => UiText.Get("Settings_Rot_45"), // NOT free: the engine gets eight discrete angles, and calling this
+                                              // "free" here and in the picker is how a user came to report free
+                                              // rotation broken
+          36 => UiText.Get("Rot_Free"),
+          > 4 => UiText.Get("Card_RotOther"),
+          _ => UiText.Get("Rot_Job"),         // -1, and it follows Settings > Advanced Settings
         };
         return $"{spacing} · {rot}";
       }

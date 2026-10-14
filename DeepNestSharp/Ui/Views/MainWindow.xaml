@@ -238,7 +238,7 @@
                         <xctk:IntegerUpDown Width="75" Minimum="0" Maximum="100000" Value="{Binding Quantity, Mode=TwoWay}"
                                             ValueChanged="OnPartQuantityChanged" Tag="{Binding}"
                                             VerticalAlignment="Center" ToolTip="{ui:Tr Tip_PartQty}" />
-                        <TextBlock Text="шт." VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
+                        <TextBlock Text="{ui:Tr Unit_Pcs}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
                       </StackPanel>
                     </DataTemplate>
                   </GridViewColumn.CellTemplate>
@@ -435,7 +435,7 @@
                         <xctk:IntegerUpDown Width="80" Minimum="1" Maximum="100000" Value="{Binding Quantity, Mode=TwoWay}"
                                             IsEnabled="{Binding Unlimited, Converter={StaticResource InvertBool}}"
                                             VerticalAlignment="Center" ToolTip="{ui:Tr Tip_SheetQty}" />
-                        <TextBlock Text="шт." VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
+                        <TextBlock Text="{ui:Tr Unit_Pcs}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
                       </StackPanel>
                     </DataTemplate>
                   </GridViewColumn.CellTemplate>

@@ -1604,4 +1604,19 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   <data name="Sheet_Dlg_InInches" xml:space="preserve">
     <value>инчове</value>
   </data>
+  <data name="Card_CommonLine" xml:space="preserve">
+    <value>общ рез</value>
+  </data>
+  <data name="Card_CommonLineSame" xml:space="preserve">
+    <value>общ рез (същият детайл)</value>
+  </data>
+  <data name="Card_SpacingDefault" xml:space="preserve">
+    <value>разстояние: по подразбиране</value>
+  </data>
+  <data name="Card_Spacing" xml:space="preserve">
+    <value>разстояние {0}</value>
+  </data>
+  <data name="Card_RotOther" xml:space="preserve">
+    <value>завъртане: друго</value>
+  </data>
 </root>

@@ -106,7 +106,7 @@
     <!-- OK / Cancel -->
     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
       <Button Style="{StaticResource PrimaryButton}" Content="{ui:Tr Btn_OK}" Width="96" FontSize="13" Padding="0,6" IsDefault="True" Click="OnOk" />
-      <Button Style="{StaticResource ModernButton}" Content="{ui:Tr Btn_Cancel}" Width="84" Margin="10,0,0,0" IsCancel="True" />
+      <Button Style="{StaticResource ModernButton}" Content="{ui:Tr Btn_Cancel}" MinWidth="84" Margin="10,0,0,0" IsCancel="True" />
     </StackPanel>
   </Grid>
 </Window>

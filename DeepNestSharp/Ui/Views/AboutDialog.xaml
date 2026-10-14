@@ -66,7 +66,7 @@
       </StackPanel>
     </ScrollViewer>
     <Border Grid.Row="1" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0" Padding="12,10">
-      <Button Content="{ui:Tr Btn_OK}" Click="OkClick" IsDefault="True" IsCancel="True" Style="{StaticResource PrimaryButton}" Width="90" HorizontalAlignment="Right" />
+      <Button Content="{ui:Tr Btn_OK}" Click="OkClick" IsDefault="True" IsCancel="True" Style="{StaticResource PrimaryButton}" MinWidth="90" HorizontalAlignment="Right" />
     </Border>
   </Grid>
 </Window>

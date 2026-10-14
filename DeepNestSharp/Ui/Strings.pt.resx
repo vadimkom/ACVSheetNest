@@ -178,7 +178,7 @@
     <value>Peça (nome / arquivo)</value>
   </data>
   <data name="Col_Preview" xml:space="preserve">
-    <value>Visualização</value>
+    <value>Prévia</value>
   </data>
   <data name="Col_Priority" xml:space="preserve">
     <value>Prioridade</value>
@@ -199,7 +199,7 @@
     <value>Tempo</value>
   </data>
   <data name="Col_RunUtil" xml:space="preserve">
-    <value>Aproveitamento</value>
+    <value>Aprov.</value>
   </data>
   <data name="Col_SheetPriority" xml:space="preserve">
     <value>Prioridade</value>
@@ -1603,5 +1603,20 @@ Abrir a página de download?</value>
   </data>
   <data name="Sheet_Dlg_InInches" xml:space="preserve">
     <value>polegadas</value>
+  </data>
+  <data name="Card_CommonLine" xml:space="preserve">
+    <value>corte comum</value>
+  </data>
+  <data name="Card_CommonLineSame" xml:space="preserve">
+    <value>corte comum (mesma peça)</value>
+  </data>
+  <data name="Card_SpacingDefault" xml:space="preserve">
+    <value>folga: padrão</value>
+  </data>
+  <data name="Card_Spacing" xml:space="preserve">
+    <value>folga {0}</value>
+  </data>
+  <data name="Card_RotOther" xml:space="preserve">
+    <value>rotação: outra</value>
   </data>
 </root>

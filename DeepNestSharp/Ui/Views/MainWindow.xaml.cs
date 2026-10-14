@@ -1214,6 +1214,14 @@ namespace DeepNestSharp.Ui.Views
     private void ApplyLocalization()
     {
       this.FillMaterialChoices();
+      if (ViewModel?.ActiveDocument is NestProjectViewModel openJob)
+      {
+        foreach (var part in openJob.ProjectInfo.DetailLoadInfos.OfType<ObservableDetailLoadInfo>())
+        {
+          part.RefreshTexts();
+        }
+      }
+
       // Menu items
       if (this.menuFile != null) this.menuFile.Header = Localization.Get("Menu_File");
       if (this.menuNewProject != null) this.menuNewProject.Header = Localization.Get("Menu_NewProject");
