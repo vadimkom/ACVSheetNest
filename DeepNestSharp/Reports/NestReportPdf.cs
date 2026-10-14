@@ -30,7 +30,8 @@ namespace DeepNestSharp.Reports
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
       int unplacedCount,
       string units = "in",
-      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
+      ReportMaterial material = null)
     {
       var pdf = new MiniPdf();
       GenerateReport(
@@ -41,7 +42,8 @@ namespace DeepNestSharp.Reports
         layouts,
         unplacedCount,
         units,
-        partColours);
+        partColours,
+        material);
 
       File.WriteAllBytes(path, pdf.Build());
     }
@@ -50,7 +52,8 @@ namespace DeepNestSharp.Reports
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
       int unplacedCount,
       string units = "in",
-      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
+      ReportMaterial material = null)
     {
       var pdf = new MiniPdf();
       GenerateReport(
@@ -61,7 +64,8 @@ namespace DeepNestSharp.Reports
         layouts,
         unplacedCount,
         units,
-        partColours);
+        partColours,
+        material);
 
       return pdf.Build();
     }
@@ -70,7 +74,8 @@ namespace DeepNestSharp.Reports
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
       int unplacedCount,
       string units = "in",
-      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
+      ReportMaterial material = null)
     {
       var doc = new System.Windows.Documents.FixedDocument();
       GenerateReport(
@@ -91,7 +96,8 @@ namespace DeepNestSharp.Reports
         layouts,
         unplacedCount,
         units,
-        partColours);
+        partColours,
+        material);
 
       return doc;
     }
@@ -100,7 +106,8 @@ namespace DeepNestSharp.Reports
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
       int unplacedCount,
       string units = "in",
-      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
+      ReportMaterial material = null)
     {
       var pages = new List<System.Windows.FrameworkElement>();
       GenerateReport(
@@ -113,7 +120,8 @@ namespace DeepNestSharp.Reports
         layouts,
         unplacedCount,
         units,
-        partColours);
+        partColours,
+        material);
 
       return pages;
     }
@@ -123,7 +131,8 @@ namespace DeepNestSharp.Reports
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
       int unplacedCount,
       string units = "in",
-      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null)
+      IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
+      ReportMaterial material = null)
     {
       if (layouts == null || layouts.Count == 0)
       {
@@ -133,8 +142,8 @@ namespace DeepNestSharp.Reports
       // A parts list that does not fit carries on over extra pages, so neither the page count in the footers
       // nor the page a layout starts on (the cutting plan's Page column) is known until the list is laid out.
       // A dry run on blank canvases finds both; the real run then prints them.
-      var dry = Render(() => new NullCanvas(), layouts, unplacedCount, units, partColours, null, 0);
-      Render(newPage, layouts, unplacedCount, units, partColours, dry.LayoutPages, dry.Pages);
+      var dry = Render(() => new NullCanvas(), layouts, unplacedCount, units, partColours, null, 0, material);
+      Render(newPage, layouts, unplacedCount, units, partColours, dry.LayoutPages, dry.Pages, material);
     }
 
     private static (int Pages, List<int> LayoutPages) Render(
@@ -144,7 +153,8 @@ namespace DeepNestSharp.Reports
       string units,
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours,
       IReadOnlyList<int> layoutPages,
-      int pageCount)
+      int pageCount,
+      ReportMaterial material)
     {
       int page = 0;
       var layoutStarts = new List<int>();
@@ -217,7 +227,13 @@ namespace DeepNestSharp.Reports
 
         // Landscape Page 1: MATERIAL REQUIRED (left) and JOB SUMMARY (right) side by side
         double boxTop = 544;
-        int jRows = unplacedCount > 0 ? 4 : 3;
+
+        // What a quote needs besides the sheets: how far the head travels cutting and how many times it
+        // pierces (once per contour, outline and holes), and with a material chosen what it all weighs.
+        double cutLength = partTotals.Sum(t => t.CutLength * t.Qty);
+        int pierces = layouts.Sum(l => l.Count * l.Sheet.PartPlacements.Sum(p => 1 + (p.Part?.Children?.Count ?? 0)));
+        bool weighs = material != null && material.Thickness > 0 && IsMillimetres(units);
+        int jRows = (unplacedCount > 0 ? 4 : 3) + 2 + (material != null ? 1 : 0) + (weighs ? 2 : 0);
         double stockBoxH = (stockLines.Count * 22) + 28;
         double sumBoxH = (jRows * 15) + 16;
         double topH = Math.Max(stockBoxH, sumBoxH);
@@ -229,7 +245,7 @@ namespace DeepNestSharp.Reports
         double ry = boxTop - 18;
         foreach (var (w, h, count) in stockLines)
         {
-          c.Text(52, ry, 14, bold: true, count.ToString("#,0", CultureInfo.InvariantCulture));
+          c.Text(52, ry, 14, bold: true, count.ToString("0", CultureInfo.InvariantCulture));
           c.Text(96, ry, 9, bold: false, LF("Rep_SheetsOf", SheetWord(count), Num(w), Num(h), UnitWord(units)));
           c.SetFill(0.35, 0.35, 0.35);
           c.Text(305, ry, 8, bold: false, FormatStockArea(w * h * count, units));
@@ -239,7 +255,7 @@ namespace DeepNestSharp.Reports
 
         c.Line(48, boxTop - topH + 20, 402, boxTop - topH + 20, 0.5);
         c.Text(52, boxTop - topH + 6, 8.5, bold: true,
-          LF("Rep_Total", totalSheets.ToString("#,0", CultureInfo.InvariantCulture), SheetWord(totalSheets), totalStockAreaStr));
+          LF("Rep_Total", totalSheets.ToString("0", CultureInfo.InvariantCulture), SheetWord(totalSheets), totalStockAreaStr));
 
         // Right box: JOB SUMMARY
         c.Text(432, 550, 10.5, bold: true, L("Rep_Summary"));
@@ -259,7 +275,22 @@ namespace DeepNestSharp.Reports
           jy -= 15;
         }
 
-        JRow(L("Rep_PartsToCut"), totalParts.ToString("#,0", CultureInfo.InvariantCulture));
+        if (material != null)
+        {
+          JRow(L("Rep_MaterialKind"), material.Thickness > 0
+            ? FormattableString.Invariant($"{material.Name}, {material.Thickness:0.##} ") + UnitWord("mm")
+            : material.Name);
+        }
+
+        JRow(L("Rep_PartsToCut"), totalParts.ToString("0", CultureInfo.InvariantCulture));
+        JRow(L("Rep_CutTotal"), FormatLength(cutLength, units));
+        JRow(L("Rep_Pierces"), pierces.ToString("0", CultureInfo.InvariantCulture)); // "1,913" read as a decimal in a Russian report
+        if (weighs)
+        {
+          JRow(L("Rep_SheetWeight"), FormattableString.Invariant($"{material.Kilograms(stockArea):0.0} ") + L("Rep_Kg"));
+          JRow(L("Rep_PartWeight"), FormattableString.Invariant($"{material.Kilograms(placedArea):0.0} ") + L("Rep_Kg"));
+        }
+
         JRow(L("Rep_MaterialUsed"), $"{overallUtil.ToString("0.0", CultureInfo.InvariantCulture)} %");
         JRow(L("Rep_DifferentLayouts"), layouts.Count.ToString(CultureInfo.InvariantCulture));
         if (unplacedCount > 0)
@@ -477,7 +508,7 @@ namespace DeepNestSharp.Reports
           c.Text(cutX, py, 8, bold: false, FormatLength(row.CutLength.Value, units));
         }
 
-        c.Text(qtyX, py, 8, bold: false, row.Qty.ToString("#,0", CultureInfo.InvariantCulture));
+        c.Text(qtyX, py, 8, bold: false, row.Qty.ToString("0", CultureInfo.InvariantCulture));
         c.Line(40, py - 4, 802, py - 4, 0.25);
         py -= RowPitch;
       }
@@ -733,7 +764,7 @@ namespace DeepNestSharp.Reports
         double sqM = area / 1_000_000.0;
         if (sqM >= 10.0)
         {
-          return FormattableString.Invariant($"{sqM:#,0.0} ") + L("Rep_M2");
+          return FormattableString.Invariant($"{sqM:0.0} ") + L("Rep_M2");
         }
 
         if (sqM >= 0.01)
@@ -751,7 +782,7 @@ namespace DeepNestSharp.Reports
 
       string u = UnitWord(units);
       return area >= 1000
-        ? FormattableString.Invariant($"{area:#,0} ") + LF("Rep_Sq", u)
+        ? FormattableString.Invariant($"{area:0} ") + LF("Rep_Sq", u)
         : FormattableString.Invariant($"{area:0.##} ") + LF("Rep_Sq", u);
     }
 
@@ -770,7 +801,7 @@ namespace DeepNestSharp.Reports
 
       string u = UnitWord(units);
       return length >= 1000
-        ? FormattableString.Invariant($"{length:#,0} {u}")
+        ? FormattableString.Invariant($"{length:0} {u}")
         : FormattableString.Invariant($"{length:0.##} {u}");
     }
 
@@ -790,12 +821,12 @@ namespace DeepNestSharp.Reports
         }
 
         return sqM >= 10
-          ? FormattableString.Invariant($"{sqM:#,0.0} m²")
+          ? FormattableString.Invariant($"{sqM:0.0} ") + L("Rep_M2")
           : FormattableString.Invariant($"{sqM:0.##} ") + L("Rep_M2");
       }
 
       double sqFt = areaSquareUnits / 144.0;
-      return FormattableString.Invariant($"{sqFt:#,0} ") + L("Rep_SqFt");
+      return FormattableString.Invariant($"{sqFt:0} ") + L("Rep_SqFt");
     }
 
     /// <summary>

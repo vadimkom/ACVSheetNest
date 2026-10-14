@@ -655,6 +655,135 @@ namespace DeepNestSharp.Ui.Views
       }
     }
 
+    private bool showingMaterial; // the combos are being filled from the project, not changed by the operator
+
+    /// <summary>The material names (translated) and the usual gauges, then the job's own choice on top.</summary>
+    private void FillMaterialChoices()
+    {
+      if (this.materialCombo == null)
+      {
+        return;
+      }
+
+      this.showingMaterial = true;
+      this.materialCombo.Items.Clear();
+      this.materialCombo.Items.Add(new ComboBoxItem { Content = Localization.Get("Mat_None"), Tag = string.Empty });
+      foreach (var m in DeepNestLib.NestProject.SheetMaterials.All)
+      {
+        this.materialCombo.Items.Add(new ComboBoxItem { Content = Localization.Get("Mat_" + m.Key), Tag = m.Key });
+      }
+
+      this.thicknessCombo.Items.Clear();
+      foreach (double t in DeepNestLib.NestProject.SheetMaterials.StandardThicknesses)
+      {
+        this.thicknessCombo.Items.Add(t.ToString("0.0#", System.Globalization.CultureInfo.InvariantCulture));
+      }
+
+      this.thicknessUnitsLabel.Text = Localization.Get("Unit_Mm");
+      this.showingMaterial = false;
+      this.ShowProjectMaterial();
+    }
+
+    private void ShowProjectMaterial()
+    {
+      if (this.materialCombo == null || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      this.showingMaterial = true;
+      string key = doc.ProjectInfo.Material ?? string.Empty;
+      this.materialCombo.SelectedItem = this.materialCombo.Items.OfType<ComboBoxItem>().FirstOrDefault(i => string.Equals((string)i.Tag, key, StringComparison.OrdinalIgnoreCase))
+        ?? (this.materialCombo.Items.Count > 0 ? this.materialCombo.Items[0] : null);
+      this.thicknessCombo.Text = doc.ProjectInfo.Thickness > 0
+        ? doc.ProjectInfo.Thickness.ToString("0.0#", System.Globalization.CultureInfo.InvariantCulture)
+        : string.Empty;
+      this.showingMaterial = false;
+    }
+
+    private void OnMaterialChanged(object sender, SelectionChangedEventArgs e)
+    {
+      if (this.showingMaterial || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      string key = (this.materialCombo.SelectedItem as ComboBoxItem)?.Tag as string;
+      key = string.IsNullOrEmpty(key) ? null : key;
+      if (doc.ProjectInfo.Material != key)
+      {
+        doc.ProjectInfo.Material = key;
+        doc.IsDirty = true;
+        this.RememberMaterial(doc);
+      }
+    }
+
+    private void OnThicknessChosen(object sender, SelectionChangedEventArgs e)
+    {
+      if (!this.showingMaterial && this.thicknessCombo.SelectedItem is string text)
+      {
+        this.ApplyThickness(text);
+      }
+    }
+
+    private void OnThicknessTyped(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e) => this.ApplyThickness(this.thicknessCombo.Text);
+
+    private void OnThicknessKey(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+      if (e.Key == System.Windows.Input.Key.Enter)
+      {
+        this.ApplyThickness(this.thicknessCombo.Text);
+      }
+    }
+
+    /// <summary>A gauge from the list or typed, with a point or a comma; anything that is not a sensible
+    /// thickness puts the job's own value back.</summary>
+    private void ApplyThickness(string text)
+    {
+      if (this.showingMaterial || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      text = (text ?? string.Empty).Trim().Replace(',', '.');
+      double thickness = 0;
+      if (text.Length > 0
+          && !(double.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out thickness)
+               && thickness > 0 && thickness <= 100))
+      {
+        this.ShowProjectMaterial();
+        return;
+      }
+
+      if (Math.Abs(doc.ProjectInfo.Thickness - thickness) > 1e-9)
+      {
+        doc.ProjectInfo.Thickness = thickness;
+        doc.IsDirty = true;
+        this.RememberMaterial(doc);
+      }
+    }
+
+    /// <summary>The next new job starts from this one's material and gauge.</summary>
+    private void RememberMaterial(NestProjectViewModel doc)
+    {
+      var session = SessionState.Load() ?? new SessionState();
+      session.LastMaterial = doc.ProjectInfo.Material;
+      session.LastThickness = doc.ProjectInfo.Thickness;
+      session.Save();
+    }
+
+    /// <summary>The job's material for the report: its name, gauge and density, or null when none is chosen.</summary>
+    private Reports.ReportMaterial CurrentReportMaterial()
+    {
+      if (ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return null;
+      }
+
+      var material = DeepNestLib.NestProject.SheetMaterials.Find(doc.ProjectInfo.Material);
+      return material == null ? null : new Reports.ReportMaterial(Localization.Get("Mat_" + material.Key), doc.ProjectInfo.Thickness, material.Density);
+    }
+
     /// <summary>The priority of the stock a nested sheet came from (1 highest, 5 normal), by its size.</summary>
     private int StockPriorityOf(ISheetPlacement sheet)
     {
@@ -747,7 +876,17 @@ namespace DeepNestSharp.Ui.Views
           doc.ProjectInfo,
           this.sessionCommonLineGapInches,
           this.sessionCommonLineMaxClusterParts);
+
+        // A new job starts in the material and gauge the last one was set to; the shop cuts runs of the same.
+        var last = SessionState.Load();
+        if (string.IsNullOrEmpty(doc.ProjectInfo.Material) && last != null)
+        {
+          doc.ProjectInfo.Material = last.LastMaterial;
+          doc.ProjectInfo.Thickness = last.LastThickness;
+        }
       }
+
+      this.ShowProjectMaterial();
 
       // ProjectInfo keeps this geometry-affecting value per document while the runtime config is shared.
       // Reapply the active tab's snapshot before nesting/export/UI consumers can observe another tab's gap.
@@ -1074,6 +1213,7 @@ namespace DeepNestSharp.Ui.Views
     /// <summary>Applies current localization (ru/bg/en) to all UI texts in the window.</summary>
     private void ApplyLocalization()
     {
+      this.FillMaterialChoices();
       // Menu items
       if (this.menuFile != null) this.menuFile.Header = Localization.Get("Menu_File");
       if (this.menuNewProject != null) this.menuNewProject.Header = Localization.Get("Menu_NewProject");
@@ -2150,7 +2290,8 @@ namespace DeepNestSharp.Ui.Views
           plan,
           selected.UnplacedParts?.Count ?? 0,
           this.unitsMm ? "mm" : "in",
-          this.dxfViewer?.PartColours);
+          this.dxfViewer?.PartColours,
+          this.CurrentReportMaterial());
       }
       catch (System.Exception ex)
       {
@@ -3151,7 +3292,7 @@ namespace DeepNestSharp.Ui.Views
       var colours = this.dxfViewer?.PartColours ?? PartColors.Build(plan.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
       int unplacedCount = selected.UnplacedParts?.Count ?? 0;
 
-      var pages = Reports.NestReportPdf.BuildWpfPages(plan, unplacedCount, units, colours);
+      var pages = Reports.NestReportPdf.BuildWpfPages(plan, unplacedCount, units, colours, this.CurrentReportMaterial());
       if (this.reportPagesStackPanel != null)
       {
         this.reportPagesStackPanel.Children.Clear();
@@ -3362,7 +3503,7 @@ namespace DeepNestSharp.Ui.Views
       var colours = this.dxfViewer?.PartColours ?? PartColors.Build(plan.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
       int unplacedCount = selected.UnplacedParts?.Count ?? 0;
 
-      var doc = Reports.NestReportPdf.BuildFixedDocument(plan, unplacedCount, units, colours);
+      var doc = Reports.NestReportPdf.BuildFixedDocument(plan, unplacedCount, units, colours, this.CurrentReportMaterial());
 
       var printDlg = new System.Windows.Controls.PrintDialog();
       if (printDlg.ShowDialog() == true)

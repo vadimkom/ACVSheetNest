@@ -56,6 +56,16 @@ namespace DeepNestLib.NestProject
     [JsonInclude]
     public string LastNestResultJson { get; set; }
 
+    /// <summary>The material the job is cut from (<see cref="SheetMaterials"/> key); empty when not chosen.</summary>
+    [JsonInclude]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string Material { get; set; }
+
+    /// <summary>The sheet thickness in millimetres; 0 when not chosen.</summary>
+    [JsonInclude]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public double Thickness { get; set; }
+
     [JsonInclude]
     public ISvgNestConfig Config
     {
@@ -145,6 +155,8 @@ namespace DeepNestLib.NestProject
     public void Load(ProjectInfo source)
     {
       this.LastNestResultJson = source.LastNestResultJson;
+      this.Material = source.Material;
+      this.Thickness = source.Thickness;
       this.CommonLineGapInches = source.CommonLineGapInches;
       this.CommonLineMaxClusterParts = source.CommonLineMaxClusterParts;
       this.DetailLoadInfos.Clear();

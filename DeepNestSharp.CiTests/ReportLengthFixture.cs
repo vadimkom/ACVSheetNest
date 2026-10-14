@@ -22,7 +22,7 @@ namespace DeepNestSharp.CiTests
     [Fact]
     public void ALaserPathInInchesStaysInInches()
     {
-      NestReportPdf.FormatLength(1250, "in").Should().StartWith("1,250");
+      NestReportPdf.FormatLength(1250, "in").Should().StartWith("1250", "no thousands separator: the shop does not use one");
     }
   }
 }

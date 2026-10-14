@@ -112,6 +112,32 @@
       set => wrappedProjectInfo.LastNestResultJson = value;
     }
 
+    public string Material
+    {
+      get => wrappedProjectInfo.Material;
+      set
+      {
+        if (wrappedProjectInfo.Material != value)
+        {
+          wrappedProjectInfo.Material = value;
+          OnPropertyChanged(nameof(Material));
+        }
+      }
+    }
+
+    public double Thickness
+    {
+      get => wrappedProjectInfo.Thickness;
+      set
+      {
+        if (wrappedProjectInfo.Thickness != value)
+        {
+          wrappedProjectInfo.Thickness = value;
+          OnPropertyChanged(nameof(Thickness));
+        }
+      }
+    }
+
     private void DetailLoadInfos_IsDirtyChanged(object? sender, EventArgs e)
     {
       IsDirtyChanged?.Invoke(this, e);

@@ -397,6 +397,37 @@
       Encoding.ASCII.GetString(PdfTrueTypeFont.FontFileStream(font)).Should().Contain("/FlateDecode", "zlib is used when it loads");
     }
 
+    [Fact]
+    public void AJobWithAMaterialSaysWhatItIsWhatItWeighsAndHowMuchCutting()
+    {
+      var layouts = new List<(ISheetPlacement Sheet, int Count, string Name)>
+      {
+        (SheetOf(("bracket.dxf", 2)), 1, "A"),
+      };
+
+      var texts = new List<string>();
+      NestReportPdf.GenerateReport(() => new RecordingCanvas(texts), layouts, 0, "mm", null, new ReportMaterial("Galvanised steel", 1.5, 7.85));
+
+      texts.Should().Contain("Material").And.Contain("Galvanised steel, 1.5 mm");
+      texts.Should().Contain("Cut length").And.Contain("Pierces").And.Contain("2", "two parts without holes are pierced twice");
+      texts.Should().Contain("Sheet weight").And.Contain("Part weight");
+      texts.Should().Contain(t => t.EndsWith(" kg", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AJobWithoutAMaterialStillSaysHowMuchCuttingButNoWeight()
+    {
+      var layouts = new List<(ISheetPlacement Sheet, int Count, string Name)>
+      {
+        (SheetOf(("bracket.dxf", 2)), 1, "A"),
+      };
+
+      var texts = RecordedTexts(layouts, "mm");
+
+      texts.Should().Contain("Cut length").And.Contain("Pierces");
+      texts.Should().NotContain("Sheet weight").And.NotContain("Material");
+    }
+
     private static List<string> RecordedTexts(
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts,
       string units = "in")

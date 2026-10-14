@@ -26,6 +26,12 @@
     /// </summary>
     string LastNestResultJson { get; set; }
 
+    /// <summary>Gets or sets the material the job is cut from, a <see cref="SheetMaterials"/> key; null when not chosen.</summary>
+    string Material { get; set; }
+
+    /// <summary>Gets or sets the sheet thickness in millimetres; 0 when not chosen.</summary>
+    double Thickness { get; set; }
+
     void Load(ISvgNestConfig config, string filePath);
 
     void Load(ProjectInfo source);

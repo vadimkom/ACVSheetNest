@@ -352,6 +352,7 @@
 
         <!-- Sheets Top Action Bar -->
         <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,6">
+          <StackPanel>
           <DockPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
               <TextBlock x:Name="sheetsCountSummary" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold" Text="Типоразмеров: 0" />
@@ -369,6 +370,18 @@
               <TextBlock x:Name="marginUnitsLabel" Text="in" VerticalAlignment="Center" Margin="4,0,8,0" Foreground="{DynamicResource Brush.TextMuted}" />
             </StackPanel>
           </DockPanel>
+            <!-- One material and one thickness per job: different metals or gauges are nested as separate jobs.
+                 A row of its own, so it fits a portrait monitor. -->
+            <StackPanel Orientation="Horizontal" Margin="3,6,0,0">
+              <TextBlock Text="{ui:Tr Lbl_Material}" VerticalAlignment="Center" Margin="0,0,4,0" />
+              <ComboBox x:Name="materialCombo" Width="170" VerticalAlignment="Center" ToolTip="{ui:Tr Tip_Material}"
+                        SelectionChanged="OnMaterialChanged" />
+              <TextBlock Text="{ui:Tr Lbl_Thickness}" VerticalAlignment="Center" Margin="14,0,4,0" />
+              <ComboBox x:Name="thicknessCombo" Width="80" IsEditable="True" VerticalAlignment="Center" ToolTip="{ui:Tr Tip_Thickness}"
+                        SelectionChanged="OnThicknessChosen" LostKeyboardFocus="OnThicknessTyped" KeyDown="OnThicknessKey" />
+              <TextBlock x:Name="thicknessUnitsLabel" Text="мм" VerticalAlignment="Center" Margin="4,0,8,0" Foreground="{DynamicResource Brush.TextMuted}" />
+            </StackPanel>
+          </StackPanel>
         </Border>
 
         <!-- Sheets Table -->

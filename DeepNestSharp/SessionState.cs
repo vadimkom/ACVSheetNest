@@ -119,6 +119,12 @@ namespace DeepNestSharp
     /// <summary>How far the offcut cut runs past the sheet edge at each end; -1/0 = flush with the edge.</summary>
     public double OffcutEdgeOverlap { get; set; } = -1;
 
+    /// <summary>The material the last job was set to, for the next new one (a <see cref="DeepNestLib.NestProject.SheetMaterials"/> key).</summary>
+    public string? LastMaterial { get; set; }
+
+    /// <summary>The thickness, in millimetres, the last job was set to; 0 when never set.</summary>
+    public double LastThickness { get; set; }
+
     /// <summary>
     /// Records the values owned by the running application when it closes. Called on an already-loaded
     /// session so preferences written by their own dialogs (including offcuts) survive.
