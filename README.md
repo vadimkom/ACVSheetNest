@@ -19,7 +19,7 @@ If you cut sheet metal, SheetNest helps you get the most parts out of every shee
 
 ## About this fork
 
-This is the ACV fork of [ManuelMRosa/SheetNest](https://github.com/ManuelMRosa/SheetNest), developed for and tested at a working laser-cutting shop. It branched from SheetNest 1.1.10; the installer is on the [releases page](https://github.com/vadimkom/ACVSheetNest/releases/latest). Everything the original does is still here, plus:
+This is the ACV fork of [ManuelMRosa/SheetNest](https://github.com/ManuelMRosa/SheetNest), developed for and tested at a working laser-cutting shop. It branched from SheetNest 1.1.10; the installer is on the [releases page](https://github.com/vadimkom/ACVSheetNest/releases/latest). It keeps the original's 2D workflow, except that importing and unfolding 3D parts (STEP/IGES through FreeCAD, with the K-factor setting) has been removed. It adds:
 
 **Workflow**
 - Four steps across the top: **Parts → Sheets → Nesting → Layout & Report** (Ctrl+1…4).
@@ -66,7 +66,7 @@ This is the ACV fork of [ManuelMRosa/SheetNest](https://github.com/ManuelMRosa/S
 - .NET 10.
 - Saved projects about 3× smaller.
 - No crash when a project's flash drive has been pulled.
-- 3D import (FreeCAD) removed, and the installer is smaller.
+- 3D import (STEP/IGES via FreeCAD) removed: parts come in as DXF or CHF flat patterns, and the installer no longer carries FreeCAD.
 
 Bug fixes that apply to the original are offered back upstream as separate pull requests.
 
