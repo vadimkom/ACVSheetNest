@@ -5,7 +5,8 @@ if ($PSScriptRoot) {
 }
 
 Write-Output "=== 1/2 dotnet publish (self-contained win-x64) ==="
-Get-Process SheetNest -ErrorAction SilentlyContinue | Stop-Process -Force
+# Running copies of SheetNest are left alone: the publish goes to its own folder and needs nothing they hold.
+# This line used to close every SheetNest on the PC, the operator's open job included, unsaved work and all.
 $env:DOTNET_ROLL_FORWARD = "Major"
 dotnet publish DeepNestSharp/DeepNestSharp.csproj -c Release -r win-x64 --self-contained -o publish-1.1.40 -v quiet --nologo
 if (-not (Test-Path "publish-1.1.40\SheetNest.exe")) { throw "publish failed: no SheetNest.exe" }

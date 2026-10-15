@@ -2339,8 +2339,8 @@ namespace DeepNestSharp.Ui.UserControls
     /// <summary>
     /// The part's name drawn inside it, the one the DXF writes (the file name without "Flat-Pattern - "),
     /// anchored where the exporter anchors it: the middle of the part if that is on the material, else a
-    /// point that is. Sized from the part so it reads on screen, not the capped engraving height, and turned
-    /// along a part that stands tall. Vector text in sheet units, so it zooms with the drawing.
+    /// point that is. One size for every part, from the sheet's size, and turned along a part that stands
+    /// tall. Vector text in sheet units, so it zooms with the drawing.
     /// </summary>
     private System.Windows.Shapes.Path BuildLabel(IPartPlacement pp, double sheetH)
     {
@@ -2361,22 +2361,16 @@ namespace DeepNestSharp.Ui.UserControls
         double w = placed.MaxX - placed.MinX, h = placed.MaxY - placed.MinY;
         bool vertical = h > w * 1.4;
         double along = vertical ? h : w;
-        double across = vertical ? w : h;
-        double em = Math.Min(along * 0.8 / (0.55 * text.Length), across * 0.3);
 
-        // A long name on a small part comes out unreadably small in one line. Drawing names read
-        // "piece^assembly_size", so break it after the '^' when two lines make bigger letters.
+        // One small size for every part on the sheet, set by the sheet: letters sized to each part were huge
+        // on a big part and lost on a small one, and the layout read as a jumble of type.
+        double em = Math.Max(this.currentSheetW, sheetH) * 0.015;
+
+        // Drawing names read "piece^assembly_size": a name longer than its part goes on two lines there.
         int caret = text.IndexOf('^');
-        if (caret > 0 && caret < text.Length - 1)
+        if (caret > 0 && caret < text.Length - 1 && 0.55 * em * text.Length > along * 0.9)
         {
-          string first = text.Substring(0, caret + 1);
-          string second = text.Substring(caret + 1);
-          double twoLines = Math.Min(along * 0.8 / (0.55 * Math.Max(first.Length, second.Length)), across * 0.3 / 1.25);
-          if (twoLines > em * 1.15)
-          {
-            text = first + "\n" + second;
-            em = twoLines;
-          }
+          text = text.Substring(0, caret + 1) + "\n" + text.Substring(caret + 1);
         }
 
         if (!(em > 0))
@@ -2400,10 +2394,8 @@ namespace DeepNestSharp.Ui.UserControls
         }
 
         var (cx, cy) = DeepNestLib.IO.DxfExporter.ComputePartCentroid(placed);
-        double fit = Math.Min(1.0, along * 0.85 / box.Width);
         var transform = new TransformGroup();
         transform.Children.Add(new TranslateTransform(-(box.X + (box.Width / 2)), -(box.Y + (box.Height / 2))));
-        transform.Children.Add(new ScaleTransform(fit, fit));
         if (vertical)
         {
           transform.Children.Add(new RotateTransform(-90));
@@ -2413,15 +2405,14 @@ namespace DeepNestSharp.Ui.UserControls
         geometry.Transform = transform;
         geometry.Freeze();
 
-        // Outlined in the opposite ink: white letters over a part full of small square holes were lost
-        // wherever they crossed the holes, which show the near-white sheet through them.
-        var ink = InkOn(this.TypeFill(pp));
+        // White letters edged in black on every part, whatever its colour: the edge keeps them readable over
+        // holes that show the sheet through, and one look for all reads calmer than ink chosen part by part.
         return new System.Windows.Shapes.Path
         {
           Data = geometry,
-          Fill = ink,
-          Stroke = ReferenceEquals(ink, LightInk) ? DarkInk : LightInk,
-          StrokeThickness = em * fit * 0.07,
+          Fill = LightInk,
+          Stroke = DarkInk,
+          StrokeThickness = em * 0.045,
           StrokeLineJoin = PenLineJoin.Round,
           IsHitTestVisible = false,
         };
@@ -2430,18 +2421,6 @@ namespace DeepNestSharp.Ui.UserControls
       {
         return null; // a name is a courtesy; never lose the drawing over one
       }
-    }
-
-    /// <summary>Dark letters on a light part colour, white on a dark one.</summary>
-    private static Brush InkOn(Brush fill)
-    {
-      if (fill is SolidColorBrush solid)
-      {
-        var c = solid.Color;
-        return ((0.299 * c.R) + (0.587 * c.G) + (0.114 * c.B)) < 140 ? LightInk : DarkInk;
-      }
-
-      return DarkInk;
     }
 
     /// <summary>A part was clicked outside manual editing (null: clicked off every part). The text is its

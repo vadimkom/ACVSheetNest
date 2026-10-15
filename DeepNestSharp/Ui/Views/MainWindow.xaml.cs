@@ -343,9 +343,10 @@ namespace DeepNestSharp.Ui.Views
     /// <summary>Offers to restore the autosaved project left behind by a crashed session.</summary>
     private void OfferAutosaveRecovery()
     {
+      string snapshot = null;
       try
       {
-        if (!Autosave.TryGetPending(out string originalPath, out string savedAt))
+        if (!Autosave.TryGetPending(out snapshot, out string originalPath, out string savedAt))
         {
           return;
         }
@@ -356,9 +357,9 @@ namespace DeepNestSharp.Ui.Views
           Localization.Format("Msg_Recover", name, when),
           Localization.Get("Title_Recovery"),
           DeepNestLib.MessageBoxIcon.Information);
-        if (answer == DeepNestLib.MessageBoxResult.OK)
+        if (answer == DeepNestLib.MessageBoxResult.OK && System.IO.File.Exists(snapshot))
         {
-          ViewModel.OnLoadNestProject(Autosave.RecoveryPath);
+          ViewModel.OnLoadNestProject(snapshot);
           if (ViewModel.ActiveDocument is NestProjectViewModel recovered)
           {
             // Point the document back at the REAL file (empty = never saved -> Save As) and keep it
@@ -368,13 +369,13 @@ namespace DeepNestSharp.Ui.Views
           }
         }
 
-        Autosave.Clear();
+        Autosave.Remove(snapshot);
       }
       catch (Exception ex)
       {
         // Recovery is best-effort and must never block startup — but a failure is worth a local log.
         CrashReporter.Save(ex, "autosave-recovery");
-        Autosave.Clear(); // a snapshot that cannot be recovered must not re-prompt forever
+        Autosave.Remove(snapshot); // a snapshot that cannot be recovered must not re-prompt forever
       }
     }
 
@@ -886,6 +887,12 @@ namespace DeepNestSharp.Ui.Views
         {
           doc.ProjectInfo.Material = last.LastMaterial;
           doc.ProjectInfo.Thickness = last.LastThickness;
+        }
+
+        // A new job starts where a job starts: with its parts, whichever step the last one ended on.
+        if (this.IsLoaded)
+        {
+          this.SetCurrentMode(WorkflowMode.Parts);
         }
       }
 

@@ -42,7 +42,8 @@ When resuming:
   - `shapes/`, `autosave/`, crash logs.
 - The user's CHF drawings: `E:/chf` (578 files, used to verify the CHF reader).
 - Rust toolchain for rebuilding Sparrow: `%USERPROFILE%/.cargo`. See BUILDING.md.
-- Do not kill the user's running SheetNest without asking. Test instances started from `bin/` are fine to stop.
+- Do not kill the user's running SheetNest without asking. Stop only the test instances you started, by their own process id. The MSI scripts up to 1.1.40 closed every running SheetNest (which killed the user's open job on 2026-10-15); from 1.1.41 they do not.
+- Each running copy autosaves to `%LOCALAPPDATA%/SheetNest/autosave/recovery-{pid}.dnest`; recovery is offered only for a copy that is no longer running. Screenshot automation: `assets/demo/take-screenshots.ps1` (-language, -width, -height).
 
 ## Code map
 
