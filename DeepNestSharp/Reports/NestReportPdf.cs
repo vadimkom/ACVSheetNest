@@ -177,6 +177,9 @@ namespace DeepNestSharp.Reports
       // thumbnail per file, and that thumbnail is what names the colour).
       var partTotals = NumberedPartTotals(layouts);
 
+      // A part's weight is shown when the job says what it is cut from, in millimetres.
+      ReportMaterial weighMaterial = material != null && material.Thickness > 0 && IsMillimetres(units) ? material : null;
+
       // The number is what ties a shape on the drawing back to a row here, so both tables and the
       // drawing read it out of the same place.
       var partNumbers = partTotals.ToDictionary(t => t.File, t => t.Number, StringComparer.OrdinalIgnoreCase);
@@ -207,7 +210,7 @@ namespace DeepNestSharp.Reports
         {
           var pc = NextPage();
           pc.Text(40, 544, 13, bold: true, LF("Rep_Continued", title));
-          next = PartTable(pc, 520, rows, next, colours, colourCoded, units);
+          next = PartTable(pc, 520, rows, next, colours, colourCoded, units, weighMaterial);
         }
       }
 
@@ -235,64 +238,81 @@ namespace DeepNestSharp.Reports
         int pierces = layouts.Sum(l => l.Count * l.Sheet.PartPlacements.Sum(p =>
           1 + (p.Part?.Children?.Count ?? 0) + DeepNestLib.IO.DxfInnerCuts.Measure(p.Part?.Name).Pieces));
         bool weighs = material != null && material.Thickness > 0 && IsMillimetres(units);
-        int jRows = (unplacedCount > 0 ? 4 : 3) + 2 + (material != null ? 1 : 0) + (weighs ? 2 : 0);
-        double stockBoxH = (stockLines.Count * 22) + 28;
+
+        // The buyer's box says everything about the metal: the sheets, what they are and what they weigh. The
+        // summary beside it is the job: parts, cutting and how well the metal is used. The material used to sit
+        // in the summary, where a long name ran past the box, with the buyer's box half empty.
+        var materialRows = new List<(string Label, string Value)>();
+        if (material != null)
+        {
+          materialRows.Add((L("Rep_MaterialKind"), material.Thickness > 0
+            ? FormattableString.Invariant($"{material.Name}, {material.Thickness:0.##} ") + UnitWord("mm")
+            : material.Name));
+        }
+
+        if (weighs)
+        {
+          materialRows.Add((L("Rep_SheetWeight"), FormattableString.Invariant($"{material.Kilograms(stockArea):0.0} ") + L("Rep_Kg")));
+          materialRows.Add((L("Rep_PartWeight"), FormattableString.Invariant($"{material.Kilograms(placedArea):0.0} ") + L("Rep_Kg")));
+        }
+
+        const double leftX = 40, leftW = 312, rightX = 368, rightW = 434;
+        int jRows = (unplacedCount > 0 ? 4 : 3) + 2;
+        double stockBoxH = (stockLines.Count * 22) + (materialRows.Count * 14) + (materialRows.Count > 0 ? 6 : 0) + 28;
         double sumBoxH = (jRows * 15) + 16;
         double topH = Math.Max(stockBoxH, sumBoxH);
 
         // Left box: MATERIAL REQUIRED
-        c.Text(40, 550, 10.5, bold: true, L("Rep_Material"));
-        c.FillRect(40, boxTop - topH, 370, topH, 0.94, 0.94, 0.94);
-        c.Rect(40, boxTop - topH, 370, topH, 0.8);
+        c.Text(leftX, 550, 10.5, bold: true, L("Rep_Material"));
+        c.FillRect(leftX, boxTop - topH, leftW, topH, 0.94, 0.94, 0.94);
+        c.Rect(leftX, boxTop - topH, leftW, topH, 0.8);
         double ry = boxTop - 18;
         foreach (var (w, h, count) in stockLines)
         {
           c.Text(52, ry, 14, bold: true, count.ToString("0", CultureInfo.InvariantCulture));
-          c.Text(96, ry, 9, bold: false, LF("Rep_SheetsOf", SheetWord(count), Num(w), Num(h), UnitWord(units)));
+          c.Text(92, ry, 9, bold: false, LF("Rep_SheetsOf", SheetWord(count), Num(w), Num(h), UnitWord(units)));
           c.SetFill(0.35, 0.35, 0.35);
-          c.Text(305, ry, 8, bold: false, FormatStockArea(w * h * count, units));
+          c.Text(leftX + leftW - 52, ry, 8, bold: false, FormatStockArea(w * h * count, units));
           c.SetFill(0, 0, 0);
           ry -= 22;
         }
 
-        c.Line(48, boxTop - topH + 20, 402, boxTop - topH + 20, 0.5);
+        if (materialRows.Count > 0)
+        {
+          ry -= 2;
+          foreach (var (label, value) in materialRows)
+          {
+            c.Text(52, ry, 8.5, bold: false, label);
+            c.Text(170, ry, 8.5, bold: true, value);
+            ry -= 14;
+          }
+        }
+
+        c.Line(48, boxTop - topH + 20, leftX + leftW - 8, boxTop - topH + 20, 0.5);
         c.Text(52, boxTop - topH + 6, 8.5, bold: true,
           LF("Rep_Total", totalSheets.ToString("0", CultureInfo.InvariantCulture), SheetWord(totalSheets), totalStockAreaStr));
 
         // Right box: JOB SUMMARY
-        c.Text(432, 550, 10.5, bold: true, L("Rep_Summary"));
-        c.FillRect(432, boxTop - topH, 370, topH, 0.965, 0.965, 0.965);
-        c.Rect(432, boxTop - topH, 370, topH, 0.8);
+        c.Text(rightX, 550, 10.5, bold: true, L("Rep_Summary"));
+        c.FillRect(rightX, boxTop - topH, rightW, topH, 0.965, 0.965, 0.965);
+        c.Rect(rightX, boxTop - topH, rightW, topH, 0.8);
         double jy = boxTop - 18;
         void JRow(string label, string value, bool warn = false)
         {
-          c.Text(446, jy, 8.5, bold: false, label);
+          c.Text(rightX + 14, jy, 8.5, bold: false, label);
           if (warn)
           {
             c.SetFill(0.75, 0, 0);
           }
 
-          c.Text(690, jy, 8.5, bold: true, value);
+          c.Text(rightX + 220, jy, 8.5, bold: true, value);
           c.SetFill(0, 0, 0);
           jy -= 15;
-        }
-
-        if (material != null)
-        {
-          JRow(L("Rep_MaterialKind"), material.Thickness > 0
-            ? FormattableString.Invariant($"{material.Name}, {material.Thickness:0.##} ") + UnitWord("mm")
-            : material.Name);
         }
 
         JRow(L("Rep_PartsToCut"), totalParts.ToString("0", CultureInfo.InvariantCulture));
         JRow(L("Rep_CutTotal"), FormatLength(cutLength, units));
         JRow(L("Rep_Pierces"), pierces.ToString("0", CultureInfo.InvariantCulture)); // "1,913" read as a decimal in a Russian report
-        if (weighs)
-        {
-          JRow(L("Rep_SheetWeight"), FormattableString.Invariant($"{material.Kilograms(stockArea):0.0} ") + L("Rep_Kg"));
-          JRow(L("Rep_PartWeight"), FormattableString.Invariant($"{material.Kilograms(placedArea):0.0} ") + L("Rep_Kg"));
-        }
-
         JRow(L("Rep_MaterialUsed"), $"{overallUtil.ToString("0.0", CultureInfo.InvariantCulture)} %");
         JRow(L("Rep_DifferentLayouts"), layouts.Count.ToString(CultureInfo.InvariantCulture));
         if (unplacedCount > 0)
@@ -337,8 +357,8 @@ namespace DeepNestSharp.Reports
         double py = ty - 16;
         c.Text(40, py, 10.5, bold: true, L("Rep_PartTotals"));
         py -= 15;
-        var totalRows = partTotals.Select(t => new PartRow(t.Number, t.Colour, t.File, t.BoxArea, t.CutLength, t.Qty, SizeText(t.BoxWidth, t.BoxHeight))).ToList();
-        int next = PartTable(c, py, totalRows, 0, colours, colourCoded, units);
+        var totalRows = partTotals.Select(t => new PartRow(t.Number, t.Colour, t.File, t.BoxArea, t.CutLength, t.Qty, SizeText(t.BoxWidth, t.BoxHeight), t.NetArea)).ToList();
+        int next = PartTable(c, py, totalRows, 0, colours, colourCoded, units, weighMaterial);
         ContinueOnNewPages(totalRows, next, L("Rep_PartTotals"));
       }
 
@@ -375,7 +395,8 @@ namespace DeepNestSharp.Reports
             partInfo.TryGetValue(t.File, out var pi) ? pi.BoxArea : (double?)null,
             partInfo.TryGetValue(t.File, out var pc) ? pc.CutLength : (double?)null,
             t.Qty,
-            partInfo.TryGetValue(t.File, out var ps) ? SizeText(ps.BoxWidth, ps.BoxHeight) : null))
+            partInfo.TryGetValue(t.File, out var ps) ? SizeText(ps.BoxWidth, ps.BoxHeight) : null,
+            partInfo.TryGetValue(t.File, out var pn) ? pn.NetArea : (double?)null))
           .ToList();
 
         // Up to LayoutListRows rows share the page with the drawing; the rest carry on overleaf.
@@ -445,7 +466,7 @@ namespace DeepNestSharp.Reports
         double py = boxY - 12;
         c.Text(40, py, 10, bold: true, L("Rep_PartsOnLayout"));
         py -= 14;
-        int next = PartTable(c, py, layoutRows, 0, colours, colourCoded, units);
+        int next = PartTable(c, py, layoutRows, 0, colours, colourCoded, units, weighMaterial);
         ContinueOnNewPages(layoutRows, next, $"{LF("Rep_LayoutN", i + 1)}: {L("Rep_PartsOnLayout")}");
       }
 
@@ -455,7 +476,7 @@ namespace DeepNestSharp.Reports
     private const int LayoutListRows = 12;
     private const double RowPitch = 13;
 
-    private readonly record struct PartRow(int? Number, string Colour, string File, double? BoxArea, double? CutLength, int Qty, string Size = null);
+    private readonly record struct PartRow(int? Number, string Colour, string File, double? BoxArea, double? CutLength, int Qty, string Size = null, double? NetArea = null);
 
     /// <summary>The parts table in ONE column across the page: header at <paramref name="py"/>, then rows from
     /// <paramref name="from"/> for as long as they clear the footer. Returns the first row it had no room for.</summary>
@@ -466,9 +487,13 @@ namespace DeepNestSharp.Reports
       int from,
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> colours,
       bool colourCoded,
-      string units)
+      string units,
+      ReportMaterial weighMaterial = null)
     {
-      const double numX = 48, swatchX = 72, sizeX = 430, areaX = 525, cutX = 625, qtyX = 740;
+      // With a weight column the others close up to make room for it; the quantity stays last, at the edge.
+      bool weighs = weighMaterial != null;
+      const double numX = 48, swatchX = 72, qtyX = 752;
+      double sizeX = weighs ? 395 : 430, areaX = weighs ? 482 : 525, weightX = 572, cutX = weighs ? 642 : 625;
       double nameX = colourCoded ? 86 : 72;
 
       c.FillRect(40, py - 4, 762, 15, 0.92, 0.92, 0.92);
@@ -476,6 +501,11 @@ namespace DeepNestSharp.Reports
       c.Text(nameX, py, 8, bold: true, L("Rep_Part"));
       c.Text(sizeX, py, 8, bold: true, LF("Rep_SizeCol", UnitWord(units)));
       c.Text(areaX, py, 8, bold: true, L("Rep_BoxArea"));
+      if (weighs)
+      {
+        c.Text(weightX, py, 8, bold: true, L("Rep_WeightCol"));
+      }
+
       c.Text(cutX, py, 8, bold: true, L("Rep_CutLength"));
       c.Text(qtyX, py, 8, bold: true, L("Rep_Qty"));
       py -= 14;
@@ -494,7 +524,7 @@ namespace DeepNestSharp.Reports
           c.FillRect(swatchX, py, 6.5, 6.5, swatch.R / 255.0, swatch.G / 255.0, swatch.B / 255.0);
         }
 
-        c.Text(nameX, py, 8, bold: false, Trunc(row.File, colourCoded ? 65 : 70));
+        c.Text(nameX, py, 8, bold: false, Trunc(row.File, weighs ? 58 : colourCoded ? 65 : 70));
         if (!string.IsNullOrEmpty(row.Size))
         {
           c.Text(sizeX, py, 8, bold: false, row.Size);
@@ -503,6 +533,12 @@ namespace DeepNestSharp.Reports
         if (row.BoxArea.HasValue)
         {
           c.Text(areaX, py, 8, bold: false, FormatArea(row.BoxArea.Value, units));
+        }
+
+        if (weighs && row.NetArea.HasValue)
+        {
+          // One piece, the metal itself (holes left out), as the summary's part weight counts it.
+          c.Text(weightX, py, 8, bold: false, weighMaterial.Kilograms(row.NetArea.Value).ToString("0.00", CultureInfo.InvariantCulture));
         }
 
         if (row.CutLength.HasValue)
@@ -589,12 +625,12 @@ namespace DeepNestSharp.Reports
     /// different mark.
     /// </para>
     /// </summary>
-    internal static List<(string File, string Colour, int Qty, int Number, double BoxArea, double CutLength, double BoxWidth, double BoxHeight)> NumberedPartTotals(
+    internal static List<(string File, string Colour, int Qty, int Number, double BoxArea, double CutLength, double BoxWidth, double BoxHeight, double NetArea)> NumberedPartTotals(
       IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> layouts)
     {
       if (layouts == null || layouts.Count == 0)
       {
-        return new List<(string, string, int, int, double, double, double, double)>();
+        return new List<(string, string, int, int, double, double, double, double, double)>();
       }
 
       return layouts
@@ -621,10 +657,11 @@ namespace DeepNestSharp.Reports
             BoxArea: boxArea,
             BoxWidth: Math.Max(boxW, boxH),
             BoxHeight: Math.Min(boxW, boxH),
-            CutLength: cutLength);
+            CutLength: cutLength,
+            NetArea: Math.Abs(p?.Part?.NetArea ?? 0));
         })
         .OrderByDescending(t => t.Qty)
-        .Select((t, i) => (t.File, t.Colour, t.Qty, Number: i + 1, t.BoxArea, t.CutLength, t.BoxWidth, t.BoxHeight))
+        .Select((t, i) => (t.File, t.Colour, t.Qty, Number: i + 1, t.BoxArea, t.CutLength, t.BoxWidth, t.BoxHeight, t.NetArea))
         .ToList();
     }
 

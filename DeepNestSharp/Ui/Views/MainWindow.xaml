@@ -158,8 +158,6 @@
               <Button x:Name="btnAddPart" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddPart}" />
               <Button x:Name="btnAddShape" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_AddShape}" Click="OnAddShapeClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddShape}" />
               <Button x:Name="btnFillRemnant" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_FillRemnant}" Click="OnFillRemnantClicked" Margin="3,0" ToolTip="{ui:Tr Tip_FillRemnant}" />
-              <Button x:Name="btnDeletePart" Style="{DynamicResource ModernButton}" Content="Удалить деталь" Click="OnRemoveSelectedPart" Margin="6,0,3,0" ToolTip="{ui:Tr Tip_DeletePart}" />
-              <Button x:Name="btnClearAllParts" Style="{DynamicResource ModernButton}" Content="Очистить всё" Click="OnClearAllParts" Margin="3,0" ToolTip="{ui:Tr Tip_ClearParts}" />
               <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
               <TextBlock x:Name="lblMultiplier" Text="Множитель (комплектов):" VerticalAlignment="Center" Margin="0,0,4,0" Style="{DynamicResource CaptionText}" />
               <xctk:IntegerUpDown x:Name="partsMultiplierUpDown" Value="1" Minimum="1" Maximum="10000" Width="55" VerticalAlignment="Center" Margin="0,0,3,0"
@@ -179,6 +177,8 @@
                     ItemsSource="{Binding ActiveDocument.ProjectInfo.DetailLoadInfos}"
                     SelectedItem="{Binding ActiveDocument.SelectedDetailLoadInfo}"
                     MouseDoubleClick="OnPartsListDoubleClick"
+                    SelectionMode="Extended"
+                    PreviewKeyDown="OnPartsListKeyDown"
                     BorderThickness="0"
                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
                     ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -200,9 +200,12 @@
                 <GridViewColumn x:Name="colHeaderPartPreview" Header="Эскиз" Width="64">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
-                      <Border Width="48" Height="48" Background="White" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" Margin="2">
-                        <Image Source="{Binding PreviewSource, Converter={StaticResource PartPreview}}" Stretch="Uniform" Margin="2" />
-                      </Border>
+                      <!-- The sketch is drawn in the part's colour, so it is where the colour is changed too. -->
+                      <Button Style="{DynamicResource ColourSwatchButton}" Click="OnPartColorClick" Tag="{Binding}" ToolTip="{ui:Tr Tip_PartColor}" Margin="2">
+                        <Border Width="48" Height="48" Background="White" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1">
+                          <Image Source="{Binding PreviewSource, Converter={StaticResource PartPreview}}" Stretch="Uniform" Margin="2" />
+                        </Border>
+                      </Button>
                     </DataTemplate>
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>
@@ -245,16 +248,7 @@
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>
 
-                <!-- Dimensions -->
-                <GridViewColumn x:Name="colHeaderDimensions" Header="Габариты (Ш × В), мм" Width="140">
-                  <GridViewColumn.CellTemplate>
-                    <DataTemplate>
-                      <TextBlock Text="{Binding SizeLabel, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="4,0" />
-                    </DataTemplate>
-                  </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-
-                <!-- Mirrored copies on top of the quantity (left/right pairs) -->
+                <!-- Mirrored copies on top of the quantity (left/right pairs), next to it -->
                 <GridViewColumn x:Name="colHeaderMirrored" Header="{ui:Tr Col_Mirrored}" Width="100">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
@@ -265,16 +259,11 @@
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>
 
-                <!-- Colour Swatch -->
-                <GridViewColumn x:Name="colHeaderColor" Header="Цвет" Width="55">
+                <!-- Dimensions -->
+                <GridViewColumn x:Name="colHeaderDimensions" Header="Габариты (Ш × В), мм" Width="140">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
-                      <Button Style="{DynamicResource ColourSwatchButton}" Width="28" Height="22" VerticalAlignment="Center" Margin="2,0"
-                              ToolTip="{ui:Tr Tip_PartColor}"
-                              Click="OnPartColorClick" Tag="{Binding}">
-                        <Border Width="28" Height="22" BorderBrush="{DynamicResource Brush.BorderStrong}" BorderThickness="1"
-                                Background="{Binding EffectiveColorRgb, Converter={StaticResource RgbToBrush}}" />
-                      </Button>
+                      <TextBlock Text="{Binding SizeLabel, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="4,0" />
                     </DataTemplate>
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>
@@ -306,19 +295,13 @@
                 </GridViewColumn>
 
                 <!-- Actions: Details button + Remove -->
-                <GridViewColumn x:Name="colHeaderPartActions" Header="Действия" Width="180">
+                <GridViewColumn x:Name="colHeaderPartActions" Header="Действия" Width="100">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Button Style="{DynamicResource ModernButton}" Content="…" MinWidth="30" Margin="2,0"
                                 Click="OnEditPart" Tag="{Binding}"
                                 ToolTip="{ui:Tr Tip_PartDetails}" />
-                        <Button Style="{DynamicResource ModernButton}" Content="↔" MinWidth="30" Margin="2,0"
-                                Click="OnFlipPartLeftRight" Tag="{Binding}"
-                                ToolTip="{ui:Tr Tip_FlipLeftRight}" />
-                        <Button Style="{DynamicResource ModernButton}" Content="↕" MinWidth="30" Margin="2,0"
-                                Click="OnFlipPartUpDown" Tag="{Binding}"
-                                ToolTip="{ui:Tr Tip_FlipUpDown}" />
                         <Button Style="{DynamicResource IconButton}" Content="✕" Margin="4,0,0,0"
                                 ToolTip="{ui:Tr Tip_PartRemove}"
                                 Command="{Binding DataContext.ActiveDocument.RemovePartCommand, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -708,12 +691,13 @@
               <Border x:Name="layoutStrip" Grid.Row="1" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}"
                       BorderThickness="0,1,0,0" Padding="6,4" Visibility="Collapsed">
                 <DockPanel>
-                  <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" Margin="8,0,2,0" MaxWidth="240">
-                    <Button x:Name="btnCutRenest" Style="{DynamicResource PrimaryButton}" Content="{ui:Tr Btn_CutRenest}" Padding="10,6"
+                  <!-- Its own line, so the thumbnails get the whole width (a portrait screen had them squeezed). -->
+                  <DockPanel DockPanel.Dock="Top" Margin="2,0,2,4">
+                    <Button x:Name="btnCutRenest" DockPanel.Dock="Left" Style="{DynamicResource PrimaryButton}" Content="{ui:Tr Btn_CutRenest}" Padding="10,4"
                             Click="OnCutAndRenest" IsEnabled="False" ToolTip="{ui:Tr Tip_CutRenest}" />
-                    <TextBlock x:Name="layoutCutSummary" Style="{DynamicResource CaptionText}" TextWrapping="Wrap" Margin="0,4,0,0"
+                    <TextBlock x:Name="layoutCutSummary" Style="{DynamicResource CaptionText}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="10,0,0,0"
                                Text="{ui:Tr Hint_MarkCut}" />
-                  </StackPanel>
+                  </DockPanel>
                   <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                     <ItemsControl x:Name="layoutStripItems">
                       <ItemsControl.ItemsPanel>
@@ -723,11 +707,11 @@
                       </ItemsControl.ItemsPanel>
                       <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                          <Border x:Name="card" Margin="3" Padding="5,4" Width="150" Background="White" BorderThickness="2"
+                          <Border x:Name="card" Margin="3" Padding="4,3" Width="124" Background="White" BorderThickness="2"
                                   BorderBrush="{DynamicResource Brush.Border}" CornerRadius="3" Cursor="Hand"
                                   MouseLeftButtonUp="OnLayoutCardClick" ToolTip="{ui:Tr Tip_LayoutCard}">
                             <StackPanel>
-                              <Grid Height="72">
+                              <Grid Height="52">
                                 <Image Source="{Binding Thumbnail}" Stretch="Uniform" />
                                 <Border x:Name="cutBadge" Background="#CC2E7D32" CornerRadius="3" Padding="6,1"
                                         HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed">

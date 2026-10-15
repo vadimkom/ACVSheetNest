@@ -1265,8 +1265,6 @@ namespace DeepNestSharp.Ui.Views
 
       // Screen 1: Parts
       if (this.btnAddPart != null) this.btnAddPart.Content = Localization.Get("Btn_AddDxf");
-      if (this.btnDeletePart != null) this.btnDeletePart.Content = Localization.Get("Btn_DeletePart");
-      if (this.btnClearAllParts != null) this.btnClearAllParts.Content = Localization.Get("Btn_ClearAll");
       if (this.btnGoToSheets != null) this.btnGoToSheets.Content = Localization.Get("Btn_NextSheets");
       if (this.partsHintText != null) this.partsHintText.Text = Localization.Get("Hint_DragDrop");
       if (this.partsEmptyTitle != null) this.partsEmptyTitle.Text = Localization.Get("Parts_EmptyTitle");
@@ -1275,7 +1273,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderPartPreview != null) this.colHeaderPartPreview.Header = Localization.Get("Col_Preview");
       if (this.colHeaderPartName != null) this.colHeaderPartName.Header = Localization.Get("Col_PartName");
       if (this.colHeaderPartQty != null) this.colHeaderPartQty.Header = Localization.Get("Col_Quantity");
-      if (this.colHeaderColor != null) this.colHeaderColor.Header = Localization.Get("Col_Color");
       if (this.colHeaderPriority != null) this.colHeaderPriority.Header = Localization.Get("Col_Priority");
       if (this.colHeaderPartStatus != null) this.colHeaderPartStatus.Header = Localization.Get("Col_Status");
       if (this.colHeaderPartActions != null) this.colHeaderPartActions.Header = Localization.Get("Col_Actions");
@@ -1719,14 +1716,11 @@ namespace DeepNestSharp.Ui.Views
       }
     }
 
-    private void OnFlipPartLeftRight(object sender, RoutedEventArgs e) => this.FlipPart(sender, PartFlip.LeftRight);
-
-    private void OnFlipPartUpDown(object sender, RoutedEventArgs e) => this.FlipPart(sender, PartFlip.UpDown);
-
-    /// <summary>Flips the part itself, for a drawing that came the wrong hand; the same button again undoes it.</summary>
-    private void FlipPart(object sender, PartFlip axis)
+    /// <summary>Flips the part itself, for a drawing that came the wrong hand; flipping the same way again
+    /// undoes it. Asked for from Edit Part ("…").</summary>
+    private void FlipPart(IDetailLoadInfo part, PartFlip axis)
     {
-      if ((sender as FrameworkElement)?.Tag is not IDetailLoadInfo part || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      if (ViewModel?.ActiveDocument is not NestProjectViewModel doc)
       {
         return;
       }
@@ -1979,6 +1973,16 @@ namespace DeepNestSharp.Ui.Views
       if (dialog.ShowDialog() != true)
       {
         return;
+      }
+
+      // Each axis ticked differently from now is one more flip of the file, which undoes itself the same way.
+      var wanted = dialog.WantedFlip;
+      foreach (var axis in new[] { PartFlip.LeftRight, PartFlip.UpDown })
+      {
+        if ((wanted & axis) != (part.Flip & axis))
+        {
+          this.FlipPart(part, axis);
+        }
       }
 
       this.partsListView.Items.Refresh(); // plain (non-observable) fields may have changed
@@ -2844,27 +2848,38 @@ namespace DeepNestSharp.Ui.Views
 
     #region Part & Sheet Table Actions
 
-    private void OnRemoveSelectedPart(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// Delete removes the selected parts (Ctrl/Shift-click to pick several, Ctrl+A for all), asking first when
+    /// there is more than one. A field being typed in (a quantity) keeps its Delete for the text.
+    /// </summary>
+    private void OnPartsListKeyDown(object sender, KeyEventArgs e)
     {
-      if (ViewModel?.ActiveDocument is NestProjectViewModel doc && this.partsListView.SelectedItem is IDetailLoadInfo selected)
+      if (e.Key != Key.Delete || e.OriginalSource is System.Windows.Controls.Primitives.TextBoxBase
+        || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
       {
-        doc.RemovePartCommand.Execute(selected);
-        this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
-        UpdateSummaryBadges();
+        return;
       }
-    }
 
-    private void OnClearAllParts(object sender, RoutedEventArgs e)
-    {
-      if (ViewModel?.ActiveDocument is NestProjectViewModel doc && doc.ProjectInfo.DetailLoadInfos.Count > 0)
+      var selected = this.partsListView.SelectedItems.OfType<IDetailLoadInfo>().ToList();
+      if (selected.Count == 0)
       {
-        if (MessageBox.Show(Localization.Get("Msg_ClearPartsConfirm"), "SheetNest", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-        {
-          doc.ClearPartsCommand.Execute(null);
-          this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
-          UpdateSummaryBadges();
-        }
+        return;
       }
+
+      e.Handled = true;
+      if (selected.Count > 1
+        && MessageBox.Show(this, Localization.Format("Msg_DeletePartsConfirm", selected.Count), "SheetNest", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+      {
+        return;
+      }
+
+      foreach (var part in selected)
+      {
+        doc.RemovePartCommand.Execute(part);
+      }
+
+      this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+      UpdateSummaryBadges();
     }
 
     private void OnRemoveSelectedSheet(object sender, RoutedEventArgs e)
@@ -3055,7 +3070,7 @@ namespace DeepNestSharp.Ui.Views
 
       double available = this.partsListView.ActualWidth - SystemParameters.VerticalScrollBarWidth - 10;
       double others = this.colHeaderPartPreview.Width + this.colHeaderPartQty.Width + this.colHeaderDimensions.Width
-        + this.colHeaderMirrored.Width + this.colHeaderColor.Width + this.colHeaderPriority.Width
+        + this.colHeaderMirrored.Width + this.colHeaderPriority.Width
         + this.colHeaderPartStatus.Width + this.colHeaderPartActions.Width;
       this.colHeaderPartName.Width = Math.Max(220, available - others);
     }

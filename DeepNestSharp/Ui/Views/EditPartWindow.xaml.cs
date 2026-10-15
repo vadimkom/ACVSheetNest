@@ -28,6 +28,8 @@ namespace DeepNestSharp.Ui.Views
       this.requiredUpDown.Value = part.Quantity;
       this.extraUpDown.Value = part.Extra;
       this.mirroredUpDown.Value = part.MirrorQuantity;
+      this.flipLeftRightCheck.IsChecked = (part.Flip & PartFlip.LeftRight) != 0;
+      this.flipUpDownCheck.IsChecked = (part.Flip & PartFlip.UpDown) != 0;
 
       // Spacing is per-part; a part that has never been edited starts from the job default.
       this.spacingUpDown.Value = part.Spacing >= 0 ? part.Spacing : defaultSpacing;
@@ -255,6 +257,12 @@ namespace DeepNestSharp.Ui.Views
       }
     }
 
+
+    /// <summary>How the part should be flipped from its drawing, as ticked; the caller flips the file on OK,
+    /// because a flipped part is another file and the parts table has to follow it.</summary>
+    public PartFlip WantedFlip
+      => (this.flipLeftRightCheck.IsChecked == true ? PartFlip.LeftRight : PartFlip.None)
+        | (this.flipUpDownCheck.IsChecked == true ? PartFlip.UpDown : PartFlip.None);
 
     private void OnOk(object sender, RoutedEventArgs e)
     {

@@ -355,7 +355,7 @@
     <value>Normal (Стандартен)</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Можете да пуснете DXF файлове директно в таблицата (Drag &amp; Drop)</value>
+    <value>💡 Пуснете DXF в таблицата · Delete — изтрива избраните детайли</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Отбележете листовете, които вече са изрязани</value>
@@ -1449,7 +1449,7 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
     <value>Към окончателния чертеж на разкроя, експорта в DXF и печата на отчета (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
-    <value>Цвят на детайла (щракнете, за да промените)</value>
+    <value>Цвят на детайла: щракнете върху скицата, за да го смените</value>
   </data>
   <data name="Tip_PartDetails" xml:space="preserve">
     <value>Подробности за детайла: резервни, завъртания, разстояние, общо рязане</value>
@@ -1783,5 +1783,20 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   </data>
   <data name="Set_LibraryTip" xml:space="preserve">
     <value>Папката на библиотеката; всяка подпапка е група. Обща мрежова папка дава една библиотека за всички компютри.</value>
+  </data>
+  <data name="Rep_WeightCol" xml:space="preserve">
+    <value>Тегло, кг</value>
+  </data>
+  <data name="Msg_DeletePartsConfirm" xml:space="preserve">
+    <value>Да се изтрият ли избраните детайли ({0})?</value>
+  </data>
+  <data name="Part_Flip" xml:space="preserve">
+    <value>Огледално обръщане</value>
+  </data>
+  <data name="Part_FlipLeftRight" xml:space="preserve">
+    <value>↔ Отляво надясно</value>
+  </data>
+  <data name="Part_FlipUpDown" xml:space="preserve">
+    <value>↕ Отгоре надолу</value>
   </data>
 </root>

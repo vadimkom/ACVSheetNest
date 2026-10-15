@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Vous pouvez glisser-déposer des fichiers DXF directement dans ce tableau</value>
+    <value>💡 Glissez des DXF dans le tableau · Suppr retire les pièces sélectionnées</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Cochez les tôles déjà découpées</value>
@@ -1449,7 +1449,7 @@ Ouvrir la page de téléchargement ?</value>
     <value>Passer au plan de découpe final, à l'export DXF et à l'impression du rapport (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
-    <value>Couleur de la pièce (cliquez pour changer)</value>
+    <value>Couleur de la pièce : cliquez sur l'aperçu pour la changer</value>
   </data>
   <data name="Tip_PartDetails" xml:space="preserve">
     <value>Plus sur la pièce : réserve, rotations, écart, coupe commune</value>
@@ -1783,5 +1783,20 @@ Ouvrir la page de téléchargement ?</value>
   </data>
   <data name="Set_LibraryTip" xml:space="preserve">
     <value>Dossier de la bibliothèque ; chaque sous-dossier est un groupe. Un dossier partagé donne une bibliothèque pour tous les PC.</value>
+  </data>
+  <data name="Rep_WeightCol" xml:space="preserve">
+    <value>Poids, kg</value>
+  </data>
+  <data name="Msg_DeletePartsConfirm" xml:space="preserve">
+    <value>Retirer les {0} pièces sélectionnées ?</value>
+  </data>
+  <data name="Part_Flip" xml:space="preserve">
+    <value>Retourner la pièce</value>
+  </data>
+  <data name="Part_FlipLeftRight" xml:space="preserve">
+    <value>↔ Gauche-droite</value>
+  </data>
+  <data name="Part_FlipUpDown" xml:space="preserve">
+    <value>↕ Haut-bas</value>
   </data>
 </root>

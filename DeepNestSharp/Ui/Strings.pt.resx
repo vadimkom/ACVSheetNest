@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Você pode arrastar e soltar arquivos DXF diretamente nesta tabela</value>
+    <value>💡 Arraste DXF para a tabela · Delete remove as peças selecionadas</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Marque as chapas que já foram cortadas</value>
@@ -1449,7 +1449,7 @@ Abrir a página de download?</value>
     <value>Seguir para o desenho de corte final, a exportação DXF e a impressão do relatório (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
-    <value>Cor da peça (clique para mudar)</value>
+    <value>Cor da peça: clique na prévia para mudá-la</value>
   </data>
   <data name="Tip_PartDetails" xml:space="preserve">
     <value>Mais sobre a peça: reservas, rotações, folga, corte comum</value>
@@ -1783,5 +1783,20 @@ Abrir a página de download?</value>
   </data>
   <data name="Set_LibraryTip" xml:space="preserve">
     <value>Pasta da biblioteca; cada subpasta é um grupo. Uma pasta compartilhada dá uma biblioteca para todos os PCs.</value>
+  </data>
+  <data name="Rep_WeightCol" xml:space="preserve">
+    <value>Peso, kg</value>
+  </data>
+  <data name="Msg_DeletePartsConfirm" xml:space="preserve">
+    <value>Remover as {0} peças selecionadas?</value>
+  </data>
+  <data name="Part_Flip" xml:space="preserve">
+    <value>Espelhar a peça</value>
+  </data>
+  <data name="Part_FlipLeftRight" xml:space="preserve">
+    <value>↔ Esquerda-direita</value>
+  </data>
+  <data name="Part_FlipUpDown" xml:space="preserve">
+    <value>↕ Cima-baixo</value>
   </data>
 </root>

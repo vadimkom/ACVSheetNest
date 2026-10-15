@@ -355,7 +355,7 @@
     <value>Normal (Стандартный)</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Можно перетащить файлы DXF прямо в эту таблицу (Drag &amp; Drop)</value>
+    <value>💡 Перетащите DXF в таблицу · Delete — удалить выделенные детали</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Отметьте листы, которые уже вырезаны</value>
@@ -1449,7 +1449,7 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
     <value>Перейти к итоговому чертежу раскроя, экспорту в DXF и печати отчёта (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
-    <value>Цвет отображения детали (щёлкните, чтобы изменить)</value>
+    <value>Цвет детали: щёлкните по эскизу, чтобы изменить</value>
   </data>
   <data name="Tip_PartDetails" xml:space="preserve">
     <value>Подробности детали: запасные, повороты, зазор, общий рез</value>
@@ -1783,5 +1783,20 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   </data>
   <data name="Set_LibraryTip" xml:space="preserve">
     <value>Папка библиотеки деталей; каждая подпапка — группа. Общая сетевая папка даёт одну библиотеку на все компьютеры.</value>
+  </data>
+  <data name="Rep_WeightCol" xml:space="preserve">
+    <value>Вес, кг</value>
+  </data>
+  <data name="Msg_DeletePartsConfirm" xml:space="preserve">
+    <value>Удалить выделенные детали ({0})?</value>
+  </data>
+  <data name="Part_Flip" xml:space="preserve">
+    <value>Отражение детали</value>
+  </data>
+  <data name="Part_FlipLeftRight" xml:space="preserve">
+    <value>↔ Слева направо</value>
+  </data>
+  <data name="Part_FlipUpDown" xml:space="preserve">
+    <value>↕ Сверху вниз</value>
   </data>
 </root>

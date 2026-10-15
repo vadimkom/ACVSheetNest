@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 DXF-Dateien können Sie direkt in diese Tabelle ziehen</value>
+    <value>💡 DXF-Dateien in die Tabelle ziehen · Entf entfernt die ausgewählten Teile</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Markieren Sie die bereits geschnittenen Bleche</value>
@@ -1449,7 +1449,7 @@ Downloadseite öffnen?</value>
     <value>Weiter zur endgültigen Schneidzeichnung, zum DXF-Export und zum Berichtsdruck (Strg+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
-    <value>Farbe des Teils (zum Ändern klicken)</value>
+    <value>Farbe des Teils: zum Ändern auf die Skizze klicken</value>
   </data>
   <data name="Tip_PartDetails" xml:space="preserve">
     <value>Mehr zum Teil: Ersatzteile, Drehungen, Abstand, Common-Line-Schnitt</value>
@@ -1783,5 +1783,20 @@ Downloadseite öffnen?</value>
   </data>
   <data name="Set_LibraryTip" xml:space="preserve">
     <value>Ordner der Teilebibliothek; jeder Unterordner ist eine Gruppe. Ein freigegebener Ordner ergibt eine Bibliothek für alle PCs.</value>
+  </data>
+  <data name="Rep_WeightCol" xml:space="preserve">
+    <value>Gewicht, kg</value>
+  </data>
+  <data name="Msg_DeletePartsConfirm" xml:space="preserve">
+    <value>Die {0} ausgewählten Teile entfernen?</value>
+  </data>
+  <data name="Part_Flip" xml:space="preserve">
+    <value>Teil spiegeln</value>
+  </data>
+  <data name="Part_FlipLeftRight" xml:space="preserve">
+    <value>↔ Links-rechts</value>
+  </data>
+  <data name="Part_FlipUpDown" xml:space="preserve">
+    <value>↕ Oben-unten</value>
   </data>
 </root>

@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Puede arrastrar y soltar archivos DXF directamente en esta tabla</value>
+    <value>💡 Arrastre DXF a la tabla · Supr quita las piezas seleccionadas</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Marque las chapas que ya están cortadas</value>
@@ -1449,7 +1449,7 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
     <value>Pasar al plano de corte final, la exportación DXF y la impresión del informe (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
-    <value>Color de la pieza (clic para cambiarlo)</value>
+    <value>Color de la pieza: haga clic en la vista para cambiarlo</value>
   </data>
   <data name="Tip_PartDetails" xml:space="preserve">
     <value>Más sobre la pieza: repuestos, giros, separación, corte común</value>
@@ -1783,5 +1783,20 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
   </data>
   <data name="Set_LibraryTip" xml:space="preserve">
     <value>Carpeta de la biblioteca; cada subcarpeta es un grupo. Una carpeta compartida da una biblioteca para todos los PC.</value>
+  </data>
+  <data name="Rep_WeightCol" xml:space="preserve">
+    <value>Peso, kg</value>
+  </data>
+  <data name="Msg_DeletePartsConfirm" xml:space="preserve">
+    <value>¿Quitar las {0} piezas seleccionadas?</value>
+  </data>
+  <data name="Part_Flip" xml:space="preserve">
+    <value>Voltear la pieza</value>
+  </data>
+  <data name="Part_FlipLeftRight" xml:space="preserve">
+    <value>↔ Izquierda-derecha</value>
+  </data>
+  <data name="Part_FlipUpDown" xml:space="preserve">
+    <value>↕ Arriba-abajo</value>
   </data>
 </root>

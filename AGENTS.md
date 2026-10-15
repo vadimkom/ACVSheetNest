@@ -31,6 +31,7 @@ When resuming:
 - Historic upstream: https://github.com/9swampy/DeepNestSharp.
 - Commit identity: `git -c user.name="vadim" -c user.email="komarov.v@gmail.com" commit ...`. No global identity is configured.
 - Every MSI handed to the user gets a new version number. Releases on the fork feed the in-app update check (`UpdateChecker`, `releases/latest`).
+- **Never publish a release before the user has tested the local MSI and said "выложи".** Build it, tell them where it is, and wait. Pushing a release is what reaches the laser PC through the update check.
 
 ## Paths on this machine
 
@@ -121,8 +122,8 @@ Last verified (2026-10-14, 1.1.38): core 1078/1080; app 487/487 with the engine 
 - **Move a part between sheets** (`DxfViewer.MoveSelectedTo`): only between single-copy sheets without common cutting. The part goes to the first free spot bottom-left, or stays red in place. An emptied sheet returns to stock (`SheetRemoved`). One undo step.
 
 **Parts and sheets**
-- Flip ↔/↕ mirrors the part itself (`PartMirror`): a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.
-- The **Mirrored** column holds copies on top of the quantity.
+- Flip ↔/↕ mirrors the part itself (`PartMirror`): ticked in Edit Part ("…") and applied on OK; a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.
+- Parts table (user's layout, 2026-10-15): sketch, name, quantity, **Mirrored** (copies on top of the quantity), size, priority, status, actions "…" and ✕. No colour column: clicking the sketch changes the colour. No delete/clear buttons: Delete removes the selected rows (Ctrl/Shift for several, asked first when more than one).
 - Shapes (`AddShapeWindow`, `PartShapes`): a catalogue of `ShapeKind`s (rectangle, circle, washer, perforated tape), each with its parameters (label key + default in mm), optional presets (values they set and lock) and `Draw`. The dialog builds its fields from the kind, so a new shape is one class plus its texts. Files go to `%LOCALAPPDATA%\SheetNest\shapes`; adding the same shape again adds to that row. Values are in drawing units; defaults and presets are converted from mm in inch mode.
   - Washers: DIN 125-A M8/M10/M12 (hole 8.4/10.5/13, outside 16/20/24) and DIN 9021 (outside 24/30/37), or custom.
   - Perforated tape (`PerforatedTapeShape`): blank L × W cut into whole strips of width B; per strip a big hole every pitch with four small ones at ±offset along and ±rowGap/2 across, the groups centred along the length. Presets: B25 Ø8 (the shop's tape: small holes on a 10 mm square round each big one, groups every 20 mm, so a small hole every 10 mm along each row; the exact spacing was ours to choose, the user said any square-ish layout serves the fitters) and B17 Ø6.2 (the drawing the user sent: 10 × 8 round it, every 15). Small holes Ø3.2 in both. Shared cuts between strips get 0.5 mm bridges about every 400 mm (both editable).
@@ -161,7 +162,8 @@ Last verified (2026-10-14, 1.1.38): core 1078/1080; app 487/487 with the engine 
   - BACKGROUND = "Background"/8: display-only names.
 - One file per layout, `name_N_WxH_xRepeats.dxf`. The offcut line is not written to DXF.
 - Report:
-  - job summary with material and thickness, cut length in metres, pierces, and sheet and part weight (material + mm only);
+  - "Material required" box: sheets, then material and thickness and the sheet and part weight (material + mm only); "Job summary": parts, cut length in metres, pierces, material used, layouts;
+  - part tables add a weight column (one piece, kg) when the job has a material;
   - a size column;
   - part tables in one column, continued on following pages;
   - page numbers from a trial render pass.

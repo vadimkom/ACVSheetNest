@@ -1,8 +1,12 @@
 param(
   [string]$project = (Join-Path $PSScriptRoot 'demo.dnest'),
-  [string]$outDir = (Join-Path $PSScriptRoot '..\..\imgs'))
-# Opens the demo job (make-demo.ps1, then make-project.ps1) in the Release build, in English, nests it and
-# takes the README's screenshots into imgs\. The program's language is put back as it was afterwards.
+  [string]$outDir = (Join-Path $PSScriptRoot '..\..\imgs'),
+  [string]$language = 'en',
+  [int]$width = 1614,
+  [int]$height = 1007)
+# Opens the demo job (make-demo.ps1, then make-project.ps1) in the Release build, in English by default, nests it
+# and takes the README's screenshots into imgs\. -language bg -width 1080 -height 1850 checks another language or
+# a portrait screen instead. The program's language is put back as it was afterwards.
 # The window draws itself into each picture, so whatever else is on the screen stays out of it.
 $ErrorActionPreference = 'Stop'
 $s = $PSScriptRoot
@@ -72,7 +76,7 @@ function PageShot($name) {
 
 $session = "$env:LOCALAPPDATA\SheetNest\session.json"
 $sessionBefore = [IO.File]::ReadAllText($session)
-[IO.File]::WriteAllText($session, ($sessionBefore -replace '"Language": "[a-z]+"', '"Language": "en"'))
+[IO.File]::WriteAllText($session, ($sessionBefore -replace '"Language": "[a-z]+"', "`"Language`": `"$language`""))
 $exe = Join-Path $PSScriptRoot '..\..\DeepNestSharp\bin\Release\net10.0-windows\SheetNest.exe'
 $p = Start-Process $exe -ArgumentList "`"$project`"" -PassThru
 try {
@@ -80,7 +84,7 @@ Start-Sleep -Seconds 10
 $main = $A::RootElement.FindFirst($TS::Children, (Cond $A::ProcessIdProperty $p.Id))
 $hwnd = [IntPtr]$main.Current.NativeWindowHandle
 [W4]::ShowWindow($hwnd, 9) | Out-Null
-[W4]::MoveWindow($hwnd, 40, 20, 1614, 1007, $true) | Out-Null
+[W4]::MoveWindow($hwnd, 40, 20, $width, $height, $true) | Out-Null
 Start-Sleep -Seconds 2
 
 Pick (ById 'navNestingBtn'); Start-Sleep -Seconds 2

@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 You can drag and drop DXF files directly into this table</value>
+    <value>💡 Drag DXF files into this table · Delete removes the selected parts</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Tick the sheets that are already cut</value>
@@ -1449,7 +1449,7 @@ Open the download page?</value>
     <value>Go on to the final cutting drawing, DXF export and report printing (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
-    <value>The part's colour (click to change)</value>
+    <value>The part's colour: click the sketch to change it</value>
   </data>
   <data name="Tip_PartDetails" xml:space="preserve">
     <value>More about the part: spares, rotations, spacing, common cutting</value>
@@ -1783,5 +1783,20 @@ Open the download page?</value>
   </data>
   <data name="Set_LibraryTip" xml:space="preserve">
     <value>The folder the parts library is read from; each subfolder is a group. A shared folder makes one library for every PC.</value>
+  </data>
+  <data name="Rep_WeightCol" xml:space="preserve">
+    <value>Weight, kg</value>
+  </data>
+  <data name="Msg_DeletePartsConfirm" xml:space="preserve">
+    <value>Remove the {0} selected parts?</value>
+  </data>
+  <data name="Part_Flip" xml:space="preserve">
+    <value>Flip the part</value>
+  </data>
+  <data name="Part_FlipLeftRight" xml:space="preserve">
+    <value>↔ Left to right</value>
+  </data>
+  <data name="Part_FlipUpDown" xml:space="preserve">
+    <value>↕ Top to bottom</value>
   </data>
 </root>
