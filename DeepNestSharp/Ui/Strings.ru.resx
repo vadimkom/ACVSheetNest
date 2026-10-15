@@ -1814,4 +1814,7 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Viewer_NotFitCount" xml:space="preserve">
     <value>Не годны к резке: {0}</value>
   </data>
+  <data name="Shape_FitSheetNote" xml:space="preserve">
+    <value>Длина и ширина — это лист {0} × {1} {2}: лента рисуется внутри его отступов, лист добавляется в задание, и сразу запускается нестинг.</value>
+  </data>
 </root>

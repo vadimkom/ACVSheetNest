@@ -1814,4 +1814,7 @@ Downloadseite öffnen?</value>
   <data name="Viewer_NotFitCount" xml:space="preserve">
     <value>Nicht schneidbar: {0}</value>
   </data>
+  <data name="Shape_FitSheetNote" xml:space="preserve">
+    <value>Länge und Breite sind das Blech, {0} × {1} {2}: Das Band wird innerhalb seiner Ränder gezeichnet, das Blech kommt in den Auftrag und das Schachteln startet sofort.</value>
+  </data>
 </root>

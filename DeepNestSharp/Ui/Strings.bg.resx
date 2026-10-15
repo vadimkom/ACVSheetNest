@@ -1814,4 +1814,7 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   <data name="Viewer_NotFitCount" xml:space="preserve">
     <value>Негодни за рязане: {0}</value>
   </data>
+  <data name="Shape_FitSheetNote" xml:space="preserve">
+    <value>Дължината и ширината са на листа, {0} × {1} {2}: лентата се чертае в отстъпите му, листът се добавя към задачата и нестингът започва веднага.</value>
+  </data>
 </root>

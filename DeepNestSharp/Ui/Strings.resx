@@ -1814,4 +1814,7 @@ Open the download page?</value>
   <data name="Viewer_NotFitCount" xml:space="preserve">
     <value>Not fit to cut: {0}</value>
   </data>
+  <data name="Shape_FitSheetNote" xml:space="preserve">
+    <value>Length and width are the sheet, {0} × {1} {2}: the tape is drawn inside its margins, the sheet goes into the job and nesting starts at once.</value>
+  </data>
 </root>

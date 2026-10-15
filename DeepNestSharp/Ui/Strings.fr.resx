@@ -1814,4 +1814,7 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Viewer_NotFitCount" xml:space="preserve">
     <value>Non découpables : {0}</value>
   </data>
+  <data name="Shape_FitSheetNote" xml:space="preserve">
+    <value>La longueur et la largeur sont celles de la tôle, {0} × {1} {2} : la bande est dessinée dans ses marges, la tôle est ajoutée au travail et l'imbrication démarre aussitôt.</value>
+  </data>
 </root>

@@ -75,6 +75,31 @@ namespace DeepNestSharp.Ui.Views
 
     public int Quantity { get; private set; }
 
+    /// <summary>
+    /// For a shape drawn to the metal it is cut from (tape): the length and width typed are the SHEET, and
+    /// this turns a side of it into the room the shape gets on it (less the edge margins and a part gap).
+    /// Null: the size typed is the shape's own.
+    /// </summary>
+    public Func<double, double> SheetRoom { get; set; }
+
+    /// <summary>The sheet the shape was drawn for (length, width), to go into the job with it; null when the
+    /// size typed was the shape's own.</summary>
+    public (double Length, double Width)? FitSheet { get; private set; }
+
+    /// <summary>The values to draw: as typed, or, for a shape fitted to a sheet, with the room on it.</summary>
+    private double[] Fitted(ShapeKind kind, double[] typed)
+    {
+      if (this.SheetRoom == null || kind.Fit is not (int length, int width))
+      {
+        return typed;
+      }
+
+      var values = (double[])typed.Clone();
+      values[length] = this.SheetRoom(typed[length]);
+      values[width] = this.SheetRoom(typed[width]);
+      return values;
+    }
+
     /// <summary>No count: as many as the job's sheets have room for once the counted parts are on.</summary>
     public bool FillSheets { get; private set; }
 
@@ -208,9 +233,18 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
-      var values = this.fields.Select(f => f.Value ?? 0).ToArray();
+      var typed = this.fields.Select(f => f.Value ?? 0).ToArray();
+      var values = this.Fitted(this.CurrentKind, typed);
       string problem = this.CurrentKind.Problem(values);
       string summary = problem == null ? this.CurrentKind.Describe(values, Localization.Get, this.unit) : null;
+      if (summary != null && !ReferenceEquals(values, typed) && this.CurrentKind.Fit is (int length, int width))
+      {
+        summary += Environment.NewLine + Localization.Format(
+          "Shape_FitSheetNote",
+          typed[length].ToString("0.##", System.Globalization.CultureInfo.CurrentCulture),
+          typed[width].ToString("0.##", System.Globalization.CultureInfo.CurrentCulture),
+          this.unit);
+      }
       this.problemText.Text = problem == null ? string.Empty : Localization.Get(problem);
       this.problemText.Visibility = problem == null ? Visibility.Collapsed : Visibility.Visible;
       this.summaryText.Text = summary ?? string.Empty;
@@ -276,9 +310,10 @@ namespace DeepNestSharp.Ui.Views
     private void OnOk(object sender, RoutedEventArgs e)
     {
       // Typed text only reaches Value on focus loss, and Enter presses this button without one.
-      var values = this.Read();
+      var typed = this.Read();
       this.qtyUpDown.CommitInput();
       var kind = this.CurrentKind;
+      var values = this.Fitted(kind, typed);
       if (kind.Problem(values) != null)
       {
         this.ShowSummary();
@@ -287,6 +322,9 @@ namespace DeepNestSharp.Ui.Views
 
       this.Kind = kind;
       this.Values = values;
+      this.FitSheet = !ReferenceEquals(values, typed) && kind.Fit is (int fitLength, int fitWidth)
+        ? (typed[fitLength], typed[fitWidth])
+        : null;
       this.Preset = this.CurrentPreset;
       this.Quantity = this.qtyUpDown.Value ?? 1;
 
@@ -294,7 +332,7 @@ namespace DeepNestSharp.Ui.Views
       lastQuantity = this.Quantity;
       this.FillSheets = this.fillCheck.IsChecked == true;
       lastFillSheets = this.FillSheets;
-      LastValues[kind] = values;
+      LastValues[kind] = typed;
       if (kind.Presets.Count > 0)
       {
         LastPreset[kind] = this.presetCombo.SelectedIndex;

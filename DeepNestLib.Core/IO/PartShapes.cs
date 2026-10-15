@@ -255,9 +255,13 @@ namespace DeepNestLib.IO
 
     public override IReadOnlyList<ShapePreset> Presets { get; } = new[]
     {
-      // B25: the shop's tape. The small holes sit on a 10 mm square round the big one and the groups repeat every
-      // 20 mm, so along each row there is a small hole every 10 mm for a screw wherever it lands; 1.5 mm of metal
-      // between big and small, 5.9 mm to the edge. B17 is the drawing the shop sent: 10 x 8 round it, every 15.
+      // B26: the shop's tape, from its own drawing (perfo1, 2026-10-15), so first. A big Ø8.2 every 25 mm and
+      // the small Ø3.5 in pairs 18 apart across, halfway between the big ones, so each pair serves the big hole
+      // on either side.
+      Tape(26, 8.2, pitch: 25, rowGap: 18, smallHole: 3.5, smallOffset: 12.5),
+
+      // B25: our first guess at it, before the drawing came. The small holes sit on a 10 mm square round the
+      // big one and the groups repeat every 20 mm. B17 is a drawing the shop sent: 10 x 8 round it, every 15.
       Tape(25, 8, pitch: 20, rowGap: 10),
       Tape(17, 6.2, pitch: 15, rowGap: 8),
     };
@@ -292,7 +296,7 @@ namespace DeepNestLib.IO
       if (Math.Sqrt((v[SmallOffset] * v[SmallOffset]) + (v[RowGap] * v[RowGap] / 4)) <= big + small
         || v[RowGap] <= 2 * small
         || 2 * v[SmallOffset] <= 2 * small
-        || v[Pitch] - (2 * v[SmallOffset]) <= 2 * small
+        || (Between(v) > 1e-6 && Between(v) <= 2 * small)
         || v[Pitch] <= 2 * big)
       {
         return "Shape_TapeHolesTouch";
@@ -345,6 +349,10 @@ namespace DeepNestLib.IO
 
       int groups = Groups(v);
       double first = (length - ((groups - 1) * v[Pitch])) / 2;
+
+      // With the small holes halfway between the big ones (offset = half the pitch) neighbouring groups
+      // share them: each is cut once, not twice on the same spot.
+      bool shared = Between(v) <= 1e-6;
       for (int k = 0; k < strips; k++)
       {
         double yc = (k + 0.5) * strip;
@@ -354,6 +362,11 @@ namespace DeepNestLib.IO
           yield return Cut(new DxfCircle(new DxfPoint(xc, yc, 0), v[BigHole] / 2));
           foreach (double dx in new[] { -v[SmallOffset], v[SmallOffset] })
           {
+            if (shared && dx > 0 && g < groups - 1)
+            {
+              continue; // the next group's left pair is this one
+            }
+
             foreach (double dy in new[] { -v[RowGap] / 2, v[RowGap] / 2 })
             {
               yield return Cut(new DxfCircle(new DxfPoint(xc + dx, yc + dy, 0), v[SmallHole] / 2));
@@ -362,6 +375,10 @@ namespace DeepNestLib.IO
         }
       }
     }
+
+    /// <summary>How far apart the last small holes of one group and the first of the next are, along the
+    /// strip; zero when they are the same holes.</summary>
+    private static double Between(IReadOnlyList<double> v) => Math.Abs(v[Pitch] - (2 * v[SmallOffset]));
 
     /// <summary>How many whole strips the blank holds.</summary>
     public static int Strips(IReadOnlyList<double> v) => (int)Math.Floor((v[Width] / v[Strip]) + 1e-9);
@@ -374,15 +391,15 @@ namespace DeepNestLib.IO
       return room < 0 ? 0 : (int)Math.Floor((room / v[Pitch]) + 1e-9) + 1;
     }
 
-    private static ShapePreset Tape(double strip, double bigHole, double pitch, double rowGap)
-      => new ShapePreset("Shape_TapePreset", Section(strip, bigHole, 3.2), new Dictionary<int, double>
+    private static ShapePreset Tape(double strip, double bigHole, double pitch, double rowGap, double smallHole = 3.2, double smallOffset = 5)
+      => new ShapePreset("Shape_TapePreset", Section(strip, bigHole, smallHole), new Dictionary<int, double>
       {
         [Strip] = strip,
         [BigHole] = bigHole,
-        [SmallHole] = 3.2,
+        [SmallHole] = smallHole,
         [Pitch] = pitch,
         [RowGap] = rowGap,
-        [SmallOffset] = 5,
+        [SmallOffset] = smallOffset,
       });
   }
 }

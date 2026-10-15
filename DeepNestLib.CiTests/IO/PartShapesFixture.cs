@@ -33,11 +33,11 @@ namespace DeepNestLib.CiTests.IO
       return PartShapes.Write(dir, kind.PartName(values, null, Text), kind, values, millimetres: true);
     }
 
-    private static double[] Tape(double length = 1000, double width = 250)
+    private static double[] Tape(double length = 1000, double width = 250, string section = "B25,")
     {
       var kind = PartShapes.PerforatedTape;
       var values = kind.Parameters.Select(p => p.DefaultMm).ToArray();
-      foreach (var kv in kind.Presets[0].ValuesMm)
+      foreach (var kv in kind.Presets.First(p => p.Detail.StartsWith(section, StringComparison.Ordinal)).ValuesMm)
       {
         values[kv.Key] = kv.Value;
       }
@@ -45,6 +45,22 @@ namespace DeepNestLib.CiTests.IO
       values[PerforatedTapeShape.Length] = length;
       values[PerforatedTapeShape.Width] = width;
       return values;
+    }
+
+    /// <summary>The shop's own tape drawing (perfo1: one strip 26 x 1237.8) has 49 big holes and 100 small
+    /// ones, each small one cut once although it sits between two groups.</summary>
+    [Fact]
+    public void TheShopsTapeCutsEachSharedSmallHoleOnce()
+    {
+      var v = Tape(1237.78, 26, "B26,");
+      PartShapes.PerforatedTape.Problem(v).Should().BeNull();
+      var circles = PartShapes.PerforatedTape.Draw(v).OfType<DxfCircle>().ToList();
+
+      circles.Count(c => Math.Abs(c.Radius - 4.1) < 1e-9).Should().Be(49);
+      var small = circles.Where(c => Math.Abs(c.Radius - 1.75) < 1e-9).ToList();
+      small.Should().HaveCount(100);
+      small.Select(c => (Math.Round(c.Center.X, 6), Math.Round(c.Center.Y, 6))).Should().OnlyHaveUniqueItems();
+      small.Select(c => Math.Round(c.Center.Y, 6)).Distinct().Should().BeEquivalentTo(new[] { 4.0, 22.0 });
     }
 
     [Theory]

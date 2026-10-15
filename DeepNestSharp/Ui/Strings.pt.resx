@@ -1814,4 +1814,7 @@ Abrir a página de download?</value>
   <data name="Viewer_NotFitCount" xml:space="preserve">
     <value>Impróprias para corte: {0}</value>
   </data>
+  <data name="Shape_FitSheetNote" xml:space="preserve">
+    <value>O comprimento e a largura são os da chapa, {0} × {1} {2}: a fita é desenhada dentro das margens, a chapa entra no trabalho e o encaixe começa na hora.</value>
+  </data>
 </root>

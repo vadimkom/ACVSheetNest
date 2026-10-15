@@ -1814,4 +1814,7 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
   <data name="Viewer_NotFitCount" xml:space="preserve">
     <value>No aptas para corte: {0}</value>
   </data>
+  <data name="Shape_FitSheetNote" xml:space="preserve">
+    <value>El largo y el ancho son los de la chapa, {0} × {1} {2}: la cinta se dibuja dentro de sus márgenes, la chapa se añade al trabajo y el anidado empieza enseguida.</value>
+  </data>
 </root>

@@ -78,12 +78,18 @@
       // Depth is how many other contours enclose this one: even means material, odd means a hole in the
       // one immediately around it. Counting rather than pairing is what makes a part inside a hole come
       // out as its own part instead of disappearing into its host.
+      //
+      // Only a contour whose box holds this one's box can enclose it, and such a contour covers the grid cell
+      // under this one's centre: each contour is asked about the few registered in that cell, not about
+      // every other contour. Asking every pair took 19 s over a 1000 x 500 blank of perforated tape (5000
+      // holes) and many minutes over a whole sheet of it.
       var depth = new int[contours.Count];
+      var grid = new ContainmentGrid(rings);
       for (int i = 0; i < contours.Count; i++)
       {
-        for (int j = 0; j < contours.Count; j++)
+        foreach (int j in grid.CouldEnclose(i))
         {
-          if (i != j && Encloses(rings[j], rings[i]))
+          if (Encloses(rings[j], rings[i]))
           {
             depth[i]++;
           }
@@ -119,7 +125,9 @@
         Island host = null;
         foreach (Island candidate in parts)
         {
-          if (Encloses(candidate.Outer, rings[i]) && (host == null || candidate.Area < host.Area))
+          if (ContainmentGrid.BoxHolds(candidate.Outer, rings[i])
+            && Encloses(candidate.Outer, rings[i])
+            && (host == null || candidate.Area < host.Area))
           {
             host = candidate;
           }
@@ -333,6 +341,80 @@
       public int PartIndex { get; }
 
       public int Quantity { get; }
+    }
+
+    /// <summary>
+    /// The contours of a drawing on a coarse grid, each registered in every cell its box covers, so the
+    /// contours that might enclose a given one are those in the cell under its centre whose box holds its box.
+    /// </summary>
+    private sealed class ContainmentGrid
+    {
+      private const int MaxCellsPerSide = 256;
+      private readonly IReadOnlyList<INfp> rings;
+      private readonly List<int>[] cells;
+      private readonly double minX;
+      private readonly double minY;
+      private readonly double cellW;
+      private readonly double cellH;
+      private readonly int side;
+
+      internal ContainmentGrid(IReadOnlyList<INfp> rings)
+      {
+        this.rings = rings;
+        this.side = Math.Clamp((int)Math.Ceiling(Math.Sqrt(rings.Count)), 1, MaxCellsPerSide);
+        this.cells = new List<int>[this.side * this.side];
+        if (rings.Count == 0)
+        {
+          return;
+        }
+
+        this.minX = rings.Min(r => r.MinX);
+        this.minY = rings.Min(r => r.MinY);
+        this.cellW = Math.Max(1e-9, (rings.Max(r => r.MaxX) - this.minX) / this.side);
+        this.cellH = Math.Max(1e-9, (rings.Max(r => r.MaxY) - this.minY) / this.side);
+        for (int j = 0; j < rings.Count; j++)
+        {
+          for (int cy = this.Row(rings[j].MinY); cy <= this.Row(rings[j].MaxY); cy++)
+          {
+            for (int cx = this.Column(rings[j].MinX); cx <= this.Column(rings[j].MaxX); cx++)
+            {
+              (this.cells[(cy * this.side) + cx] ??= new List<int>()).Add(j);
+            }
+          }
+        }
+      }
+
+      /// <summary>Whether <paramref name="outer"/>'s box holds <paramref name="inner"/>'s, give or take a
+      /// rounding: a ring that encloses another always does.</summary>
+      internal static bool BoxHolds(INfp outer, INfp inner)
+      {
+        double eps = 1e-9 * Math.Max(1, Math.Max(outer.MaxX - outer.MinX, outer.MaxY - outer.MinY));
+        return outer.MinX <= inner.MinX + eps && outer.MinY <= inner.MinY + eps
+          && outer.MaxX >= inner.MaxX - eps && outer.MaxY >= inner.MaxY - eps;
+      }
+
+      /// <summary>The other contours whose box holds contour <paramref name="i"/>'s box.</summary>
+      internal IEnumerable<int> CouldEnclose(int i)
+      {
+        INfp ring = this.rings[i];
+        var cell = this.cells[(this.Row((ring.MinY + ring.MaxY) / 2) * this.side) + this.Column((ring.MinX + ring.MaxX) / 2)];
+        if (cell == null)
+        {
+          yield break;
+        }
+
+        foreach (int j in cell)
+        {
+          if (j != i && BoxHolds(this.rings[j], ring))
+          {
+            yield return j;
+          }
+        }
+      }
+
+      private int Column(double x) => Math.Clamp((int)Math.Floor((x - this.minX) / this.cellW), 0, this.side - 1);
+
+      private int Row(double y) => Math.Clamp((int)Math.Floor((y - this.minY) / this.cellH), 0, this.side - 1);
     }
 
     /// <summary>One outer contour while its holes are still being gathered onto it.</summary>

@@ -1849,14 +1849,8 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
-      // The tape is drawn to what is left of the offcut inside the edge margin and one part gap, its
-      // length along the offcut's long side, in whole millimetres (or inches) and a little short of the
-      // room so it is never refused for touching it.
-      var config = ViewModel.SvgNestConfigViewModel.SvgNestConfig;
-      double inset = (2 * Math.Max(0, config.SheetSpacing)) + Math.Max(0, config.Spacing);
-      double slack = this.unitsMm ? 0.5 : 0.02;
-      double whole = this.unitsMm ? 1 : 0.1;
-      double Room(double side) => Math.Floor((side - inset - slack) / whole) * whole;
+      // The tape is drawn to what is left of the offcut (see TapeRoom), its length along the long side.
+      double Room(double side) => this.TapeRoom(side);
       double longSide = Room(Math.Max(dialog.PieceWidth, dialog.PieceLength));
       double shortSide = Room(Math.Min(dialog.PieceWidth, dialog.PieceLength));
       var paths = new List<string>();
@@ -1913,6 +1907,21 @@ namespace DeepNestSharp.Ui.Views
 
     /// <summary>A part the program draws (a rectangle, washers, perforated tape...): 50 squares 100 x 100
     /// without a CAD trip.</summary>
+    /// <summary>
+    /// The room a shape drawn to its metal (tape) gets on a side of a sheet: less the edge margin at both ends
+    /// and one part gap, in whole millimetres (or tenths of an inch), and a little short of that. The engine
+    /// packs the outline grown by half a gap and refuses one exactly as long as the room (sparrow gives up on
+    /// an item that only just fits its strip).
+    /// </summary>
+    private double TapeRoom(double side)
+    {
+      var config = ViewModel.SvgNestConfigViewModel.SvgNestConfig;
+      double inset = (2 * Math.Max(0, config.SheetSpacing)) + Math.Max(0, config.Spacing);
+      double slack = this.unitsMm ? 0.5 : 0.02;
+      double whole = this.unitsMm ? 1 : 0.1;
+      return Math.Floor((side - inset - slack) / whole) * whole;
+    }
+
     private async void OnAddShapeClicked(object sender, RoutedEventArgs e)
     {
       if (ViewModel?.ActiveDocument is not NestProjectViewModel doc)
@@ -1923,6 +1932,7 @@ namespace DeepNestSharp.Ui.Views
       var dialog = new AddShapeWindow(this.unitsMm)
       {
         Owner = this,
+        SheetRoom = this.TapeRoom,
         LibraryFolder = (SessionState.Load() ?? new SessionState()).EffectiveLibraryFolder,
       };
       if (dialog.ShowDialog() != true)
@@ -1983,6 +1993,14 @@ namespace DeepNestSharp.Ui.Views
 
       doc.IsDirty = true;
       UpdateSummaryBadges();
+
+      // Tape is drawn for a sheet: that sheet goes into the job, one per blank, and the nest starts at once.
+      if (dialog.FitSheet is (double sheetLength, double sheetWidth) && !dialog.FillSheets)
+      {
+        this.AddSheetOfSize((int)Math.Round(sheetLength), (int)Math.Round(sheetWidth), dialog.Quantity, unlimited: false, priority: 1);
+        this.SetCurrentMode(WorkflowMode.Nesting);
+        this.OnNest(this.btnStartNest, e);
+      }
     }
 
     private void OnPartsListDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
