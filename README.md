@@ -19,7 +19,7 @@ If you cut sheet metal, SheetNest helps you get the most parts out of every shee
 
 ## About this fork
 
-This is the ACV fork of [ManuelMRosa/SheetNest](https://github.com/ManuelMRosa/SheetNest), developed for and tested at a working laser-cutting shop. It branched from SheetNest 1.1.10; the installer is on the [releases page](https://github.com/vadimkom/ACVSheetNest/releases/latest). It keeps the original's 2D workflow, except that importing and unfolding 3D parts (STEP/IGES through FreeCAD, with the K-factor setting) has been removed. It adds:
+This is the acvent.bg fork of [ManuelMRosa/SheetNest](https://github.com/ManuelMRosa/SheetNest), developed for and tested at a working laser-cutting shop. It branched from SheetNest 1.1.10; the installer is on the [releases page](https://github.com/vadimkom/ACVSheetNest/releases/latest). It keeps the original's 2D workflow, except that importing and unfolding 3D parts (STEP/IGES through FreeCAD, with the K-factor setting) has been removed. It adds:
 
 **Workflow**
 - Four steps across the top: **Parts → Sheets → Nesting → Layout & Report** (Ctrl+1…4).
@@ -87,24 +87,31 @@ Bug fixes that apply to the original are offered back upstream as separate pull 
 
 ## Screenshots
 
+The pictures show a made-up demo job: an arm, a plate, a lever, a ring, a clip and a hub on a 2500 × 1250 mm sheet. The drawings are in [assets/demo](assets/demo), so the shots can be taken again.
+
 <p align="center">
   <img src="imgs/main-nest.png" alt="SheetNest nesting sheet-metal parts on a stock sheet for laser cutting" width="900"><br>
-  <em>One-click true-shape nesting. Your parts packed tight on the sheet, ready to cut.</em>
+  <em>One-click true-shape nesting: the hubs go into the rings' holes, the leftover strip is offered as an offcut, and every sheet has a thumbnail to tick when it is cut.</em>
+</p>
+
+<p align="center">
+  <img src="imgs/parts.png" alt="SheetNest parts table: quantities, mirrored copies, colours, priority and the part tools" width="900"><br>
+  <em>The parts: quantities and mirrored copies in the row, each part's colour and priority, flip buttons, shapes without a DXF and filling an offcut from the library.</em>
 </p>
 
 <p align="center">
   <img src="imgs/edit-nest.png" alt="Editing a nest by hand in SheetNest: select, drag, rotate and mirror parts" width="900"><br>
-  <em>Fine-tune by hand: select, drag, rotate, mirror, nudge, or type a coordinate to place a part exactly.</em>
+  <em>Fine-tune by hand: select, drag, rotate, mirror, nudge, or move a part to another sheet.</em>
 </p>
 
 <p align="center">
-  <img src="imgs/nest-report.png" alt="SheetNest PDF nest report: material required, job summary, cutting plan and part totals" width="640"><br>
-  <em>The one-click PDF report: how much material to buy, the cutting plan, and what is on each layout.</em>
+  <img src="imgs/nest-report.png" alt="SheetNest PDF nest report: material required, job summary with weight and cut length, cutting plan and part totals" width="900"><br>
+  <em>The one-click PDF report: how much material to buy, what it weighs, metres of cut and pierces, the cutting plan, and every part with its size.</em>
 </p>
 
 <p align="center">
-  <img src="imgs/nest-report-layout.png" alt="SheetNest nest report layout page: the sheet drawn to scale with every part numbered" width="640"><br>
-  <em>Every layout drawn to scale, with each part numbered so a cut piece can be matched to its row and marked.</em>
+  <img src="imgs/nest-report-layout.png" alt="SheetNest nest report layout page: the sheet drawn to scale with every part numbered" width="900"><br>
+  <em>Every layout drawn to scale, with each part numbered so a cut piece can be matched to its row.</em>
 </p>
 
 ## License

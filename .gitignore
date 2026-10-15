@@ -374,3 +374,6 @@ reference/
 # The nesting engine writes its log and solution next to its working directory;
 # running it from the repo root leaves this behind.
 output/
+
+# Built by assets/demo/make-project.ps1 with this machine's paths in it
+assets/demo/demo.dnest

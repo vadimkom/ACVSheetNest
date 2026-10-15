@@ -1,10 +1,10 @@
-# SheetNest (ACV fork): notes for coding agents
+# SheetNest (acvent.bg fork): notes for coding agents
 
 ## Quick start
 
 SheetNest is a Windows nesting program for sheet metal, grown out of DeepNestSharp. It imports DXF and SC2000 CHF drawings, nests parts onto stock sheets with the Sparrow engine, allows manual editing, and exports DXF and a PDF production report. C# / .NET 10 / WPF.
 
-This repository is the ACV fork, used at a laser-cutting shop. The shop PC is usually a Ryzen 5600, occasionally a Celeron J4125. The operator nests almost always with the fast setting (now the **▶ Nest** button) and works in millimetres.
+This repository is the acvent.bg fork, used at a laser-cutting shop. The shop PC is usually a Ryzen 5600, occasionally a Celeron J4125. The operator nests almost always with the fast setting (now the **▶ Nest** button) and works in millimetres.
 
 When resuming:
 1. Run `git status --short --branch` and `git log -5 --oneline`.
