@@ -119,6 +119,7 @@ namespace DeepNestSharp.Domain.Models
     {
       OnPropertyChanged(nameof(FlipLabel));
       OnPropertyChanged(nameof(NestingLabel));
+      OnPropertyChanged(nameof(FillLabel));
     }
 
     public int Quantity
@@ -127,6 +128,7 @@ namespace DeepNestSharp.Domain.Models
       set
       {
         SetProperty(nameof(Quantity), () => detailLoadInfo.Quantity, v => detailLoadInfo.Quantity = v, value);
+        OnPropertyChanged(nameof(FillLabel));
         OnPropertyChanged(nameof(NestedInfo));
       }
     }
@@ -150,6 +152,22 @@ namespace DeepNestSharp.Domain.Models
         OnPropertyChanged(nameof(NestedInfo));
       }
     }
+
+    public bool FillSheets
+    {
+      get => detailLoadInfo.FillSheets;
+      set
+      {
+        SetProperty(nameof(FillSheets), () => detailLoadInfo.FillSheets, v => detailLoadInfo.FillSheets = v, value);
+        OnPropertyChanged(nameof(FillLabel));
+      }
+    }
+
+    /// <summary>What the quantity cell says for a part that fills the sheets: "fill", and how many the last nest
+    /// put on once there has been one.</summary>
+    public string FillLabel => detailLoadInfo.Quantity > 0
+      ? DeepNestSharp.Domain.Services.UiText.Format("Part_FillCount", detailLoadInfo.Quantity)
+      : DeepNestSharp.Domain.Services.UiText.Get("Part_Fill");
 
     private int nestedCount;
 

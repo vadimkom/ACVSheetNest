@@ -1799,4 +1799,19 @@ Downloadseite öffnen?</value>
   <data name="Part_FlipUpDown" xml:space="preserve">
     <value>↕ Oben-unten</value>
   </data>
+  <data name="Part_FillSheets" xml:space="preserve">
+    <value>Bleche füllen</value>
+  </data>
+  <data name="Part_Fill" xml:space="preserve">
+    <value>füllen</value>
+  </data>
+  <data name="Part_FillCount" xml:space="preserve">
+    <value>füllen: {0}</value>
+  </data>
+  <data name="Tip_PartFill" xml:space="preserve">
+    <value>Ohne Anzahl: Das Schachteln setzt so viele, wie auf den Blechen nach allen gezählten Teilen Platz haben.</value>
+  </data>
+  <data name="Viewer_NotFitCount" xml:space="preserve">
+    <value>Nicht schneidbar: {0}</value>
+  </data>
 </root>

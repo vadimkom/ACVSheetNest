@@ -2011,6 +2011,11 @@ namespace DeepNestLib.IO
     private static readonly System.Text.RegularExpressions.Regex FlatPatternPrefix = new System.Text.RegularExpressions.Regex(
       @"^\s*Flat[\s_-]*Pattern\s*-\s*", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 
+    /// <summary>Drawings whose copies carry no name, on the layout or in the DXF: parts that fill the sheets
+    /// (a sheet of washers), where a name on each of thousands is only noise and engraving time. Swapped
+    /// whole by the app whenever the job's parts change.</summary>
+    public static ISet<string> UnnamedParts { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
     public static string GetPartNameLabel(string source)
     {
       if (string.IsNullOrWhiteSpace(source))
@@ -2176,7 +2181,7 @@ namespace DeepNestLib.IO
 
       foreach (var placement in placements)
       {
-        string text = GetPartNameLabel(placement.Part?.Name);
+        string text = UnnamedParts.Contains(placement.Part?.Name ?? string.Empty) ? null : GetPartNameLabel(placement.Part?.Name);
         if (string.IsNullOrWhiteSpace(text))
         {
           continue;
@@ -2232,7 +2237,7 @@ namespace DeepNestLib.IO
           continue;
         }
 
-        string text = GetPartNameLabel(polygon.Name);
+        string text = UnnamedParts.Contains(polygon.Name ?? string.Empty) ? null : GetPartNameLabel(polygon.Name);
         if (string.IsNullOrWhiteSpace(text))
         {
           continue;

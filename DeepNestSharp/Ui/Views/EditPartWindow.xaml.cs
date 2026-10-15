@@ -16,6 +16,15 @@ namespace DeepNestSharp.Ui.Views
     private readonly int globalRotations;
     private bool commonCuttingSelectionChanged;
 
+    /// <summary>A part that fills the sheets has no count: its counts rest while the box is ticked.</summary>
+    private void OnFillSheetsChanged(object sender, RoutedEventArgs e)
+    {
+      bool counted = this.fillSheetsCheck.IsChecked != true;
+      this.requiredUpDown.IsEnabled = counted;
+      this.extraUpDown.IsEnabled = counted;
+      this.mirroredUpDown.IsEnabled = counted;
+    }
+
     public EditPartWindow(IDetailLoadInfo part, int globalRotations, double defaultSpacing)
     {
       this.part = part;
@@ -28,6 +37,7 @@ namespace DeepNestSharp.Ui.Views
       this.requiredUpDown.Value = part.Quantity;
       this.extraUpDown.Value = part.Extra;
       this.mirroredUpDown.Value = part.MirrorQuantity;
+      this.fillSheetsCheck.IsChecked = part.FillSheets;
       this.flipLeftRightCheck.IsChecked = (part.Flip & PartFlip.LeftRight) != 0;
       this.flipUpDownCheck.IsChecked = (part.Flip & PartFlip.UpDown) != 0;
 
@@ -276,6 +286,7 @@ namespace DeepNestSharp.Ui.Views
       this.part.Quantity = this.requiredUpDown.Value ?? this.part.Quantity;
       this.part.Extra = this.extraUpDown.Value ?? this.part.Extra;
       this.part.MirrorQuantity = this.mirroredUpDown.Value ?? this.part.MirrorQuantity;
+      this.part.FillSheets = this.fillSheetsCheck.IsChecked == true;
       this.part.Spacing = System.Math.Max(0, this.spacingUpDown.Value ?? 0);
 
       var commonCutting = ChosenCommonCutting(

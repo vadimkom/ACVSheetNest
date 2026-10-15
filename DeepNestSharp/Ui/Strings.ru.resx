@@ -1799,4 +1799,19 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Part_FlipUpDown" xml:space="preserve">
     <value>↕ Сверху вниз</value>
   </data>
+  <data name="Part_FillSheets" xml:space="preserve">
+    <value>Заполнить листы</value>
+  </data>
+  <data name="Part_Fill" xml:space="preserve">
+    <value>заполнить</value>
+  </data>
+  <data name="Part_FillCount" xml:space="preserve">
+    <value>заполнить: {0}</value>
+  </data>
+  <data name="Tip_PartFill" xml:space="preserve">
+    <value>Без количества: нестинг кладёт столько, сколько поместится на листы после всех деталей с количеством.</value>
+  </data>
+  <data name="Viewer_NotFitCount" xml:space="preserve">
+    <value>Не годны к резке: {0}</value>
+  </data>
 </root>

@@ -100,6 +100,7 @@ namespace DeepNestSharp.RasterNest
       public int Qty;
       public bool Mirrored;   // this population is X-flipped — placements carry IsMirrored for the exporter
       public int Priority;    // 1-10, LOWER nests first (1 = highest); decides which parts fill earlier sheets
+      public bool Fill;       // asked for "as many as go on", not a count: what is left over was never ordered
 
       /// <summary>The same part, loaded once already, asked for a different number of times.</summary>
       public Loaded WithQty(int qty)
@@ -398,7 +399,31 @@ namespace DeepNestSharp.RasterNest
         return null;
       }
 
-      return RunNestBody(
+      bool filling = loaded.Any(l => l.Fill);
+      if (filling)
+      {
+        // Parts asked to fill the sheets are offered as many as the whole stock could hold (by the area of
+        // their spaced outline, which errs on the generous side) and go after everything ordered by count.
+        // An unlimited size would never run out of room, so in such a job it counts as the sheets in the
+        // box, at least one.
+        foreach (var size in sizes.Where(s => s.Unlimited))
+        {
+          size.Unlimited = false;
+          size.Remaining = Math.Max(1, size.Remaining);
+        }
+
+        double stockArea = sizes.Sum(s => Math.Max(0, s.W - (2 * margin)) * Math.Max(0, s.H - (2 * margin)) * s.Remaining);
+        for (int i = 0; i < loaded.Count; i++)
+        {
+          if (loaded[i].Fill)
+          {
+            double footprint = Math.Max(1e-9, Math.Abs((loaded[i].Dilated ?? loaded[i].Nfp).Area));
+            loaded[i] = loaded[i].WithQty(Math.Max(1, (int)Math.Ceiling(stockArea / footprint)));
+          }
+        }
+      }
+
+      var result = RunNestBody(
         loaded,
         sizes,
         margin,
@@ -413,7 +438,21 @@ namespace DeepNestSharp.RasterNest
         out error,
         candidateCallback,
         seedOffset);
+      if (result == null || !filling)
+      {
+        return result;
+      }
+
+      // The filling parts that found no room were never asked for: only what is still owed of the counted
+      // parts comes back as unplaced.
+      var fillOutlines = new HashSet<INfp>(loaded.Where(l => l.Fill).Select(l => l.Nfp), ReferenceEqualityComparer.Instance);
+      var owed = result.UnplacedParts.Where(p => !fillOutlines.Contains(p)).ToList();
+      int placed = result.UsedSheets.Sum(s => s.PartPlacements.Count);
+      return new NestResult(placed + owed.Count, (SheetPlacementCollection)result.UsedSheets, owed, PlacementTypeEnum.BoundingBox, 0, 0);
     }
+
+    /// <summary>The priority parts that fill the sheets nest at: after every part ordered by count (1-10).</summary>
+    internal const int FillPriority = 11;
 
     /// <summary>What <see cref="Fill"/> says when not one of the parts goes on the piece.</summary>
     internal const string NothingFits = "Nothing fits on the piece.";
@@ -749,7 +788,12 @@ namespace DeepNestSharp.RasterNest
             }
           };
 
-          var (placements, placedBySrc, packW, packH, seamsSnapped, seamsGivenUp, commonEdges, commonLineFallbacks) = PackOneSheet(
+          // A sheet of one filler alone (washers) is laid in rows, not searched: see LatticeFill.
+          string perr = null;
+          bool lattice = batchQty.Count == 1 && loadedById[batchQty.Keys.First()].Fill;
+          var (placements, placedBySrc, packW, packH, seamsSnapped, seamsGivenUp, commonEdges, commonLineFallbacks) = lattice
+            ? LatticeSheet(loadedById[batchQty.Keys.First()], pool[batchQty.Keys.First()], loadedById, w, h, margin)
+            : PackOneSheet(
             loaded,
             batchQty,
             w,
@@ -766,7 +810,7 @@ namespace DeepNestSharp.RasterNest
             geometryTolerance,
             effort,
             commonLineMaxClusterParts,
-            out string perr,
+            out perr,
             onCandidate: onSheetCandidate,
             seedOffset: seedOffset);
           firstPackError ??= perr;
@@ -802,7 +846,7 @@ namespace DeepNestSharp.RasterNest
           // no second chance at all, while one that seats 13 of 14 gets one. It was there to keep the cost
           // down when a single budget served everybody; the operator picks the effort now, and giving parts
           // back uncut is worth more seconds than any of them.
-          if (placements != null && packedHere > 0 && leftOver > 0 && IsLastChanceFor(size, sizes) && LastChanceBudget(effort) > 0)
+          if (!lattice && placements != null && packedHere > 0 && leftOver > 0 && IsLastChanceFor(size, sizes) && LastChanceBudget(effort) > 0)
           {
             var (retryPl, retryBy, retryW, retryH, retrySeamsSnapped, retrySeamsGivenUp, retryCommonEdges, retryCommonLineFallbacks) = PackOneSheet(
               loaded,
@@ -929,7 +973,10 @@ namespace DeepNestSharp.RasterNest
         // The sheet is judged by the rule that decides whether it may be cut, before it is handed over.
         // Whatever fails goes back in the pool and lands on the next sheet, so no layout ever leaves here
         // that the app would paint red. See DeferUnfit for why this is not the same as trusting the pack.
-        int deferred = DeferUnfit(
+        // A sheet of one filler laid in rows is clear by construction, and judging a few thousand washers
+        // pair by pair took 25 s on a 2000 x 1000 sheet.
+        bool rowsOnly = bestPlacedBySrc.Count == 1 && loadedById[bestPlacedBySrc.Keys.First()].Fill;
+        int deferred = rowsOnly ? 0 : DeferUnfit(
           bestPlacements,
           bestPlacedBySrc,
           loadedById,
@@ -947,6 +994,26 @@ namespace DeepNestSharp.RasterNest
         if (deferred > 0)
         {
           DiagDeferred += deferred;
+        }
+
+        // The counted parts are on and judged fit: what room they left goes to the parts that fill the
+        // sheets. Rows laid around them are clear by construction; a search (several fillers) is judged again.
+        if (!rowsOnly && !cancel.IsCancellationRequested)
+        {
+          var topped = TopUpWithFillers(
+            loaded, loadedById, pool, bestPlacements, bestPlacedBySrc, bestW, bestH, margin,
+            effort, WatchdogSeconds(perSheetBudgetSec, effort), sparrowExePath, cancel,
+            commonLineGap, geometryTolerance, commonLineMaxClusterParts, seedOffset);
+          if (topped.Placements != null)
+          {
+            bestPlacements = topped.Placements;
+            bestPlacedBySrc = topped.PlacedBySrc;
+            bestCommonEdges = topped.CommonEdges;
+            if (topped.PlacedBySrc.Keys.Count(k => loadedById[k].Fill) > 1)
+            {
+              DiagDeferred += DeferUnfit(bestPlacements, bestPlacedBySrc, loadedById, bestCommonEdges, bestW, bestH, margin, commonLineGap, geometryTolerance);
+            }
+          }
         }
 
         sheetLayouts.Add(bestPlacements);
@@ -1296,7 +1363,8 @@ namespace DeepNestSharp.RasterNest
             RequiresMergedLines = part.RequiresMergedLines,
             Qty = part.Quantity,
             Mirrored = part.Mirrored,
-            Priority = part.Priority,
+            Priority = part.Fill ? FillPriority : part.Priority,
+            Fill = part.Fill,
           });
           source++;
         }
@@ -1410,7 +1478,7 @@ namespace DeepNestSharp.RasterNest
       List<CommonEdgeIntent> keptEdges = null;
       var candidates = pool.Keys
         .Where(k => Waiting(k, current) > 0
-          && !loadedById[k].RequiresMergedLines
+          && !loadedById[k].RequiresMergedLines && !loadedById[k].Fill
           && Area(k) >= (NestProfiles.For(effort)?.FillUpMinShare ?? BigPartShare) * usable
           && FitsOnSheet(loadedById[k], w, h, margin))
         .OrderByDescending(Area)
@@ -1461,6 +1529,207 @@ namespace DeepNestSharp.RasterNest
       return keptPlacements == null ? (null, null, null) : (keptPlacements, current, keptEdges);
     }
 
+    /// <summary>
+    /// Adds the parts that fill the sheets (no count) around the counted parts a sheet was packed with, the
+    /// biggest filler first, as many as the room left allows. The engine packs a strip and is priority-blind,
+    /// so a pack that pushed a counted part off is not kept; it is tried again with fewer fillers. Null when
+    /// the sheet has no counted parts (fillers alone were packed as usual), no fillers wait, or none went on.
+    /// </summary>
+    private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySrc, List<CommonEdgeIntent> CommonEdges) TopUpWithFillers(
+      List<Loaded> loaded,
+      Dictionary<int, Loaded> loadedById,
+      Dictionary<int, int> pool,
+      List<IPartPlacement> placements,
+      Dictionary<int, int> placedBySrc,
+      int w,
+      int h,
+      double margin,
+      NestEffort effort,
+      int hardTimeoutSec,
+      string exe,
+      CancellationToken cancel,
+      double commonLineGap,
+      double geometryTolerance,
+      int commonLineMaxClusterParts,
+      int seedOffset)
+    {
+      if (placements == null || placedBySrc == null
+        || placedBySrc.Keys.Any(k => loadedById[k].Fill)
+        || placedBySrc.Keys.Any(k => loadedById[k].RequiresMergedLines))
+      {
+        return (null, null, null);
+      }
+
+      double usable = Math.Max(0, w - (2 * margin)) * Math.Max(0, h - (2 * margin));
+      double Footprint(int src) => Math.Max(1e-9, Math.Abs((loadedById[src].Dilated ?? loadedById[src].Nfp).Area));
+      var fillers = pool.Keys
+        .Where(k => pool[k] > 0 && loadedById[k].Fill && FitsOnSheet(loadedById[k], w, h, margin))
+        .OrderByDescending(Footprint)
+        .ThenBy(k => k)
+        .ToList();
+
+      var current = new Dictionary<int, int>(placedBySrc);
+      List<IPartPlacement> keptPlacements = null;
+      List<CommonEdgeIntent> keptEdges = null;
+      if (fillers.Count == 1)
+      {
+        var around = LatticeFill(loadedById[fillers[0]], pool[fillers[0]], placements, loadedById, w, h, margin);
+        if (around.Count == 0)
+        {
+          return (null, null, null);
+        }
+
+        var by = new Dictionary<int, int>(placedBySrc) { [fillers[0]] = around.Count };
+        return (placements.Concat(around).ToList(), by, new List<CommonEdgeIntent>());
+      }
+
+      foreach (int src in fillers)
+      {
+        double used = current.Sum(kv => kv.Value * Footprint(kv.Key));
+        int offer = Math.Min(pool[src], (int)Math.Floor((usable - used) / Footprint(src)));
+
+        // Fewer each time a counted part was pushed off; a handful of tries, then the sheet stays as it is.
+        for (int attempt = 0; attempt < 3 && offer >= 1 && !cancel.IsCancellationRequested; attempt++)
+        {
+          var batch = new Dictionary<int, int>(current) { [src] = offer };
+          var (pl, by, _, _, _, _, edges, _) = PackOneSheet(
+            loaded,
+            batch,
+            w,
+            h,
+            margin,
+            IterationBudget(effort),
+            SearchWorkers(effort),
+            hardTimeoutSec,
+            TriesFor(1, true, effort),
+            exe,
+            cancel,
+            null,
+            commonLineGap,
+            geometryTolerance,
+            effort,
+            commonLineMaxClusterParts,
+            out _,
+            seedOffset: seedOffset);
+          if (pl != null && by != null
+            && by.TryGetValue(src, out int got) && got > 0
+            && current.All(kv => by.TryGetValue(kv.Key, out int n) && n >= kv.Value))
+          {
+            current = by.Where(kv => kv.Value > 0).ToDictionary(kv => kv.Key, kv => kv.Value);
+            keptPlacements = pl;
+            keptEdges = edges;
+            break;
+          }
+
+          offer = (int)Math.Floor(offer * 0.7);
+        }
+      }
+
+      return keptPlacements == null ? (null, null, null) : (keptPlacements, current, keptEdges);
+    }
+
+    /// <summary>
+    /// Sets one kind of part down in rows, as many as go on, around whatever is already on the sheet: the
+    /// way to fill a sheet with washers. The engine took two and a half minutes over 900 washers on a
+    /// 1250 x 500 sheet; a lattice takes well under a second and for identical round or rectangular parts is
+    /// as dense as a search gets. Every allowed orientation is tried in straight rows and in rows shifted by
+    /// half a step (washers then sit in the hollows of the row below), each step the smallest the part's
+    /// own outline, grown by half its spacing, allows. The orientation and layout that seat most win.
+    /// </summary>
+    private static List<IPartPlacement> LatticeFill(Loaded part, int max, IReadOnlyList<IPartPlacement> already, Dictionary<int, Loaded> loadedById, int w, int h, double margin)
+    {
+      const double scale = 1e6;
+      double eps = 1e-6 * scale * scale;
+      var occupants = new List<(List<IntPoint> Path, (long MinX, long MinY, long MaxX, long MaxY) Box)>();
+      foreach (var existing in already ?? Array.Empty<IPartPlacement>())
+      {
+        double grow = loadedById.TryGetValue(existing.Source, out var el) ? el.FitSpacing / 2.0 : 0;
+        var path = DeepNestClipper.ScaleUpPath(OffsetOutward(existing.PlacedPart, grow).Points, scale);
+        occupants.Add((path, BoundsOfPath(path)));
+      }
+
+      List<IPartPlacement> best = new List<IPartPlacement>();
+      var angles = (part.Angles ?? new[] { 0 }).Select(a => ((a % 360) + 360) % 360).Distinct().Take(8).ToList();
+      foreach (int rot in angles)
+      {
+        var turned = rot == 0 ? part.Nfp : part.Nfp.Rotate(rot);
+        var dil = OffsetOutward(turned, part.FitSpacing / 2.0);
+        var dilPath = DeepNestClipper.ScaleUpPath(dil.Points, scale);
+        double dilW = dil.MaxX - dil.MinX;
+        double dilH = dil.MaxY - dil.MinY;
+        double slack = Math.Max(1e-4, 1e-3 * Math.Max(dilW, dilH));
+
+        bool Clear(double dx, double dy) => !Overlaps(TranslatePath(dilPath, (long)Math.Round(dx * scale), (long)Math.Round(dy * scale)), dilPath, eps);
+
+        // The smallest step that keeps two neighbours apart; the bounding box always does.
+        double Smallest(Func<double, bool> clearAt, double hi)
+        {
+          double lo = 0;
+          for (int i = 0; i < 30; i++)
+          {
+            double mid = (lo + hi) / 2;
+            if (clearAt(mid))
+            {
+              hi = mid;
+            }
+            else
+            {
+              lo = mid;
+            }
+          }
+
+          return hi + slack;
+        }
+
+        double px = Smallest(dx => Clear(dx, 0), dilW);
+        foreach (double shift in new[] { 0.0, px / 2 })
+        {
+          double py = Smallest(dy => Enumerable.Range(-2, 5).All(k => Clear(shift + (k * px), dy)), dilH);
+          if (!Enumerable.Range(-2, 5).All(k => Clear(shift + (k * px), py) && Clear(shift + (k * px), -py)) || !Clear(px, 0))
+          {
+            continue; // an outline the bisection misjudged (deeply hollow): leave this layout out
+          }
+
+          var placed = new List<IPartPlacement>();
+          double x0 = margin - turned.MinX;
+          double y0 = margin - turned.MinY;
+          for (int row = 0; y0 + (row * py) + turned.MaxY <= h - margin + 1e-9 && placed.Count < max; row++)
+          {
+            double ty = y0 + (row * py);
+            for (double tx = x0 + (row % 2 == 1 ? shift : 0); tx + turned.MaxX <= w - margin + 1e-9 && placed.Count < max; tx += px)
+            {
+              if (occupants.Count > 0)
+              {
+                var moved = TranslatePath(dilPath, (long)Math.Round(tx * scale), (long)Math.Round(ty * scale));
+                var box = BoundsOfPath(moved);
+                if (occupants.Any(o => o.Box.MinX < box.MaxX && box.MinX < o.Box.MaxX && o.Box.MinY < box.MaxY && box.MinY < o.Box.MaxY && Overlaps(moved, o.Path, eps)))
+                {
+                  continue;
+                }
+              }
+
+              placed.Add(new PartPlacement(turned) { X = tx, Y = ty, Rotation = rot, Source = part.Source, IsMirrored = part.Mirrored });
+            }
+          }
+
+          if (placed.Count > best.Count)
+          {
+            best = placed;
+          }
+        }
+      }
+
+      return best;
+    }
+
+    /// <summary><see cref="LatticeFill"/> on an empty sheet, in the shape <see cref="PackOneSheet"/> answers in.</summary>
+    private static (List<IPartPlacement>, Dictionary<int, int>, int, int, int, int, List<CommonEdgeIntent>, IReadOnlyList<CommonLineFallbackNotice>) LatticeSheet(
+      Loaded part, int max, Dictionary<int, Loaded> loadedById, int w, int h, double margin)
+    {
+      var placed = LatticeFill(part, max, null, loadedById, w, h, margin);
+      return (placed, new Dictionary<int, int> { [part.Source] = placed.Count }, w, h, 0, 0, new List<CommonEdgeIntent>(), Array.Empty<CommonLineFallbackNotice>());
+    }
+
     /// <summary>Picks a batch from the pool up to ~1.3× the sheet area (extra choice for sparrow), keeping
     /// source variety for mixed jobs. Offers only parts that can actually go on this size of sheet, the
     /// ones with the fewest sizes left to choose from first, and returns an empty batch when none of them
@@ -1493,6 +1762,7 @@ namespace DeepNestSharp.RasterNest
       // parts to a sheet size they were the only ones that fitted, with two sheets of another size left
       // over. Without it the answer depended on which drawing happened to be imported first, which is not
       // something the row order should decide.
+      bool countedWaiting = pool.Any(kv => kv.Value > 0 && !loadedById[kv.Key].Fill);
       var homesBySource = pool.ToDictionary(
         kv => kv.Key,
         kv => sizes.Count(size => size.HasStock && FitsOnSheet(loadedById[kv.Key], size.W, size.H, margin)));
@@ -1510,6 +1780,14 @@ namespace DeepNestSharp.RasterNest
         // parts that fit and sheets left to cut them on: the operator got seven parts back uncut when
         // only one of them was impossible.
         if (kv.Value <= 0 || !FitsOnSheet(loadedById[kv.Key], w, h, margin))
+        {
+          continue;
+        }
+
+        // A part that fills the sheets waits until every counted one is on: the engine is priority-blind, so
+        // offered together a sheet of washers could push the order off. They go in around the counted parts
+        // afterwards (see TopUpWithFillers).
+        if (loadedById[kv.Key].Fill && countedWaiting)
         {
           continue;
         }

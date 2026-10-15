@@ -2352,7 +2352,9 @@ namespace DeepNestSharp.Ui.UserControls
           return null;
         }
 
-        string text = DeepNestLib.IO.DxfExporter.GetPartNameLabel(pp.Part?.Name);
+        string text = DeepNestLib.IO.DxfExporter.UnnamedParts.Contains(pp.Part?.Name ?? string.Empty)
+          ? null
+          : DeepNestLib.IO.DxfExporter.GetPartNameLabel(pp.Part?.Name);
         if (string.IsNullOrWhiteSpace(text))
         {
           return null;
@@ -4585,7 +4587,7 @@ namespace DeepNestSharp.Ui.UserControls
         ? 0
         : this.invalid.Count(p => group.Representative.PartPlacements.Contains(p));
 
-      this.overlapCount.Text = n == 1 ? "1 part not fit to cut" : $"{n} parts not fit to cut";
+      this.overlapCount.Text = Localization.Format("Viewer_NotFitCount", n);
       this.overlapCount.Visibility = n > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 

@@ -238,12 +238,23 @@
                 <GridViewColumn x:Name="colHeaderPartQty" Header="Количество" Width="118">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
-                      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
-                        <xctk:IntegerUpDown Width="75" Minimum="0" Maximum="100000" Value="{Binding Quantity, Mode=TwoWay}"
-                                            ValueChanged="OnPartQuantityChanged" Tag="{Binding}"
-                                            VerticalAlignment="Center" ToolTip="{ui:Tr Tip_PartQty}" />
-                        <TextBlock Text="{ui:Tr Unit_Pcs}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
-                      </StackPanel>
+                      <Grid VerticalAlignment="Center" Margin="4,0">
+                        <StackPanel x:Name="countCell" Orientation="Horizontal">
+                          <xctk:IntegerUpDown Width="75" Minimum="0" Maximum="100000" Value="{Binding Quantity, Mode=TwoWay}"
+                                              ValueChanged="OnPartQuantityChanged" Tag="{Binding}"
+                                              VerticalAlignment="Center" ToolTip="{ui:Tr Tip_PartQty}" />
+                          <TextBlock Text="{ui:Tr Unit_Pcs}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource Brush.TextMuted}" />
+                        </StackPanel>
+                        <!-- A part that fills the sheets has no count to type: it says so, and how many went on -->
+                        <TextBlock x:Name="fillCell" Text="{Binding FillLabel}" Visibility="Collapsed" VerticalAlignment="Center"
+                                   FontWeight="SemiBold" ToolTip="{ui:Tr Tip_PartFill}" />
+                      </Grid>
+                      <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding FillSheets}" Value="True">
+                          <Setter TargetName="countCell" Property="Visibility" Value="Collapsed" />
+                          <Setter TargetName="fillCell" Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                      </DataTemplate.Triggers>
                     </DataTemplate>
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>

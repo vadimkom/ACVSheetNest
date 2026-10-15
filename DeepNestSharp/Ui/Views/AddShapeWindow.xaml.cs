@@ -20,12 +20,14 @@ namespace DeepNestSharp.Ui.Views
     private static readonly Dictionary<ShapeKind, int> LastPreset = new Dictionary<ShapeKind, int>();
     private static ShapeKind lastKind = PartShapes.Rectangle;
     private static int lastQuantity = 1;
+    private static bool lastFillSheets;
 
     private readonly bool millimetres;
     private readonly string unit;
     private readonly ComboBox kindCombo = new ComboBox { MinWidth = 170 };
     private readonly ComboBox presetCombo = new ComboBox { MinWidth = 170 };
     private readonly IntegerUpDown qtyUpDown = new IntegerUpDown { Minimum = 1, Maximum = 100000, Value = 1 };
+    private readonly CheckBox fillCheck = new CheckBox { VerticalAlignment = VerticalAlignment.Center };
     private readonly List<DoubleUpDown> fields = new List<DoubleUpDown>();
     private bool building;
 
@@ -43,6 +45,10 @@ namespace DeepNestSharp.Ui.Views
       this.kindCombo.SelectionChanged += (_, __) => this.Build();
       this.presetCombo.SelectionChanged += (_, __) => this.ApplyPreset();
       this.qtyUpDown.Value = lastQuantity;
+      this.fillCheck.IsChecked = lastFillSheets;
+      this.fillCheck.Checked += (_, __) => this.qtyUpDown.IsEnabled = false;
+      this.fillCheck.Unchecked += (_, __) => this.qtyUpDown.IsEnabled = true;
+      this.qtyUpDown.IsEnabled = !lastFillSheets;
       this.kindCombo.SelectedIndex = Math.Max(0, PartShapes.Kinds.ToList().IndexOf(lastKind));
 
       this.Loaded += (_, __) => this.Dispatcher.BeginInvoke(
@@ -68,6 +74,9 @@ namespace DeepNestSharp.Ui.Views
     public ShapePreset Preset { get; private set; }
 
     public int Quantity { get; private set; }
+
+    /// <summary>No count: as many as the job's sheets have room for once the counted parts are on.</summary>
+    public bool FillSheets { get; private set; }
 
     private ShapeKind CurrentKind => PartShapes.Kinds[Math.Max(0, this.kindCombo.SelectedIndex)];
 
@@ -140,6 +149,14 @@ namespace DeepNestSharp.Ui.Views
       }
 
       Row("Shape_Quantity", this.qtyUpDown, false);
+
+      // ...or no count at all: the sheets chosen in the next step are filled with it (a sheet of washers).
+      this.fillCheck.Content = Localization.Get("Part_FillSheets");
+      this.fillCheck.ToolTip = Localization.Get("Tip_PartFill");
+      this.fillCheck.Margin = new Thickness(10, 0, 0, 6);
+      Grid.SetRow(this.fillCheck, row - 1);
+      Grid.SetColumn(this.fillCheck, 2);
+      grid.Children.Add(this.fillCheck);
 
       this.building = false;
       if (kind.Presets.Count > 0)
@@ -275,6 +292,8 @@ namespace DeepNestSharp.Ui.Views
 
       lastKind = kind;
       lastQuantity = this.Quantity;
+      this.FillSheets = this.fillCheck.IsChecked == true;
+      lastFillSheets = this.FillSheets;
       LastValues[kind] = values;
       if (kind.Presets.Count > 0)
       {

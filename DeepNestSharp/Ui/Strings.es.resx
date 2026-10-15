@@ -1799,4 +1799,19 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
   <data name="Part_FlipUpDown" xml:space="preserve">
     <value>↕ Arriba-abajo</value>
   </data>
+  <data name="Part_FillSheets" xml:space="preserve">
+    <value>Llenar las chapas</value>
+  </data>
+  <data name="Part_Fill" xml:space="preserve">
+    <value>llenar</value>
+  </data>
+  <data name="Part_FillCount" xml:space="preserve">
+    <value>llenar: {0}</value>
+  </data>
+  <data name="Tip_PartFill" xml:space="preserve">
+    <value>Sin cantidad: el anidado coloca tantas como quepan en las chapas después de todas las piezas con cantidad.</value>
+  </data>
+  <data name="Viewer_NotFitCount" xml:space="preserve">
+    <value>No aptas para corte: {0}</value>
+  </data>
 </root>

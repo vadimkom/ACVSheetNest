@@ -17,5 +17,6 @@ namespace DeepNestSharp.RasterNest
     // False means this part keeps ordinary spacing everywhere.
     public bool RequiresMergedLines;
     public bool Mirrored;       // nest this population X-flipped; its placements carry IsMirrored for the exporter
+    public bool Fill;           // no count: as many as the stock still has room for once everything else is on
   }
 }

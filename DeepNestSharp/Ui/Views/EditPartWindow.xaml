@@ -51,6 +51,7 @@
               <RowDefinition Height="Auto" />
               <RowDefinition Height="Auto" />
               <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="{ui:Tr Part_Required}" VerticalAlignment="Center" Margin="0,0,10,6" />
@@ -67,6 +68,10 @@
             <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" x:Name="mirroredUpDown" Minimum="0" Maximum="100000"
                                 Width="70" HorizontalAlignment="Left"
                                 ToolTip="{ui:Tr Part_MirroredTip}" />
+
+            <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" x:Name="fillSheetsCheck" Margin="0,8,0,0"
+                      Content="{ui:Tr Part_FillSheets}" ToolTip="{ui:Tr Tip_PartFill}"
+                      Checked="OnFillSheetsChanged" Unchecked="OnFillSheetsChanged" />
           </Grid>
         </GroupBox>
 

@@ -105,7 +105,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-10-14, 1.1.38): core 1078/1080; app 487/487 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
+Last verified (2026-10-15, 1.1.43): core 1078/1080; app 490/490 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
@@ -121,6 +121,10 @@ Last verified (2026-10-14, 1.1.38): core 1078/1080; app 487/487 with the engine 
 - The variants list holds only finished nests of the whole job, one per press, no duplicates. The best is starred: all parts placed, then fewest sheets, then highest utilisation. Per-sheet attempts only draw in the preview.
 - **Cut sheets, nest the rest** (`CutSheets.DeductParts/KeepConsumed`): ticked sheets' parts come off the order (mirrored from the mirrored count, others from quantity, then from spares) and the sheets stay consumed. A part quantity may be 0; such rows are not sent to the engine.
 - **Move a part between sheets** (`DxfViewer.MoveSelectedTo`): only between single-copy sheets without common cutting. The part goes to the first free spot bottom-left, or stays red in place. An emptied sheet returns to stock (`SheetRemoved`). One undo step.
+- **Fill the sheets** (`IDetailLoadInfo.FillSheets`; "Fill the sheets" in + Shape and in the part's "…"): a row with no count, e.g. a sheet of washers. The operator picks sheets as usual; the nest puts on as many as fit after every counted part.
+  - Engine (`SparrowNestService.Nest`): a filler is offered ceil(stock area / spaced outline area), at priority 11. Unlimited sizes count as their box number, at least 1. `SelectBatch` keeps fillers out while counted parts wait. `TopUpWithFillers` adds them around a packed sheet after `DeferUnfit`. Unplaced fillers are not reported as missing.
+  - One filler goes in rows (`LatticeFill`): every allowed angle, straight or half-shifted rows, steps bisected on the spaced outline. Sparrow took 2.5 min over 900 washers on 1250×500; rows take 0.2 s and seat 798 Ø24. A rows-only sheet skips `DeferUnfit`, being clear by construction. `CommonEdgeClearance.FindUnfit` now skips pairs whose boxes are apart (a 2652-washer sheet: 25 s → 0.5 s, in the viewer too).
+  - After a nest the row's Quantity = what went on (`CountFilledRows`); the cell shows "fill: N". Fill parts get no names on the layout or in the DXF (`DxfExporter.UnnamedParts`, set in `ApplyPartColours`).
 
 **Parts and sheets**
 - Flip ↔/↕ mirrors the part itself (`PartMirror`): ticked in Edit Part ("…") and applied on OK; a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.

@@ -1575,6 +1575,11 @@ namespace DeepNestSharp.Ui.Views
     private void ApplyPartColours(System.Collections.Generic.IEnumerable<DeepNestLib.NestProject.IDetailLoadInfo> parts)
     {
       var map = PartColors.Build(parts?.Select(o => (o.Path, o.ColorRgb)));
+
+      // Parts that fill the sheets go unnamed on the layout and in the DXF (see DxfExporter.UnnamedParts).
+      DeepNestLib.IO.DxfExporter.UnnamedParts = new HashSet<string>(
+        parts?.Where(o => o.FillSheets && !string.IsNullOrEmpty(o.Path)).Select(o => o.Path) ?? Enumerable.Empty<string>(),
+        StringComparer.OrdinalIgnoreCase);
       if (this.dxfViewer != null)
       {
         this.dxfViewer.PartColours = map;
@@ -1776,6 +1781,28 @@ namespace DeepNestSharp.Ui.Views
       this.UpdateSummaryBadges();
     }
 
+    /// <summary>A row that fills the sheets asks for what the nest put on, so the report, the export and
+    /// "cut, nest the rest" count the parts that are really there. It still fills the next nest.</summary>
+    private void CountFilledRows(IProjectInfo project, INestResult result)
+    {
+      var rows = project.DetailLoadInfos.Where(r => r.FillSheets).ToList();
+      if (rows.Count == 0)
+      {
+        return;
+      }
+
+      var placed = result.UsedSheets
+        .SelectMany(s => s.PartPlacements)
+        .GroupBy(p => p.Part?.Name ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+        .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+      foreach (var row in rows)
+      {
+        row.Quantity = placed.TryGetValue(row.Path ?? string.Empty, out int n) ? n : 0;
+      }
+
+      this.UpdateSummaryBadges();
+    }
+
     /// <summary>The share of the offcut under which a part is not tried, while a fill is on its way to
     /// <see cref="OnNest"/>; null for an ordinary nest.</summary>
     private double? pendingFillMinShare;
@@ -1917,9 +1944,26 @@ namespace DeepNestSharp.Ui.Views
 
       // The same shape again is more of the same part, not a second row drawing the same file.
       IDetailLoadInfo Row() => doc.ProjectInfo.DetailLoadInfos.LastOrDefault(p => string.Equals(p.Path, path, StringComparison.OrdinalIgnoreCase));
+      // A shape that fills the sheets has no count until a nest has put some on.
+      void Take(IDetailLoadInfo row, bool added)
+      {
+        if (dialog.FillSheets)
+        {
+          row.FillSheets = true;
+          row.Quantity = 0;
+          row.Extra = 0;
+          row.MirrorQuantity = 0;
+        }
+        else
+        {
+          row.Quantity = added || row.FillSheets ? dialog.Quantity : row.Quantity + dialog.Quantity;
+          row.FillSheets = false;
+        }
+      }
+
       if (Row() is IDetailLoadInfo existing)
       {
-        existing.Quantity += dialog.Quantity;
+        Take(existing, false);
       }
       else
       {
@@ -1931,7 +1975,7 @@ namespace DeepNestSharp.Ui.Views
 
         if (Row() is IDetailLoadInfo added)
         {
-          added.Quantity = dialog.Quantity;
+          Take(added, true);
         }
 
         this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
@@ -2047,6 +2091,23 @@ namespace DeepNestSharp.Ui.Views
           var cc = o.EffectiveCommonCutting;
           string commonCuttingDomain = CommonCuttingDomainOf(o);
           bool directCommonCutting = RequiresMergedLinesForDirectCommonCutting(o);
+          if (o.FillSheets)
+          {
+            // No count: the engine offers as many as the stock has room for, after every counted part.
+            return new List<RasterPartInfo>
+            {
+              new RasterPartInfo
+              {
+                Path = o.Path,
+                Quantity = 1,
+                Fill = true,
+                Rotations = o.Rotations,
+                Priority = o.Priority,
+                Spacing = o.Spacing,
+              },
+            };
+          }
+
           var populations = new List<RasterPartInfo>
           {
             new RasterPartInfo
@@ -2264,6 +2325,10 @@ namespace DeepNestSharp.Ui.Views
         if (fillMinShare != null)
         {
           this.TakeFillQuantities(project, result);
+        }
+        else
+        {
+          this.CountFilledRows(project, result);
         }
 
         // Show it in the results list + viewer + status bar so utilization / placed / sheets / fitness /

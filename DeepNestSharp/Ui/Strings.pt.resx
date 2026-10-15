@@ -1799,4 +1799,19 @@ Abrir a página de download?</value>
   <data name="Part_FlipUpDown" xml:space="preserve">
     <value>↕ Cima-baixo</value>
   </data>
+  <data name="Part_FillSheets" xml:space="preserve">
+    <value>Preencher as chapas</value>
+  </data>
+  <data name="Part_Fill" xml:space="preserve">
+    <value>preencher</value>
+  </data>
+  <data name="Part_FillCount" xml:space="preserve">
+    <value>preencher: {0}</value>
+  </data>
+  <data name="Tip_PartFill" xml:space="preserve">
+    <value>Sem quantidade: o encaixe coloca quantas couberem nas chapas depois de todas as peças com quantidade.</value>
+  </data>
+  <data name="Viewer_NotFitCount" xml:space="preserve">
+    <value>Impróprias para corte: {0}</value>
+  </data>
 </root>

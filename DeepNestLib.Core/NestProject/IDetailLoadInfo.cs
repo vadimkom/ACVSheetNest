@@ -33,6 +33,13 @@
     int MirrorQuantity { get; set; }
 
     /// <summary>
+    /// Gets or sets whether this part has no count: the nest puts on as many as the sheets still have room
+    /// for once every counted part is on (a sheet of washers). <see cref="Quantity"/> is then what the last
+    /// nest placed.
+    /// </summary>
+    bool FillSheets { get; set; }
+
+    /// <summary>
     /// Gets or sets the per-part allowed rotations (1 = fixed, 2 = 0/180, 4 = 90° steps, 36 = free).
     /// Values &lt;= 0 fall back to the engine's configured default.
     /// </summary>

@@ -436,6 +436,18 @@ namespace DeepNestSharp.RasterNest
         ? Array.Empty<EdgeReference>()
         : ValidEdges(commonEdges, commonLineGap, geometryTol, sourceCatalogs);
       var boundaryCache = new Dictionary<IPartPlacement, BoundaryGeometry>();
+
+      // Each part's box once, and a pair whose boxes stand further apart than its clearance is never shifted
+      // into place to be measured: building both placed outlines for every pair took 25 s on a sheet of 2652
+      // washers, in the viewer as much as in the engine. A valid shared edge only ever LOWERS what a pair
+      // must keep, so boxes apart by the normal clearance are apart by any.
+      var boxes = new (double MinX, double MinY, double MaxX, double MaxY)[placements.Count];
+      for (int k = 0; k < placements.Count; k++)
+      {
+        IPartPlacement p = placements[k];
+        boxes[k] = p?.Part == null ? default : (p.MinX, p.MinY, p.MaxX, p.MaxY);
+      }
+
       for (int i = 0; i < placements.Count; i++)
       {
         cancel.ThrowIfCancellationRequested();
@@ -464,6 +476,14 @@ namespace DeepNestSharp.RasterNest
           }
 
           double clearance = Math.Max(0, normalClearanceBetween(a, b));
+          if (PlacementCollision.BoxesApart(
+            boxes[i].MinX, boxes[i].MinY, boxes[i].MaxX, boxes[i].MaxY,
+            boxes[j].MinX, boxes[j].MinY, boxes[j].MaxX, boxes[j].MaxY,
+            clearance + numericalTol))
+          {
+            continue;
+          }
+
           double sliver = sliverBetween(a, b);
           if (clearance <= 0 || valid.Count == 0
               ? PlacementCollision.TooClose(a.PlacedPart, b.PlacedPart, clearance, sliver)

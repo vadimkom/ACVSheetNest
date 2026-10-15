@@ -1799,4 +1799,19 @@ Open the download page?</value>
   <data name="Part_FlipUpDown" xml:space="preserve">
     <value>↕ Top to bottom</value>
   </data>
+  <data name="Part_FillSheets" xml:space="preserve">
+    <value>Fill the sheets</value>
+  </data>
+  <data name="Part_Fill" xml:space="preserve">
+    <value>fill</value>
+  </data>
+  <data name="Part_FillCount" xml:space="preserve">
+    <value>fill: {0}</value>
+  </data>
+  <data name="Tip_PartFill" xml:space="preserve">
+    <value>No count: the nest puts on as many as the sheets have room for once every counted part is on.</value>
+  </data>
+  <data name="Viewer_NotFitCount" xml:space="preserve">
+    <value>Not fit to cut: {0}</value>
+  </data>
 </root>
