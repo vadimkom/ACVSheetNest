@@ -1274,7 +1274,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderPartName != null) this.colHeaderPartName.Header = Localization.Get("Col_PartName");
       if (this.colHeaderPartQty != null) this.colHeaderPartQty.Header = Localization.Get("Col_Quantity");
       if (this.colHeaderPriority != null) this.colHeaderPriority.Header = Localization.Get("Col_Priority");
-      if (this.colHeaderPartStatus != null) this.colHeaderPartStatus.Header = Localization.Get("Col_Status");
       if (this.colHeaderPartActions != null) this.colHeaderPartActions.Header = Localization.Get("Col_Actions");
       if (this.lblMultiplier != null) this.lblMultiplier.Text = Localization.Get("Lbl_Multiplier");
       if (this.btnApplyMultiplier != null)
@@ -3071,7 +3070,7 @@ namespace DeepNestSharp.Ui.Views
       double available = this.partsListView.ActualWidth - SystemParameters.VerticalScrollBarWidth - 10;
       double others = this.colHeaderPartPreview.Width + this.colHeaderPartQty.Width + this.colHeaderDimensions.Width
         + this.colHeaderMirrored.Width + this.colHeaderPriority.Width
-        + this.colHeaderPartStatus.Width + this.colHeaderPartActions.Width;
+        + this.colHeaderPartActions.Width;
       this.colHeaderPartName.Width = Math.Max(220, available - others);
     }
 

@@ -283,18 +283,8 @@
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>
 
-                <!-- Status / Available -->
-                <GridViewColumn x:Name="colHeaderPartStatus" Header="Статус" Width="80">
-                  <GridViewColumn.CellTemplate>
-                    <DataTemplate>
-                      <Border Style="{DynamicResource CountBadge}" ToolTip="{ui:Tr Tip_PartStatus}">
-                        <TextBlock Style="{DynamicResource CountBadgeText}" Text="{Binding NestedInfo, Mode=OneWay}" />
-                      </Border>
-                    </DataTemplate>
-                  </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-
                 <!-- Actions: Details button + Remove -->
+                <!-- No status column: how many went on is the nesting step's and the status bar's to say. -->
                 <GridViewColumn x:Name="colHeaderPartActions" Header="Действия" Width="100">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
