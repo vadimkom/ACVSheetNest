@@ -165,6 +165,7 @@ Last verified (2026-10-15, 1.1.43): core 1078/1080; app 490/490 with the engine 
   - CUT = "0"/7: everything cut.
   - PAINT = "9"/1: bend lines and engraved names.
   - BACKGROUND = "Background"/8: display-only names.
+- Non-ASCII names are written in the Windows codepage, not as `\U+XXXX` escapes, which SC2000 shows literally (`DxfExporter.SaveForCam`): 1251 when every such letter fits, else 1252, and the header `$DWGCODEPAGE` says so. A plain-ASCII file is unchanged.
 - One file per layout, `name_N_WxH_xRepeats.dxf`. The offcut line is not written to DXF.
 - Report:
   - "Material required" box: sheets, then material and thickness and the sheet and part weight (material + mm only); "Job summary": parts, cut length in metres, pierces, material used, layouts;

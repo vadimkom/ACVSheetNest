@@ -47,7 +47,7 @@ namespace DeepNestLib.IO
         return;
       }
 
-      await Task.Run(() => dxf.Save(path, true)).ConfigureAwait(false);
+      await Task.Run(() => SaveForCam(dxf, path)).ConfigureAwait(false);
     }
 
     public async Task Export(Stream stream, ISheetPlacement sheetPlacement, bool doMergeLines)
@@ -57,7 +57,7 @@ namespace DeepNestLib.IO
         DxfFile dxf = this.Finish(GenerateCommonLineDxfFile(sheetPlacement, null, this.PartNameExport));
         if (dxf.Entities.Count > 0)
         {
-          await Task.Run(() => dxf.Save(stream, true)).ConfigureAwait(false);
+          await Task.Run(() => SaveForCam(dxf, stream)).ConfigureAwait(false);
         }
 
         return;
@@ -77,7 +77,7 @@ namespace DeepNestLib.IO
       {
         await Task.Run(() =>
         {
-          dxf.Save(stream, true);
+          SaveForCam(dxf, stream);
           //dxf.Save(@"C:\Temp\DeepnestSharp.dxf");
         }).ConfigureAwait(false);
       }
@@ -108,11 +108,11 @@ namespace DeepNestLib.IO
             {
               if (dxfexports.Count() == 1)
               {
-                dxf.Save(fi.FullName, true);
+                SaveForCam(dxf, fi.FullName);
               }
               else
               {
-                dxf.Save($"{fi.FullName.Substring(0, fi.FullName.Length - 4)}{id}.dxf", true);
+                SaveForCam(dxf, $"{fi.FullName.Substring(0, fi.FullName.Length - 4)}{id}.dxf");
               }
             }).ConfigureAwait(false);
           }
@@ -122,6 +122,66 @@ namespace DeepNestLib.IO
       {
         throw;
       }
+    }
+
+    /// <summary>Writes the DXF the way the shop's CAM reads it, to a file.</summary>
+    internal static void SaveForCam(DxfFile dxf, string path)
+    {
+      using var stream = File.Create(path);
+      SaveForCam(dxf, stream);
+    }
+
+    /// <summary>
+    /// Writes the DXF the way the shop's CAM reads it. An R2000 file is 8-bit text in the codepage its header
+    /// names, and the library writes every letter outside ASCII as an escape: "Правоъгълник" became
+    /// "\U+041F\U+0440...", which SC2000 shows as it stands. When every such letter has a place in the
+    /// Cyrillic (1251) or Western (1252) Windows codepage, the file is written in that codepage instead, and
+    /// its header says so. A file of plain ASCII is written exactly as before.
+    /// </summary>
+    internal static void SaveForCam(DxfFile dxf, Stream stream)
+    {
+      using var buffer = new MemoryStream();
+      dxf.Save(buffer, true);
+      string text = System.Text.Encoding.ASCII.GetString(buffer.ToArray());
+      var escape = new System.Text.RegularExpressions.Regex(@"\\U\+([0-9A-Fa-f]{4})");
+      var letters = escape.Matches(text)
+        .Select(m => (char)Convert.ToInt32(m.Groups[1].Value, 16))
+        .Distinct()
+        .ToList();
+      if (letters.Count == 0)
+      {
+        stream.Write(buffer.ToArray(), 0, (int)buffer.Length);
+        return;
+      }
+
+      System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+      foreach (int codePage in new[] { 1251, 1252 })
+      {
+        var encoding = System.Text.Encoding.GetEncoding(codePage, System.Text.EncoderFallback.ExceptionFallback, System.Text.DecoderFallback.ExceptionFallback);
+        bool fits = letters.All(c =>
+        {
+          try
+          {
+            return encoding.GetString(encoding.GetBytes(new[] { c }))[0] == c;
+          }
+          catch (System.Text.EncoderFallbackException)
+          {
+            return false;
+          }
+        });
+        if (!fits)
+        {
+          continue;
+        }
+
+        string plain = escape.Replace(text, m => ((char)Convert.ToInt32(m.Groups[1].Value, 16)).ToString());
+        plain = new System.Text.RegularExpressions.Regex(@"(\$DWGCODEPAGE\r?\n\s*3\r?\n)ANSI_\d+").Replace(plain, "${1}ANSI_" + codePage, 1);
+        byte[] bytes = encoding.GetBytes(plain);
+        stream.Write(bytes, 0, bytes.Length);
+        return;
+      }
+
+      stream.Write(buffer.ToArray(), 0, (int)buffer.Length); // letters of more than one script: escapes it is
     }
 
     private static DxfFile GenerateEmptyDxfFile()

@@ -8,10 +8,10 @@
     <PublishSingleFile>false</PublishSingleFile>
     <ApplicationIcon>Branding\sheetnest.ico</ApplicationIcon>
     <DebugType>embedded</DebugType>
-    <AssemblyVersion>1.1.43.0</AssemblyVersion>
-    <FileVersion>1.1.43.0</FileVersion>
-    <InformationalVersion>1.1.43</InformationalVersion>
-    <Version>1.1.43</Version>
+    <AssemblyVersion>1.1.44.0</AssemblyVersion>
+    <FileVersion>1.1.44.0</FileVersion>
+    <InformationalVersion>1.1.44</InformationalVersion>
+    <Version>1.1.44</Version>
     <!-- Only filters the .NET runtime's and packages' translated system messages: the program's own languages
          (Ui/Strings.*.resx) are built whatever this says. Of those system messages, keep Russian and Bulgarian
          (English is built in; .NET ships no Bulgarian, so that one costs nothing): the other twelve were 8 MB
