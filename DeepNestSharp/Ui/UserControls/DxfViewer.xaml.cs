@@ -2364,7 +2364,7 @@ namespace DeepNestSharp.Ui.UserControls
 
         // One small size for every part on the sheet, set by the sheet: letters sized to each part were huge
         // on a big part and lost on a small one, and the layout read as a jumble of type.
-        double em = Math.Max(this.currentSheetW, sheetH) * 0.015;
+        double em = Math.Max(this.currentSheetW, sheetH) * 0.02;
 
         // Drawing names read "piece^assembly_size": a name longer than its part goes on two lines there.
         int caret = text.IndexOf('^');
