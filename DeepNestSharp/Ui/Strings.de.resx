@@ -1815,7 +1815,7 @@ Downloadseite öffnen?</value>
     <value>Nicht schneidbar: {0}</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
-    <value>Länge und Breite sind das Blech, {0} × {1} {2}: Das Band wird innerhalb seiner Ränder gezeichnet, das Blech kommt in den Auftrag und das Schachteln startet sofort.</value>
+    <value>Blech {0} × {1} {2}: Der Zuschnitt wird innerhalb seiner Ränder gezeichnet, das Blech kommt in den Auftrag und das Schachteln startet sofort.</value>
   </data>
   <data name="Shape_Profile" xml:space="preserve">
     <value>Profil</value>
@@ -1846,5 +1846,11 @@ Downloadseite öffnen?</value>
   </data>
   <data name="Library_ProfileGroup" xml:space="preserve">
     <value>Profile</value>
+  </data>
+  <data name="Shape_SheetLength" xml:space="preserve">
+    <value>Blechlänge:</value>
+  </data>
+  <data name="Shape_SheetWidth" xml:space="preserve">
+    <value>Blechbreite:</value>
   </data>
 </root>

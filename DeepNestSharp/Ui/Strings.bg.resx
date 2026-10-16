@@ -1815,7 +1815,7 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
     <value>Негодни за рязане: {0}</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
-    <value>Дължината и ширината са на листа, {0} × {1} {2}: лентата се чертае в отстъпите му, листът се добавя към задачата и нестингът започва веднага.</value>
+    <value>Лист {0} × {1} {2}: заготовката се чертае в отстъпите му, листът се добавя към задачата и нестингът започва веднага.</value>
   </data>
   <data name="Shape_Profile" xml:space="preserve">
     <value>Профил</value>
@@ -1846,5 +1846,11 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   </data>
   <data name="Library_ProfileGroup" xml:space="preserve">
     <value>Профили</value>
+  </data>
+  <data name="Shape_SheetLength" xml:space="preserve">
+    <value>Дължина на листа:</value>
+  </data>
+  <data name="Shape_SheetWidth" xml:space="preserve">
+    <value>Ширина на листа:</value>
   </data>
 </root>

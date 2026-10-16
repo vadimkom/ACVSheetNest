@@ -1815,7 +1815,7 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
     <value>No aptas para corte: {0}</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
-    <value>El largo y el ancho son los de la chapa, {0} × {1} {2}: la cinta se dibuja dentro de sus márgenes, la chapa se añade al trabajo y el anidado empieza enseguida.</value>
+    <value>Chapa {0} × {1} {2}: la pieza se dibuja dentro de sus márgenes, la chapa se añade al trabajo y el anidado empieza enseguida.</value>
   </data>
   <data name="Shape_Profile" xml:space="preserve">
     <value>Perfil</value>
@@ -1846,5 +1846,11 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   </data>
   <data name="Library_ProfileGroup" xml:space="preserve">
     <value>Perfiles</value>
+  </data>
+  <data name="Shape_SheetLength" xml:space="preserve">
+    <value>Largo de la chapa:</value>
+  </data>
+  <data name="Shape_SheetWidth" xml:space="preserve">
+    <value>Ancho de la chapa:</value>
   </data>
 </root>

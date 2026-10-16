@@ -1815,7 +1815,7 @@ Ouvrir la page de téléchargement ?</value>
     <value>Non découpables : {0}</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
-    <value>La longueur et la largeur sont celles de la tôle, {0} × {1} {2} : la bande est dessinée dans ses marges, la tôle est ajoutée au travail et l'imbrication démarre aussitôt.</value>
+    <value>Tôle {0} × {1} {2} : le flan est dessiné dans ses marges, la tôle est ajoutée au travail et l'imbrication démarre aussitôt.</value>
   </data>
   <data name="Shape_Profile" xml:space="preserve">
     <value>Profilé</value>
@@ -1846,5 +1846,11 @@ Ouvrir la page de téléchargement ?</value>
   </data>
   <data name="Library_ProfileGroup" xml:space="preserve">
     <value>Profilés</value>
+  </data>
+  <data name="Shape_SheetLength" xml:space="preserve">
+    <value>Longueur de la tôle :</value>
+  </data>
+  <data name="Shape_SheetWidth" xml:space="preserve">
+    <value>Largeur de la tôle :</value>
   </data>
 </root>

@@ -1815,7 +1815,7 @@ Open the download page?</value>
     <value>Not fit to cut: {0}</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
-    <value>Length and width are the sheet, {0} × {1} {2}: the tape is drawn inside its margins, the sheet goes into the job and nesting starts at once.</value>
+    <value>Sheet {0} × {1} {2}: the blank is drawn inside its margins, the sheet goes into the job and nesting starts at once.</value>
   </data>
   <data name="Shape_Profile" xml:space="preserve">
     <value>Profile</value>
@@ -1846,5 +1846,11 @@ Open the download page?</value>
   </data>
   <data name="Library_ProfileGroup" xml:space="preserve">
     <value>Profiles</value>
+  </data>
+  <data name="Shape_SheetLength" xml:space="preserve">
+    <value>Sheet length:</value>
+  </data>
+  <data name="Shape_SheetWidth" xml:space="preserve">
+    <value>Sheet width:</value>
   </data>
 </root>

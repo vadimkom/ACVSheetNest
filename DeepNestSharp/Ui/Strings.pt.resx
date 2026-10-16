@@ -1815,7 +1815,7 @@ Abrir a página de download?</value>
     <value>Impróprias para corte: {0}</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
-    <value>O comprimento e a largura são os da chapa, {0} × {1} {2}: a fita é desenhada dentro das margens, a chapa entra no trabalho e o encaixe começa na hora.</value>
+    <value>Chapa {0} × {1} {2}: o blank é desenhado dentro das margens, a chapa entra no trabalho e o encaixe começa na hora.</value>
   </data>
   <data name="Shape_Profile" xml:space="preserve">
     <value>Perfil</value>
@@ -1846,5 +1846,11 @@ Abrir a página de download?</value>
   </data>
   <data name="Library_ProfileGroup" xml:space="preserve">
     <value>Perfis</value>
+  </data>
+  <data name="Shape_SheetLength" xml:space="preserve">
+    <value>Comprimento da chapa:</value>
+  </data>
+  <data name="Shape_SheetWidth" xml:space="preserve">
+    <value>Largura da chapa:</value>
   </data>
 </root>

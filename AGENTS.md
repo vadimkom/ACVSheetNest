@@ -137,6 +137,9 @@ Last verified (2026-10-15, 1.1.43): core 1078/1080; app 490/490 with the engine 
       - B25 Ø8 (our guess before the drawing: 10 mm square, every 20, Ø3.2).
       - B17 Ø6.2 (another drawing of the user's: 10 × 8, every 15, Ø3.2).
     - In + Shape the tape's length × width are the **sheet**. The tape is drawn to `MainWindow.TapeRoom`: less 2 margins + one gap + 0.5, whole mm. Sparrow panics on an item whose spaced outline exactly fills the strip, hence the 0.5. The sheet is added to the job (one per blank, priority 1), and the nest starts.
+      - The blank's row gets part priority 1, so in a job with other parts it lands on its own sheet first.
+      - The fields read "Длина/Ширина листа" (`Shape_SheetLength/Width`; `SheetRoom` rebuilds the fields when set).
+      - "Fill the sheets" is hidden for fit kinds. A tick left from the washers made the tape a filler: no sheet, no nest (the user's report on 1.1.46).
     - A 2474×1224 sheet of B26 (30k holes): split 3 s, nest 4.7 s. `DxfPartSplitter` used to compare every contour pair: 19 s for 5000 holes, minutes for a sheet. It now uses a grid (`ContainmentGrid`).
   - Profile (`ProfileShape`, presets B100 and B66), from the shop's `profilm.chf` (2026-10-16). Strips like tape, same sheet flow and `StripCuts` bridges. One row per strip: round Ø10 every 62.5; a slot 10 × 28 (obround along the strip) centred 32.5 after each round hole but the last. 2000 mm gives 32 + 31, as in the drawing.
     - Bridges default to 0.5 every ~350, i.e. 5 at 2000/6 as in the drawing.

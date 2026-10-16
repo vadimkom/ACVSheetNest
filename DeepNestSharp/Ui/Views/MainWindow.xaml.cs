@@ -1968,6 +1968,12 @@ namespace DeepNestSharp.Ui.Views
         {
           row.Quantity = added || row.FillSheets ? dialog.Quantity : row.Quantity + dialog.Quantity;
           row.FillSheets = false;
+
+          // A blank drawn for its sheet goes on that sheet first, before the job's other parts can take it.
+          if (dialog.FitSheet != null)
+          {
+            row.Priority = 1;
+          }
         }
       }
 

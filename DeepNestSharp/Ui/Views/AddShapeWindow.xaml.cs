@@ -80,7 +80,18 @@ namespace DeepNestSharp.Ui.Views
     /// this turns a side of it into the room the shape gets on it (less the edge margins and a part gap).
     /// Null: the size typed is the shape's own.
     /// </summary>
-    public Func<double, double> SheetRoom { get; set; }
+    public Func<double, double> SheetRoom
+    {
+      get => this.sheetRoom;
+      set
+      {
+        // Set after the constructor has drawn the fields: draw them again, with the sheet's labels.
+        this.sheetRoom = value;
+        this.Build();
+      }
+    }
+
+    private Func<double, double> sheetRoom;
 
     /// <summary>The sheet the shape was drawn for (length, width), to go into the job with it; null when the
     /// size typed was the shape's own.</summary>
@@ -170,7 +181,11 @@ namespace DeepNestSharp.Ui.Views
         var field = new DoubleUpDown { Minimum = 0, Maximum = 100000, FormatString = "0.###", Value = remembered[i] };
         field.ValueChanged += (_, __) => this.ShowSummary();
         this.fields.Add(field);
-        Row(kind.Parameters[i].LabelKey, field, true);
+        // For a blank drawn to its sheet the length and width typed ARE the sheet; the labels say so.
+        string label = this.SheetRoom != null && kind.Fit is (int fitLength, int fitWidth) && (i == fitLength || i == fitWidth)
+          ? (i == fitLength ? "Shape_SheetLength" : "Shape_SheetWidth")
+          : kind.Parameters[i].LabelKey;
+        Row(label, field, true);
       }
 
       Row("Shape_Quantity", this.qtyUpDown, false);
@@ -182,6 +197,12 @@ namespace DeepNestSharp.Ui.Views
       Grid.SetRow(this.fillCheck, row - 1);
       Grid.SetColumn(this.fillCheck, 2);
       grid.Children.Add(this.fillCheck);
+
+      // A blank drawn to a sheet (tape, profile) already fills it: no box to tick, and one left ticked from the
+      // washers must not turn it into a filler that adds no sheet and starts no nest.
+      bool fitted = kind.Fit != null;
+      this.fillCheck.Visibility = fitted ? Visibility.Collapsed : Visibility.Visible;
+      this.qtyUpDown.IsEnabled = fitted || this.fillCheck.IsChecked != true;
 
       this.building = false;
       if (kind.Presets.Count > 0)
@@ -330,8 +351,8 @@ namespace DeepNestSharp.Ui.Views
 
       lastKind = kind;
       lastQuantity = this.Quantity;
-      this.FillSheets = this.fillCheck.IsChecked == true;
-      lastFillSheets = this.FillSheets;
+      lastFillSheets = this.fillCheck.IsChecked == true;
+      this.FillSheets = lastFillSheets && kind.Fit == null;
       LastValues[kind] = typed;
       if (kind.Presets.Count > 0)
       {

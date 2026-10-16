@@ -1815,7 +1815,7 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
     <value>Не годны к резке: {0}</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
-    <value>Длина и ширина — это лист {0} × {1} {2}: лента рисуется внутри его отступов, лист добавляется в задание, и сразу запускается нестинг.</value>
+    <value>Лист {0} × {1} {2}: заготовка рисуется внутри его отступов, лист добавляется в задание, и сразу запускается нестинг.</value>
   </data>
   <data name="Shape_Profile" xml:space="preserve">
     <value>Профиль</value>
@@ -1846,5 +1846,11 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   </data>
   <data name="Library_ProfileGroup" xml:space="preserve">
     <value>Профили</value>
+  </data>
+  <data name="Shape_SheetLength" xml:space="preserve">
+    <value>Длина листа:</value>
+  </data>
+  <data name="Shape_SheetWidth" xml:space="preserve">
+    <value>Ширина листа:</value>
   </data>
 </root>
