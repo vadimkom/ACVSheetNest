@@ -610,7 +610,7 @@ Le projet n'est pas enregistré. Enregistrez-le ailleurs (Fichier → Enregistre
   </data>
   <data name="Msg_UnsupportedFiles" xml:space="preserve">
     <value>Impossible d'ouvrir {0}.
-SheetNest ouvre les projets (*.dnest) et les dessins DXF et SC2000 (*.dxf, *.dfx, *.chf).</value>
+SheetNest ouvre les projets (*.dnest) et les dessins DXF et SC2000 (*.dxf, *.chf).</value>
   </data>
   <data name="Msg_UpToDate" xml:space="preserve">
     <value>Vous êtes à jour (SheetNest {0}).</value>
@@ -1816,5 +1816,35 @@ Ouvrir la page de téléchargement ?</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
     <value>La longueur et la largeur sont celles de la tôle, {0} × {1} {2} : la bande est dessinée dans ses marges, la tôle est ajoutée au travail et l'imbrication démarre aussitôt.</value>
+  </data>
+  <data name="Shape_Profile" xml:space="preserve">
+    <value>Profilé</value>
+  </data>
+  <data name="Shape_ProfilePreset" xml:space="preserve">
+    <value>Profilé</value>
+  </data>
+  <data name="Shape_ProfileWidth" xml:space="preserve">
+    <value>Largeur du profilé B :</value>
+  </data>
+  <data name="Shape_RoundHole" xml:space="preserve">
+    <value>Trou rond Ø :</value>
+  </data>
+  <data name="Shape_SlotLength" xml:space="preserve">
+    <value>Longueur de la boutonnière :</value>
+  </data>
+  <data name="Shape_SlotWidth" xml:space="preserve">
+    <value>Largeur de la boutonnière :</value>
+  </data>
+  <data name="Shape_HolePitch" xml:space="preserve">
+    <value>Pas des trous ronds :</value>
+  </data>
+  <data name="Shape_SlotOffset" xml:space="preserve">
+    <value>Centre de la boutonnière après le trou :</value>
+  </data>
+  <data name="Shape_ProfileSummary" xml:space="preserve">
+    <value>Profilés : {0}, flan {1} × {2} {3}, chacun {4} trous ronds et {5} boutonnières</value>
+  </data>
+  <data name="Library_ProfileGroup" xml:space="preserve">
+    <value>Profilés</value>
   </data>
 </root>

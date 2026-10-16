@@ -138,10 +138,13 @@ Last verified (2026-10-15, 1.1.43): core 1078/1080; app 490/490 with the engine 
       - B17 Ø6.2 (another drawing of the user's: 10 × 8, every 15, Ø3.2).
     - In + Shape the tape's length × width are the **sheet**. The tape is drawn to `MainWindow.TapeRoom`: less 2 margins + one gap + 0.5, whole mm. Sparrow panics on an item whose spaced outline exactly fills the strip, hence the 0.5. The sheet is added to the job (one per blank, priority 1), and the nest starts.
     - A 2474×1224 sheet of B26 (30k holes): split 3 s, nest 4.7 s. `DxfPartSplitter` used to compare every contour pair: 19 s for 5000 holes, minutes for a sheet. It now uses a grid (`ContainmentGrid`).
+  - Profile (`ProfileShape`, presets B100 and B66), from the shop's `profilm.chf` (2026-10-16). Strips like tape, same sheet flow and `StripCuts` bridges. One row per strip: round Ø10 every 62.5; a slot 10 × 28 (obround along the strip) centred 32.5 after each round hole but the last. 2000 mm gives 32 + 31, as in the drawing.
+    - Bridges default to 0.5 every ~350, i.e. 5 at 2000/6 as in the drawing.
+    - The CHF keeps its bridges in `<PWM Control>` (count, then from/to fractions of the contour's length). `ChfReader` ignores that block, so imported CHF lines come in unbroken.
 - **Parts library and filling offcuts** (`DeepNestLib.Core/IO/PartLibrary.cs`, `FillRemnantWindow`, `SparrowNestService.Fill`).
   - The library is a folder (`SessionState.LibraryFolder`, default `Documents\SheetNest\Library`, set in Advanced Settings). Each subfolder is a group; loose files form a group of their own.
   - Items are DXF/CHF parts, or `*.pattern.json` patterns: a `ShapeKind` id plus its values in mm, keyed by label key, without the fitted length/width (`ShapeKind.Fit`).
-  - A new library is seeded with the two tape presets. "To library..." in + Shape saves a pattern (fit kinds) or a DXF (others).
+  - A new library is seeded with the tape presets (group "Перфолента") and the profiles (group "Профили"); an existing one is left alone. "To library..." in + Shape saves a pattern (fit kinds) or a DXF (others).
   - **▦ From offcut...** creates a new job: the offcut W×L × pieces as the only stock (priority 1), the ticked groups' parts, patterns realized to the offcut (inside 2×margin + spacing, floored to whole mm). Then `OnNest` runs in fill mode (`pendingFillMinShare`).
   - `Fill`: one `PackOneSheet` per part, biggest first. It offers as many as the area left allows and keeps the result if everything chosen before still goes on. Parts under the min share (default 2%) are skipped. The chosen counts × pieces then go through `RunNestBody`, so compaction, holes and replication are the normal ones, and unplaced parts are dropped.
   - `TakeFillQuantities` then sets the rows to what went on and removes the rest.

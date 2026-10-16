@@ -610,7 +610,7 @@ O projeto não está salvo. Salve-o em outro lugar (Arquivo → Salvar como).</v
   </data>
   <data name="Msg_UnsupportedFiles" xml:space="preserve">
     <value>Não é possível abrir {0}.
-O SheetNest abre projetos (*.dnest) e desenhos DXF e SC2000 (*.dxf, *.dfx, *.chf).</value>
+O SheetNest abre projetos (*.dnest) e desenhos DXF e SC2000 (*.dxf, *.chf).</value>
   </data>
   <data name="Msg_UpToDate" xml:space="preserve">
     <value>Você está atualizado (SheetNest {0}).</value>
@@ -1816,5 +1816,35 @@ Abrir a página de download?</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
     <value>O comprimento e a largura são os da chapa, {0} × {1} {2}: a fita é desenhada dentro das margens, a chapa entra no trabalho e o encaixe começa na hora.</value>
+  </data>
+  <data name="Shape_Profile" xml:space="preserve">
+    <value>Perfil</value>
+  </data>
+  <data name="Shape_ProfilePreset" xml:space="preserve">
+    <value>Perfil</value>
+  </data>
+  <data name="Shape_ProfileWidth" xml:space="preserve">
+    <value>Largura do perfil B:</value>
+  </data>
+  <data name="Shape_RoundHole" xml:space="preserve">
+    <value>Furo redondo Ø:</value>
+  </data>
+  <data name="Shape_SlotLength" xml:space="preserve">
+    <value>Comprimento do oblongo:</value>
+  </data>
+  <data name="Shape_SlotWidth" xml:space="preserve">
+    <value>Largura do oblongo:</value>
+  </data>
+  <data name="Shape_HolePitch" xml:space="preserve">
+    <value>Passo dos furos redondos:</value>
+  </data>
+  <data name="Shape_SlotOffset" xml:space="preserve">
+    <value>Centro do oblongo após o furo:</value>
+  </data>
+  <data name="Shape_ProfileSummary" xml:space="preserve">
+    <value>Perfis: {0}, blank {1} × {2} {3}, cada um com {4} furos redondos e {5} oblongos</value>
+  </data>
+  <data name="Library_ProfileGroup" xml:space="preserve">
+    <value>Perfis</value>
   </data>
 </root>

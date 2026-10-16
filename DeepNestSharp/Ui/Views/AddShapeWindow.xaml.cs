@@ -275,7 +275,7 @@ namespace DeepNestSharp.Ui.Views
       PartLibrary.CreateIfMissing(this.LibraryFolder, Localization.Get);
       var groups = PartLibrary.Groups(this.LibraryFolder, string.Empty).Select(g => g.Name).Where(g => g.Length > 0).ToList();
       bool pattern = kind.Fit != null;
-      string group = lastLibraryGroup ?? (pattern ? Localization.Get("Library_TapeGroup") : groups.FirstOrDefault() ?? Localization.Get("Library_DefaultGroup"));
+      string group = lastLibraryGroup ?? (pattern ? Localization.Get(ReferenceEquals(kind, PartShapes.Profile) ? "Library_ProfileGroup" : "Library_TapeGroup") : groups.FirstOrDefault() ?? Localization.Get("Library_DefaultGroup"));
       var preset = this.CurrentPreset;
       string name = pattern ? kind.PatternName(values, Localization.Get) : kind.PartName(values, preset, Localization.Get);
       var dialog = new LibrarySaveWindow(groups, group, name, Localization.Get(pattern ? "Library_PatternNote" : "Library_DrawingNote")) { Owner = this };

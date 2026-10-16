@@ -15,7 +15,7 @@ namespace DeepNestLib.IO
     }
 
     /// <summary>
-    /// Whether the path is a part drawing the DXF pipeline reads: .dxf (or its alias .dfx), or .chf, the laser
+    /// Whether the path is a part drawing the DXF pipeline reads: .dxf, or .chf, the laser
     /// CAM's own format, which <see cref="DrawingFile"/> reads into the same entities.
     /// </summary>
     public static bool IsDxf(string? path)
@@ -26,7 +26,6 @@ namespace DeepNestLib.IO
       }
 
       return path.EndsWith(".dxf", StringComparison.OrdinalIgnoreCase)
-          || path.EndsWith(".dfx", StringComparison.OrdinalIgnoreCase)
           || path.EndsWith(".chf", StringComparison.OrdinalIgnoreCase);
     }
   }

@@ -610,7 +610,7 @@ El proyecto no está guardado. Guárdelo en otro lugar (Archivo → Guardar como
   </data>
   <data name="Msg_UnsupportedFiles" xml:space="preserve">
     <value>No se puede abrir {0}.
-SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).</value>
+SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value>
   </data>
   <data name="Msg_UpToDate" xml:space="preserve">
     <value>Está al día (SheetNest {0}).</value>
@@ -1816,5 +1816,35 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.dfx, *.chf).
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
     <value>El largo y el ancho son los de la chapa, {0} × {1} {2}: la cinta se dibuja dentro de sus márgenes, la chapa se añade al trabajo y el anidado empieza enseguida.</value>
+  </data>
+  <data name="Shape_Profile" xml:space="preserve">
+    <value>Perfil</value>
+  </data>
+  <data name="Shape_ProfilePreset" xml:space="preserve">
+    <value>Perfil</value>
+  </data>
+  <data name="Shape_ProfileWidth" xml:space="preserve">
+    <value>Ancho del perfil B:</value>
+  </data>
+  <data name="Shape_RoundHole" xml:space="preserve">
+    <value>Agujero redondo Ø:</value>
+  </data>
+  <data name="Shape_SlotLength" xml:space="preserve">
+    <value>Largo del ojal:</value>
+  </data>
+  <data name="Shape_SlotWidth" xml:space="preserve">
+    <value>Ancho del ojal:</value>
+  </data>
+  <data name="Shape_HolePitch" xml:space="preserve">
+    <value>Paso de los agujeros redondos:</value>
+  </data>
+  <data name="Shape_SlotOffset" xml:space="preserve">
+    <value>Centro del ojal tras el agujero:</value>
+  </data>
+  <data name="Shape_ProfileSummary" xml:space="preserve">
+    <value>Perfiles: {0}, pieza {1} × {2} {3}, cada uno con {4} agujeros redondos y {5} ojales</value>
+  </data>
+  <data name="Library_ProfileGroup" xml:space="preserve">
+    <value>Perfiles</value>
   </data>
 </root>

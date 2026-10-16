@@ -610,7 +610,7 @@ https://github.com/vadimkom/ACVSheetNest/issues</value>
   </data>
   <data name="Msg_UnsupportedFiles" xml:space="preserve">
     <value>Не удалось открыть: {0}.
-SheetNest открывает проекты (*.dnest) и чертежи DXF и SC2000 (*.dxf, *.dfx, *.chf).</value>
+SheetNest открывает проекты (*.dnest) и чертежи DXF и SC2000 (*.dxf, *.chf).</value>
   </data>
   <data name="Msg_UpToDate" xml:space="preserve">
     <value>У вас последняя версия (SheetNest {0}).</value>
@@ -1816,5 +1816,35 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
     <value>Длина и ширина — это лист {0} × {1} {2}: лента рисуется внутри его отступов, лист добавляется в задание, и сразу запускается нестинг.</value>
+  </data>
+  <data name="Shape_Profile" xml:space="preserve">
+    <value>Профиль</value>
+  </data>
+  <data name="Shape_ProfilePreset" xml:space="preserve">
+    <value>Профиль</value>
+  </data>
+  <data name="Shape_ProfileWidth" xml:space="preserve">
+    <value>Ширина профиля B:</value>
+  </data>
+  <data name="Shape_RoundHole" xml:space="preserve">
+    <value>Круглое отверстие Ø:</value>
+  </data>
+  <data name="Shape_SlotLength" xml:space="preserve">
+    <value>Длина паза:</value>
+  </data>
+  <data name="Shape_SlotWidth" xml:space="preserve">
+    <value>Ширина паза:</value>
+  </data>
+  <data name="Shape_HolePitch" xml:space="preserve">
+    <value>Шаг круглых отверстий:</value>
+  </data>
+  <data name="Shape_SlotOffset" xml:space="preserve">
+    <value>Центр паза от отверстия:</value>
+  </data>
+  <data name="Shape_ProfileSummary" xml:space="preserve">
+    <value>Профилей: {0}, заготовка {1} × {2} {3}, на каждом {4} круглых отверстий и {5} пазов</value>
+  </data>
+  <data name="Library_ProfileGroup" xml:space="preserve">
+    <value>Профили</value>
   </data>
 </root>

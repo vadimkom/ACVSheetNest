@@ -610,7 +610,7 @@ The project is not saved. Save it somewhere else (File → Save As).</value>
   </data>
   <data name="Msg_UnsupportedFiles" xml:space="preserve">
     <value>Unable to open {0}.
-SheetNest opens projects (*.dnest) and DXF and SC2000 drawings (*.dxf, *.dfx, *.chf).</value>
+SheetNest opens projects (*.dnest) and DXF and SC2000 drawings (*.dxf, *.chf).</value>
   </data>
   <data name="Msg_UpToDate" xml:space="preserve">
     <value>You are up to date (SheetNest {0}).</value>
@@ -1816,5 +1816,35 @@ Open the download page?</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
     <value>Length and width are the sheet, {0} × {1} {2}: the tape is drawn inside its margins, the sheet goes into the job and nesting starts at once.</value>
+  </data>
+  <data name="Shape_Profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="Shape_ProfilePreset" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="Shape_ProfileWidth" xml:space="preserve">
+    <value>Profile width B:</value>
+  </data>
+  <data name="Shape_RoundHole" xml:space="preserve">
+    <value>Round hole Ø:</value>
+  </data>
+  <data name="Shape_SlotLength" xml:space="preserve">
+    <value>Slot length:</value>
+  </data>
+  <data name="Shape_SlotWidth" xml:space="preserve">
+    <value>Slot width:</value>
+  </data>
+  <data name="Shape_HolePitch" xml:space="preserve">
+    <value>Round hole pitch:</value>
+  </data>
+  <data name="Shape_SlotOffset" xml:space="preserve">
+    <value>Slot centre after the hole:</value>
+  </data>
+  <data name="Shape_ProfileSummary" xml:space="preserve">
+    <value>Profiles: {0}, blank {1} × {2} {3}, on each {4} round holes and {5} slots</value>
+  </data>
+  <data name="Library_ProfileGroup" xml:space="preserve">
+    <value>Profiles</value>
   </data>
 </root>

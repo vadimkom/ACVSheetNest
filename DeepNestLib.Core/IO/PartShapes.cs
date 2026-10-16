@@ -72,6 +72,28 @@ namespace DeepNestLib.IO
       return entity;
     }
 
+    /// <summary>
+    /// The cuts between neighbouring strips of a blank <paramref name="length"/> long, on the inner-cut layer
+    /// (they enclose nothing), each broken by a bridge of <paramref name="bridge"/> about every
+    /// <paramref name="bridgeEvery"/>, so the strips hold together until the blank is out of the sheet.
+    /// </summary>
+    protected static IEnumerable<DxfEntity> StripCuts(double length, int strips, double strip, double bridge, double bridgeEvery)
+    {
+      int bridges = bridge > 0 ? Math.Max(0, (int)Math.Ceiling((length / bridgeEvery) - 1e-9) - 1) : 0;
+      var gaps = Enumerable.Range(1, bridges).Select(j => length * j / (bridges + 1)).ToList();
+      for (int k = 1; k < strips; k++)
+      {
+        double y = k * strip, from = 0;
+        foreach (double gap in gaps)
+        {
+          yield return InnerCut(new DxfLine(new DxfPoint(from, y, 0), new DxfPoint(gap - (bridge / 2), y, 0)));
+          from = gap + (bridge / 2);
+        }
+
+        yield return InnerCut(new DxfLine(new DxfPoint(from, y, 0), new DxfPoint(length, y, 0)));
+      }
+    }
+
     protected static DxfLwPolyline Rectangle(double width, double height)
       => new DxfLwPolyline(new[]
       {
@@ -94,9 +116,10 @@ namespace DeepNestLib.IO
     public static readonly ShapeKind Circle = new CircleShape();
     public static readonly ShapeKind Washer = new WasherShape();
     public static readonly ShapeKind PerforatedTape = new PerforatedTapeShape();
+    public static readonly ShapeKind Profile = new ProfileShape();
 
     /// <summary>Every shape, in the order the dialog offers them.</summary>
-    public static readonly IReadOnlyList<ShapeKind> Kinds = new[] { Rectangle, Circle, Washer, PerforatedTape };
+    public static readonly IReadOnlyList<ShapeKind> Kinds = new[] { Rectangle, Circle, Washer, PerforatedTape, Profile };
 
     /// <summary>Where the shapes live. Not temp: a saved project points at them and nothing else could
     /// put them back.</summary>
@@ -333,18 +356,9 @@ namespace DeepNestLib.IO
       yield return Cut(Rectangle(length, strips * strip));
 
       // The shared cut between neighbours, broken by a bridge about every BridgeEvery.
-      int bridges = v[Bridge] > 0 ? Math.Max(0, (int)Math.Ceiling((length / v[BridgeEvery]) - 1e-9) - 1) : 0;
-      var gaps = Enumerable.Range(1, bridges).Select(j => length * j / (bridges + 1)).ToList();
-      for (int k = 1; k < strips; k++)
+      foreach (var cut in StripCuts(length, strips, strip, v[Bridge], v[BridgeEvery]))
       {
-        double y = k * strip, from = 0;
-        foreach (double gap in gaps)
-        {
-          yield return InnerCut(new DxfLine(new DxfPoint(from, y, 0), new DxfPoint(gap - (v[Bridge] / 2), y, 0)));
-          from = gap + (v[Bridge] / 2);
-        }
-
-        yield return InnerCut(new DxfLine(new DxfPoint(from, y, 0), new DxfPoint(length, y, 0)));
+        yield return cut;
       }
 
       int groups = Groups(v);
@@ -400,6 +414,161 @@ namespace DeepNestLib.IO
         [Pitch] = pitch,
         [RowGap] = rowGap,
         [SmallOffset] = smallOffset,
+      });
+  }
+
+  /// <summary>
+  /// Mounting profile, drawn like tape: a blank L × W cut into whole strips of width B, each with one row of
+  /// holes along its middle, a round hole every pitch and a slot (an obround, its length along the strip)
+  /// after each round hole but the last. From the shop's drawing (profilm, 2026-10-16): Ø10, slot 10 × 28,
+  /// pitch 62.5, slot centre 32.5 after the hole, 0.5 mm bridges every 2000/6 in the long cuts; the same
+  /// pattern comes 100 or 66 wide.
+  /// </summary>
+  public sealed class ProfileShape : ShapeKind
+  {
+    public const int Length = 0;
+    public const int Width = 1;
+    public const int Strip = 2;
+    public const int Hole = 3;
+    public const int SlotLength = 4;
+    public const int SlotWidth = 5;
+    public const int Pitch = 6;
+    public const int SlotOffset = 7;
+    public const int Bridge = 8;
+    public const int BridgeEvery = 9;
+
+    public override string Id => "profile";
+
+    public override string NameKey => "Shape_Profile";
+
+    /// <summary>A blank of profile is as long and as wide as the piece of metal it is cut from.</summary>
+    public override (int Length, int Width)? Fit => (Length, Width);
+
+    public override IReadOnlyList<ShapeParameter> Parameters { get; } = new[]
+    {
+      new ShapeParameter("Shape_Length", 2000),
+      new ShapeParameter("Shape_BlankWidth", 300),
+      new ShapeParameter("Shape_ProfileWidth", 100),
+      new ShapeParameter("Shape_RoundHole", 10),
+      new ShapeParameter("Shape_SlotLength", 28),
+      new ShapeParameter("Shape_SlotWidth", 10),
+      new ShapeParameter("Shape_HolePitch", 62.5),
+      new ShapeParameter("Shape_SlotOffset", 32.5),
+      new ShapeParameter("Shape_Bridge", 0.5),
+      new ShapeParameter("Shape_BridgeEvery", 350),
+    };
+
+    public override IReadOnlyList<ShapePreset> Presets { get; } = new[] { Of(100), Of(66) };
+
+    public override string Problem(IReadOnlyList<double> v)
+    {
+      for (int i = 0; i < v.Count; i++)
+      {
+        if (!(v[i] > 0) && i != Bridge)
+        {
+          return "Shape_NeedsSize";
+        }
+      }
+
+      if (v[Bridge] < 0 || v[Bridge] >= v[BridgeEvery])
+      {
+        return "Shape_NeedsSize";
+      }
+
+      if (Strips(v) < 1)
+      {
+        return "Shape_TapeBlankTooNarrow";
+      }
+
+      if (v[Hole] >= v[Strip] || v[SlotWidth] >= v[Strip] || v[SlotLength] < v[SlotWidth])
+      {
+        return "Shape_TapeHolesOutside";
+      }
+
+      // Metal between the slot and the round hole on either side of it.
+      double halfSlot = v[SlotLength] / 2, r = v[Hole] / 2;
+      if (v[SlotOffset] - halfSlot <= r || v[Pitch] - v[SlotOffset] - halfSlot <= r)
+      {
+        return "Shape_TapeHolesTouch";
+      }
+
+      return Holes(v) < 1 ? "Shape_TapeTooShort" : null;
+    }
+
+    public override string Describe(IReadOnlyList<double> v, Func<string, string> text, string unit)
+    {
+      if (Problem(v) != null)
+      {
+        return null;
+      }
+
+      int strips = Strips(v);
+      return string.Format(CultureInfo.CurrentCulture, text("Shape_ProfileSummary"), strips, N(v[Length]), N(strips * v[Strip]), unit, Holes(v), Holes(v) - 1);
+    }
+
+    public override string PartName(IReadOnlyList<double> v, ShapePreset preset, Func<string, string> text)
+      => text("Shape_Profile") + " B" + N(v[Strip]) + " " + N(v[Length]) + "x" + N(Strips(v) * v[Strip]);
+
+    public override string PatternName(IReadOnlyList<double> v, Func<string, string> text)
+      => text("Shape_Profile") + " B" + N(v[Strip]);
+
+    public override IEnumerable<DxfEntity> Draw(IReadOnlyList<double> v)
+    {
+      int strips = Strips(v);
+      double length = v[Length], strip = v[Strip];
+      yield return Cut(Rectangle(length, strips * strip));
+      foreach (var cut in StripCuts(length, strips, strip, v[Bridge], v[BridgeEvery]))
+      {
+        yield return cut;
+      }
+
+      int holes = Holes(v);
+      double first = (length - ((holes - 1) * v[Pitch])) / 2;
+      double straight = (v[SlotLength] - v[SlotWidth]) / 2, half = v[SlotWidth] / 2;
+      for (int k = 0; k < strips; k++)
+      {
+        double yc = (k + 0.5) * strip;
+        for (int h = 0; h < holes; h++)
+        {
+          double xc = first + (h * v[Pitch]);
+          yield return Cut(new DxfCircle(new DxfPoint(xc, yc, 0), v[Hole] / 2));
+          if (h == holes - 1)
+          {
+            continue;
+          }
+
+          double sx = xc + v[SlotOffset];
+          yield return Cut(new DxfLwPolyline(new[]
+          {
+            new DxfLwPolylineVertex { X = sx - straight, Y = yc - half },
+            new DxfLwPolylineVertex { X = sx + straight, Y = yc - half, Bulge = 1 },
+            new DxfLwPolylineVertex { X = sx + straight, Y = yc + half },
+            new DxfLwPolylineVertex { X = sx - straight, Y = yc + half, Bulge = 1 },
+          })
+          { IsClosed = true });
+        }
+      }
+    }
+
+    /// <summary>How many whole strips the blank holds.</summary>
+    public static int Strips(IReadOnlyList<double> v) => (int)Math.Floor((v[Width] / v[Strip]) + 1e-9);
+
+    /// <summary>How many round holes go along a strip, keeping a hole's width of metal past each end one.</summary>
+    public static int Holes(IReadOnlyList<double> v)
+    {
+      double room = v[Length] - (3 * v[Hole]);
+      return room < 0 ? 0 : (int)Math.Floor((room / v[Pitch]) + 1e-9) + 1;
+    }
+
+    private static ShapePreset Of(double width)
+      => new ShapePreset("Shape_ProfilePreset", "B" + N(width), new Dictionary<int, double>
+      {
+        [Strip] = width,
+        [Hole] = 10,
+        [SlotLength] = 28,
+        [SlotWidth] = 10,
+        [Pitch] = 62.5,
+        [SlotOffset] = 32.5,
       });
   }
 }

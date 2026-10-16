@@ -123,18 +123,20 @@ namespace DeepNestLib.IO
         return;
       }
 
-      var tape = PartShapes.PerforatedTape;
-      string group = Path.Combine(folder, text("Library_TapeGroup"));
-      Directory.CreateDirectory(group);
-      foreach (var preset in tape.Presets)
+      foreach (var (kind, groupKey) in new[] { (PartShapes.PerforatedTape, "Library_TapeGroup"), (PartShapes.Profile, "Library_ProfileGroup") })
       {
-        var values = tape.Parameters.Select(p => p.DefaultMm).ToArray();
-        foreach (var kv in preset.ValuesMm)
+        string group = Path.Combine(folder, text(groupKey));
+        Directory.CreateDirectory(group);
+        foreach (var preset in kind.Presets)
         {
-          values[kv.Key] = kv.Value;
-        }
+          var values = kind.Parameters.Select(p => p.DefaultMm).ToArray();
+          foreach (var kv in preset.ValuesMm)
+          {
+            values[kv.Key] = kv.Value;
+          }
 
-        SavePattern(group, tape.PatternName(values, text), ShapePattern.Of(tape, values, millimetres: true));
+          SavePattern(group, kind.PatternName(values, text), ShapePattern.Of(kind, values, millimetres: true));
+        }
       }
     }
 

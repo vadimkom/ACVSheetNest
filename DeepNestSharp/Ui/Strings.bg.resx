@@ -610,7 +610,7 @@ https://github.com/vadimkom/ACVSheetNest/issues</value>
   </data>
   <data name="Msg_UnsupportedFiles" xml:space="preserve">
     <value>Не може да се отвори: {0}.
-SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 (*.dxf, *.dfx, *.chf).</value>
+SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 (*.dxf, *.chf).</value>
   </data>
   <data name="Msg_UpToDate" xml:space="preserve">
     <value>Използвате последната версия (SheetNest {0}).</value>
@@ -1816,5 +1816,35 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
     <value>Дължината и ширината са на листа, {0} × {1} {2}: лентата се чертае в отстъпите му, листът се добавя към задачата и нестингът започва веднага.</value>
+  </data>
+  <data name="Shape_Profile" xml:space="preserve">
+    <value>Профил</value>
+  </data>
+  <data name="Shape_ProfilePreset" xml:space="preserve">
+    <value>Профил</value>
+  </data>
+  <data name="Shape_ProfileWidth" xml:space="preserve">
+    <value>Ширина на профила B:</value>
+  </data>
+  <data name="Shape_RoundHole" xml:space="preserve">
+    <value>Кръгъл отвор Ø:</value>
+  </data>
+  <data name="Shape_SlotLength" xml:space="preserve">
+    <value>Дължина на канала:</value>
+  </data>
+  <data name="Shape_SlotWidth" xml:space="preserve">
+    <value>Ширина на канала:</value>
+  </data>
+  <data name="Shape_HolePitch" xml:space="preserve">
+    <value>Стъпка на кръглите отвори:</value>
+  </data>
+  <data name="Shape_SlotOffset" xml:space="preserve">
+    <value>Център на канала от отвора:</value>
+  </data>
+  <data name="Shape_ProfileSummary" xml:space="preserve">
+    <value>Профили: {0}, заготовка {1} × {2} {3}, на всеки {4} кръгли отвора и {5} канала</value>
+  </data>
+  <data name="Library_ProfileGroup" xml:space="preserve">
+    <value>Профили</value>
   </data>
 </root>

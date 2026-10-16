@@ -63,6 +63,52 @@ namespace DeepNestLib.CiTests.IO
       small.Select(c => Math.Round(c.Center.Y, 6)).Distinct().Should().BeEquivalentTo(new[] { 4.0, 22.0 });
     }
 
+    private static double[] Profile(double length, double width, int preset = 0)
+    {
+      var kind = PartShapes.Profile;
+      var values = kind.Parameters.Select(p => p.DefaultMm).ToArray();
+      foreach (var kv in kind.Presets[preset].ValuesMm)
+      {
+        values[kv.Key] = kv.Value;
+      }
+
+      values[ProfileShape.Length] = length;
+      values[ProfileShape.Width] = width;
+      return values;
+    }
+
+    /// <summary>The shop's profile drawing (profilm: 100 x 2000) has 32 round holes Ø10 and 31 slots 10 x 28 in
+    /// one row; two strips of it share one cut with five 0.5 mm bridges, as the drawing's long cuts have.</summary>
+    [Fact]
+    public void TheShopsProfileLoadsWithItsHolesAndSlots()
+    {
+      var v = Profile(2000, 200);
+      PartShapes.Profile.Problem(v).Should().BeNull();
+      ProfileShape.Strips(v).Should().Be(2);
+      ProfileShape.Holes(v).Should().Be(32);
+
+      var nfp = Load(Write(PartShapes.Profile, v));
+      (nfp.MaxX - nfp.MinX).Should().BeApproximately(2000, 0.01);
+      (nfp.MaxY - nfp.MinY).Should().BeApproximately(200, 0.01);
+      nfp.Children.Should().HaveCount(2 * (32 + 31));
+      var slots = nfp.Children.Where(c => c.MaxX - c.MinX > 20).ToList();
+      slots.Should().HaveCount(62);
+      slots.Should().OnlyContain(s => Math.Abs(s.MaxX - s.MinX - 28) < 0.05 && Math.Abs(s.MaxY - s.MinY - 10) < 0.05);
+
+      var shared = PartShapes.Profile.Draw(v).OfType<DxfLine>().Where(l => l.Layer == DxfOutputLayers.InnerCutSourceName).ToList();
+      shared.Should().HaveCount(6, "five bridges break the cut between the two strips");
+      shared.Sum(l => Math.Abs(l.P2.X - l.P1.X)).Should().BeApproximately(2000 - (5 * 0.5), 1e-6);
+    }
+
+    [Fact]
+    public void ProfileB66IsTheSamePatternNarrower()
+    {
+      var v = Profile(2000, 66, preset: 1);
+      PartShapes.Profile.Problem(v).Should().BeNull();
+      PartShapes.Profile.PartName(v, null, Text).Should().Be("Shape_Profile B66 2000x66");
+      PartShapes.Profile.Draw(v).OfType<DxfLine>().Should().BeEmpty("one strip has no cut shared with another");
+    }
+
     [Theory]
     [InlineData(100, 50, 5000)]
     [InlineData(100, 100, 10000)]

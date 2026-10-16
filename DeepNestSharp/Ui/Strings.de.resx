@@ -610,7 +610,7 @@ Das Projekt ist nicht gespeichert. Speichern Sie es an einem anderen Ort (Datei 
   </data>
   <data name="Msg_UnsupportedFiles" xml:space="preserve">
     <value>{0} kann nicht geöffnet werden.
-SheetNest öffnet Projekte (*.dnest) sowie DXF- und SC2000-Zeichnungen (*.dxf, *.dfx, *.chf).</value>
+SheetNest öffnet Projekte (*.dnest) sowie DXF- und SC2000-Zeichnungen (*.dxf, *.chf).</value>
   </data>
   <data name="Msg_UpToDate" xml:space="preserve">
     <value>Sie sind auf dem neuesten Stand (SheetNest {0}).</value>
@@ -1816,5 +1816,35 @@ Downloadseite öffnen?</value>
   </data>
   <data name="Shape_FitSheetNote" xml:space="preserve">
     <value>Länge und Breite sind das Blech, {0} × {1} {2}: Das Band wird innerhalb seiner Ränder gezeichnet, das Blech kommt in den Auftrag und das Schachteln startet sofort.</value>
+  </data>
+  <data name="Shape_Profile" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="Shape_ProfilePreset" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="Shape_ProfileWidth" xml:space="preserve">
+    <value>Profilbreite B:</value>
+  </data>
+  <data name="Shape_RoundHole" xml:space="preserve">
+    <value>Rundloch Ø:</value>
+  </data>
+  <data name="Shape_SlotLength" xml:space="preserve">
+    <value>Langlochlänge:</value>
+  </data>
+  <data name="Shape_SlotWidth" xml:space="preserve">
+    <value>Langlochbreite:</value>
+  </data>
+  <data name="Shape_HolePitch" xml:space="preserve">
+    <value>Abstand der Rundlöcher:</value>
+  </data>
+  <data name="Shape_SlotOffset" xml:space="preserve">
+    <value>Langlochmitte nach dem Loch:</value>
+  </data>
+  <data name="Shape_ProfileSummary" xml:space="preserve">
+    <value>Profile: {0}, Zuschnitt {1} × {2} {3}, je {4} Rundlöcher und {5} Langlöcher</value>
+  </data>
+  <data name="Library_ProfileGroup" xml:space="preserve">
+    <value>Profile</value>
   </data>
 </root>

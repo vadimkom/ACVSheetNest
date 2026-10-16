@@ -85,7 +85,7 @@ namespace DeepNestLib.IO
       string extension = Path.GetExtension(sourcePath);
       if (!string.Equals(extension, ".dxf", StringComparison.OrdinalIgnoreCase))
       {
-        extension = ".dxf"; // a CHF (or a .dfx) is written out as the DXF it was read into
+        extension = ".dxf"; // a CHF is written out as the DXF it was read into
       }
 
       string path = Path.Combine(directory, Path.GetFileNameWithoutExtension(sourcePath) + extension);

@@ -17,6 +17,8 @@ namespace DeepNestLib.CiTests.IO
     {
       "Library_TapeGroup" => "Tape",
       "Shape_Tape" => "Tape",
+      "Library_ProfileGroup" => "Profiles",
+      "Shape_Profile" => "Profile",
       _ => key,
     };
 
@@ -29,10 +31,11 @@ namespace DeepNestLib.CiTests.IO
       PartLibrary.CreateIfMissing(folder, Text);
 
       var groups = PartLibrary.Groups(folder, "Loose");
-      var tape = groups.Should().ContainSingle().Subject;
-      tape.Name.Should().Be("Tape");
+      groups.Select(g => g.Name).Should().BeEquivalentTo("Tape", "Profiles");
+      var tape = groups.Single(g => g.Name == "Tape");
       tape.Items.Should().HaveCount(3).And.OnlyContain(i => i.Pattern != null);
       tape.Items.Select(i => i.Name).Should().Contain("Tape B25, Ø8 + 4×Ø3.2").And.Contain("Tape B26, Ø8.2 + 4×Ø3.5");
+      groups.Single(g => g.Name == "Profiles").Items.Select(i => i.Name).Should().BeEquivalentTo("Profile B100", "Profile B66");
     }
 
     [Fact]

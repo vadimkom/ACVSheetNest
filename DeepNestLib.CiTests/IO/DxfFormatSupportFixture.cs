@@ -14,15 +14,15 @@ namespace DeepNestLib.CiTests.IO
     [Theory]
     [InlineData("part.dxf", true)]
     [InlineData("part.DXF", true)]
-    [InlineData("part.dfx", true)]
-    [InlineData("part.DFX", true)]
+    [InlineData("part.dfx", false)] // a typo the program once accepted as DXF; the shop asked for it gone
+    [InlineData("part.DFX", false)]
     [InlineData("C:\\path\\to\\file.Dxf", true)]
-    [InlineData("C:\\path\\to\\file.Dfx", true)]
+    [InlineData("C:\\path\\to\\file.Dfx", false)]
     [InlineData("part.step", false)]
     [InlineData("part.dnpoly", false)]
     [InlineData("", false)]
     [InlineData(null, false)]
-    public void IsDxfRecognizesDxfAndDfxVariations(string path, bool expected)
+    public void IsDxfRecognizesDxfButNotTheDfxTypo(string path, bool expected)
     {
       DxfFileExtensions.IsDxf(path).Should().Be(expected);
     }
@@ -45,28 +45,6 @@ namespace DeepNestLib.CiTests.IO
         if (File.Exists(tempDxf))
         {
           File.Delete(tempDxf);
-        }
-      }
-    }
-
-    [Fact]
-    public void LoadRawDetailLoadsDfxFile()
-    {
-      string tempDfx = Path.Combine(Path.GetTempPath(), "test_part.dfx");
-      try
-      {
-        File.WriteAllText(tempDfx, "0\nSECTION\n2\nENTITIES\n0\nLINE\n8\n0\n10\n0.0\n20\n0.0\n11\n10.0\n21\n0.0\n0\nLINE\n8\n0\n10\n10.0\n20\n0.0\n11\n10.0\n21\n10.0\n0\nLINE\n8\n0\n10\n10.0\n20\n10.0\n11\n0.0\n21\n10.0\n0\nLINE\n8\n0\n10\n0.0\n20\n10.0\n11\n0.0\n21\n0.0\n0\nENDSEC\n0\nEOF\n");
-        var helper = new NestExecutionHelper();
-        var raw = helper.LoadRawDetail(new FileInfo(tempDfx));
-        raw.Should().NotBeNull();
-        raw.TryConvertToNfp(0, out INfp nfp).Should().BeTrue();
-        nfp.Points.Length.Should().BeGreaterThanOrEqualTo(4);
-      }
-      finally
-      {
-        if (File.Exists(tempDfx))
-        {
-          File.Delete(tempDfx);
         }
       }
     }
