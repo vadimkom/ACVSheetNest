@@ -93,6 +93,31 @@ namespace DeepNestSharp.Ui.Views
 
     private Func<double, double> sheetRoom;
 
+    /// <summary>The values as typed (for a blank drawn to a sheet, its length and width are the sheet's).</summary>
+    public double[] Typed { get; private set; }
+
+    /// <summary>
+    /// Opens the next dialog on a shape already in the job, as it was made: its kind, preset, values, count.
+    /// Called before the dialog is built, which is when it reads what to show.
+    /// </summary>
+    public static void Prime(ShapeKind kind, double[] typed, string presetDetail, int quantity, bool fillSheets)
+    {
+      lastKind = kind;
+      LastValues[kind] = typed;
+      int preset = kind.Presets.Select((p, i) => (p, i)).FirstOrDefault(x => x.p.Detail == presetDetail).i;
+      bool known = kind.Presets.Any(p => p.Detail == presetDetail);
+      LastPreset[kind] = known ? preset : kind.Presets.Count; // "Custom" comes after the presets
+      lastQuantity = Math.Max(1, quantity);
+      lastFillSheets = fillSheets;
+    }
+
+    /// <summary>Changing a shape in the job rather than adding one: the title and the button say so.</summary>
+    public void ForEditing()
+    {
+      this.Title = Localization.Get("Shape_EditTitle");
+      this.addButton.Content = Localization.Get("Shape_Apply");
+    }
+
     /// <summary>The sheet the shape was drawn for (length, width), to go into the job with it; null when the
     /// size typed was the shape's own.</summary>
     public (double Length, double Width)? FitSheet { get; private set; }
@@ -343,6 +368,7 @@ namespace DeepNestSharp.Ui.Views
 
       this.Kind = kind;
       this.Values = values;
+      this.Typed = typed;
       this.FitSheet = !ReferenceEquals(values, typed) && kind.Fit is (int fitLength, int fitWidth)
         ? (typed[fitLength], typed[fitWidth])
         : null;

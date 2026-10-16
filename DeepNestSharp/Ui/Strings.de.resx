@@ -1853,4 +1853,10 @@ Downloadseite öffnen?</value>
   <data name="Shape_SheetWidth" xml:space="preserve">
     <value>Blechbreite:</value>
   </data>
+  <data name="Shape_EditTitle" xml:space="preserve">
+    <value>Form ändern</value>
+  </data>
+  <data name="Shape_Apply" xml:space="preserve">
+    <value>Übernehmen</value>
+  </data>
 </root>

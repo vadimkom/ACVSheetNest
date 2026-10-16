@@ -1922,11 +1922,25 @@ namespace DeepNestSharp.Ui.Views
       return Math.Floor((side - inset - slack) / whole) * whole;
     }
 
-    private async void OnAddShapeClicked(object sender, RoutedEventArgs e)
+    private async void OnAddShapeClicked(object sender, RoutedEventArgs e) => await this.RunShapeDialog(null, null, e);
+
+    /// <summary>
+    /// The shape dialog, to add a shape or, given a row and the record its drawing was made from, to change one
+    /// (double-click). The shape is drawn and its record kept beside the drawing. A new one is added as a row,
+    /// or to the row already drawing the same file; a changed one replaces the drawing of its own row. A blank
+    /// drawn for a sheet (tape, profile) brings its sheet into the job, or moves the one it brought, and the
+    /// nest starts.
+    /// </summary>
+    private async Task RunShapeDialog(IDetailLoadInfo editing, DeepNestLib.IO.ShapeRecord was, RoutedEventArgs e)
     {
       if (ViewModel?.ActiveDocument is not NestProjectViewModel doc)
       {
         return;
+      }
+
+      if (editing != null)
+      {
+        AddShapeWindow.Prime(was.Kind, was.ValuesIn(this.unitsMm), was.Preset, editing.Quantity, editing.FillSheets);
       }
 
       var dialog = new AddShapeWindow(this.unitsMm)
@@ -1935,6 +1949,11 @@ namespace DeepNestSharp.Ui.Views
         SheetRoom = this.TapeRoom,
         LibraryFolder = (SessionState.Load() ?? new SessionState()).EffectiveLibraryFolder,
       };
+      if (editing != null)
+      {
+        dialog.ForEditing();
+      }
+
       if (dialog.ShowDialog() != true)
       {
         return;
@@ -1952,10 +1971,10 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
-      // The same shape again is more of the same part, not a second row drawing the same file.
-      IDetailLoadInfo Row() => doc.ProjectInfo.DetailLoadInfos.LastOrDefault(p => string.Equals(p.Path, path, StringComparison.OrdinalIgnoreCase));
+      DeepNestLib.IO.ShapeRecord.Of(dialog.Kind, dialog.Typed, dialog.Preset, this.unitsMm, dialog.FitSheet != null).SaveFor(path);
+
       // A shape that fills the sheets has no count until a nest has put some on.
-      void Take(IDetailLoadInfo row, bool added)
+      void Take(IDetailLoadInfo row, bool replace)
       {
         if (dialog.FillSheets)
         {
@@ -1966,7 +1985,7 @@ namespace DeepNestSharp.Ui.Views
         }
         else
         {
-          row.Quantity = added || row.FillSheets ? dialog.Quantity : row.Quantity + dialog.Quantity;
+          row.Quantity = replace || row.FillSheets ? dialog.Quantity : row.Quantity + dialog.Quantity;
           row.FillSheets = false;
 
           // A blank drawn for its sheet goes on that sheet first, before the job's other parts can take it.
@@ -1977,36 +1996,82 @@ namespace DeepNestSharp.Ui.Views
         }
       }
 
-      if (Row() is IDetailLoadInfo existing)
+      if (editing != null)
       {
-        Take(existing, false);
+        // The row keeps its place, colour and settings; only what it draws changes.
+        editing.Path = path;
+        Take(editing, true);
+        this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+        this.partsListView.Items.Refresh();
       }
       else
       {
-        await doc.AddPartFilesAsync(new[] { path });
-        if (this.isClosed || !this.IsLoaded)
+        // The same shape again is more of the same part, not a second row drawing the same file.
+        IDetailLoadInfo Row() => doc.ProjectInfo.DetailLoadInfos.LastOrDefault(p => string.Equals(p.Path, path, StringComparison.OrdinalIgnoreCase));
+        if (Row() is IDetailLoadInfo existing)
         {
-          return;
+          Take(existing, false);
         }
-
-        if (Row() is IDetailLoadInfo added)
+        else
         {
-          Take(added, true);
-        }
+          await doc.AddPartFilesAsync(new[] { path });
+          if (this.isClosed || !this.IsLoaded)
+          {
+            return;
+          }
 
-        this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+          if (Row() is IDetailLoadInfo added)
+          {
+            Take(added, true);
+          }
+
+          this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+        }
       }
 
       doc.IsDirty = true;
       UpdateSummaryBadges();
 
       // Tape is drawn for a sheet: that sheet goes into the job, one per blank, and the nest starts at once.
+      // A changed blank takes the sheet it brought along with it, when that sheet is still in the job.
       if (dialog.FitSheet is (double sheetLength, double sheetWidth) && !dialog.FillSheets)
       {
-        this.AddSheetOfSize((int)Math.Round(sheetLength), (int)Math.Round(sheetWidth), dialog.Quantity, unlimited: false, priority: 1);
+        int width = (int)Math.Round(sheetLength), height = (int)Math.Round(sheetWidth);
+        var brought = editing != null && was.ForSheet ? this.SheetBroughtBy(doc, was) : null;
+        if (brought != null)
+        {
+          if (lastNestConsumed != null)
+          {
+            ClearNestResult(); // its stock comes back first, so the count set here is the one that stays
+          }
+
+          brought.Width = width;
+          brought.Height = height;
+          brought.Quantity = dialog.Quantity;
+          this.sheetsListView.Items.Refresh();
+        }
+        else
+        {
+          this.AddSheetOfSize(width, height, dialog.Quantity, unlimited: false, priority: 1);
+        }
+
         this.SetCurrentMode(WorkflowMode.Nesting);
         this.OnNest(this.btnStartNest, e);
       }
+    }
+
+    /// <summary>The sheet a blank drawn for a sheet brought into the job: of the size typed then, first in
+    /// line (priority 1). Null when the operator has since changed or removed it.</summary>
+    private ISheetLoadInfo SheetBroughtBy(NestProjectViewModel doc, DeepNestLib.IO.ShapeRecord was)
+    {
+      if (was.Kind?.Fit is not (int length, int width))
+      {
+        return null;
+      }
+
+      var typed = was.ValuesIn(this.unitsMm);
+      int w = (int)Math.Round(typed[length]), h = (int)Math.Round(typed[width]);
+      return doc.ProjectInfo.SheetLoadInfos.LastOrDefault(s => s.Width == w && s.Height == h && s.Priority == 1 && !s.Unlimited);
     }
 
     private void OnPartsListDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -2028,7 +2093,16 @@ namespace DeepNestSharp.Ui.Views
 
       if (d is ListViewItem item && item.DataContext is IDetailLoadInfo part)
       {
-        OpenEditPart(part);
+        // A shape the program drew opens its shape dialog, to change the shape; turning, priority and the
+        // rest stay on the "..." button.
+        if (DeepNestLib.IO.ShapeRecord.LoadFor(part.Path) is DeepNestLib.IO.ShapeRecord shape)
+        {
+          _ = this.RunShapeDialog(part, shape, e);
+        }
+        else
+        {
+          OpenEditPart(part);
+        }
       }
     }
 

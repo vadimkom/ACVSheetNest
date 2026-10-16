@@ -1853,4 +1853,10 @@ Abrir a página de download?</value>
   <data name="Shape_SheetWidth" xml:space="preserve">
     <value>Largura da chapa:</value>
   </data>
+  <data name="Shape_EditTitle" xml:space="preserve">
+    <value>Alterar a forma</value>
+  </data>
+  <data name="Shape_Apply" xml:space="preserve">
+    <value>Aplicar</value>
+  </data>
 </root>

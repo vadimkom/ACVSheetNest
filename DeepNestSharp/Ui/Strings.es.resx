@@ -1853,4 +1853,10 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Shape_SheetWidth" xml:space="preserve">
     <value>Ancho de la chapa:</value>
   </data>
+  <data name="Shape_EditTitle" xml:space="preserve">
+    <value>Cambiar la figura</value>
+  </data>
+  <data name="Shape_Apply" xml:space="preserve">
+    <value>Aplicar</value>
+  </data>
 </root>

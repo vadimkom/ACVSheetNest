@@ -1853,4 +1853,10 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Shape_SheetWidth" xml:space="preserve">
     <value>Largeur de la tôle :</value>
   </data>
+  <data name="Shape_EditTitle" xml:space="preserve">
+    <value>Modifier la forme</value>
+  </data>
+  <data name="Shape_Apply" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
 </root>
