@@ -40,6 +40,12 @@
     bool FillSheets { get; set; }
 
     /// <summary>
+    /// Gets or sets the name the operator gave the part, shown on the layout, in the DXF and in the report
+    /// instead of its file's name; null keeps the file's name. The drawing itself is not renamed.
+    /// </summary>
+    string DisplayName { get; set; }
+
+    /// <summary>
     /// Gets or sets the per-part allowed rotations (1 = fixed, 2 = 0/180, 4 = 90° steps, 36 = free).
     /// Values &lt;= 0 fall back to the engine's configured default.
     /// </summary>

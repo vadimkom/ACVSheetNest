@@ -67,6 +67,20 @@ namespace DeepNestSharp.Domain.Models
       get => detailLoadInfo.Name;
     }
 
+    /// <summary>The name the operator gave the part; null keeps the file's name.</summary>
+    public string DisplayName
+    {
+      get => detailLoadInfo.DisplayName;
+      set
+      {
+        SetProperty(nameof(DisplayName), () => detailLoadInfo.DisplayName, v => detailLoadInfo.DisplayName = v, value);
+        OnPropertyChanged(nameof(ShownName));
+      }
+    }
+
+    /// <summary>What the parts table shows: the operator's name, or the file's.</summary>
+    public string ShownName => string.IsNullOrWhiteSpace(detailLoadInfo.DisplayName) ? this.Name : detailLoadInfo.DisplayName;
+
     public string Path
     {
       get => detailLoadInfo.Path;
@@ -83,6 +97,7 @@ namespace DeepNestSharp.Domain.Models
         this.nfp = null;
         this.netArea = null;
         OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(ShownName));
         OnPropertyChanged(nameof(PreviewSource));
         OnPropertyChanged(nameof(SizeLabel));
         NotifyCommonCuttingCapabilityChanged();

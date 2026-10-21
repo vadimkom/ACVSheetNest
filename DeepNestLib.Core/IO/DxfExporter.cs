@@ -2076,11 +2076,20 @@ namespace DeepNestLib.IO
     /// whole by the app whenever the job's parts change.</summary>
     public static ISet<string> UnnamedParts { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>Names the operator gave parts, by drawing path: shown on the layout, written in the DXF and
+    /// the report in place of the file's name. Swapped whole by the app whenever the job's parts change.</summary>
+    public static IReadOnlyDictionary<string, string> PartNames { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
     public static string GetPartNameLabel(string source)
     {
       if (string.IsNullOrWhiteSpace(source))
       {
         return string.Empty;
+      }
+
+      if (PartNames.TryGetValue(source, out string given) && !string.IsNullOrWhiteSpace(given))
+      {
+        return given;
       }
 
       try

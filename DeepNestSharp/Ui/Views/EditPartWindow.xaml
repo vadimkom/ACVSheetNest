@@ -23,11 +23,19 @@
     </Grid.RowDefinitions>
 
     <!-- Part file -->
-    <DockPanel Grid.Row="0" Margin="0,0,0,10">
-      <TextBlock Text="{ui:Tr Part_File}" VerticalAlignment="Center" Margin="0,0,8,0" />
-      <TextBox x:Name="partFileText" IsReadOnly="True" Background="White" Padding="4,3" MinWidth="420"
-               VerticalContentAlignment="Center" />
-    </DockPanel>
+    <StackPanel Grid.Row="0" Margin="0,0,0,10">
+      <DockPanel>
+        <TextBlock Text="{ui:Tr Part_File}" VerticalAlignment="Center" Margin="0,0,8,0" MinWidth="60" />
+        <TextBox x:Name="partFileText" IsReadOnly="True" Background="White" Padding="4,3" MinWidth="420"
+                 VerticalContentAlignment="Center" />
+      </DockPanel>
+      <!-- The name on the layout, in the DXF and in the report; empty keeps the file's name -->
+      <DockPanel Margin="0,6,0,0">
+        <TextBlock Text="{ui:Tr Part_Name}" VerticalAlignment="Center" Margin="0,0,8,0" MinWidth="60" />
+        <TextBox x:Name="partNameText" Padding="4,3" MinWidth="420" VerticalContentAlignment="Center"
+                 ToolTip="{ui:Tr Tip_PartName}" />
+      </DockPanel>
+    </StackPanel>
 
     <!-- Preview + Quantity (left) | Settings (right) -->
     <Grid Grid.Row="1">

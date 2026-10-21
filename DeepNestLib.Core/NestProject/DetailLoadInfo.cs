@@ -24,6 +24,9 @@ namespace DeepNestLib.NestProject
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool FillSheets { get; set; } // no count: as many as the sheets have room for after the counted parts
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string DisplayName { get; set; } // the operator's name for the part; null = the file's name
+
     public int Rotations { get; set; } = -1; // per-part: 1 fixed, 2 = 0/180, 4 = 90° steps, 36 free; -1 = unset (geometry-based suggestion in Edit Part)
 
     public int Priority { get; set; } = 5;   // 1-10, LOWER nests first (1 = highest); 5 = normal

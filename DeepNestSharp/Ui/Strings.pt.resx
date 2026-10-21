@@ -1859,4 +1859,19 @@ Abrir a página de download?</value>
   <data name="Shape_Apply" xml:space="preserve">
     <value>Aplicar</value>
   </data>
+  <data name="Title_RenamePart" xml:space="preserve">
+    <value>Nome da peça</value>
+  </data>
+  <data name="Prompt_RenamePart" xml:space="preserve">
+    <value>Nome para {0} no encaixe, no DXF e no relatório (vazio: o nome do arquivo):</value>
+  </data>
+  <data name="Part_Name" xml:space="preserve">
+    <value>Nome:</value>
+  </data>
+  <data name="Tip_PartName" xml:space="preserve">
+    <value>Nome da peça no encaixe, no DXF e no relatório. Vazio: o nome do arquivo. O desenho não é renomeado.</value>
+  </data>
+  <data name="Nest_Stopping" xml:space="preserve">
+    <value>Parando…</value>
+  </data>
 </root>

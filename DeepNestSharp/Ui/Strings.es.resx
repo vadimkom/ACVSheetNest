@@ -1859,4 +1859,19 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Shape_Apply" xml:space="preserve">
     <value>Aplicar</value>
   </data>
+  <data name="Title_RenamePart" xml:space="preserve">
+    <value>Nombre de la pieza</value>
+  </data>
+  <data name="Prompt_RenamePart" xml:space="preserve">
+    <value>Nombre para {0} en el anidado, el DXF y el informe (vacío: el nombre del archivo):</value>
+  </data>
+  <data name="Part_Name" xml:space="preserve">
+    <value>Nombre:</value>
+  </data>
+  <data name="Tip_PartName" xml:space="preserve">
+    <value>Nombre de la pieza en el anidado, el DXF y el informe. Vacío: el nombre del archivo. El dibujo no se renombra.</value>
+  </data>
+  <data name="Nest_Stopping" xml:space="preserve">
+    <value>Deteniendo…</value>
+  </data>
 </root>

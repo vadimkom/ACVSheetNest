@@ -32,6 +32,7 @@ namespace DeepNestSharp.Ui.Views
       InitializeComponent();
 
       this.partFileText.Text = part.Path;
+      this.partNameText.Text = string.IsNullOrWhiteSpace(part.DisplayName) ? System.IO.Path.GetFileNameWithoutExtension(part.Path ?? string.Empty) : part.DisplayName;
       this.previewImage.Source = new PartPreviewConverter().Convert(part, typeof(ImageSource), null, null) as ImageSource;
 
       this.requiredUpDown.Value = part.Quantity;
@@ -287,6 +288,10 @@ namespace DeepNestSharp.Ui.Views
       this.part.Extra = this.extraUpDown.Value ?? this.part.Extra;
       this.part.MirrorQuantity = this.mirroredUpDown.Value ?? this.part.MirrorQuantity;
       this.part.FillSheets = this.fillSheetsCheck.IsChecked == true;
+
+      // An empty name, or the file's own, goes back to the file's name.
+      string typedName = (this.partNameText.Text ?? string.Empty).Trim();
+      this.part.DisplayName = typedName.Length == 0 || typedName == System.IO.Path.GetFileNameWithoutExtension(this.part.Path ?? string.Empty) ? null : typedName;
       this.part.Spacing = System.Math.Max(0, this.spacingUpDown.Value ?? 0);
 
       var commonCutting = ChosenCommonCutting(

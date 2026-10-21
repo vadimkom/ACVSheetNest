@@ -1859,4 +1859,19 @@ Open the download page?</value>
   <data name="Shape_Apply" xml:space="preserve">
     <value>Apply</value>
   </data>
+  <data name="Title_RenamePart" xml:space="preserve">
+    <value>Part name</value>
+  </data>
+  <data name="Prompt_RenamePart" xml:space="preserve">
+    <value>Name for {0} on the layout, in the DXF and in the report (empty: the file's name):</value>
+  </data>
+  <data name="Part_Name" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="Tip_PartName" xml:space="preserve">
+    <value>The part's name on the layout, in the DXF and in the report. Empty: the file's name. The drawing is not renamed.</value>
+  </data>
+  <data name="Nest_Stopping" xml:space="preserve">
+    <value>Stopping…</value>
+  </data>
 </root>

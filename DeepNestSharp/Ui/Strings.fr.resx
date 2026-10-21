@@ -1859,4 +1859,19 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Shape_Apply" xml:space="preserve">
     <value>Appliquer</value>
   </data>
+  <data name="Title_RenamePart" xml:space="preserve">
+    <value>Nom de la pièce</value>
+  </data>
+  <data name="Prompt_RenamePart" xml:space="preserve">
+    <value>Nom de {0} sur l'imbrication, dans le DXF et le rapport (vide : le nom du fichier) :</value>
+  </data>
+  <data name="Part_Name" xml:space="preserve">
+    <value>Nom :</value>
+  </data>
+  <data name="Tip_PartName" xml:space="preserve">
+    <value>Nom de la pièce sur l'imbrication, dans le DXF et le rapport. Vide : le nom du fichier. Le dessin n'est pas renommé.</value>
+  </data>
+  <data name="Nest_Stopping" xml:space="preserve">
+    <value>Arrêt…</value>
+  </data>
 </root>

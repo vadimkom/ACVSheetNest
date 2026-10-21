@@ -77,6 +77,39 @@ namespace DeepNestSharp.CiTests.RasterNest
       names.Count(n => n == "m12").Should().BeGreaterThan(30, "the 190 x 240 strip beside the plate alone takes 6 x 8");
     }
 
+    /// <summary>Two fillers are one kit (a bracket of two parts): the sheet takes as many of each.</summary>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void TwoFillersComeOutAsManyOfEach(int plates)
+    {
+      if (SparrowExe.Resolve() == null)
+      {
+        return;
+      }
+
+      string dir = Directory.CreateTempSubdirectory("sheetnest_fillsheets").FullName;
+      var parts = new List<RasterPartInfo>
+      {
+        new RasterPartInfo { Path = Part(dir, "upright", PartShapes.Rectangle, 160, 40), Quantity = 1, Fill = true },
+        new RasterPartInfo { Path = Part(dir, "foot", PartShapes.Circle, 50), Quantity = 1, Fill = true },
+      };
+      if (plates > 0)
+      {
+        parts.Add(new RasterPartInfo { Path = Part(dir, "plate", PartShapes.Rectangle, 300, 200), Quantity = plates });
+      }
+
+      var result = Nest(parts, (600, 400, 1, false, 5), out string error);
+
+      error.Should().BeNull();
+      result.UnplacedParts.Should().BeEmpty();
+      var names = result.UsedSheets.SelectMany(s => s.PartPlacements).Select(p => Path.GetFileNameWithoutExtension(p.Part.Name)).ToList();
+      int uprights = names.Count(n => n == "upright");
+      uprights.Should().BeGreaterThan(5);
+      names.Count(n => n == "foot").Should().Be(uprights, "a kit comes out even");
+      names.Count(n => n == "plate").Should().Be(plates);
+    }
+
     [Fact]
     public void ACountedPartThatDoesNotFitIsStillMissing()
     {

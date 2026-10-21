@@ -215,7 +215,7 @@
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel VerticalAlignment="Center" Margin="4,0">
-                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding ShownName}" FontWeight="Bold" FontSize="12" TextTrimming="CharacterEllipsis" />
                         <TextBlock Text="{Binding NestingLabel, Mode=OneWay}" FontSize="10" Foreground="{DynamicResource Brush.TextMuted}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
                         <TextBlock Text="{Binding FlipLabel, Mode=OneWay}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Accent}" TextTrimming="CharacterEllipsis">
                           <TextBlock.Style>

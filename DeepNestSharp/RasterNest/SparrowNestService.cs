@@ -413,11 +413,17 @@ namespace DeepNestSharp.RasterNest
         }
 
         double stockArea = sizes.Sum(s => Math.Max(0, s.W - (2 * margin)) * Math.Max(0, s.H - (2 * margin)) * s.Remaining);
+        double Footprint(Loaded l) => Math.Max(1e-9, Math.Abs((l.Dilated ?? l.Nfp).Area));
+
+        // Several fillers are one kit (an air-conditioner bracket is two parts): as many of each, so the kit
+        // is offered by its own footprint and every member the same number of times.
+        var fillers = loaded.Where(l => l.Fill).ToList();
+        double kitFootprint = fillers.Sum(Footprint);
         for (int i = 0; i < loaded.Count; i++)
         {
           if (loaded[i].Fill)
           {
-            double footprint = Math.Max(1e-9, Math.Abs((loaded[i].Dilated ?? loaded[i].Nfp).Area));
+            double footprint = fillers.Count > 1 ? kitFootprint : Footprint(loaded[i]);
             loaded[i] = loaded[i].WithQty(Math.Max(1, (int)Math.Ceiling(stockArea / footprint)));
           }
         }
@@ -1056,6 +1062,7 @@ namespace DeepNestSharp.RasterNest
       var diagHoles = System.Diagnostics.Stopwatch.StartNew();
       FillHoles(sheetLayouts, pool, loadedById, cancel);
       DiagHolesMs = diagHoles.ElapsedMilliseconds;
+      EvenOutKit(sheetLayouts, loadedById);
 
       // Cloning and hole filling are intentionally incapable of moving a cluster, but the persisted
       // metadata is safety-critical: prove that assumption on the exact final layouts before ids/export.
@@ -1583,6 +1590,57 @@ namespace DeepNestSharp.RasterNest
         return (placements.Concat(around).ToList(), by, new List<CommonEdgeIntent>());
       }
 
+      if (fillers.Count > 1)
+      {
+        // A kit: as many of each member, by the kit's footprint, fewer when a counted part was pushed off.
+        if (pool.Keys.Count(k => loadedById[k].Fill) != fillers.Count)
+        {
+          return (null, null, null); // a member that cannot go on this sheet leaves the kit off it
+        }
+
+        double kitFootprint = fillers.Sum(Footprint);
+        double taken = current.Sum(kv => kv.Value * Footprint(kv.Key));
+        int kits = Math.Min(fillers.Min(k => pool[k]), (int)Math.Floor((usable - taken) / kitFootprint));
+        for (int attempt = 0; attempt < 3 && kits >= 1 && !cancel.IsCancellationRequested; attempt++)
+        {
+          var batch = new Dictionary<int, int>(current);
+          foreach (int k in fillers)
+          {
+            batch[k] = kits;
+          }
+
+          var (pl, by, _, _, _, _, edges, _) = PackOneSheet(
+            loaded,
+            batch,
+            w,
+            h,
+            margin,
+            IterationBudget(effort),
+            SearchWorkers(effort),
+            hardTimeoutSec,
+            TriesFor(1, true, effort),
+            exe,
+            cancel,
+            null,
+            commonLineGap,
+            geometryTolerance,
+            effort,
+            commonLineMaxClusterParts,
+            out _,
+            seedOffset: seedOffset);
+          if (pl != null && by != null
+            && fillers.All(k => by.TryGetValue(k, out int got) && got > 0)
+            && current.All(kv => by.TryGetValue(kv.Key, out int n) && n >= kv.Value))
+          {
+            return (pl, by.Where(kv => kv.Value > 0).ToDictionary(kv => kv.Key, kv => kv.Value), edges);
+          }
+
+          kits = (int)Math.Floor(kits * 0.7);
+        }
+
+        return (null, null, null);
+      }
+
       foreach (int src in fillers)
       {
         double used = current.Sum(kv => kv.Value * Footprint(kv.Key));
@@ -1626,6 +1684,39 @@ namespace DeepNestSharp.RasterNest
       }
 
       return keptPlacements == null ? (null, null, null) : (keptPlacements, current, keptEdges);
+    }
+
+    /// <summary>
+    /// Several fillers are one kit: the job ends with as many of each. The engine sets down what fits, which is
+    /// rarely the same number of each, so the extra copies of the members there are more of come off, from
+    /// the last sheets first (the first sheets are the full ones the job is cut from).
+    /// </summary>
+    private static void EvenOutKit(List<List<IPartPlacement>> sheetLayouts, Dictionary<int, Loaded> loadedById)
+    {
+      var kit = loadedById.Values.Where(l => l.Fill).Select(l => l.Source).ToList();
+      if (kit.Count < 2)
+      {
+        return;
+      }
+
+      var counts = kit.ToDictionary(k => k, k => sheetLayouts.Sum(s => s.Count(p => p.Source == k)));
+      int even = counts.Values.Min();
+      foreach (int k in kit)
+      {
+        int extra = counts[k] - even;
+        for (int si = sheetLayouts.Count - 1; si >= 0 && extra > 0; si--)
+        {
+          var layout = sheetLayouts[si];
+          for (int pi = layout.Count - 1; pi >= 0 && extra > 0; pi--)
+          {
+            if (layout[pi].Source == k)
+            {
+              layout.RemoveAt(pi);
+              extra--;
+            }
+          }
+        }
+      }
     }
 
     /// <summary>
@@ -1763,6 +1854,25 @@ namespace DeepNestSharp.RasterNest
       // over. Without it the answer depended on which drawing happened to be imported first, which is not
       // something the row order should decide.
       bool countedWaiting = pool.Any(kv => kv.Value > 0 && !loadedById[kv.Key].Fill);
+
+      // A kit of fillers alone on a sheet is offered in whole kits, as many of each member, up to the cap; one
+      // member that cannot go on this size of sheet leaves the kit off it.
+      var kit = pool.Keys.Where(k => loadedById[k].Fill).ToList();
+      if (!countedWaiting && kit.Count > 1)
+      {
+        var kitBatch = new Dictionary<int, int>();
+        if (kit.All(k => pool[k] > 0 && FitsOnSheet(loadedById[k], w, h, margin)))
+        {
+          double kitArea = kit.Sum(k => Math.Max(1e-6, Math.Abs(loadedById[k].Nfp.Area)));
+          int kits = (int)Math.Min(kit.Min(k => pool[k]), Math.Floor(1.5 * w * h / kitArea));
+          foreach (int k in kit)
+          {
+            kitBatch[k] = Math.Max(1, kits);
+          }
+        }
+
+        return kitBatch;
+      }
       var homesBySource = pool.ToDictionary(
         kv => kv.Key,
         kv => sizes.Count(size => size.HasStock && FitsOnSheet(loadedById[kv.Key], size.W, size.H, margin)));

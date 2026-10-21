@@ -156,6 +156,8 @@ namespace DeepNestSharp.Ui.Views
       this.layoutStripItems.ItemsSource = this.layoutCutItems;
       this.dxfViewer.LayoutsChanged += (_, __) => this.RefreshLayoutStrip();
       this.dxfViewer.SheetIndexChanged += this.OnLayoutShown;
+      this.dxfViewer.PartRenameRequested += this.OnPartRenameRequested;
+      this.nestDxfViewer.PartRenameRequested += this.OnPartRenameRequested;
       this.RefreshLayoutStrip();
 
       this.nestLayoutItems.ItemsSource = this.nestLayouts;
@@ -1576,6 +1578,18 @@ namespace DeepNestSharp.Ui.Views
     {
       var map = PartColors.Build(parts?.Select(o => (o.Path, o.ColorRgb)));
 
+      // Names the operator gave parts replace their files' names on the layout, in the DXF and the report.
+      var named = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+      foreach (var row in parts ?? Enumerable.Empty<IDetailLoadInfo>())
+      {
+        if (!string.IsNullOrWhiteSpace(row.DisplayName) && !string.IsNullOrEmpty(row.Path))
+        {
+          named[row.Path] = row.DisplayName.Trim();
+        }
+      }
+
+      DeepNestLib.IO.DxfExporter.PartNames = named;
+
       // Parts that fill the sheets go unnamed on the layout and in the DXF (see DxfExporter.UnnamedParts).
       DeepNestLib.IO.DxfExporter.UnnamedParts = new HashSet<string>(
         parts?.Where(o => o.FillSheets && !string.IsNullOrEmpty(o.Path)).Select(o => o.Path) ?? Enumerable.Empty<string>(),
@@ -1583,6 +1597,12 @@ namespace DeepNestSharp.Ui.Views
       if (this.dxfViewer != null)
       {
         this.dxfViewer.PartColours = map;
+      }
+
+      // The Nesting step's preview too: it drew every part grey while the layout step showed them in colour.
+      if (this.nestDxfViewer != null)
+      {
+        this.nestDxfViewer.PartColours = map;
       }
 
       DeepNestSharp.Ui.Converters.PartPreviewConverter.SetColours(map);
@@ -2074,6 +2094,78 @@ namespace DeepNestSharp.Ui.Views
       return doc.ProjectInfo.SheetLoadInfos.LastOrDefault(s => s.Width == w && s.Height == h && s.Priority == 1 && !s.Unlimited);
     }
 
+    /// <summary>
+    /// A part double-clicked on a layout: asks for its new name and gives it to every row drawing that part.
+    /// The name shows on the layout, in the DXF and in the report; the drawing keeps its file name. An empty
+    /// name, or the file's own, goes back to the file's name.
+    /// </summary>
+    private void OnPartRenameRequested(object sender, string drawing)
+    {
+      if (ViewModel?.ActiveDocument is not NestProjectViewModel doc)
+      {
+        return;
+      }
+
+      var rows = doc.ProjectInfo.DetailLoadInfos.Where(r => string.Equals(r.Path, drawing, StringComparison.OrdinalIgnoreCase)).ToList();
+      if (rows.Count == 0)
+      {
+        return;
+      }
+
+      string fileName = System.IO.Path.GetFileNameWithoutExtension(drawing);
+      string current = rows.Select(r => r.DisplayName).FirstOrDefault(n => !string.IsNullOrWhiteSpace(n)) ?? fileName;
+      string typed = AskText(Localization.Get("Title_RenamePart"), Localization.Format("Prompt_RenamePart", System.IO.Path.GetFileName(drawing)), current);
+      if (typed == null)
+      {
+        return;
+      }
+
+      typed = typed.Trim();
+      string name = typed.Length == 0 || typed == fileName ? null : typed;
+      foreach (var row in rows)
+      {
+        row.DisplayName = name;
+      }
+
+      doc.IsDirty = true;
+      this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+      this.dxfViewer?.RefreshRender();
+      this.nestDxfViewer?.RefreshRender();
+      this.RefreshLayoutStrip();
+    }
+
+    /// <summary>A one-line question: the text typed, or null when cancelled.</summary>
+    private string AskText(string title, string prompt, string text)
+    {
+      var box = new TextBox { Text = text ?? string.Empty, MinWidth = 320, Margin = new Thickness(0, 6, 0, 12) };
+      var ok = new Button { Content = Localization.Get("Btn_OK"), IsDefault = true, MinWidth = 90, Margin = new Thickness(0, 0, 8, 0) };
+      var cancel = new Button { Content = Localization.Get("Btn_Cancel"), IsCancel = true, MinWidth = 90 };
+      var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+      buttons.Children.Add(ok);
+      buttons.Children.Add(cancel);
+      var panel = new StackPanel { Margin = new Thickness(16) };
+      panel.Children.Add(new TextBlock { Text = prompt, TextWrapping = TextWrapping.Wrap, MaxWidth = 420 });
+      panel.Children.Add(box);
+      panel.Children.Add(buttons);
+      var window = new Window
+      {
+        Title = title,
+        Content = panel,
+        Owner = this,
+        SizeToContent = SizeToContent.WidthAndHeight,
+        ResizeMode = ResizeMode.NoResize,
+        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        ShowInTaskbar = false,
+      };
+      ok.Click += (_, __) => window.DialogResult = true;
+      window.Loaded += (_, __) =>
+      {
+        box.Focus();
+        box.SelectAll();
+      };
+      return window.ShowDialog() == true ? box.Text : null;
+    }
+
     private void OnPartsListDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
       // MouseDoubleClick fires even for double-clicks on the qty spinner's repeat arrows or the ✕
@@ -2131,6 +2223,14 @@ namespace DeepNestSharp.Ui.Views
         {
           this.FlipPart(part, axis);
         }
+      }
+
+      // A new name reaches the layout, the DXF and the report through the job's name list.
+      if (ViewModel?.ActiveDocument is NestProjectViewModel edited)
+      {
+        this.ApplyPartColours(edited.ProjectInfo.DetailLoadInfos);
+        this.dxfViewer?.RefreshRender();
+        this.nestDxfViewer?.RefreshRender();
       }
 
       this.partsListView.Items.Refresh(); // plain (non-observable) fields may have changed
@@ -2280,7 +2380,7 @@ namespace DeepNestSharp.Ui.Views
       this.btnNestDraft.IsEnabled = false;
 
       nestCts = new System.Threading.CancellationTokenSource();
-      this.cancelNestButton.Content = "■  Cancel";
+      this.cancelNestButton.Content = Localization.Get("Btn_StopNest");
       this.cancelNestButton.IsEnabled = true;
       this.cancelNestButton.Visibility = Visibility.Visible;
       this.nestPhaseText.Text = Localization.Format("Nest_Running", "0:00");
@@ -2581,7 +2681,7 @@ namespace DeepNestSharp.Ui.Views
     private void OnCancelNest(object sender, RoutedEventArgs e)
     {
       // Cooperative: the engine checks the token at its phase boundaries (sub-second on real jobs).
-      this.cancelNestButton.Content = "Cancelling…";
+      this.cancelNestButton.Content = Localization.Get("Nest_Stopping");
       this.cancelNestButton.IsEnabled = false;
       nestCts?.Cancel();
     }

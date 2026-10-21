@@ -972,6 +972,9 @@ namespace DeepNestSharp.Ui.UserControls
     /// <summary>Another layout is on screen.</summary>
     public event EventHandler SheetIndexChanged;
 
+    /// <summary>A part was double-clicked: the operator wants to rename it. Carries the part's drawing path.</summary>
+    public event EventHandler<string> PartRenameRequested;
+
     /// <summary>The layouts were rebuilt: a new result was shown.</summary>
     public event EventHandler LayoutsChanged;
 
@@ -2256,6 +2259,24 @@ namespace DeepNestSharp.Ui.UserControls
     private void OnPanStart(object sender, MouseButtonEventArgs e)
     {
       this.host.Focus(); // so Ctrl+Z / Ctrl+Y reach the viewer
+
+      // A double-click on a part (or on its name) renames it.
+      if (e.ClickCount == 2 && !this.MeasureMode && this.PartRenameRequested != null)
+      {
+        int hit = this.partPaths.FindIndex(x => ReferenceEquals(x.Path, e.OriginalSource));
+        if (hit < 0)
+        {
+          hit = this.partLabels.FindIndex(l => l != null && ReferenceEquals(l, e.OriginalSource));
+        }
+
+        string drawing = hit >= 0 && hit < this.partPaths.Count ? this.partPaths[hit].Pp?.Part?.Name : null;
+        if (!string.IsNullOrEmpty(drawing))
+        {
+          e.Handled = true;
+          this.PartRenameRequested(this, drawing);
+          return;
+        }
+      }
 
       if (this.MeasureMode)
       {

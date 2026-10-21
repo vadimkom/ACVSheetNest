@@ -1859,4 +1859,19 @@ Downloadseite öffnen?</value>
   <data name="Shape_Apply" xml:space="preserve">
     <value>Übernehmen</value>
   </data>
+  <data name="Title_RenamePart" xml:space="preserve">
+    <value>Teilename</value>
+  </data>
+  <data name="Prompt_RenamePart" xml:space="preserve">
+    <value>Name für {0} im Schachtelplan, im DXF und im Bericht (leer: der Dateiname):</value>
+  </data>
+  <data name="Part_Name" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="Tip_PartName" xml:space="preserve">
+    <value>Name des Teils im Schachtelplan, im DXF und im Bericht. Leer: der Dateiname. Die Zeichnung selbst wird nicht umbenannt.</value>
+  </data>
+  <data name="Nest_Stopping" xml:space="preserve">
+    <value>Wird gestoppt…</value>
+  </data>
 </root>

@@ -604,6 +604,13 @@ namespace DeepNestSharp.Reports
     {
       try
       {
+        if (!string.IsNullOrWhiteSpace(path)
+          && DeepNestLib.IO.DxfExporter.PartNames.TryGetValue(path, out string given)
+          && !string.IsNullOrWhiteSpace(given))
+        {
+          return given; // the name the operator gave the part
+        }
+
         return string.IsNullOrWhiteSpace(path) ? L("Rep_PartFallback") : Path.GetFileName(path);
       }
       catch (ArgumentException)

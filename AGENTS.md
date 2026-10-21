@@ -105,7 +105,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-10-15, 1.1.43): core 1078/1080; app 490/490 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
+Last verified (2026-10-21, 1.1.49): core 1087/1089; app 492/492 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
@@ -124,10 +124,18 @@ Last verified (2026-10-15, 1.1.43): core 1078/1080; app 490/490 with the engine 
 - **Fill the sheets** (`IDetailLoadInfo.FillSheets`; "Fill the sheets" in + Shape and in the part's "…"): a row with no count, e.g. a sheet of washers. The operator picks sheets as usual; the nest puts on as many as fit after every counted part.
   - Engine (`SparrowNestService.Nest`): a filler is offered ceil(stock area / spaced outline area), at priority 11. Unlimited sizes count as their box number, at least 1. `SelectBatch` keeps fillers out while counted parts wait. `TopUpWithFillers` adds them around a packed sheet after `DeferUnfit`. Unplaced fillers are not reported as missing.
   - One filler goes in rows (`LatticeFill`): every allowed angle, straight or half-shifted rows, steps bisected on the spaced outline. Sparrow took 2.5 min over 900 washers on 1250×500; rows take 0.2 s and seat 798 Ø24. A rows-only sheet skips `DeferUnfit`, being clear by construction. `CommonEdgeClearance.FindUnfit` now skips pairs whose boxes are apart (a 2652-washer sheet: 25 s → 0.5 s, in the viewer too).
+  - **Several fillers are one kit** (an air-conditioner bracket of two parts), always as many of each:
+    - each is offered ceil(stock area / kit footprint);
+    - `SelectBatch` offers whole kits on a fillers-only sheet;
+    - `TopUpWithFillers` tops up by kits;
+    - `EvenOutKit` drops the extra copies, last sheets first, after holes are filled.
+    - Tested: `FillSheetsFixture.TwoFillersComeOutAsManyOfEach`.
   - After a nest the row's Quantity = what went on (`CountFilledRows`); the cell shows "fill: N". Fill parts get no names on the layout or in the DXF (`DxfExporter.UnnamedParts`, set in `ApplyPartColours`).
 
 **Parts and sheets**
 - Flip ↔/↕ mirrors the part itself (`PartMirror`): ticked in Edit Part ("…") and applied on OK; a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.
+- **Part names** (`IDetailLoadInfo.DisplayName`; null = the file's name). Set in "…" or by double-clicking a part on a layout (`DxfViewer.PartRenameRequested` → `MainWindow.OnPartRenameRequested`). It shows in the parts table (`ShownName`), on layouts, in the DXF and the report, via `DxfExporter.PartNames` (set in `ApplyPartColours`; `GetPartNameLabel` and the report's `DisplayName` read it). The drawing file is not renamed.
+- Both viewers get the part colours (the Nesting step's preview was grey until 1.1.49).
 - Parts table (user's layout, 2026-10-15): sketch, name, quantity, **Mirrored** (copies on top of the quantity), size, priority, actions "…" and ✕. No colour column: clicking the sketch changes the colour. No delete/clear buttons: Delete removes the selected rows (Ctrl/Shift for several, asked first when more than one).
 - Shapes (`AddShapeWindow`, `PartShapes`): a catalogue of `ShapeKind`s (rectangle, circle, washer, perforated tape), each with its parameters (label key + default in mm), optional presets (values they set and lock) and `Draw`. The dialog builds its fields from the kind, so a new shape is one class plus its texts. Files go to `%LOCALAPPDATA%\SheetNest\shapes`; adding the same shape again adds to that row. Values are in drawing units; defaults and presets are converted from mm in inch mode.
   - Washers: DIN 125-A M8/M10/M12 (hole 8.4/10.5/13, outside 16/20/24) and DIN 9021 (outside 24/30/37), or custom.

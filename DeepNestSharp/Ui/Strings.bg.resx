@@ -1859,4 +1859,19 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   <data name="Shape_Apply" xml:space="preserve">
     <value>Приложи</value>
   </data>
+  <data name="Title_RenamePart" xml:space="preserve">
+    <value>Име на детайла</value>
+  </data>
+  <data name="Prompt_RenamePart" xml:space="preserve">
+    <value>Име за {0} в разкроя, в DXF и в отчета (празно — името на файла):</value>
+  </data>
+  <data name="Part_Name" xml:space="preserve">
+    <value>Име:</value>
+  </data>
+  <data name="Tip_PartName" xml:space="preserve">
+    <value>Име на детайла в разкроя, в DXF и в отчета. Празно — името на файла. Самият чертеж не се преименува.</value>
+  </data>
+  <data name="Nest_Stopping" xml:space="preserve">
+    <value>Спиране…</value>
+  </data>
 </root>
