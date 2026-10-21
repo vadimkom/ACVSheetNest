@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 DXF-Dateien in die Tabelle ziehen · Entf entfernt die ausgewählten Teile</value>
+    <value>💡 DXF-Dateien in die Tabelle ziehen · Strg+A wählt alle · Entf entfernt die ausgewählten Teile</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Markieren Sie die bereits geschnittenen Bleche</value>

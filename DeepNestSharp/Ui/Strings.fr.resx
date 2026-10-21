@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Glissez des DXF dans le tableau · Suppr retire les pièces sélectionnées</value>
+    <value>💡 Glissez des DXF dans le tableau · Ctrl+A sélectionne tout · Suppr retire les pièces sélectionnées</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Cochez les tôles déjà découpées</value>

@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Drag DXF files into this table · Delete removes the selected parts</value>
+    <value>💡 Drag DXF files into this table · Ctrl+A selects all · Delete removes the selected parts</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Tick the sheets that are already cut</value>

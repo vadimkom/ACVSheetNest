@@ -975,6 +975,10 @@ namespace DeepNestSharp.Ui.UserControls
     /// <summary>A part was double-clicked: the operator wants to rename it. Carries the part's drawing path.</summary>
     public event EventHandler<string> PartRenameRequested;
 
+    /// <summary>Whether the ◀ layout n/m ▶ bar shows; off where a strip of thumbnails below already moves
+    /// between layouts (the Nesting step).</summary>
+    public bool ShowSheetNav { get; set; } = true;
+
     /// <summary>The layouts were rebuilt: a new result was shown.</summary>
     public event EventHandler LayoutsChanged;
 
@@ -1127,7 +1131,7 @@ namespace DeepNestSharp.Ui.UserControls
       this.sheetLabel.Text = group.Count > 1
         ? Localization.Format("Dxf_NestN", idx + 1, this.groups.Count) + $"  ({group.Count})"
         : Localization.Format("Dxf_NestN", idx + 1, this.groups.Count);
-      this.sheetNav.Visibility = this.groups.Count > 1 || group.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+      this.sheetNav.Visibility = this.ShowSheetNav && (this.groups.Count > 1 || group.Count > 1) ? Visibility.Visible : Visibility.Collapsed;
 
       double w = sheet.WidthCalculated;
       double h = sheet.HeightCalculated;

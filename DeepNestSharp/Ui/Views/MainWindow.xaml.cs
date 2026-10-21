@@ -158,6 +158,7 @@ namespace DeepNestSharp.Ui.Views
       this.dxfViewer.SheetIndexChanged += this.OnLayoutShown;
       this.dxfViewer.PartRenameRequested += this.OnPartRenameRequested;
       this.nestDxfViewer.PartRenameRequested += this.OnPartRenameRequested;
+      this.nestDxfViewer.ShowSheetNav = false; // the thumbnails below the Nesting step move between layouts
       this.RefreshLayoutStrip();
 
       this.nestLayoutItems.ItemsSource = this.nestLayouts;
@@ -3123,6 +3124,16 @@ namespace DeepNestSharp.Ui.Views
     /// </summary>
     private void OnPartsListKeyDown(object sender, KeyEventArgs e)
     {
+      // Ctrl+A takes every row, so the whole list can go with one Delete; inside a number box it stays the
+      // box's own select-all.
+      if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control
+        && e.OriginalSource is not System.Windows.Controls.Primitives.TextBoxBase)
+      {
+        this.partsListView.SelectAll();
+        e.Handled = true;
+        return;
+      }
+
       if (e.Key != Key.Delete || e.OriginalSource is System.Windows.Controls.Primitives.TextBoxBase
         || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
       {

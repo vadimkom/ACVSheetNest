@@ -355,7 +355,7 @@
     <value>Normal (Стандартный)</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Перетащите DXF в таблицу · Delete — удалить выделенные детали</value>
+    <value>💡 Перетащите DXF в таблицу · Ctrl+A — выделить все · Delete — удалить выделенные</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Отметьте листы, которые уже вырезаны</value>

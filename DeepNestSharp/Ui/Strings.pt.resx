@@ -355,7 +355,7 @@
     <value>Normal</value>
   </data>
   <data name="Hint_DragDrop" xml:space="preserve">
-    <value>💡 Arraste DXF para a tabela · Delete remove as peças selecionadas</value>
+    <value>💡 Arraste DXF para a tabela · Ctrl+A seleciona tudo · Delete remove as peças selecionadas</value>
   </data>
   <data name="Hint_MarkCut" xml:space="preserve">
     <value>Marque as chapas que já foram cortadas</value>
