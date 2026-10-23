@@ -1290,6 +1290,7 @@ namespace DeepNestSharp.Ui.Views
       if (this.partsEmptySub != null) this.partsEmptySub.Text = Localization.Get("Hint_DragDrop");
       if (this.btnAddPartEmpty != null) this.btnAddPartEmpty.Content = Localization.Get("Btn_AddDxf");
       if (this.colHeaderPartPreview != null) this.colHeaderPartPreview.Header = Localization.Get("Col_Preview");
+      if (this.colHeaderSheetPreview != null) this.colHeaderSheetPreview.Header = Localization.Get("Col_Preview");
       if (this.colHeaderPartName != null) this.colHeaderPartName.Header = Localization.Get("Col_PartName");
       if (this.colHeaderPartQty != null) this.colHeaderPartQty.Header = Localization.Get("Col_Quantity");
       if (this.colHeaderPriority != null) this.colHeaderPriority.Header = Localization.Get("Col_Priority");

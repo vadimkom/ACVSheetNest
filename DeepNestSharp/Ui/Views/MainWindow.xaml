@@ -17,6 +17,7 @@
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVis" />
     <converters:PartPreviewConverter x:Key="PartPreview" />
+    <converters:SheetPreviewConverter x:Key="SheetPreview" />
     <converters:RgbToBrushConverter x:Key="RgbToBrush" />
     <converters:InverseBooleanConverter x:Key="InvertBool" />
     <converters:PriorityToOptionConverter x:Key="PriorityToOption" />
@@ -397,6 +398,26 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
               <GridView>
+                <!-- The sheet in proportion; an offcut read from a drawing shows its own outline and holes. -->
+                <GridViewColumn x:Name="colHeaderSheetPreview" Header="Эскиз" Width="64">
+                  <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                      <Border Width="48" Height="48" Margin="2" Background="White" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                              ToolTip="{Binding ShapePath, Mode=OneWay}">
+                        <Image Stretch="Uniform" Margin="2">
+                          <Image.Source>
+                            <MultiBinding Converter="{StaticResource SheetPreview}">
+                              <Binding Path="ShapePath" Mode="OneWay" />
+                              <Binding Path="Width" Mode="OneWay" />
+                              <Binding Path="Height" Mode="OneWay" />
+                            </MultiBinding>
+                          </Image.Source>
+                        </Image>
+                      </Border>
+                    </DataTemplate>
+                  </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+
                 <!-- Sheet Dimensions -->
                 <GridViewColumn x:Name="colHeaderSheetDimensions" Header="Размеры листа (Ширина × Высота), мм" Width="230">
                   <GridViewColumn.CellTemplate>
