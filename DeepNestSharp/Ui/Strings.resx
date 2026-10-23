@@ -426,6 +426,15 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Custom size…</value>
   </data>
+  <data name="Fill_Even" xml:space="preserve">
+    <value>Fill: as many of each</value>
+  </data>
+  <data name="Fill_Max" xml:space="preserve">
+    <value>Fill: as many as fit</value>
+  </data>
+  <data name="Tip_FillMode" xml:space="preserve">
+    <value>Several parts fill the sheets. As many of each: they come out in equal numbers, like a kit. As many as fit: each takes all the room it can, biggest first.</value>
+  </data>
   <data name="Menu_SheetFromDrawing" xml:space="preserve">
     <value>Sheet from a drawing (DXF, CHF)…</value>
   </data>

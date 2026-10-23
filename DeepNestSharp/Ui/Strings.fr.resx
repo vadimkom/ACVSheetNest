@@ -426,6 +426,15 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Format personnalisé…</value>
   </data>
+  <data name="Fill_Even" xml:space="preserve">
+    <value>Remplir : autant de chaque</value>
+  </data>
+  <data name="Fill_Max" xml:space="preserve">
+    <value>Remplir : le plus possible</value>
+  </data>
+  <data name="Tip_FillMode" xml:space="preserve">
+    <value>Plusieurs pièces remplissent les tôles. Autant de chaque : elles sortent en nombre égal, comme un kit. Le plus possible : chacune prend toute la place possible, la plus grande d'abord.</value>
+  </data>
   <data name="Menu_SheetFromDrawing" xml:space="preserve">
     <value>Tôle depuis un dessin (DXF, CHF)…</value>
   </data>

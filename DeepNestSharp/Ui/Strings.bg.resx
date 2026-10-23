@@ -426,6 +426,15 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Индивидуален размер…</value>
   </data>
+  <data name="Fill_Even" xml:space="preserve">
+    <value>Запълване: поравно</value>
+  </data>
+  <data name="Fill_Max" xml:space="preserve">
+    <value>Запълване: максимум</value>
+  </data>
+  <data name="Tip_FillMode" xml:space="preserve">
+    <value>Няколко детайла запълват листовете. Поравно: излизат в еднакъв брой, като комплект. Максимум: всеки заема колкото място може, като се започне от най-едрия.</value>
+  </data>
   <data name="Menu_SheetFromDrawing" xml:space="preserve">
     <value>Лист от чертеж (DXF, CHF)…</value>
   </data>

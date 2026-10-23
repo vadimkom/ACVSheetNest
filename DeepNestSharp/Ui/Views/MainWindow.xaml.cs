@@ -216,13 +216,20 @@ namespace DeepNestSharp.Ui.Views
       // A persisted 0 is ALSO normalized to 0.25" (the shop rule: spacing ≥ 2× material thickness, so
       // 0.25 covers up to 1/8" plate): a global default of "every part touches" is never what a laser
       // job wants — true common-line cutting is a deliberate per-part choice in Edit Part.
+      // In millimetres the default is 4 (2026-10-23, the shop's choice for 0.5-2 mm sheet); it was 6.35, a quarter
+      // inch, which on the shop's elbow sides cost a part per round offcut. A 6.35 stored by an older build was
+      // that default, not a choice, and becomes 4 once; set again afterwards it stays.
       if (cfg.Spacing == 10.0 || cfg.Spacing <= 0.0)
       {
-        cfg.Spacing = this.unitsMm ? 6.35 : 0.25;
+        cfg.Spacing = this.unitsMm ? 4.0 : 0.25;
       }
       else if (this.unitsMm && cfg.Spacing == 0.25)
       {
-        cfg.Spacing = 6.35;
+        cfg.Spacing = 4.0;
+      }
+      else if (this.unitsMm && cfg.Spacing == 6.35 && (session?.SettingsVersion ?? 0) < SessionState.SpacingFourMillimetresVersion)
+      {
+        cfg.Spacing = 4.0;
       }
 
       (this.sessionCommonLineGapInches, this.sessionCommonLineMaxClusterParts) =
@@ -2299,6 +2306,7 @@ namespace DeepNestSharp.Ui.Views
       }
 
       this.partsListView.Items.Refresh(); // plain (non-observable) fields may have changed
+      this.UpdateSummaryBadges(); // "Fill the sheets" may have been ticked: the fill switch shows from two such parts
     }
 
     private async void OnNest(object sender, RoutedEventArgs e)
@@ -2411,6 +2419,7 @@ namespace DeepNestSharp.Ui.Views
       // EVERY sheet entry participates. For each sheet the engine packs the pending work onto every size
       // still in stock and cuts whichever filled most of its own sheet, so list order decides nothing; a
       // size marked Unlimited never runs down, and its Quantity is carried along only to be ignored.
+      bool fillToMaximum = project.FillToMaximum;
       var stockRows = project.SheetLoadInfos
         .Where(s => s.Width > 0 && s.Height > 0 && (s.Unlimited || s.Quantity > 0))
         .ToList();
@@ -2604,7 +2613,8 @@ namespace DeepNestSharp.Ui.Views
             commonLineMaxClusterParts: config.CommonLineMaxClusterParts,
             candidateCallback: candidateCallback,
             seedOffset: this.runSeedOffset,
-            stockShapes: sheetShapes);
+            stockShapes: sheetShapes,
+            fillAsKit: !fillToMaximum);
           return (r, err);
         });
 
@@ -3174,6 +3184,41 @@ namespace DeepNestSharp.Ui.Views
       }
     }
 
+    private bool showingFillMode;
+
+    /// <summary>The switch between "as many of each" and "as many as go on" is shown only when it matters: when
+    /// more than one part fills the sheets.</summary>
+    private void ShowFillMode(bool several, bool toMaximum)
+    {
+      if (this.fillModeCombo == null)
+      {
+        return;
+      }
+
+      this.showingFillMode = true;
+      this.fillModeCombo.SelectedIndex = toMaximum ? 1 : 0;
+      this.showingFillMode = false;
+      this.fillModeCombo.Visibility = several ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void OnFillModeChanged(object sender, SelectionChangedEventArgs e)
+    {
+      if (this.showingFillMode || !(ViewModel?.ActiveDocument is NestProjectViewModel doc) || doc.ProjectInfo == null)
+      {
+        return;
+      }
+
+      bool toMaximum = this.fillModeCombo.SelectedIndex == 1;
+      if (doc.ProjectInfo.FillToMaximum != toMaximum)
+      {
+        doc.ProjectInfo.FillToMaximum = toMaximum;
+        if (lastNestConsumed != null)
+        {
+          ClearNestResult();
+        }
+      }
+    }
+
     private void UpdateSummaryBadges()
     {
       if (this.partsCountSummary == null || this.sheetsCountSummary == null)
@@ -3184,6 +3229,7 @@ namespace DeepNestSharp.Ui.Views
       if (ViewModel?.ActiveDocument is NestProjectViewModel doc && doc.ProjectInfo != null)
       {
         var parts = doc.ProjectInfo.DetailLoadInfos;
+        this.ShowFillMode(parts.Count(p => p.FillSheets && p.IsIncluded) > 1, doc.ProjectInfo.FillToMaximum);
         int partTypes = parts.Count;
         int totalPartQty = parts.Sum(p => p.Quantity + p.Extra + p.MirrorQuantity);
         this.partsCountSummary.Text = string.Format(

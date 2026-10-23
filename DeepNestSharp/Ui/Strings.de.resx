@@ -426,6 +426,15 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Eigene Größe…</value>
   </data>
+  <data name="Fill_Even" xml:space="preserve">
+    <value>Füllen: gleich viele</value>
+  </data>
+  <data name="Fill_Max" xml:space="preserve">
+    <value>Füllen: so viele wie möglich</value>
+  </data>
+  <data name="Tip_FillMode" xml:space="preserve">
+    <value>Mehrere Teile füllen die Bleche. Gleich viele: sie kommen in gleicher Anzahl heraus, wie ein Satz. So viele wie möglich: jedes nimmt allen Platz, den es bekommt, das größte zuerst.</value>
+  </data>
   <data name="Menu_SheetFromDrawing" xml:space="preserve">
     <value>Blech aus Zeichnung (DXF, CHF)…</value>
   </data>

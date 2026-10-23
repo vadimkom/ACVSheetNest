@@ -1615,6 +1615,7 @@ namespace DeepNestLib.IO
         }
 
         var sheetXoffset = -sheet.WidthCalculated * i;
+        AppendSheetOutline(sheetdxf, sheet, sheetXoffset);
         var bendPlacements = polygons
           .Where(o => o.Fitted != false && o.Sheet.Id == sheet.Id && o.Name != null && DxfFileExtensions.IsDxf(o.Name))
           .Select(p => (p.Name, new DxfPoint(p.X + sheetXoffset, p.Y, 0D), p.Rotation, p.IsMirrored));
@@ -1630,6 +1631,35 @@ namespace DeepNestLib.IO
       catch (Exception ex)
       {
         throw;
+      }
+    }
+
+    /// <summary>
+    /// A sheet read from a drawing (an offcut of any shape) carries its outline and holes into the file, on
+    /// <see cref="DxfOutputLayers.Background"/>: shown so the operator can lay the layout over the real piece,
+    /// never cut. A rectangle writes nothing, as before.
+    /// </summary>
+    public static void AppendSheetOutline(DxfFile dxf, ISheet sheet, double xOffset)
+    {
+      if (!SheetShape.IsShaped(sheet))
+      {
+        return;
+      }
+
+      foreach (var contour in new[] { (INfp)sheet }.Concat(sheet.Children ?? new List<INfp>()))
+      {
+        if (contour?.Points == null || contour.Points.Length < 3)
+        {
+          continue;
+        }
+
+        var vertices = contour.Points.Select(p => new DxfLwPolylineVertex { X = p.X + xOffset, Y = p.Y }).ToList();
+        if (vertices.Count > 3 && Math.Abs(vertices[0].X - vertices[^1].X) < 1e-9 && Math.Abs(vertices[0].Y - vertices[^1].Y) < 1e-9)
+        {
+          vertices.RemoveAt(vertices.Count - 1);
+        }
+
+        dxf.Entities.Add(new DxfLwPolyline(vertices) { IsClosed = true, Layer = DxfOutputLayers.Background.Name });
       }
     }
 

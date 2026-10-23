@@ -16,7 +16,13 @@ namespace DeepNestSharp
     /// stamp existed. It is what lets a one-off correction to a stored preference happen exactly once
     /// instead of every time the app starts.
     /// </summary>
-    public const int CurrentSettingsVersion = 1;
+    public const int CurrentSettingsVersion = 2;
+
+    /// <summary>Files older than this get a stored Fast effort forgotten once (see NestEffortDefaults.NeedsEffortReset).</summary>
+    public const int EffortResetVersion = 1;
+
+    /// <summary>Files older than this get the old 6.35 mm default part spacing replaced by 4 mm once (1.1.55).</summary>
+    public const int SpacingFourMillimetresVersion = 2;
 
     /// <summary>The version this file was last written by; see <see cref="CurrentSettingsVersion"/>.</summary>
     public int SettingsVersion { get; set; }

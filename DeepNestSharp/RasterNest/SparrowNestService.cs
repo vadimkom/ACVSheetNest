@@ -54,6 +54,9 @@ namespace DeepNestSharp.RasterNest
     /// Zero on a healthy job; anything else is material the pack claimed and could not keep.</summary>
     internal static int DiagDeferred;
 
+    /// <summary>Parts a shaped sheet gave back for lying off its metal after the checks (diagnostics).</summary>
+    internal static int DiagShapeDropped;
+
     internal static int DiagSeamsSnapped;
 
     internal static int DiagSeamsGivenUp;
@@ -101,6 +104,7 @@ namespace DeepNestSharp.RasterNest
       public bool Mirrored;   // this population is X-flipped — placements carry IsMirrored for the exporter
       public int Priority;    // 1-10, LOWER nests first (1 = highest); decides which parts fill earlier sheets
       public bool Fill;       // asked for "as many as go on", not a count: what is left over was never ordered
+      public bool Kit;        // one of several fillers that come out as many of each (the job's choice); else each fills on its own
 
       /// <summary>The same part, loaded once already, asked for a different number of times.</summary>
       public Loaded WithQty(int qty)
@@ -329,7 +333,8 @@ namespace DeepNestSharp.RasterNest
       int commonLineMaxClusterParts = CommonLineDefaults.AutoMaxClusterParts,
       Action<INestResult>? candidateCallback = null,
       int seedOffset = 0,
-      IReadOnlyList<INfp> stockShapes = null)
+      IReadOnlyList<INfp> stockShapes = null,
+      bool fillAsKit = true)
     {
       error = null;
       // These values are already expressed in the caller's active drawing units. Substituting inch
@@ -422,13 +427,16 @@ namespace DeepNestSharp.RasterNest
 
         // Several fillers are one kit (an air-conditioner bracket is two parts): as many of each, so the kit
         // is offered by its own footprint and every member the same number of times.
+        // The operator may ask for the most of each instead: then every filler fills on its own, biggest first.
         var fillers = loaded.Where(l => l.Fill).ToList();
+        bool kit = fillAsKit && fillers.Count > 1;
         double kitFootprint = fillers.Sum(Footprint);
         for (int i = 0; i < loaded.Count; i++)
         {
           if (loaded[i].Fill)
           {
-            double footprint = fillers.Count > 1 ? kitFootprint : Footprint(loaded[i]);
+            double footprint = kit ? kitFootprint : Footprint(loaded[i]);
+            loaded[i].Kit = kit;
             loaded[i] = loaded[i].WithQty(Math.Max(1, (int)Math.Ceiling(stockArea / footprint)));
           }
         }
@@ -1011,7 +1019,9 @@ namespace DeepNestSharp.RasterNest
           geometryTolerance);
         if (shapedSheet)
         {
-          deferred += DropOutsideShape(bestPlacements, bestPlacedBySrc, bestSize.Shape, margin);
+          int offMetal = DropOutsideShape(bestPlacements, bestPlacedBySrc, bestSize.Shape, margin);
+          DiagShapeDropped += offMetal;
+          deferred += offMetal;
         }
 
         if (bestPlacements.Count == 0)
@@ -1614,7 +1624,7 @@ namespace DeepNestSharp.RasterNest
         return (placements.Concat(around).ToList(), by, new List<CommonEdgeIntent>());
       }
 
-      if (fillers.Count > 1)
+      if (fillers.Count > 1 && fillers.All(k => loadedById[k].Kit))
       {
         // A kit: as many of each member, by the kit's footprint, fewer when a counted part was pushed off.
         if (pool.Keys.Count(k => loadedById[k].Fill) != fillers.Count)
@@ -1717,7 +1727,7 @@ namespace DeepNestSharp.RasterNest
     /// </summary>
     private static void EvenOutKit(List<List<IPartPlacement>> sheetLayouts, Dictionary<int, Loaded> loadedById)
     {
-      var kit = loadedById.Values.Where(l => l.Fill).Select(l => l.Source).ToList();
+      var kit = loadedById.Values.Where(l => l.Fill && l.Kit).Select(l => l.Source).ToList();
       if (kit.Count < 2)
       {
         return;
@@ -1881,7 +1891,7 @@ namespace DeepNestSharp.RasterNest
 
       // A kit of fillers alone on a sheet is offered in whole kits, as many of each member, up to the cap; one
       // member that cannot go on this size of sheet leaves the kit off it.
-      var kit = pool.Keys.Where(k => loadedById[k].Fill).ToList();
+      var kit = pool.Keys.Where(k => loadedById[k].Fill && loadedById[k].Kit).ToList();
       if (!countedWaiting && kit.Count > 1)
       {
         var kitBatch = new Dictionary<int, int>();

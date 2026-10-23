@@ -39,6 +39,10 @@
     /// <summary>Gets or sets the sheet thickness in millimetres; 0 when not chosen.</summary>
     double Thickness { get; set; }
 
+    /// <summary>Gets or sets whether several parts that fill the sheets each take as many as go on (true), rather
+    /// than coming out as many of each, like a kit (false, the default).</summary>
+    bool FillToMaximum { get; set; }
+
     void Load(ISvgNestConfig config, string filePath);
 
     void Load(ProjectInfo source);

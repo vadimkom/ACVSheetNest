@@ -93,11 +93,19 @@ namespace DeepNestSharp.CiTests.RasterNest
       var reopened = DeepNestLib.Placement.SheetPlacement.FromJson(((DeepNestLib.Placement.SheetPlacement)sheet).ToJson());
       SheetShape.IsShaped(reopened.Sheet).Should().BeTrue("a saved project opens on the same outline");
       reopened.Sheet.Children.Should().HaveCount(1);
+
+      // The cut file carries the offcut's outline and hole on Background, shown and never cut.
+      var dxf = new DxfFile();
+      DxfExporter.AppendSheetOutline(dxf, sheet.Sheet, 0);
+      dxf.Entities.Should().HaveCount(2);
+      dxf.Entities.Should().OnlyContain(e => e.Layer == DxfOutputLayers.BackgroundName);
+      DxfExporter.AppendSheetOutline(dxf, Sheet.NewSheet(1, 1000, 600), 0);
+      dxf.Entities.Should().HaveCount(2, "a rectangle writes no outline, as before");
       var placed = sheet.PartPlacements.Select(p => p.PlacedPart).ToList();
       this.output.WriteLine($"placed {placed.Count}");
 
-      // The hole keeps squares off the bottom left; seven is all this metal holds at 184 a square.
-      placed.Count.Should().Be(7);
+      // The hole keeps squares off the bottom left. Settling along the short side as well finds eight.
+      placed.Count.Should().Be(8);
       (placed.Count + result.UnplacedParts.Count).Should().Be(20);
 
       const double scale = 1e4;
@@ -185,6 +193,89 @@ namespace DeepNestSharp.CiTests.RasterNest
           Area(Clip(grown[i], grown[j], ClipType.ctIntersection)).Should().BeLessThan(1e-6, $"parts {i} and {j} must keep the spacing");
         }
       }
+    }
+
+    /// <summary>
+    /// The shop's round offcut, Ø795, and elbow sides (test-data/bad, 2026-10-23). The first version put three
+    /// of the four ordered parts on it and left half the circle empty: a sliver of zero area where two no-fit
+    /// polygons met read as free room, a part landed on top of another and the final check took it off. The
+    /// operator's own layout holds four of the big sides and one small; so must ours, and in seconds.
+    /// </summary>
+    [Theory]
+    [InlineData(2, 2)]
+    [InlineData(4, 1)]
+    public void RoundOffcutHoldsWhatTheOperatorLaidByHand(int big, int small)
+    {
+      string exe = Path.Combine(this.dir, "sparrow.exe");
+      File.WriteAllText(exe, string.Empty);
+      string data = FindTestData();
+      if (data == null)
+      {
+        this.output.WriteLine("test-data not found — skipping.");
+        return;
+      }
+
+      string bad = Path.Combine(Path.GetDirectoryName(data), "bad");
+      var parts = new List<RasterPartInfo>
+      {
+        new RasterPartInfo { Path = Path.Combine(bad, "side-E90_200_R100.dxf"), Quantity = big, Rotations = 36, Spacing = 5.5 },
+        new RasterPartInfo { Path = Path.Combine(bad, "side-E90_150_R100.dxf"), Quantity = small, Rotations = 36, Spacing = 5.5 },
+      };
+      var shape = SheetShape.Load(Path.Combine(bad, "round-offcut-795.dxf"));
+      var watch = Stopwatch.StartNew();
+      var result = SparrowNestService.Nest(parts, new[] { (795, 795, 1, false, 1) }, 4, 5.5, 6, 5, exe, out string error, stockShapes: new[] { shape });
+      this.output.WriteLine($"{watch.ElapsedMilliseconds} ms");
+
+      result.Should().NotBeNull(error);
+      result.UnplacedParts.Should().BeEmpty();
+      var sheet = result.UsedSheets.Single();
+      sheet.PartPlacements.Should().HaveCount(big + small);
+      sheet.PartPlacements.Should().OnlyContain(pp => !SparrowNestService.IsOutsideShape(pp, sheet.Sheet, 6));
+      watch.ElapsedMilliseconds.Should().BeLessThan(30000);
+    }
+
+    /// <summary>
+    /// The same offcut and sides at the shop's 6.35 spacing (bad2, bad2a). Filling as a kit gave one of each
+    /// while the same two parts by count went on three and two: the big side took all the room first and the
+    /// kit was evened down. A kit now goes on one of each in turn, so it holds at least what a count does.
+    /// </summary>
+    [Fact]
+    public void RoundOffcutFilledAsAKitHoldsWhatACountDoes()
+    {
+      string exe = Path.Combine(this.dir, "sparrow.exe");
+      File.WriteAllText(exe, string.Empty);
+      string data = FindTestData();
+      if (data == null)
+      {
+        return;
+      }
+
+      string bad = Path.Combine(Path.GetDirectoryName(data), "bad");
+      var shape = SheetShape.Load(Path.Combine(bad, "round-offcut-795.dxf"));
+      DeepNestLib.Placement.INestResult Run(int qty, bool fill) => SparrowNestService.Nest(
+        new List<RasterPartInfo>
+        {
+          new RasterPartInfo { Path = Path.Combine(bad, "side-E90_150_R100.dxf"), Quantity = qty, Fill = fill, Rotations = 36, Spacing = 6.35 },
+          new RasterPartInfo { Path = Path.Combine(bad, "side-E90_200_R100.dxf"), Quantity = qty, Fill = fill, Rotations = 36, Spacing = 6.35 },
+        },
+        new[] { (795, 795, 1, false, 1) },
+        4,
+        6.35,
+        6,
+        5,
+        exe,
+        out _,
+        stockShapes: new[] { shape });
+
+      int Count(DeepNestLib.Placement.INestResult r, string name) => r.UsedSheets.Sum(s => s.PartPlacements.Count(p => p.Part.Name.Contains(name)));
+      var byCount = Run(3, false);
+      var filled = Run(1, true);
+      this.output.WriteLine($"by count {Count(byCount, "E90_200")}+{Count(byCount, "E90_150")}, filled {Count(filled, "E90_200")}+{Count(filled, "E90_150")}");
+
+      int kits = Math.Min(Count(byCount, "E90_200"), Count(byCount, "E90_150"));
+      Count(filled, "E90_150").Should().Be(Count(filled, "E90_200"), "a kit comes out even");
+      Count(filled, "E90_150").Should().BeGreaterOrEqualTo(Math.Max(2, kits));
+      (Count(byCount, "E90_200") + Count(byCount, "E90_150")).Should().BeGreaterOrEqualTo(5);
     }
 
     private static string FindTestData()

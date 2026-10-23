@@ -25,6 +25,12 @@ namespace DeepNestSharp.RasterNest
     /// hair over the line; far below anything a laser can tell apart.</summary>
     private const double ShapeSafety = 0.002;
 
+    /// <summary>Time the last shaped sheet spent on the poses (inner-fit regions), and their sizes (diagnostics).</summary>
+    internal static long DiagShapedPosesMs;
+
+    internal static string DiagShapedPoints;
+
+
     /// <summary>
     /// The region a part's own outline has to stay inside on a shaped sheet: the outline shrunk by the
     /// margin, less each hole of the sheet grown by it. Clipper paths at <paramref name="scale"/>, holes
@@ -63,6 +69,9 @@ namespace DeepNestSharp.RasterNest
     /// <summary>
     /// Packs one shaped sheet from what is left in <paramref name="pool"/>: the parts ordered by count first,
     /// by priority and then biggest first, and the parts that fill the sheets after them, as many as go on.
+    /// <para>Which way the parts settle decides how many go on a round or ragged offcut, and no one way wins
+    /// everywhere: along the long side, along the short one, or out against the edge. All are packed (the
+    /// costly geometry is shared between them) and the one that puts on the most is kept.</para>
     /// </summary>
     private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySrc) PackShapedSheet(
       Dictionary<int, int> pool,
@@ -72,19 +81,23 @@ namespace DeepNestSharp.RasterNest
       CancellationToken cancel)
     {
       const double scale = ShapeScale;
-      var placements = new List<IPartPlacement>();
-      var placedBySrc = new Dictionary<int, int>();
-      var region = UsableRegion(shape, margin + ShapeSafety, scale);
-      if (region.Count == 0)
+      var exact = UsableRegion(shape, margin + ShapeSafety, scale);
+      if (exact.Count == 0)
       {
-        return (placements, placedBySrc);
+        return (new List<IPartPlacement>(), new Dictionary<int, int>());
       }
 
-      var bounds = BoundsOfPaths(region);
-      bool alongX = (bounds.MaxX - bounds.MinX) >= (bounds.MaxY - bounds.MinY);
-      var placed = new List<(ShapedPose Pose, long X, long Y)>();
-      var pairNfps = new Dictionary<(ShapedPose Fixed, ShapedPose Moving), List<List<IntPoint>>>();
-      long reach = alongX ? bounds.MinX : bounds.MinY; // far edge of the pack along the long side
+      // Curves come as hundreds of short chords, and a no-fit polygon costs the product of the two point
+      // counts. Every outline is simplified by a hair (a quarter of a millimetre on a metre of sheet), always to the safe
+      // side: parts and their shells grown first, the sheet shrunk first.
+      var bounds = BoundsOfPaths(exact);
+      double diagonal = Math.Sqrt(Math.Pow(bounds.MaxX - bounds.MinX, 2) + Math.Pow(bounds.MaxY - bounds.MinY, 2));
+      long delta = Math.Max(1, (long)(diagonal * 2.5e-4));
+      var region = Simplified(OffsetAll(exact, -delta), delta);
+      if (region.Count == 0)
+      {
+        return (new List<IPartPlacement>(), new Dictionary<int, int>());
+      }
 
       var order = pool
         .Where(kv => kv.Value > 0)
@@ -95,64 +108,321 @@ namespace DeepNestSharp.RasterNest
         .ThenBy(k => k)
         .ToList();
 
-      foreach (int src in order)
+      var jobs = order.SelectMany(src => loadedById[src].Angles.Distinct().Select(angle => (Src: src, Angle: angle))).ToList();
+      var posesWatch = System.Diagnostics.Stopwatch.StartNew();
+      var built = new ShapedPose[jobs.Count];
+      System.Threading.Tasks.Parallel.For(
+        0,
+        jobs.Count,
+        new System.Threading.Tasks.ParallelOptions { CancellationToken = cancel },
+        i => built[i] = ShapedPose.Create(loadedById[jobs[i].Src], jobs[i].Angle, region, scale, delta));
+      var poses = order.ToDictionary(src => src, src => built.Where((p, i) => jobs[i].Src == src && p.Inner.Count > 0).ToList());
+
+      DiagShapedPosesMs = posesWatch.ElapsedMilliseconds;
+      DiagShapedPoints = $"region {region.Sum(r => r.Count)}, parts {string.Join("/", built.Take(1).Select(p => p.Shell.Count + "+" + p.Outline.Count))}";
+      var pairNfps = new System.Collections.Concurrent.ConcurrentDictionary<(ShapedPose Fixed, ShapedPose Moving), List<List<IntPoint>>>();
+      // The order the copies go on in. Biggest first leaves the small ones the gaps; taking the sizes in turn
+      // can be the only way the last small one goes on. A kit of fillers always goes on in turn, one of each:
+      // filled biggest first, the first member took all the room on a round offcut, and the kit was evened
+      // down to one of each where the same two parts by count went on three and two.
+      double Area(int src) => Math.Abs(loadedById[src].Nfp.Area);
+      var counted = order.Where(src => !loadedById[src].Fill).ToList();
+      var fillers = order.Where(src => loadedById[src].Fill).ToList();
+      bool kit = fillers.Count > 1 && fillers.All(src => loadedById[src].Kit);
+      var fillerSequence = kit
+        ? InTurn(fillers, pool)
+        : fillers.SelectMany(src => Enumerable.Repeat(src, pool[src])).ToList();
+      var sequences = new List<List<int>>
+      {
+        counted.SelectMany(src => Enumerable.Repeat(src, pool[src])).Concat(fillerSequence).ToList(),
+      };
+      var turns = counted.GroupBy(src => loadedById[src].Priority).SelectMany(g => InTurn(g.ToList(), pool)).Concat(fillerSequence).ToList();
+      if (!turns.SequenceEqual(sequences[0]))
+      {
+        sequences.Add(turns);
+      }
+
+      // Kept: the most of the counted parts, then the most filling, a kit counted as whole kits.
+      double Worth(Dictionary<int, int> bySrc)
+      {
+        int Got(int src) => bySrc.TryGetValue(src, out int n) ? n : 0;
+        double countedArea = counted.Sum(src => Got(src) * Area(src));
+        double fillArea = kit ? fillers.Min(Got) * fillers.Sum(Area) : fillers.Sum(src => Got(src) * Area(src));
+        return (countedArea * 1e6) + fillArea;
+      }
+
+      List<IPartPlacement> bestPlacements = null;
+      Dictionary<int, int> bestBySrc = null;
+      double bestWorth = -1;
+      foreach (var sequence in sequences)
+      {
+        foreach (ShapedGravity gravity in Enum.GetValues(typeof(ShapedGravity)))
+        {
+          var (placements, bySrc) = PackShapedOnce(loadedById, sequence, kit ? fillers : null, poses, pairNfps, exact, bounds, gravity, scale, cancel);
+          double worth = Worth(bySrc);
+          if (worth > bestWorth + 1e-6)
+          {
+            bestWorth = worth;
+            bestPlacements = placements;
+            bestBySrc = bySrc;
+          }
+        }
+      }
+
+      return (bestPlacements, bestBySrc);
+    }
+
+    /// <summary>The copies of <paramref name="sources"/> one of each in turn, as long as each has copies left.</summary>
+    private static List<int> InTurn(List<int> sources, Dictionary<int, int> pool)
+    {
+      var left = sources.ToDictionary(src => src, src => pool[src]);
+      var sequence = new List<int>();
+      while (left.Values.Any(n => n > 0))
+      {
+        foreach (int src in sources.Where(src => left[src] > 0))
+        {
+          sequence.Add(src);
+          left[src]--;
+        }
+      }
+
+      return sequence;
+    }
+
+    /// <summary>Which way the parts settle on a shaped sheet.</summary>
+    private enum ShapedGravity
+    {
+      /// <summary>Keep the pack short along the long side, then low across it.</summary>
+      AlongLong,
+
+      /// <summary>The same along the short side.</summary>
+      AlongShort,
+
+      /// <summary>Out against the edge, as far from the middle of the sheet as they go: rings a round offcut.</summary>
+      Outward,
+    }
+
+    /// <summary>Puts the copies on in <paramref name="sequence"/> order. A part that no longer goes on anywhere is
+    /// skipped from then on; a member of <paramref name="kit"/> that does not go on ends the whole kit, whose
+    /// next round could not be whole.</summary>
+    private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySrc) PackShapedOnce(
+      Dictionary<int, Loaded> loadedById,
+      List<int> sequence,
+      List<int> kit,
+      Dictionary<int, List<ShapedPose>> poses,
+      System.Collections.Concurrent.ConcurrentDictionary<(ShapedPose Fixed, ShapedPose Moving), List<List<IntPoint>>> pairNfps,
+      List<List<IntPoint>> exact,
+      (long MinX, long MinY, long MaxX, long MaxY) bounds,
+      ShapedGravity gravity,
+      double scale,
+      CancellationToken cancel)
+    {
+      var placements = new List<IPartPlacement>();
+      var placedBySrc = new Dictionary<int, int>();
+      var placed = new List<(ShapedPose Pose, long X, long Y)>();
+      bool longIsX = (bounds.MaxX - bounds.MinX) >= (bounds.MaxY - bounds.MinY);
+      bool alongX = gravity == ShapedGravity.AlongShort ? !longIsX : longIsX;
+      long reach = alongX ? bounds.MinX : bounds.MinY; // far edge of the pack along the chosen side
+      double midX = (bounds.MinX + bounds.MaxX) / 2.0, midY = (bounds.MinY + bounds.MaxY) / 2.0;
+
+      (long, long, long) Score(ShapedPose pose, IntPoint p)
+      {
+        if (gravity == ShapedGravity.Outward)
+        {
+          double cx = p.X + pose.CentreX - midX, cy = p.Y + pose.CentreY - midY;
+          return (-(long)(((cx * cx) + (cy * cy)) / 1000), alongX ? p.Y : p.X, alongX ? p.X : p.Y);
+        }
+
+        long along = alongX ? p.X : p.Y;
+        long across = alongX ? p.Y : p.X;
+        return (Math.Max(reach, along + pose.FarAlong(alongX)), across, along);
+      }
+
+      var state = new System.Collections.Concurrent.ConcurrentDictionary<ShapedPose, ShapedPose.Blocked>();
+      var done = new HashSet<int>();
+      foreach (int src in sequence)
       {
         var loaded = loadedById[src];
-        var poses = loaded.Angles
-          .Distinct()
-          .Select(angle => ShapedPose.Create(loaded, angle, region, scale))
-          .Where(p => p.Inner.Count > 0)
-          .ToList();
-
-        int left = pool[src];
-        while (left > 0 && poses.Count > 0)
+        var srcPoses = poses[src];
+        if (done.Contains(src))
         {
-          cancel.ThrowIfCancellationRequested();
-          ShapedPose bestPose = null;
-          (long Reach, long Across, long Along) bestScore = (long.MaxValue, long.MaxValue, long.MaxValue);
-          IntPoint best = default;
-          foreach (var pose in poses)
-          {
-            var free = pose.FreeAfter(placed, pairNfps);
-            foreach (var path in free)
-            {
-              foreach (var p in path)
-              {
-                long along = alongX ? p.X : p.Y;
-                long across = alongX ? p.Y : p.X;
-                var score = (Math.Max(reach, along + pose.FarAlong(alongX)), across, along);
-                if (score.CompareTo(bestScore) < 0)
-                {
-                  bestScore = score;
-                  bestPose = pose;
-                  best = p;
-                }
-              }
-            }
-          }
-
-          if (bestPose == null)
-          {
-            break; // no pose of this part goes on any more; smaller parts still may
-          }
-
-          placements.Add(new PartPlacement(bestPose.Rotated)
-          {
-            X = best.X / scale,
-            Y = best.Y / scale,
-            Rotation = bestPose.Angle,
-            Source = src,
-            IsMirrored = loaded.Mirrored,
-          });
-          placed.Add((bestPose, best.X, best.Y));
-          reach = bestScore.Reach;
-          placedBySrc[src] = placedBySrc.TryGetValue(src, out int n) ? n + 1 : 1;
-          left--;
+          continue;
         }
+
+        cancel.ThrowIfCancellationRequested();
+
+        // A few of the best positions of every pose, best first. The no-fit polygons are exact in principle,
+        // but Clipper can leave a sliver of zero area where two of them meet, and a corner of that sliver
+        // reads as free room: on a round offcut a part went straight on top of another one. Each position is
+        // therefore checked against the real shapes before it is taken.
+        var candidates = new System.Collections.Concurrent.ConcurrentBag<((long, long, long) Score, ShapedPose Pose, IntPoint At)>();
+        System.Threading.Tasks.Parallel.ForEach(srcPoses, pose =>
+        {
+          var free = pose.FreeAfter(state.GetOrAdd(pose, _ => new ShapedPose.Blocked()), placed, pairNfps);
+          foreach (var top in free.SelectMany(path => path).Select(p => (Score: Score(pose, p), At: p)).OrderBy(t => t.Score).Take(6))
+          {
+            candidates.Add((top.Score, pose, top.At));
+          }
+        });
+
+        var chosen = candidates
+          .OrderBy(c => c.Score)
+          .ThenBy(c => c.Pose.Angle)
+          .ThenBy(c => c.At.X)
+          .ThenBy(c => c.At.Y)
+          .FirstOrDefault(c => ShapedFits(c.Pose, c.At, placed, exact));
+        if (chosen.Pose == null)
+        {
+          // No pose of this part goes on any more; smaller parts still may.
+          done.Add(src);
+          if (kit != null && kit.Contains(src))
+          {
+            done.UnionWith(kit);
+          }
+
+          continue;
+        }
+
+        placements.Add(new PartPlacement(chosen.Pose.Rotated)
+        {
+          X = chosen.At.X / scale,
+          Y = chosen.At.Y / scale,
+          Rotation = chosen.Pose.Angle,
+          Source = src,
+          IsMirrored = loaded.Mirrored,
+        });
+        placed.Add((chosen.Pose, chosen.At.X, chosen.At.Y));
+        if (gravity != ShapedGravity.Outward)
+        {
+          reach = Math.Max(reach, chosen.Score.Item1);
+        }
+
+        placedBySrc[src] = placedBySrc.TryGetValue(src, out int n) ? n + 1 : 1;
       }
 
       return (placements, placedBySrc);
     }
+
+    /// <summary>The check every position passes before a part is put there: its outline inside the metal and
+    /// its shell clear of every shell already placed, measured on the shapes themselves.</summary>
+    private static bool ShapedFits(ShapedPose pose, IntPoint at, List<(ShapedPose Pose, long X, long Y)> placed, List<List<IntPoint>> exact)
+    {
+      const double eps = 1e-4 * ShapeScale * ShapeScale;
+      var outline = Translate(pose.Outline, at.X, at.Y);
+      var c = new Clipper();
+      c.AddPath(outline, PolyType.ptSubject, true);
+      c.AddPaths(exact, PolyType.ptClip, true);
+      var outside = new List<List<IntPoint>>();
+      c.Execute(ClipType.ctDifference, outside, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+      if (outside.Sum(o => Math.Abs(Clipper.Area(o))) > eps)
+      {
+        return false;
+      }
+
+      var shell = Translate(pose.Shell, at.X, at.Y);
+      var box = BoundsOfPaths(new List<List<IntPoint>> { shell });
+      foreach (var (other, x, y) in placed)
+      {
+        var otherShell = Translate(other.Shell, x, y);
+        var ob = BoundsOfPaths(new List<List<IntPoint>> { otherShell });
+        if (ob.MinX > box.MaxX || ob.MaxX < box.MinX || ob.MinY > box.MaxY || ob.MaxY < box.MinY)
+        {
+          continue;
+        }
+
+        var k = new Clipper();
+        k.AddPath(shell, PolyType.ptSubject, true);
+        k.AddPath(otherShell, PolyType.ptClip, true);
+        var both = new List<List<IntPoint>>();
+        k.Execute(ClipType.ctIntersection, both, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+        if (both.Sum(o => Math.Abs(Clipper.Area(o))) > eps)
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    private static List<IntPoint> Translate(List<IntPoint> path, long dx, long dy) => TranslatePath(path, dx, dy);
+
+    /// <summary>Every path offset together (holes included) by <paramref name="delta"/> scaled units.</summary>
+    private static List<List<IntPoint>> OffsetAll(List<List<IntPoint>> paths, long delta)
+    {
+      var co = new ClipperOffset(4, SvgNest.Config.CurveTolerance * ShapeScale);
+      co.AddPaths(paths, JoinType.jtMiter, EndType.etClosedPolygon);
+      var solution = new List<List<IntPoint>>();
+      co.Execute(ref solution, delta);
+      return solution;
+    }
+
+    /// <summary>
+    /// Douglas-Peucker on a closed path: the fewest vertices that keep every dropped one within
+    /// <paramref name="tolerance"/> of the new outline. An arc of hundreds of short chords comes down to the
+    /// few dozen its tolerance needs (Clipper's own clean-up only drops vertices already in line).
+    /// </summary>
+    private static List<IntPoint> Reduce(List<IntPoint> path, long tolerance)
+    {
+      if (path.Count <= 4)
+      {
+        return path;
+      }
+
+      // Split the ring at its first vertex and the vertex farthest from it, and reduce both halves.
+      int far = 0;
+      double farDist = -1;
+      for (int i = 1; i < path.Count; i++)
+      {
+        double dx = path[i].X - path[0].X, dy = path[i].Y - path[0].Y;
+        double d = (dx * dx) + (dy * dy);
+        if (d > farDist)
+        {
+          farDist = d;
+          far = i;
+        }
+      }
+
+      var keep = new bool[path.Count];
+      keep[0] = keep[far] = true;
+      var stack = new Stack<(int From, int To)>();
+      stack.Push((0, far));
+      stack.Push((far, path.Count));
+      double tol2 = (double)tolerance * tolerance;
+      while (stack.Count > 0)
+      {
+        var (from, to) = stack.Pop();
+        var a = path[from];
+        var b = path[to % path.Count];
+        double ex = b.X - a.X, ey = b.Y - a.Y;
+        double len2 = (ex * ex) + (ey * ey);
+        int worst = -1;
+        double worstDist = tol2;
+        for (int i = from + 1; i < to; i++)
+        {
+          double px = path[i].X - a.X, py = path[i].Y - a.Y;
+          double d2 = len2 <= 0 ? (px * px) + (py * py) : Math.Pow((px * ey) - (py * ex), 2) / len2;
+          if (d2 > worstDist)
+          {
+            worstDist = d2;
+            worst = i;
+          }
+        }
+
+        if (worst >= 0)
+        {
+          keep[worst] = true;
+          stack.Push((from, worst));
+          stack.Push((worst, to));
+        }
+      }
+
+      var reduced = path.Where((p, i) => keep[i]).ToList();
+      return reduced.Count >= 3 ? reduced : path;
+    }
+
+    /// <summary>Each path reduced to <paramref name="delta"/> (see <see cref="Reduce"/>); paths that collapse go.</summary>
+    private static List<List<IntPoint>> Simplified(List<List<IntPoint>> paths, long delta)
+      => paths.Select(p => Reduce(p, delta)).Where(p => p.Count >= 3).ToList();
 
     /// <summary><see cref="PackShapedSheet"/> in the shape the sheet loop takes a pack in.</summary>
     private static (List<IPartPlacement>, Dictionary<int, int>, int, int, int, int, List<CommonEdgeIntent>, IReadOnlyList<CommonLineFallbackNotice>) ShapedSheet(
@@ -282,42 +552,49 @@ namespace DeepNestSharp.RasterNest
     private static List<IntPoint> Negate(List<IntPoint> path)
       => path.Select(p => new IntPoint(-p.X, -p.Y)).ToList();
 
+
     /// <summary>
     /// One part at one angle on a shaped sheet. Positions are the shift applied to the turned outline, the
-    /// same as <see cref="PartPlacement.X"/>/<see cref="PartPlacement.Y"/>.
+    /// same as <see cref="PartPlacement.X"/>/<see cref="PartPlacement.Y"/>. What one packing has blocked for
+    /// it is kept apart (<see cref="Blocked"/>), so several packings share the costly geometry.
     /// </summary>
     private sealed class ShapedPose
     {
-      private List<List<IntPoint>> blocked = new List<List<IntPoint>>();
-      private int blockedBy;
-
       public int Angle { get; private set; }
 
       public INfp Rotated { get; private set; }
 
-      /// <summary>The spacing shell, half the spacing round the turned outline, wound counter-clockwise.</summary>
+      /// <summary>The turned outline, wound counter-clockwise, as it is.</summary>
+      public List<IntPoint> Outline { get; private set; }
+
+      /// <summary>The spacing shell, half the spacing round the turned outline, simplified outward.</summary>
       public List<IntPoint> Shell { get; private set; }
 
       /// <summary>Where the shift may put the part with its outline inside the sheet: the inner-fit region.</summary>
       public List<List<IntPoint>> Inner { get; private set; }
 
+      public double CentreX { get; private set; }
+
+      public double CentreY { get; private set; }
+
       private long MaxX { get; set; }
 
       private long MaxY { get; set; }
 
-      public static ShapedPose Create(Loaded loaded, int angle, List<List<IntPoint>> region, double scale)
+      public static ShapedPose Create(Loaded loaded, int angle, List<List<IntPoint>> region, double scale, long delta)
       {
         var rotated = Math.Abs(angle % 360) < 1e-9 ? loaded.Nfp : loaded.Nfp.Rotate(angle);
         var outline = Ccw(DeepNestClipper.ScaleUpPath(rotated.Points, scale));
         var shellNfp = OffsetOutward(rotated, (loaded.FitSpacing + ShapeSafety) / 2.0);
-        var shell = Ccw(DeepNestClipper.ScaleUpPath(shellNfp.Points, scale));
+        var shell = Grown(Ccw(DeepNestClipper.ScaleUpPath(shellNfp.Points, scale)), delta);
+        var forFit = Grown(outline, delta);
 
         // The outline lies inside the region exactly when one of its points does, its edges cross none of the
         // region's, and no boundary of the region (a hole of the sheet) lies wholly inside it:
         //   (region - p0) - (boundary (+) -outline) - (each boundary's first point - outline).
-        var neg = Negate(outline);
+        var neg = Negate(forFit);
         var c = new Clipper();
-        c.AddPaths(region.Select(r => Translate(r, -outline[0].X, -outline[0].Y)).ToList(), PolyType.ptSubject, true);
+        c.AddPaths(region.Select(r => Translate(r, -forFit[0].X, -forFit[0].Y)).ToList(), PolyType.ptSubject, true);
         foreach (var boundary in region)
         {
           c.AddPaths(Clipper.MinkowskiSum(neg, boundary, true), PolyType.ptClip, true);
@@ -331,57 +608,59 @@ namespace DeepNestSharp.RasterNest
         {
           Angle = angle,
           Rotated = rotated,
+          Outline = outline,
           Shell = shell,
           Inner = inner,
+          CentreX = outline.Average(p => (double)p.X),
+          CentreY = outline.Average(p => (double)p.Y),
           MaxX = outline.Max(p => p.X),
           MaxY = outline.Max(p => p.Y),
         };
       }
 
-      /// <summary>How far past the shift the outline reaches along the long side of the sheet.</summary>
+      /// <summary>How far past the shift the outline reaches along the chosen side of the sheet.</summary>
       public long FarAlong(bool alongX) => alongX ? this.MaxX : this.MaxY;
 
       /// <summary>The inner-fit region less every position where this pose's shell would overlap a shell already
-      /// placed. The blocked area is kept and only grown by the parts placed since the last call.</summary>
-      public List<List<IntPoint>> FreeAfter(List<(ShapedPose Pose, long X, long Y)> placed, Dictionary<(ShapedPose Fixed, ShapedPose Moving), List<List<IntPoint>>> pairNfps)
+      /// placed. The blocked area is kept in <paramref name="state"/> and only grown by the parts placed since.</summary>
+      public List<List<IntPoint>> FreeAfter(
+        Blocked state,
+        List<(ShapedPose Pose, long X, long Y)> placed,
+        System.Collections.Concurrent.ConcurrentDictionary<(ShapedPose Fixed, ShapedPose Moving), List<List<IntPoint>>> pairNfps)
       {
-        if (this.blockedBy < placed.Count)
+        if (state.By < placed.Count)
         {
           var u = new Clipper();
-          u.AddPaths(this.blocked, PolyType.ptSubject, true);
-          for (int i = this.blockedBy; i < placed.Count; i++)
+          u.AddPaths(state.Area, PolyType.ptSubject, true);
+          for (int i = state.By; i < placed.Count; i++)
           {
             var (other, x, y) = placed[i];
-            if (!pairNfps.TryGetValue((other, this), out var nfp))
-            {
-              nfp = PairNfp(other.Shell, this.Shell);
-              pairNfps[(other, this)] = nfp;
-            }
-
+            var nfp = pairNfps.GetOrAdd((other, this), key => PairNfp(key.Fixed.Shell, key.Moving.Shell));
             u.AddPaths(nfp.Select(path => Translate(path, x, y)).ToList(), PolyType.ptClip, true);
           }
 
           var merged = new List<List<IntPoint>>();
           u.Execute(ClipType.ctUnion, merged, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
-          this.blocked = merged;
-          this.blockedBy = placed.Count;
+          state.Area = merged;
+          state.By = placed.Count;
         }
 
-        if (this.blocked.Count == 0)
+        if (state.Area.Count == 0)
         {
           return this.Inner;
         }
 
         var c = new Clipper();
         c.AddPaths(this.Inner, PolyType.ptSubject, true);
-        c.AddPaths(this.blocked, PolyType.ptClip, true);
+        c.AddPaths(state.Area, PolyType.ptClip, true);
         var free = new List<List<IntPoint>>();
         c.Execute(ClipType.ctDifference, free, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
         return free;
       }
 
       /// <summary>Shifts of <paramref name="moving"/> at which it overlaps <paramref name="fixedShell"/> at rest:
-      /// fixed (+) -moving, built as the sum of the boundaries plus one copy of each shape.</summary>
+      /// fixed (+) -moving, built as the sum of the boundaries plus one copy of each shape. Holes of no real
+      /// size (Clipper leaves slivers where the sums meet) are filled: no part fits in them.</summary>
       private static List<List<IntPoint>> PairNfp(List<IntPoint> fixedShell, List<IntPoint> moving)
       {
         var neg = Negate(moving);
@@ -391,10 +670,24 @@ namespace DeepNestSharp.RasterNest
         c.AddPath(Translate(neg, fixedShell[0].X, fixedShell[0].Y), PolyType.ptClip, true);
         var nfp = new List<List<IntPoint>>();
         c.Execute(ClipType.ctUnion, nfp, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
-        return nfp;
+        return nfp.Where(p => Clipper.Area(p) > 0 || Math.Abs(Clipper.Area(p)) > ShapeScale * ShapeScale).ToList();
       }
 
-      private static List<IntPoint> Translate(List<IntPoint> path, long dx, long dy) => TranslatePath(path, dx, dy);
+      /// <summary>The path grown by <paramref name="delta"/> and then simplified by as much: never smaller.</summary>
+      private static List<IntPoint> Grown(List<IntPoint> path, long delta)
+      {
+        var grown = OffsetAll(new List<List<IntPoint>> { path }, delta).OrderByDescending(p => Math.Abs(Clipper.Area(p))).FirstOrDefault() ?? path;
+        var clean = Reduce(grown, delta);
+        return Ccw(clean.Count >= 3 ? clean : grown);
+      }
+
+      /// <summary>What one packing has made unusable for a pose so far, and after how many placed parts.</summary>
+      public sealed class Blocked
+      {
+        public List<List<IntPoint>> Area { get; set; } = new List<List<IntPoint>>();
+
+        public int By { get; set; }
+      }
     }
   }
 }

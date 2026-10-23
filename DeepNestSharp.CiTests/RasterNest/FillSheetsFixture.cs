@@ -18,7 +18,7 @@ namespace DeepNestSharp.CiTests.RasterNest
     private static string Part(string dir, string name, ShapeKind kind, params double[] values)
       => PartShapes.Write(dir, name, kind, values, millimetres: true);
 
-    private static INestResult Nest(List<RasterPartInfo> parts, (int W, int H, int Qty, bool Unlimited, int Priority) sheet, out string error)
+    private static INestResult Nest(List<RasterPartInfo> parts, (int W, int H, int Qty, bool Unlimited, int Priority) sheet, out string error, bool fillAsKit = true)
       => SparrowNestService.Nest(
         parts,
         new[] { sheet },
@@ -28,7 +28,8 @@ namespace DeepNestSharp.CiTests.RasterNest
         perSheetBudgetSec: 5,
         SparrowExe.Resolve(),
         out error,
-        effort: NestEffort.Fast);
+        effort: NestEffort.Fast,
+        fillAsKit: fillAsKit);
 
     [Fact]
     public void WashersFillTheSheetAndNoneAreMissing()
@@ -108,6 +109,34 @@ namespace DeepNestSharp.CiTests.RasterNest
       uprights.Should().BeGreaterThan(5);
       names.Count(n => n == "foot").Should().Be(uprights, "a kit comes out even");
       names.Count(n => n == "plate").Should().Be(plates);
+    }
+
+    /// <summary>Asked for as many as go on rather than as many of each, the same two fillers are not evened
+    /// out: the sheet holds more of them, in whatever numbers fit.</summary>
+    [Fact]
+    public void TwoFillersToTheMaximumAreNotEvenedOut()
+    {
+      if (SparrowExe.Resolve() == null)
+      {
+        return;
+      }
+
+      string dir = Directory.CreateTempSubdirectory("sheetnest_fillsheets").FullName;
+      var parts = new List<RasterPartInfo>
+      {
+        new RasterPartInfo { Path = Part(dir, "upright", PartShapes.Rectangle, 160, 40), Quantity = 1, Fill = true },
+        new RasterPartInfo { Path = Part(dir, "foot", PartShapes.Circle, 50), Quantity = 1, Fill = true },
+      };
+
+      double Total(INestResult r) => r.UsedSheets.Sum(s => s.PartPlacements.Sum(p => System.Math.Abs(p.Part.Area)));
+      var even = Nest(parts, (600, 400, 1, false, 5), out _);
+      var most = Nest(parts, (600, 400, 1, false, 5), out string error, fillAsKit: false);
+
+      error.Should().BeNull();
+      var names = most.UsedSheets.SelectMany(s => s.PartPlacements).Select(p => Path.GetFileNameWithoutExtension(p.Part.Name)).ToList();
+      names.Should().Contain("upright");
+      names.Count(n => n == "foot").Should().NotBe(names.Count(n => n == "upright"), "nothing evens them out");
+      Total(most).Should().BeGreaterThan(Total(even), $"as many as go on covers more of the sheet ({names.Count(n => n == "upright")} uprights, {names.Count(n => n == "foot")} feet)");
     }
 
     [Fact]

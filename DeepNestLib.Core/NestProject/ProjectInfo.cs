@@ -70,6 +70,11 @@ namespace DeepNestLib.NestProject
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double Thickness { get; set; }
 
+    /// <inheritdoc />
+    [JsonInclude]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool FillToMaximum { get; set; }
+
     [JsonInclude]
     public ISvgNestConfig Config
     {
@@ -162,6 +167,7 @@ namespace DeepNestLib.NestProject
       this.SheetsKeptWhole = source.SheetsKeptWhole;
       this.Material = source.Material;
       this.Thickness = source.Thickness;
+      this.FillToMaximum = source.FillToMaximum;
       this.CommonLineGapInches = source.CommonLineGapInches;
       this.CommonLineMaxClusterParts = source.CommonLineMaxClusterParts;
       this.DetailLoadInfos.Clear();

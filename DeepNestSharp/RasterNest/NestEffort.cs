@@ -67,6 +67,6 @@ namespace DeepNestSharp.RasterNest
     /// undone again on the next start.</para>
     /// </summary>
     internal static bool NeedsEffortReset(int persisted, int settingsVersion)
-      => settingsVersion < SessionState.CurrentSettingsVersion && persisted == (int)NestEffort.Fast;
+      => settingsVersion < SessionState.EffortResetVersion && persisted == (int)NestEffort.Fast;
   }
 }

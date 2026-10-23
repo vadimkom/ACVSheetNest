@@ -426,6 +426,15 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Tamaño personalizado…</value>
   </data>
+  <data name="Fill_Even" xml:space="preserve">
+    <value>Rellenar: igual de cada una</value>
+  </data>
+  <data name="Fill_Max" xml:space="preserve">
+    <value>Rellenar: el máximo</value>
+  </data>
+  <data name="Tip_FillMode" xml:space="preserve">
+    <value>Varias piezas rellenan las chapas. Igual de cada una: salen en el mismo número, como un kit. El máximo: cada una ocupa todo el sitio que puede, la más grande primero.</value>
+  </data>
   <data name="Menu_SheetFromDrawing" xml:space="preserve">
     <value>Chapa desde un dibujo (DXF, CHF)…</value>
   </data>

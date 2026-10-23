@@ -144,6 +144,19 @@
       }
     }
 
+    public bool FillToMaximum
+    {
+      get => wrappedProjectInfo.FillToMaximum;
+      set
+      {
+        if (wrappedProjectInfo.FillToMaximum != value)
+        {
+          wrappedProjectInfo.FillToMaximum = value;
+          OnPropertyChanged(nameof(FillToMaximum));
+        }
+      }
+    }
+
     private void DetailLoadInfos_IsDirtyChanged(object? sender, EventArgs e)
     {
       IsDirtyChanged?.Invoke(this, e);
