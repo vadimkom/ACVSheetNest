@@ -105,7 +105,23 @@ namespace DeepNestSharp.Ui.Views
       viewModel.AboutDialogService = new AboutDialogService(() => new AboutDialog());
       this.Loaded += MainWindow_Loaded;
       this.Closing += MainWindow_Closing;
-      this.Closed += (s, e) => this.isClosed = true;
+      this.Closed += (s, e) =>
+      {
+        this.isClosed = true;
+
+        // An update downloaded and agreed to installs once this copy is gone (see ShowUpdateWindow).
+        if (this.pendingUpdateScript != null)
+        {
+          try
+          {
+            UpdateChecker.RunInstallScript(this.pendingUpdateScript);
+          }
+          catch (Exception ex)
+          {
+            CrashReporter.Save(ex, "update-install");
+          }
+        }
+      };
       viewModel.ActiveDocumentChanged += MainWindow_ActiveDocumentChanged;
 
       // Autosave (auto-save workspace): snapshot the dirty project periodically; a crash then
@@ -401,7 +417,7 @@ namespace DeepNestSharp.Ui.Views
           return;
         }
 
-        this.ShowUpdateNotice(result.Value.Latest, result.Value.Url);
+        this.ShowUpdateNotice(result.Value.Latest, result.Value.Url, result.Value.MsiUrl);
       }
       catch
       {
@@ -409,11 +425,106 @@ namespace DeepNestSharp.Ui.Views
       }
     }
 
-    private void ShowUpdateNotice(Version latest, string url)
+    private void ShowUpdateNotice(Version latest, string url, string msiUrl)
     {
       this.updateUrl = url;
-      this.updateNotice.Text = $"Update available: {latest.ToString(3)}";
+      this.updateMsiUrl = msiUrl;
+      this.updateVersion = latest;
+      this.updateNotice.Text = Localization.Format("Upd_Notice", latest.ToString(3));
       this.updateNotice.Visibility = Visibility.Visible;
+    }
+
+    private string updateMsiUrl;
+    private Version updateVersion;
+
+    /// <summary>The install script of an update the operator agreed to; it runs when this copy closes.</summary>
+    private string pendingUpdateScript;
+
+    /// <summary>
+    /// A newer version: download its installer here, with a progress bar, then close, install and start
+    /// again, all on one press. The release page is a button away for what is new. The download can be
+    /// stopped; a failed one says why and leaves everything as it was.
+    /// </summary>
+    private void ShowUpdateWindow(Version latest, string pageUrl, string msiUrl)
+    {
+      var current = UpdateChecker.CurrentVersion;
+      var text = new TextBlock
+      {
+        Text = Localization.Format("Upd_Available", latest.ToString(3), current.ToString(3)),
+        TextWrapping = TextWrapping.Wrap,
+        MaxWidth = 440,
+        Margin = new Thickness(0, 0, 0, 10),
+      };
+      var bar = new ProgressBar { Height = 16, Minimum = 0, Maximum = 1, Visibility = Visibility.Collapsed, Margin = new Thickness(0, 0, 0, 6) };
+      var status = new TextBlock { TextWrapping = TextWrapping.Wrap, MaxWidth = 440, Margin = new Thickness(0, 0, 0, 10), Visibility = Visibility.Collapsed };
+      var install = new Button { Content = Localization.Get("Upd_Install"), IsDefault = true, MinWidth = 150, Margin = new Thickness(0, 0, 8, 0), IsEnabled = msiUrl != null };
+      var news = new Button { Content = Localization.Get("Upd_WhatsNew"), MinWidth = 100, Margin = new Thickness(0, 0, 8, 0) };
+      var later = new Button { Content = Localization.Get("Upd_Later"), IsCancel = true, MinWidth = 90 };
+      var buttons = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+      buttons.Children.Add(install);
+      buttons.Children.Add(news);
+      buttons.Children.Add(later);
+      var panel = new StackPanel { Margin = new Thickness(16) };
+      panel.Children.Add(text);
+      panel.Children.Add(bar);
+      panel.Children.Add(status);
+      panel.Children.Add(buttons);
+      var window = new Window
+      {
+        Title = Localization.Get("Title_Updates"),
+        Content = panel,
+        Owner = this,
+        SizeToContent = SizeToContent.WidthAndHeight,
+        ResizeMode = ResizeMode.NoResize,
+        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        ShowInTaskbar = false,
+      };
+
+      System.Threading.CancellationTokenSource downloading = null;
+      string script = null;
+      news.Click += (_, __) => UpdateChecker.OpenDownloadPage(pageUrl);
+      later.Click += (_, __) => downloading?.Cancel();
+      window.Closing += (_, __) => downloading?.Cancel();
+      install.Click += async (_, __) =>
+      {
+        install.IsEnabled = false;
+        bar.Visibility = Visibility.Visible;
+        status.Visibility = Visibility.Visible;
+        status.Text = Localization.Format("Upd_Downloading", 0);
+        downloading = new System.Threading.CancellationTokenSource();
+        var progress = new Progress<double>(f =>
+        {
+          bar.Value = f;
+          status.Text = Localization.Format("Upd_Downloading", (int)Math.Round(f * 100));
+        });
+        try
+        {
+          string msi = await UpdateChecker.DownloadAsync(msiUrl, progress, downloading.Token);
+          script = UpdateChecker.WriteInstallScript(msi, Environment.ProcessId);
+          window.DialogResult = true;
+        }
+        catch (OperationCanceledException)
+        {
+          // "Later" while downloading: nothing kept, nothing installed
+        }
+        catch (Exception ex)
+        {
+          bar.Visibility = Visibility.Collapsed;
+          status.Text = Localization.Format("Upd_Failed", ex.GetBaseException().Message);
+          install.IsEnabled = true;
+        }
+      };
+
+      if (window.ShowDialog() != true || script == null)
+      {
+        return;
+      }
+
+      // Closing goes through the usual "save changes?" question; if the operator keeps the program open,
+      // the update waits and installs whenever it does close.
+      this.pendingUpdateScript = script;
+      MessageBox.Show(this, Localization.Get("Upd_WillRestart"), Localization.Get("Title_Updates"), MessageBoxButton.OK, MessageBoxImage.Information);
+      this.Close();
     }
 
     /// <summary>Help menu: check GitHub on demand and report the outcome.</summary>
@@ -469,15 +580,8 @@ namespace DeepNestSharp.Ui.Views
           return;
         }
 
-        this.ShowUpdateNotice(result.Value.Latest, result.Value.Url);
-        var answer = ViewModel.MessageService.DisplayOkCancel(
-          Localization.Format("Msg_UpdateAvailable", result.Value.Latest.ToString(3), current.ToString(3)),
-          Localization.Get("Title_Updates"),
-          DeepNestLib.MessageBoxIcon.Information);
-        if (answer == DeepNestLib.MessageBoxResult.OK)
-        {
-          UpdateChecker.OpenDownloadPage(result.Value.Url);
-        }
+        this.ShowUpdateNotice(result.Value.Latest, result.Value.Url, result.Value.MsiUrl);
+        this.ShowUpdateWindow(result.Value.Latest, result.Value.Url, result.Value.MsiUrl);
       }
       catch (Exception ex)
       {
@@ -488,7 +592,11 @@ namespace DeepNestSharp.Ui.Views
 
     private void OnUpdateNoticeClick(object sender, MouseButtonEventArgs e)
     {
-      if (!string.IsNullOrEmpty(this.updateUrl))
+      if (this.updateVersion != null)
+      {
+        this.ShowUpdateWindow(this.updateVersion, this.updateUrl, this.updateMsiUrl);
+      }
+      else if (!string.IsNullOrEmpty(this.updateUrl))
       {
         UpdateChecker.OpenDownloadPage(this.updateUrl);
       }

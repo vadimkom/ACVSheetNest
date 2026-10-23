@@ -1892,4 +1892,28 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Sheet_UnlimitedUsed" xml:space="preserve">
     <value>ilimitado · {0} usadas</value>
   </data>
+  <data name="Upd_Notice" xml:space="preserve">
+    <value>Actualización disponible: {0}</value>
+  </data>
+  <data name="Upd_Available" xml:space="preserve">
+    <value>Ya está SheetNest {0} (usted tiene {1}). Se puede descargar e instalar ahora mismo: el programa se cierra, instala la nueva versión y vuelve a abrirse.</value>
+  </data>
+  <data name="Upd_Install" xml:space="preserve">
+    <value>Descargar e instalar</value>
+  </data>
+  <data name="Upd_WhatsNew" xml:space="preserve">
+    <value>Novedades</value>
+  </data>
+  <data name="Upd_Later" xml:space="preserve">
+    <value>Más tarde</value>
+  </data>
+  <data name="Upd_Downloading" xml:space="preserve">
+    <value>Descargando… {0}%</value>
+  </data>
+  <data name="Upd_Failed" xml:space="preserve">
+    <value>No se pudo descargar: {0}</value>
+  </data>
+  <data name="Upd_WillRestart" xml:space="preserve">
+    <value>SheetNest se cerrará, instalará la actualización y se abrirá de nuevo. Si pregunta por guardar el trabajo, responda como siempre; si lo deja abierto, la actualización se instalará al cerrarlo.</value>
+  </data>
 </root>

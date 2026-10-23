@@ -31,6 +31,12 @@ When resuming:
 - Historic upstream: https://github.com/9swampy/DeepNestSharp.
 - Commit identity: `git -c user.name="vadim" -c user.email="komarov.v@gmail.com" commit ...`. No global identity is configured.
 - Every MSI handed to the user gets a new version number. Releases on the fork feed the in-app update check (`UpdateChecker`, `releases/latest`).
+  - Since 1.1.58 the program installs updates itself (`MainWindow.ShowUpdateWindow`): status-bar notice or Help → check, then "Download and install".
+  - It downloads the release's `.msi`, only from `UpdateChecker.DownloadPrefix`, into `%TEMP%\SheetNest-update`.
+  - It writes `install-update.cmd` (UTF-8 with `chcp 65001`; `find.exe` by full path, since Git's `find` can come first in PATH) and closes, through the usual save prompt.
+  - On `Closed` it runs the script hidden: wait for the PID, `msiexec /i … /passive`, start `SheetNest.exe` again from `HKCU\Software\SheetNest\InstallFolder`.
+  - **A release must carry the MSI as an asset**, or the button stays disabled and only "What's new" works.
+  - Verified: the live check and download of 1.1.57 (54.7 MB), the script text, and the registry lookup. The full install-and-restart was not run here.
 - **Never publish a release before the user has tested the local MSI and said "выложи".** Build it, tell them where it is, and wait. Pushing a release is what reaches the laser PC through the update check.
 
 ## Paths on this machine

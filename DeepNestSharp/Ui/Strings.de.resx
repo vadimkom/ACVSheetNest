@@ -1892,4 +1892,28 @@ Downloadseite öffnen?</value>
   <data name="Sheet_UnlimitedUsed" xml:space="preserve">
     <value>unbegrenzt · {0} verwendet</value>
   </data>
+  <data name="Upd_Notice" xml:space="preserve">
+    <value>Update verfügbar: {0}</value>
+  </data>
+  <data name="Upd_Available" xml:space="preserve">
+    <value>SheetNest {0} ist da (Sie haben {1}). Sie kann sofort geladen und installiert werden: Das Programm schließt sich, installiert die neue Version und startet neu.</value>
+  </data>
+  <data name="Upd_Install" xml:space="preserve">
+    <value>Laden und installieren</value>
+  </data>
+  <data name="Upd_WhatsNew" xml:space="preserve">
+    <value>Was ist neu</value>
+  </data>
+  <data name="Upd_Later" xml:space="preserve">
+    <value>Später</value>
+  </data>
+  <data name="Upd_Downloading" xml:space="preserve">
+    <value>Wird geladen… {0}%</value>
+  </data>
+  <data name="Upd_Failed" xml:space="preserve">
+    <value>Laden fehlgeschlagen: {0}</value>
+  </data>
+  <data name="Upd_WillRestart" xml:space="preserve">
+    <value>SheetNest schließt sich jetzt, installiert das Update und startet neu. Fragt es nach dem Speichern, antworten Sie wie gewohnt; bleibt das Programm offen, wird das Update beim Schließen installiert.</value>
+  </data>
 </root>

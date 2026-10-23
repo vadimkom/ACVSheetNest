@@ -1892,4 +1892,28 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Sheet_UnlimitedUsed" xml:space="preserve">
     <value>без ограничения · использовано {0}</value>
   </data>
+  <data name="Upd_Notice" xml:space="preserve">
+    <value>Есть обновление: {0}</value>
+  </data>
+  <data name="Upd_Available" xml:space="preserve">
+    <value>Вышла версия SheetNest {0} (у вас {1}). Её можно скачать и установить прямо сейчас: программа закроется, установит новую версию и запустится снова.</value>
+  </data>
+  <data name="Upd_Install" xml:space="preserve">
+    <value>Скачать и установить</value>
+  </data>
+  <data name="Upd_WhatsNew" xml:space="preserve">
+    <value>Что нового</value>
+  </data>
+  <data name="Upd_Later" xml:space="preserve">
+    <value>Позже</value>
+  </data>
+  <data name="Upd_Downloading" xml:space="preserve">
+    <value>Скачивание… {0}%</value>
+  </data>
+  <data name="Upd_Failed" xml:space="preserve">
+    <value>Не удалось скачать: {0}</value>
+  </data>
+  <data name="Upd_WillRestart" xml:space="preserve">
+    <value>Сейчас SheetNest закроется, установит обновление и запустится снова. Если спросит про сохранение задания — ответьте как обычно; если оставите программу открытой, обновление установится, когда её закроете.</value>
+  </data>
 </root>

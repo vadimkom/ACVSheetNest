@@ -1892,4 +1892,28 @@ Open the download page?</value>
   <data name="Sheet_UnlimitedUsed" xml:space="preserve">
     <value>unlimited · {0} used</value>
   </data>
+  <data name="Upd_Notice" xml:space="preserve">
+    <value>Update available: {0}</value>
+  </data>
+  <data name="Upd_Available" xml:space="preserve">
+    <value>SheetNest {0} is out (you have {1}). It can be downloaded and installed right now: the program closes, installs the new version and starts again.</value>
+  </data>
+  <data name="Upd_Install" xml:space="preserve">
+    <value>Download and install</value>
+  </data>
+  <data name="Upd_WhatsNew" xml:space="preserve">
+    <value>What's new</value>
+  </data>
+  <data name="Upd_Later" xml:space="preserve">
+    <value>Later</value>
+  </data>
+  <data name="Upd_Downloading" xml:space="preserve">
+    <value>Downloading… {0}%</value>
+  </data>
+  <data name="Upd_Failed" xml:space="preserve">
+    <value>The download failed: {0}</value>
+  </data>
+  <data name="Upd_WillRestart" xml:space="preserve">
+    <value>SheetNest will now close, install the update and start again. If it asks to save the job, answer as usual; if you keep it open, the update installs when you close it.</value>
+  </data>
 </root>

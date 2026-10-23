@@ -39,6 +39,47 @@ namespace DeepNestSharp.CiTests
     }
 
     [Fact]
+    public void TryParseLatest_TakesTheInstallerFromOurReleasesOnly()
+    {
+      var json = "{\"tag_name\":\"v1.1.58\",\"assets\":["
+        + "{\"browser_download_url\":\"https://example.com/SheetNest-1.1.58-win-x64.msi\"},"
+        + "{\"browser_download_url\":\"https://github.com/vadimkom/ACVSheetNest/releases/download/v1.1.58/notes.txt\"},"
+        + "{\"browser_download_url\":\"https://github.com/vadimkom/ACVSheetNest/releases/download/v1.1.58/SheetNest-1.1.58-win-x64.msi\"}]}";
+
+      var result = UpdateChecker.TryParseLatest(json);
+
+      result.Value.MsiUrl.Should().Be("https://github.com/vadimkom/ACVSheetNest/releases/download/v1.1.58/SheetNest-1.1.58-win-x64.msi");
+    }
+
+    [Fact]
+    public void TryParseLatest_NoInstallerIsNoInstaller()
+    {
+      UpdateChecker.TryParseLatest("{\"tag_name\":\"v1.1.58\",\"assets\":[]}").Value.MsiUrl.Should().BeNull();
+    }
+
+    [Fact]
+    public async System.Threading.Tasks.Task DownloadAsync_RefusesAnythingButOurReleases()
+    {
+      System.Func<System.Threading.Tasks.Task> act = () => UpdateChecker.DownloadAsync("https://example.com/SheetNest.msi", null, default);
+      await act.Should().ThrowAsync<System.InvalidOperationException>();
+    }
+
+    [Fact]
+    public void TheInstallScriptWaitsInstallsAndStartsAgain()
+    {
+      string folder = System.IO.Directory.CreateTempSubdirectory("sheetnest_update").FullName;
+      string msi = System.IO.Path.Combine(folder, "SheetNest-1.1.58-win-x64.msi");
+
+      string script = UpdateChecker.WriteInstallScript(msi, 4242);
+      string text = System.IO.File.ReadAllText(script);
+
+      text.Should().Contain("PID eq 4242", "it waits for this copy to close");
+      text.Should().Contain($"msiexec /i \"{msi}\" /passive /norestart");
+      text.Should().Contain("SheetNest.exe", "and starts the program again");
+      text.IndexOf("PID eq", System.StringComparison.Ordinal).Should().BeLessThan(text.IndexOf("msiexec", System.StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void IsNewer_ComparesThreeFields()
     {
       UpdateChecker.IsNewer(new Version(1, 2, 0), new Version(1, 1, 4)).Should().BeTrue();
