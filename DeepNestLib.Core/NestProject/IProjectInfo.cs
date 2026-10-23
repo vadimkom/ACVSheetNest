@@ -26,6 +26,13 @@
     /// </summary>
     string LastNestResultJson { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether the sheet quantities are the stock as entered. Up to 1.1.50 a nest took its
+    /// sheets off the quantities and a project was saved that way; such a project (false) gets them back once
+    /// when it opens. From 1.1.51 a nest never changes the quantities.
+    /// </summary>
+    bool SheetsKeptWhole { get; set; }
+
     /// <summary>Gets or sets the material the job is cut from, a <see cref="SheetMaterials"/> key; null when not chosen.</summary>
     string Material { get; set; }
 

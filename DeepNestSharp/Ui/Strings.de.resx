@@ -160,7 +160,7 @@
     <value>Aktionen</value>
   </data>
   <data name="Col_AvailableUsed" xml:space="preserve">
-    <value>Verfügbar / Verbraucht</value>
+    <value>Verwendet / vorrätig</value>
   </data>
   <data name="Col_Color" xml:space="preserve">
     <value>Farbe</value>
@@ -1873,5 +1873,8 @@ Downloadseite öffnen?</value>
   </data>
   <data name="Nest_Stopping" xml:space="preserve">
     <value>Wird gestoppt…</value>
+  </data>
+  <data name="Sheet_UnlimitedUsed" xml:space="preserve">
+    <value>unbegrenzt · {0} verwendet</value>
   </data>
 </root>

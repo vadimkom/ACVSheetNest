@@ -56,6 +56,10 @@ namespace DeepNestLib.NestProject
     [JsonInclude]
     public string LastNestResultJson { get; set; }
 
+    /// <inheritdoc />
+    [JsonInclude]
+    public bool SheetsKeptWhole { get; set; }
+
     /// <summary>The material the job is cut from (<see cref="SheetMaterials"/> key); empty when not chosen.</summary>
     [JsonInclude]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -155,6 +159,7 @@ namespace DeepNestLib.NestProject
     public void Load(ProjectInfo source)
     {
       this.LastNestResultJson = source.LastNestResultJson;
+      this.SheetsKeptWhole = source.SheetsKeptWhole;
       this.Material = source.Material;
       this.Thickness = source.Thickness;
       this.CommonLineGapInches = source.CommonLineGapInches;

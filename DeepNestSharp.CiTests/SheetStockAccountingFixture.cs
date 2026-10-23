@@ -8,58 +8,38 @@ namespace DeepNestSharp.CiTests
   using Xunit;
 
   /// <summary>
-  /// The arithmetic that charges a finished nest to the stock in the Sheets tab, and hands it back when
-  /// the result is discarded.
-  /// <para>It has a fixture at all because it broke twice in one afternoon while it lived inside the NEST
-  /// button's click handler, where the suite could not reach it: first the Available badge read "0 used"
-  /// after a nest, then the give-back turned out to have a second route in. Both were found by Manuel
-  /// looking at the screen. <see cref="MainWindow"/> is a WPF Window and cannot be instantiated here, but
-  /// these are static, which is the same trick <c>CommonCuttingOf</c> and <c>DxfViewer.CountUnfit</c>
-  /// already use.</para>
+  /// What a finished nest used of the stock in the Sheets step. Since 1.1.51 a nest only REPORTS what it used
+  /// (the "used / in stock" badge) and leaves the quantities as entered: taking them off summed up over several
+  /// nests, so a sheet added after one nest came on top of the ones that nest still held and the operator saw
+  /// "2/3" with no idea where the third came from. Sheets leave the stock only when cut (CutSheetsFixture).
+  /// <para><see cref="MainWindow"/> is a WPF Window and cannot be instantiated here, but these are static.</para>
   /// </summary>
   public class SheetStockAccountingFixture
   {
     [Fact]
-    public void ACountedRowLosesExactlyWhatTheNestUsed()
+    public void ANestReportsWhatItUsedAndLeavesTheQuantity()
     {
       var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 5) };
 
-      var consumed = MainWindow.ConsumeStock(rows, Used((120, 60, 3)));
+      var used = MainWindow.ConsumeStock(rows, Used((120, 60, 3)));
 
-      rows[0].Quantity.Should().Be(2, "five in stock, three cut");
-      consumed[(120, 60)].Should().Be(3);
+      rows[0].Quantity.Should().Be(5, "the stock as entered stays");
+      used[(120, 60)].Should().Be(3);
     }
 
-    /// <summary>The nest can use more sheets of a size than the row claims to have, because a second row
-    /// of the same size supplies the rest. Stock still cannot go negative.</summary>
     [Fact]
-    public void ACountedRowNeverGoesBelowZero()
+    public void NestingAgainStartsFromTheSameStock()
     {
-      var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 2) };
+      var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 5) };
 
-      var consumed = MainWindow.ConsumeStock(rows, Used((120, 60, 5)));
+      MainWindow.ConsumeStock(rows, Used((120, 60, 3)));
+      var second = MainWindow.ConsumeStock(rows, Used((120, 60, 4)));
 
-      rows[0].Quantity.Should().Be(0);
-      consumed[(120, 60)].Should().Be(2, "it can only give up what it had");
+      rows[0].Quantity.Should().Be(5, "nothing sums up from one nest to the next");
+      second[(120, 60)].Should().Be(4);
     }
 
-    /// <summary>
-    /// The one that was wrong on screen. An unlimited size is not charged, but it still has to report what
-    /// the nest took, because that report IS the badge. Leaving it out of the record to protect the
-    /// give-back is exactly the mistake that made it read "0 used".
-    /// </summary>
-    [Fact]
-    public void AnUnlimitedRowReportsWhatItUsedAndKeepsItsQuantity()
-    {
-      var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 4) { Unlimited = true } };
-
-      var consumed = MainWindow.ConsumeStock(rows, Used((120, 60, 3)));
-
-      rows[0].Quantity.Should().Be(4, "an unlimited size is not a stock level and must not move");
-      consumed.Should().ContainKey((120, 60));
-      consumed[(120, 60)].Should().Be(3, "the badge has nothing else to count");
-    }
-
+    /// <summary>A counted row reports at most what it has; a second row of the size reports the rest.</summary>
     [Fact]
     public void TwoRowsOfTheSameSizeShareWhatWasUsed()
     {
@@ -69,17 +49,27 @@ namespace DeepNestSharp.CiTests
         new SheetLoadInfo(120, 60, 5),
       };
 
-      var consumed = MainWindow.ConsumeStock(rows, Used((120, 60, 4)));
+      var used = MainWindow.ConsumeStock(rows, Used((120, 60, 4)));
 
-      rows[0].Quantity.Should().Be(0, "the first row is emptied first");
-      rows[1].Quantity.Should().Be(3, "the second covers the remaining two, not all four");
-      consumed[(120, 60)].Should().Be(4);
+      used[(120, 60)].Should().Be(4);
+      rows[0].Quantity.Should().Be(2);
+      rows[1].Quantity.Should().Be(5);
     }
 
-    /// <summary>The caller's tally is theirs: charging the stock must not empty the dictionary it was
-    /// handed, or the next thing to read it sees a nest that used nothing.</summary>
     [Fact]
-    public void ChargingTheStockLeavesTheCallersTallyAlone()
+    public void AnUnlimitedRowReportsWhatItUsed()
+    {
+      var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 4) { Unlimited = true } };
+
+      var used = MainWindow.ConsumeStock(rows, Used((120, 60, 7)));
+
+      rows[0].Quantity.Should().Be(4);
+      used[(120, 60)].Should().Be(7, "the badge has nothing else to count");
+    }
+
+    /// <summary>The caller's tally is theirs: reporting must not empty the dictionary it was handed.</summary>
+    [Fact]
+    public void ReportingLeavesTheCallersTallyAlone()
     {
       var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 5) };
       var used = Used((120, 60, 3));
@@ -89,33 +79,31 @@ namespace DeepNestSharp.CiTests
       used[(120, 60)].Should().Be(3);
     }
 
+    /// <summary>A project saved by 1.1.50 or older has its nest's sheets taken off the quantities; opening it
+    /// puts them back once.</summary>
     [Fact]
-    public void ClearResultGivesBackWhatACountedRowLost()
+    public void AnOldProjectGetsItsSheetsBack()
     {
-      var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 5) };
-      var consumed = MainWindow.ConsumeStock(rows, Used((120, 60, 3)));
+      var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 2) };
 
-      MainWindow.ReturnStock(rows, consumed);
+      MainWindow.ReturnStock(rows, Used((120, 60, 3)));
 
-      rows[0].Quantity.Should().Be(5, "discarding the result puts the sheets back on the rack");
+      rows[0].Quantity.Should().Be(5);
     }
 
-    /// <summary>The guard against inventing stock. Nothing was taken from an unlimited size, so nothing
-    /// may be credited to it however the consumed record was arrived at.</summary>
     [Fact]
-    public void ClearResultCreditsAnUnlimitedRowNothing()
+    public void AnOldProjectsUnlimitedRowGetsNothing()
     {
       var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 4) { Unlimited = true } };
 
-      // Straight from the record, the way reopening a saved project rebuilds it from the result itself.
       MainWindow.ReturnStock(rows, Used((120, 60, 7)));
 
       rows[0].Quantity.Should().Be(4);
     }
 
-    /// <summary>A row deleted after nesting comes back, so the operator does not silently lose stock.</summary>
+    /// <summary>An old project whose row was deleted after nesting gets the size back.</summary>
     [Fact]
-    public void ClearResultBringsBackASizeWhoseRowWasDeleted()
+    public void AnOldProjectGetsBackASizeWhoseRowWasDeleted()
     {
       var rows = new List<ISheetLoadInfo>();
 
@@ -124,25 +112,6 @@ namespace DeepNestSharp.CiTests
       rows.Should().HaveCount(1);
       rows[0].Width.Should().Be(120);
       rows[0].Quantity.Should().Be(3);
-    }
-
-    [Fact]
-    public void RecalculatingNestRestoresStockBeforeSecondNestRuns()
-    {
-      var rows = new List<ISheetLoadInfo> { new SheetLoadInfo(120, 60, 5) };
-
-      // First nest uses 3 sheets
-      var consumedFirst = MainWindow.ConsumeStock(rows, Used((120, 60, 3)));
-      rows[0].Quantity.Should().Be(2);
-
-      // When Nest is pressed again, previous consumed stock is returned before recalculating
-      MainWindow.ReturnStock(rows, consumedFirst);
-      rows[0].Quantity.Should().Be(5);
-
-      // Second nest recalculation now has the full stock available
-      var consumedSecond = MainWindow.ConsumeStock(rows, Used((120, 60, 4)));
-      rows[0].Quantity.Should().Be(1);
-      consumedSecond[(120, 60)].Should().Be(4);
     }
 
     private static Dictionary<(int W, int H), int> Used(params (int W, int H, int Count)[] entries)

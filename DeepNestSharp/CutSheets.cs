@@ -56,29 +56,20 @@ namespace DeepNestSharp
     }
 
     /// <summary>
-    /// The cut sheets were taken off the stock when the nest was made; this keeps them off when the rest
-    /// of that nest's sheets go back for the next one.
+    /// The cut sheets are gone from the stock: each takes one off the quantity of a row of its size (the
+    /// first that still has one; an unlimited size has no count to lower). A nest itself no longer changes the
+    /// quantities, so this is the only place sheets leave the stock.
     /// </summary>
-    internal static void KeepConsumed(IDictionary<(int W, int H), int> consumed, IEnumerable<ISheetPlacement> cutSheets)
+    internal static void TakeCutSheets(IEnumerable<ISheetLoadInfo> rows, IEnumerable<ISheetPlacement> cutSheets)
     {
-      if (consumed == null)
+      var list = rows?.ToList() ?? new List<ISheetLoadInfo>();
+      foreach (var sheet in cutSheets ?? Enumerable.Empty<ISheetPlacement>())
       {
-        return;
-      }
-
-      foreach (var sheet in cutSheets)
-      {
-        var key = ((int)Math.Round(sheet.Sheet.WidthCalculated), (int)Math.Round(sheet.Sheet.HeightCalculated));
-        if (consumed.TryGetValue(key, out int n) && n > 0)
+        int w = (int)Math.Round(sheet.Sheet.WidthCalculated), h = (int)Math.Round(sheet.Sheet.HeightCalculated);
+        var row = list.FirstOrDefault(r => r.Width == w && r.Height == h && !r.Unlimited && r.Quantity > 0);
+        if (row != null)
         {
-          if (n == 1)
-          {
-            consumed.Remove(key);
-          }
-          else
-          {
-            consumed[key] = n - 1;
-          }
+          row.Quantity--;
         }
       }
     }

@@ -453,7 +453,7 @@
                 </GridViewColumn>
 
                 <!-- Available / Used Status -->
-                <GridViewColumn x:Name="colHeaderSheetStatus" Header="Доступно / Использовано" Width="160">
+                <GridViewColumn x:Name="colHeaderSheetStatus" Header="Использовано / в наличии" Width="160">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <Border Style="{DynamicResource CountBadge}">

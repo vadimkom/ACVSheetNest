@@ -853,13 +853,10 @@ namespace DeepNestSharp.Ui.Views
 
       this.UpdateNestedInfo(null);
 
-      if (hadResult && lastNestConsumed != null && ViewModel.ActiveDocument is NestProjectViewModel doc)
-      {
-        ReturnStock(doc.ProjectInfo.SheetLoadInfos, lastNestConsumed);
-        this.sheetsListView?.Items.Refresh();
-      }
-
-      lastNestConsumed = null; // a result can only be given back once
+      // A nest no longer takes its sheets off the quantities, so dropping it gives nothing back: the record of
+      // what it used goes, and the "used" badges read 0 again.
+      lastNestConsumed = null;
+      this.sheetsListView?.Items.Refresh();
     }
 
     /// <summary>
@@ -923,6 +920,8 @@ namespace DeepNestSharp.Ui.Views
       string json = doc.ProjectInfo.LastNestResultJson;
       if (string.IsNullOrWhiteSpace(json))
       {
+        doc.ProjectInfo.SheetsKeptWhole = true; // no result, nothing was taken off
+
         monitor.Reset();
         lastNestConsumed = null;
         if (this.nestDxfViewer != null) this.nestDxfViewer.Result = null;
@@ -989,6 +988,15 @@ namespace DeepNestSharp.Ui.Views
         {
           var key = ((int)System.Math.Round(sp.Sheet.WidthCalculated), (int)System.Math.Round(sp.Sheet.HeightCalculated));
           restoredConsumed[key] = restoredConsumed.TryGetValue(key, out int n) ? n + 1 : 1;
+        }
+
+        // Saved by 1.1.50 or older, the quantities have this nest's sheets taken off: put them back once, so
+        // the Sheets step shows the stock as entered, as it does now everywhere.
+        if (!doc.ProjectInfo.SheetsKeptWhole)
+        {
+          ReturnStock(doc.ProjectInfo.SheetLoadInfos, restoredConsumed);
+          doc.ProjectInfo.SheetsKeptWhole = true;
+          this.sheetsListView?.Items.Refresh();
         }
 
         lastNestConsumed = restoredConsumed;
@@ -2544,9 +2552,9 @@ namespace DeepNestSharp.Ui.Views
 
         this.AddFinishedNest(result);
 
-        // Consume the stock this nest used, right in the Sheets tab — the count visibly drops
-        // (35 in stock, nest used 31 → the tab now shows 4) and closing the app persists what
-        // physically remains.
+        // What this nest used, by size, for the "used / in stock" badges. The quantities stay as entered: taking
+        // them off summed up over several nests (a sheet added after one nest came on top of the ones it held)
+        // and the operator could not tell what was in stock. Sheets go for good only when cut (CutSheets).
         var used = new Dictionary<(int W, int H), int>();
         foreach (var sp in result.UsedSheets)
         {
@@ -2555,6 +2563,7 @@ namespace DeepNestSharp.Ui.Views
         }
 
         lastNestConsumed = ConsumeStock(project.SheetLoadInfos, used);
+        project.SheetsKeptWhole = true;
         this.sheetsListView.Items.Refresh();
         this.UpdateNestedInfo(result);
 
@@ -2849,8 +2858,9 @@ namespace DeepNestSharp.Ui.Views
         && part.EffectiveCommonCutting != CommonCuttingMode.None;
 
     /// <summary>
-    /// Charge a finished nest to the stock: counted sizes lose what it used, and the record of what each
-    /// size gave up comes back for the Available badge and for <see cref="ReturnStock"/> to undo.
+    /// What a finished nest used of the stock, by size, for the "used / in stock" badge. Since 1.1.51 it does
+    /// not change the quantities (see the note in <c>OnNest</c>); a counted row reports at most its quantity,
+    /// and two rows of a size share what was used.
     /// <para>An unlimited size is REPORTED and not charged. Those are two different jobs and conflating
     /// them is what put "0 used" on the badge: leaving the size out of the record to stop Clear Result
     /// crediting it also took away the only number the badge had to show.</para>
@@ -2858,7 +2868,7 @@ namespace DeepNestSharp.Ui.Views
     /// as a method is that it failed twice in one afternoon inside <c>OnNest</c>, where the suite cannot
     /// reach it without instantiating a WPF Window.</para>
     /// </summary>
-    /// <param name="rows">The stock rows, whose Quantity this mutates.</param>
+    /// <param name="rows">The stock rows; not modified.</param>
     /// <param name="usedBySize">How many sheets of each size the nest consumed. Not modified.</param>
     internal static Dictionary<(int W, int H), int> ConsumeStock(
       IEnumerable<ISheetLoadInfo> rows,
@@ -2884,10 +2894,6 @@ namespace DeepNestSharp.Ui.Views
         }
 
         int take = row.Unlimited ? n : Math.Min(row.Quantity, n);
-        if (!row.Unlimited)
-        {
-          row.Quantity -= take;
-        }
 
         remaining[key] = n - take;
         if (take > 0)
@@ -2900,7 +2906,8 @@ namespace DeepNestSharp.Ui.Views
     }
 
     /// <summary>
-    /// Undo <see cref="ConsumeStock"/>: the sheets a discarded result was holding go back on the rack.
+    /// Puts back sheets a nest took off the quantities, which up to 1.1.50 every nest did and saved that way.
+    /// Used once, when such a project opens.
     /// <para>An unlimited size gets nothing, because nothing was taken from it. That guard has to live
     /// here rather than at the deduction: reopening a saved project rebuilds the consumed record from the
     /// result itself, so this is the only place BOTH routes into a give-back pass through.</para>
@@ -3572,7 +3579,6 @@ namespace DeepNestSharp.Ui.Views
       {
         if (this.lastNestConsumed != null && this.lastNestConsumed.TryGetValue(key, out int n) && n > 0)
         {
-          ReturnStock(doc.ProjectInfo.SheetLoadInfos, one);
           if (n == 1)
           {
             this.lastNestConsumed.Remove(key);
@@ -3585,12 +3591,8 @@ namespace DeepNestSharp.Ui.Views
       }
       else
       {
-        var taken = ConsumeStock(doc.ProjectInfo.SheetLoadInfos, one);
-        if (taken.Count > 0)
-        {
-          this.lastNestConsumed ??= new Dictionary<(int W, int H), int>();
-          this.lastNestConsumed[key] = (this.lastNestConsumed.TryGetValue(key, out int had) ? had : 0) + 1;
-        }
+        this.lastNestConsumed ??= new Dictionary<(int W, int H), int>();
+        this.lastNestConsumed[key] = (this.lastNestConsumed.TryGetValue(key, out int had) ? had : 0) + 1;
       }
 
       doc.IsDirty = true;
@@ -3709,9 +3711,10 @@ namespace DeepNestSharp.Ui.Views
       }
 
       CutSheets.DeductParts(doc.ProjectInfo.DetailLoadInfos, cut);
-      CutSheets.KeepConsumed(this.lastNestConsumed, cut);
+      CutSheets.TakeCutSheets(doc.ProjectInfo.SheetLoadInfos, cut);
       doc.IsDirty = true;
       this.partsListView?.Items.Refresh();
+      this.sheetsListView?.Items.Refresh();
       this.UpdateSummaryBadges();
 
       bool anyLeft = doc.ProjectInfo.DetailLoadInfos.Any(p => p.IsIncluded && p.Quantity + p.Extra + p.MirrorQuantity > 0);

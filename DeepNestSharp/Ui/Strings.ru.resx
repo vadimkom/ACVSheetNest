@@ -160,7 +160,7 @@
     <value>Действия</value>
   </data>
   <data name="Col_AvailableUsed" xml:space="preserve">
-    <value>Доступно / Использовано</value>
+    <value>Использовано / в наличии</value>
   </data>
   <data name="Col_Color" xml:space="preserve">
     <value>Цвет</value>
@@ -1873,5 +1873,8 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   </data>
   <data name="Nest_Stopping" xml:space="preserve">
     <value>Останавливаю…</value>
+  </data>
+  <data name="Sheet_UnlimitedUsed" xml:space="preserve">
+    <value>без ограничения · использовано {0}</value>
   </data>
 </root>

@@ -73,13 +73,14 @@ namespace DeepNestSharp.Domain.Models
     }
 
     /// <summary>
-    /// Gets the always-visible "Available" indicator (Quantity Available):
-    /// sheets of this size still available / total. The row's Quantity is already deducted while a
-    /// result is on screen, so it IS the available count — no result: "31/31"; nest used 28: "3/31".
-    /// <para>An unlimited size has no available count to show, so it says so and reports what the nest
-    /// took instead; showing its stored Quantity there would read as a stock level it does not have.</para>
+    /// Gets the always-visible "used / in stock" indicator: how many sheets of this size the nest on screen
+    /// took, of the quantity entered. A nest no longer takes them off the quantity (that summed up across
+    /// nests and confused the operator): no result "0/31", a nest of 28 "28/31".
+    /// <para>An unlimited size has no stock level, so it reports only what the nest took.</para>
     /// </summary>
-    public string NestedInfo => Unlimited ? $"Unlimited · {nestedCount} used" : $"{Quantity}/{Quantity + nestedCount}";
+    public string NestedInfo => Unlimited
+      ? DeepNestSharp.Domain.Services.UiText.Format("Sheet_UnlimitedUsed", nestedCount)
+      : $"{nestedCount}/{Quantity}";
 
     public SheetLoadInfo Item => this.sheetLoadInfo;
   }

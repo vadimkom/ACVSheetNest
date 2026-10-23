@@ -112,6 +112,12 @@
       set => wrappedProjectInfo.LastNestResultJson = value;
     }
 
+    public bool SheetsKeptWhole
+    {
+      get => wrappedProjectInfo.SheetsKeptWhole;
+      set => wrappedProjectInfo.SheetsKeptWhole = value;
+    }
+
     public string Material
     {
       get => wrappedProjectInfo.Material;

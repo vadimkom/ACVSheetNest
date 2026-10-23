@@ -160,7 +160,7 @@
     <value>Acciones</value>
   </data>
   <data name="Col_AvailableUsed" xml:space="preserve">
-    <value>Disponible / Usado</value>
+    <value>Usadas / en stock</value>
   </data>
   <data name="Col_Color" xml:space="preserve">
     <value>Color</value>
@@ -1873,5 +1873,8 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   </data>
   <data name="Nest_Stopping" xml:space="preserve">
     <value>Deteniendo…</value>
+  </data>
+  <data name="Sheet_UnlimitedUsed" xml:space="preserve">
+    <value>ilimitado · {0} usadas</value>
   </data>
 </root>

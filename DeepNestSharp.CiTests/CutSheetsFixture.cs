@@ -64,12 +64,18 @@ namespace DeepNestSharp.CiTests
     }
 
     [Fact]
-    public void CutSheetsStayOffTheStockWhenTheRestGoesBack()
+    public void CutSheetsLeaveTheStockForGood()
     {
-      var consumed = new Dictionary<(int W, int H), int> { [(2500, 1250)] = 3, [(1250, 500)] = 1 };
-      CutSheets.KeepConsumed(consumed, new[] { Sheet(2500, 1250), Sheet(2500, 1250), Sheet(1250, 500) });
+      var big = new SheetLoadInfo(2500, 1250, 3);
+      var small = new SheetLoadInfo(1250, 500, 1);
+      var endless = new SheetLoadInfo(2000, 1000, 5) { Unlimited = true };
+      CutSheets.TakeCutSheets(
+        new ISheetLoadInfo[] { big, small, endless },
+        new[] { Sheet(2500, 1250), Sheet(2500, 1250), Sheet(1250, 500), Sheet(1250, 500), Sheet(2000, 1000) });
 
-      consumed.Should().Equal(new Dictionary<(int W, int H), int> { [(2500, 1250)] = 1 });
+      big.Quantity.Should().Be(1);
+      small.Quantity.Should().Be(0, "never below zero");
+      endless.Quantity.Should().Be(5, "an unlimited size has no count to lower");
     }
 
     private static ISheetPlacement Sheet(double w, double h, params (string Path, bool Mirrored)[] parts)
