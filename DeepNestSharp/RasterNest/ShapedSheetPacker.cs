@@ -153,23 +153,160 @@ namespace DeepNestSharp.RasterNest
 
       List<IPartPlacement> bestPlacements = null;
       Dictionary<int, int> bestBySrc = null;
+      List<(ShapedPose Pose, long X, long Y)> bestPlaced = null;
       double bestWorth = -1;
       foreach (var sequence in sequences)
       {
         foreach (ShapedGravity gravity in Enum.GetValues(typeof(ShapedGravity)))
         {
-          var (placements, bySrc) = PackShapedOnce(loadedById, sequence, kit ? fillers : null, poses, pairNfps, exact, bounds, gravity, scale, cancel);
+          var (placements, bySrc, placed) = PackShapedOnce(loadedById, sequence, kit ? fillers : null, poses, pairNfps, exact, bounds, gravity, scale, cancel);
           double worth = Worth(bySrc);
           if (worth > bestWorth + 1e-6)
           {
             bestWorth = worth;
             bestPlacements = placements;
             bestBySrc = bySrc;
+            bestPlaced = placed;
           }
         }
       }
 
+      // One part filling what is left (washers): rows, straight or half a step shifted, as on a rectangle. On
+      // the shop's round offcut the part-by-part pack scattered 665 washers where shifted rows hold about 745,
+      // and rows are what an operator lays by hand and a laser cuts in order. Kept when they seat at least as
+      // many as the pack did.
+      if (fillers.Count == 1 && poses[fillers[0]].Count > 0)
+      {
+        int filler = fillers[0];
+        var around = bestPlaced.Where(p => !poses[filler].Contains(p.Pose)).ToList();
+        int packed = bestBySrc.TryGetValue(filler, out int n) ? n : 0;
+        var rows = ShapedRows(loadedById[filler], pool[filler], poses[filler], around, pairNfps, exact, scale, cancel);
+        if (rows.Count > 0 && rows.Count >= packed)
+        {
+          bestPlacements = bestPlacements.Where(p => p.Source != filler).ToList();
+          foreach (var (pose, at) in rows)
+          {
+            bestPlacements.Add(new PartPlacement(pose.Rotated)
+            {
+              X = at.X / scale,
+              Y = at.Y / scale,
+              Rotation = pose.Angle,
+              Source = filler,
+              IsMirrored = loadedById[filler].Mirrored,
+            });
+          }
+
+          bestBySrc[filler] = rows.Count;
+        }
+      }
+
       return (bestPlacements, bestBySrc);
+    }
+
+    /// <summary>
+    /// One part laid in rows on a shaped sheet, around the parts already on it: every orientation, straight
+    /// and half-shifted rows at the smallest steps its spacing allows (<see cref="LatticeSteps"/>), and the
+    /// grid slid over an eighth of a step at a time, since on a curved edge where the rows start decides how
+    /// many fit. A position counts when it lies in the pose's free region (on the metal, clear of the parts
+    /// placed); the grid that seats most is kept, each of its positions checked on the real shapes.
+    /// </summary>
+    private static List<(ShapedPose Pose, IntPoint At)> ShapedRows(
+      Loaded part,
+      int max,
+      List<ShapedPose> partPoses,
+      List<(ShapedPose Pose, long X, long Y)> placed,
+      System.Collections.Concurrent.ConcurrentDictionary<(ShapedPose Fixed, ShapedPose Moving), List<List<IntPoint>>> pairNfps,
+      List<List<IntPoint>> exact,
+      double scale,
+      CancellationToken cancel)
+    {
+      const int slides = 8;
+      var gate = new object();
+      (int Count, ShapedPose Pose, double Px, double Py, double Shift, double Ox, double Oy, (long MinX, long MinY, long MaxX, long MaxY) Box) best = default;
+      (int, double, int, int) bestKey = (int.MaxValue, 0, 0, 0); // ties go to the lowest angle, straight rows, least slide: the same answer on any core count
+      var free = new System.Collections.Concurrent.ConcurrentDictionary<ShapedPose, List<(List<IntPoint> Path, (long MinX, long MinY, long MaxX, long MaxY) Box, int Sign)>>();
+
+      bool Inside(List<(List<IntPoint> Path, (long MinX, long MinY, long MaxX, long MaxY) Box, int Sign)> region, IntPoint p)
+      {
+        int winding = 0;
+        foreach (var (path, box, sign) in region)
+        {
+          if (p.X >= box.MinX && p.X <= box.MaxX && p.Y >= box.MinY && p.Y <= box.MaxY && Clipper.PointInPolygon(p, path) != 0)
+          {
+            winding += sign;
+          }
+        }
+
+        return winding > 0;
+      }
+
+      IEnumerable<IntPoint> Grid((long MinX, long MinY, long MaxX, long MaxY) box, double px, double py, double shift, double ox, double oy)
+      {
+        int row = 0;
+        for (double y = box.MinY + oy; y <= box.MaxY; y += py, row++)
+        {
+          for (double x = box.MinX + ox + ((row & 1) == 1 ? shift : 0); x <= box.MaxX; x += px)
+          {
+            yield return new IntPoint((long)Math.Round(x), (long)Math.Round(y));
+          }
+        }
+      }
+
+      var jobs = partPoses
+        .Where(pose => LatticeAngles(part).Contains(pose.Angle))
+        .SelectMany(pose => LatticeSteps(pose.Rotated, part.FitSpacing).Select(s => (Pose: pose, Px: s.Px * scale, Py: s.Py * scale, Shift: s.Shift * scale)))
+        .ToList();
+      System.Threading.Tasks.Parallel.ForEach(jobs, new System.Threading.Tasks.ParallelOptions { CancellationToken = cancel }, job =>
+      {
+        var region = free.GetOrAdd(job.Pose, pose => pose.FreeAfter(new ShapedPose.Blocked(), placed, pairNfps)
+          .Select(path => (path, BoundsOfPaths(new List<List<IntPoint>> { path }), Clipper.Orientation(path) ? 1 : -1))
+          .ToList());
+        if (region.Count == 0)
+        {
+          return;
+        }
+
+        var box = BoundsOfPaths(region.Select(r => r.Path).ToList());
+        for (int sx = 0; sx < slides; sx++)
+        {
+          for (int sy = 0; sy < slides; sy++)
+          {
+            double ox = job.Px * sx / slides, oy = job.Py * sy / slides;
+            int count = Grid(box, job.Px, job.Py, job.Shift, ox, oy).Count(p => Inside(region, p));
+            lock (gate)
+            {
+              var key = (job.Pose.Angle, job.Shift, sx, sy);
+              if (count > best.Count || (count == best.Count && count > 0 && key.CompareTo(bestKey) < 0))
+              {
+                best = (count, job.Pose, job.Px, job.Py, job.Shift, ox, oy, box);
+                bestKey = key;
+              }
+            }
+          }
+        }
+      });
+
+      var rows = new List<(ShapedPose Pose, IntPoint At)>();
+      if (best.Pose == null)
+      {
+        return rows;
+      }
+
+      var region0 = free[best.Pose];
+      foreach (var p in Grid(best.Box, best.Px, best.Py, best.Shift, best.Ox, best.Oy))
+      {
+        if (rows.Count >= max)
+        {
+          break;
+        }
+
+        if (Inside(region0, p) && ShapedFits(best.Pose, p, placed, exact))
+        {
+          rows.Add((best.Pose, p));
+        }
+      }
+
+      return rows;
     }
 
     /// <summary>The copies of <paramref name="sources"/> one of each in turn, as long as each has copies left.</summary>
@@ -205,7 +342,7 @@ namespace DeepNestSharp.RasterNest
     /// <summary>Puts the copies on in <paramref name="sequence"/> order. A part that no longer goes on anywhere is
     /// skipped from then on; a member of <paramref name="kit"/> that does not go on ends the whole kit, whose
     /// next round could not be whole.</summary>
-    private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySrc) PackShapedOnce(
+    private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySrc, List<(ShapedPose Pose, long X, long Y)> Placed) PackShapedOnce(
       Dictionary<int, Loaded> loadedById,
       List<int> sequence,
       List<int> kit,
@@ -300,7 +437,7 @@ namespace DeepNestSharp.RasterNest
         placedBySrc[src] = placedBySrc.TryGetValue(src, out int n) ? n + 1 : 1;
       }
 
-      return (placements, placedBySrc);
+      return (placements, placedBySrc, placed);
     }
 
     /// <summary>The check every position passes before a part is put there: its outline inside the metal and

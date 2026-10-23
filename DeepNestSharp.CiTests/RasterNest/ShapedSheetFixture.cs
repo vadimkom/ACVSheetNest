@@ -278,6 +278,51 @@ namespace DeepNestSharp.CiTests.RasterNest
       (Count(byCount, "E90_200") + Count(byCount, "E90_150")).Should().BeGreaterOrEqualTo(5);
     }
 
+    /// <summary>
+    /// Washers M8 (Ø16) filling the shop's Ø638 round offcut at 5.5 spacing and margin (BAD3, bad4.chf). The
+    /// part-by-part pack scattered 665; the operator's straight rows held 659; rows shifted half a step hold
+    /// about 745, and that is what the sheet gets now, in rows.
+    /// </summary>
+    [Fact]
+    public void WashersFillARoundOffcutInShiftedRows()
+    {
+      string exe = Path.Combine(this.dir, "sparrow.exe");
+      File.WriteAllText(exe, string.Empty);
+      string data = FindTestData();
+      if (data == null)
+      {
+        return;
+      }
+
+      string bad = Path.Combine(Path.GetDirectoryName(data), "bad");
+      var shape = SheetShape.Load(Path.Combine(bad, "round-offcut-638.dxf"));
+      var watch = Stopwatch.StartNew();
+      var result = SparrowNestService.Nest(
+        new List<RasterPartInfo> { new RasterPartInfo { Path = Path.Combine(bad, "washer-M8-D16.dxf"), Quantity = 1, Fill = true } },
+        new[] { (638, 638, 1, false, 1) },
+        4,
+        5.5,
+        5.5,
+        5,
+        exe,
+        out string error,
+        stockShapes: new[] { shape });
+      this.output.WriteLine($"{watch.ElapsedMilliseconds} ms");
+
+      result.Should().NotBeNull(error);
+      var sheet = result.UsedSheets.Single();
+      this.output.WriteLine($"{sheet.PartPlacements.Count} washers");
+      sheet.PartPlacements.Count.Should().BeGreaterOrEqualTo(730);
+      sheet.PartPlacements.Should().OnlyContain(pp => !SparrowNestService.IsOutsideShape(pp, sheet.Sheet, 5.5));
+
+      // In rows: a handful of distinct heights, not one per washer.
+      sheet.PartPlacements.Select(p => Math.Round(p.Y, 2)).Distinct().Count().Should().BeLessThan(40);
+      var centres = sheet.PartPlacements.Select(p => (X: p.X, Y: p.Y)).ToList();
+      double nearest = centres.Take(100).Min(a => centres.Where(b => b != a).Min(b => Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2))));
+      nearest.Should().BeGreaterOrEqualTo(21.5 - 1e-3, "16 mm washers keep 5.5 mm apart");
+      watch.ElapsedMilliseconds.Should().BeLessThan(30000);
+    }
+
     private static string FindTestData()
     {
       for (var d = new DirectoryInfo(AppContext.BaseDirectory); d != null; d = d.Parent)

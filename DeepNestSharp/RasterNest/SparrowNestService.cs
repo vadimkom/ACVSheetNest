@@ -1774,47 +1774,12 @@ namespace DeepNestSharp.RasterNest
       }
 
       List<IPartPlacement> best = new List<IPartPlacement>();
-      var angles = (part.Angles ?? new[] { 0 }).Select(a => ((a % 360) + 360) % 360).Distinct().Take(8).ToList();
-      foreach (int rot in angles)
+      foreach (int rot in LatticeAngles(part))
       {
         var turned = rot == 0 ? part.Nfp : part.Nfp.Rotate(rot);
-        var dil = OffsetOutward(turned, part.FitSpacing / 2.0);
-        var dilPath = DeepNestClipper.ScaleUpPath(dil.Points, scale);
-        double dilW = dil.MaxX - dil.MinX;
-        double dilH = dil.MaxY - dil.MinY;
-        double slack = Math.Max(1e-4, 1e-3 * Math.Max(dilW, dilH));
-
-        bool Clear(double dx, double dy) => !Overlaps(TranslatePath(dilPath, (long)Math.Round(dx * scale), (long)Math.Round(dy * scale)), dilPath, eps);
-
-        // The smallest step that keeps two neighbours apart; the bounding box always does.
-        double Smallest(Func<double, bool> clearAt, double hi)
+        var dilPath = DeepNestClipper.ScaleUpPath(OffsetOutward(turned, part.FitSpacing / 2.0).Points, scale);
+        foreach (var (px, py, shift) in LatticeSteps(turned, part.FitSpacing))
         {
-          double lo = 0;
-          for (int i = 0; i < 30; i++)
-          {
-            double mid = (lo + hi) / 2;
-            if (clearAt(mid))
-            {
-              hi = mid;
-            }
-            else
-            {
-              lo = mid;
-            }
-          }
-
-          return hi + slack;
-        }
-
-        double px = Smallest(dx => Clear(dx, 0), dilW);
-        foreach (double shift in new[] { 0.0, px / 2 })
-        {
-          double py = Smallest(dy => Enumerable.Range(-2, 5).All(k => Clear(shift + (k * px), dy)), dilH);
-          if (!Enumerable.Range(-2, 5).All(k => Clear(shift + (k * px), py) && Clear(shift + (k * px), -py)) || !Clear(px, 0))
-          {
-            continue; // an outline the bisection misjudged (deeply hollow): leave this layout out
-          }
-
           var placed = new List<IPartPlacement>();
           double x0 = margin - turned.MinX;
           double y0 = margin - turned.MinY;
@@ -1845,6 +1810,63 @@ namespace DeepNestSharp.RasterNest
       }
 
       return best;
+    }
+
+    /// <summary>The orientations rows are tried at: the part's own, at most eight.</summary>
+    private static List<int> LatticeAngles(Loaded part)
+      => (part.Angles ?? new[] { 0 }).Select(a => ((a % 360) + 360) % 360).Distinct().Take(8).ToList();
+
+    /// <summary>
+    /// The steps one part at one orientation can be laid in rows at: along a row (<c>Px</c>), from row to row
+    /// (<c>Py</c>), and how far every other row is shifted along (0, or half a step so the parts sit in the
+    /// hollows of the row below). Each step the smallest the outline, grown by half its spacing, allows.
+    /// </summary>
+    private static List<(double Px, double Py, double Shift)> LatticeSteps(INfp turned, double fitSpacing)
+    {
+      const double scale = 1e6;
+      double eps = 1e-6 * scale * scale;
+      var dil = OffsetOutward(turned, fitSpacing / 2.0);
+      var dilPath = DeepNestClipper.ScaleUpPath(dil.Points, scale);
+      double dilW = dil.MaxX - dil.MinX;
+      double dilH = dil.MaxY - dil.MinY;
+      double slack = Math.Max(1e-4, 1e-3 * Math.Max(dilW, dilH));
+
+      bool Clear(double dx, double dy) => !Overlaps(TranslatePath(dilPath, (long)Math.Round(dx * scale), (long)Math.Round(dy * scale)), dilPath, eps);
+
+      // The smallest step that keeps two neighbours apart; the bounding box always does.
+      double Smallest(Func<double, bool> clearAt, double hi)
+      {
+        double lo = 0;
+        for (int i = 0; i < 30; i++)
+        {
+          double mid = (lo + hi) / 2;
+          if (clearAt(mid))
+          {
+            hi = mid;
+          }
+          else
+          {
+            lo = mid;
+          }
+        }
+
+        return hi + slack;
+      }
+
+      var steps = new List<(double, double, double)>();
+      double px = Smallest(dx => Clear(dx, 0), dilW);
+      foreach (double shift in new[] { 0.0, px / 2 })
+      {
+        double py = Smallest(dy => Enumerable.Range(-2, 5).All(k => Clear(shift + (k * px), dy)), dilH);
+        if (!Enumerable.Range(-2, 5).All(k => Clear(shift + (k * px), py) && Clear(shift + (k * px), -py)) || !Clear(px, 0))
+        {
+          continue; // an outline the bisection misjudged (deeply hollow): leave this layout out
+        }
+
+        steps.Add((px, py, shift));
+      }
+
+      return steps;
     }
 
     /// <summary><see cref="LatticeFill"/> on an empty sheet, in the shape <see cref="PackOneSheet"/> answers in.</summary>
