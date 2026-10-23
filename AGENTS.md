@@ -105,7 +105,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-10-23, 1.1.54): core 1087/1089; app 497/497 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
+Last verified (2026-10-23, 1.1.57): core 1087/1089; app 499/499 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
