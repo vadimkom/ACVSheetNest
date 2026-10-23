@@ -24,15 +24,15 @@ namespace DeepNestSharp.Ui.Views
       {
         this.widthUpDown.Maximum = 25000;
         this.heightUpDown.Maximum = 25000;
-        this.widthUpDown.Value = 3000;
-        this.heightUpDown.Value = 1500;
+        this.widthUpDown.Value = 1500; // sheets stand: the short side across, the long side up
+        this.heightUpDown.Value = 3000;
       }
       else
       {
         this.widthUpDown.Maximum = 1000;
         this.heightUpDown.Maximum = 1000;
-        this.widthUpDown.Value = 120;
-        this.heightUpDown.Value = 60;
+        this.widthUpDown.Value = 60;
+        this.heightUpDown.Value = 120;
       }
 
       this.priorityCombo.SelectedValue = 5;
@@ -107,8 +107,8 @@ namespace DeepNestSharp.Ui.Views
       this.heightUpDown.CommitInput();
       this.qtyUpDown.CommitInput();
 
-      this.SheetWidth = this.widthUpDown.Value ?? (this.isUnitsMm ? 3000 : 120);
-      this.SheetHeight = this.heightUpDown.Value ?? (this.isUnitsMm ? 1500 : 60);
+      this.SheetWidth = this.widthUpDown.Value ?? (this.isUnitsMm ? 1500 : 60);
+      this.SheetHeight = this.heightUpDown.Value ?? (this.isUnitsMm ? 3000 : 120);
       this.SheetQuantity = this.qtyUpDown.Value ?? 1;
       this.SheetUnlimited = this.unlimitedCheck.IsChecked == true;
       this.SheetPriority = (this.priorityCombo.SelectedValue as int?) ?? 5;

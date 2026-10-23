@@ -52,6 +52,19 @@ namespace DeepNestSharp.Domain.Models
       set => SetProperty(nameof(Priority), () => sheetLoadInfo.Priority, v => sheetLoadInfo.Priority = v, value);
     }
 
+    public string ShapePath
+    {
+      get => sheetLoadInfo.ShapePath;
+      set
+      {
+        SetProperty(nameof(ShapePath), () => sheetLoadInfo.ShapePath, v => sheetLoadInfo.ShapePath = v, value);
+        OnPropertyChanged(nameof(ShapeName));
+      }
+    }
+
+    /// <summary>Gets the drawing's file name for a sheet of any shape, empty for a rectangle.</summary>
+    public string ShapeName => string.IsNullOrEmpty(ShapePath) ? string.Empty : System.IO.Path.GetFileName(ShapePath);
+
     private int nestedCount;
 
     /// <summary>

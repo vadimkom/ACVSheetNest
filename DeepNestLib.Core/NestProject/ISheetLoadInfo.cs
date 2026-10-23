@@ -14,5 +14,9 @@ namespace DeepNestLib.NestProject
  
     /// <summary>Gets or sets the sheet priority (1-10, lower number nests first; 5 = normal).</summary>
     int Priority { get; set; }
+
+    /// <summary>Gets or sets the drawing (DXF or CHF) the sheet's outline is read from: an offcut of any shape.
+    /// Null or empty for a plain rectangle. <see cref="Width"/> and <see cref="Height"/> are then the box round it.</summary>
+    string ShapePath { get; set; }
   }
 }

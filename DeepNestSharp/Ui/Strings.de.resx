@@ -426,6 +426,12 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Eigene Größe…</value>
   </data>
+  <data name="Menu_SheetFromDrawing" xml:space="preserve">
+    <value>Blech aus Zeichnung (DXF, CHF)…</value>
+  </data>
+  <data name="Msg_SheetShapeUnreadable" xml:space="preserve">
+    <value>Das Blech {0} konnte nicht gelesen werden: {1}</value>
+  </data>
   <data name="Menu_Exit" xml:space="preserve">
     <value>Beenden</value>
   </data>

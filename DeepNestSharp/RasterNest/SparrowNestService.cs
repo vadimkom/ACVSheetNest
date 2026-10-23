@@ -24,7 +24,7 @@ namespace DeepNestSharp.RasterNest
   /// layouts so a uniform job is 1-2 sparrow runs instead of N. The placement mapping (rotate about the
   /// origin, then translate) was verified to reproduce sparrow's layout with zero overlap.
   /// </summary>
-  internal static class SparrowNestService
+  internal static partial class SparrowNestService
   {
     // Stage timers, read by MetricUnitsPerfFixture.MeasureRealJobStageBreakdown. The wall time of a nest
     // is (waves x per-sheet budget) and everything else is noise — but only a breakdown proves that, so
@@ -328,7 +328,8 @@ namespace DeepNestSharp.RasterNest
       double geometryTolerance = CommonLineDefaults.DefaultGeometryToleranceInches,
       int commonLineMaxClusterParts = CommonLineDefaults.AutoMaxClusterParts,
       Action<INestResult>? candidateCallback = null,
-      int seedOffset = 0)
+      int seedOffset = 0,
+      IReadOnlyList<INfp> stockShapes = null)
     {
       error = null;
       // These values are already expressed in the caller's active drawing units. Substituting inch
@@ -361,11 +362,15 @@ namespace DeepNestSharp.RasterNest
       var sizes = new List<StockSize>();
       if (stock != null)
       {
-        foreach (var s in stock)
+        for (int i = 0; i < stock.Count; i++)
         {
+          var s = stock[i];
           if (s.Win > 0 && s.Hin > 0 && (s.Unlimited || s.Qty > 0))
           {
-            sizes.Add(new StockSize { W = s.Win, H = s.Hin, Remaining = s.Qty, Unlimited = s.Unlimited, Priority = s.Priority });
+            // A sheet read from a drawing (an offcut of any shape) carries its outline; its size is the box round it.
+            // A drawing that is just a rectangle nests like any other sheet of its size.
+            var shape = stockShapes != null && i < stockShapes.Count && SheetShape.IsShaped(stockShapes[i]) ? stockShapes[i] : null;
+            sizes.Add(new StockSize { W = s.Win, H = s.Hin, Remaining = s.Qty, Unlimited = s.Unlimited, Priority = s.Priority, Shape = shape });
           }
         }
       }
@@ -625,6 +630,10 @@ namespace DeepNestSharp.RasterNest
 
       public int Priority { get; set; } = 5;
 
+      /// <summary>The outline and holes of a sheet read from a drawing, in sheet coordinates with the box round
+      /// it at the origin; null for a rectangle. Such a sheet is packed by <see cref="PackShapedSheet"/>.</summary>
+      public INfp Shape { get; set; }
+
       public bool HasStock => this.Unlimited || this.Remaining > 0;
 
       public void TakeOne()
@@ -664,6 +673,7 @@ namespace DeepNestSharp.RasterNest
       var sheetCommonEdges = new List<List<CommonEdgeIntent>>();
       string firstPackError = null;
       var sheetSizes = new List<(int W, int H)>();
+      var sheetShapes = new List<INfp>();
 
       // A sheet that gets used places at least one part, so the job cannot ask for more sheets than it has
       // parts. The old flat slot list carried a MaxSheets = 1000 truncation; the bound is now the work
@@ -743,7 +753,7 @@ namespace DeepNestSharp.RasterNest
               var collection = new SheetPlacementCollection();
               for (int prev = 0; prev < sheetLayouts.Count; prev++)
               {
-                var prevSheet = Sheet.NewSheet(prev + 1, sheetSizes[prev].W, sheetSizes[prev].H);
+                var prevSheet = MakeSheet(prev + 1, sheetSizes[prev].W, sheetSizes[prev].H, sheetShapes[prev]);
                 var prevPlacement = new SheetPlacement(
                   PlacementTypeEnum.BoundingBox,
                   prevSheet,
@@ -756,7 +766,7 @@ namespace DeepNestSharp.RasterNest
 
               // A copy, not the search's own list: the winner goes on to DeferUnfit, which removes and moves
               // placements on this thread while the UI is drawing the preview.
-              var candSheet = Sheet.NewSheet(sheetLayouts.Count + 1, w, h);
+              var candSheet = MakeSheet(sheetLayouts.Count + 1, w, h, size.Shape);
               var candPlacement = new SheetPlacement(
                 PlacementTypeEnum.BoundingBox,
                 candSheet,
@@ -795,9 +805,13 @@ namespace DeepNestSharp.RasterNest
           };
 
           // A sheet of one filler alone (washers) is laid in rows, not searched: see LatticeFill.
+          // A sheet of any other shape than a rectangle is packed with no-fit polygons: see PackShapedSheet.
           string perr = null;
-          bool lattice = batchQty.Count == 1 && loadedById[batchQty.Keys.First()].Fill;
-          var (placements, placedBySrc, packW, packH, seamsSnapped, seamsGivenUp, commonEdges, commonLineFallbacks) = lattice
+          bool shaped = size.Shape != null;
+          bool lattice = !shaped && batchQty.Count == 1 && loadedById[batchQty.Keys.First()].Fill;
+          var (placements, placedBySrc, packW, packH, seamsSnapped, seamsGivenUp, commonEdges, commonLineFallbacks) = shaped
+            ? ShapedSheet(pool, loadedById, size.Shape, w, h, margin, cancel)
+            : lattice
             ? LatticeSheet(loadedById[batchQty.Keys.First()], pool[batchQty.Keys.First()], loadedById, w, h, margin)
             : PackOneSheet(
             loaded,
@@ -852,7 +866,7 @@ namespace DeepNestSharp.RasterNest
           // no second chance at all, while one that seats 13 of 14 gets one. It was there to keep the cost
           // down when a single budget served everybody; the operator picks the effort now, and giving parts
           // back uncut is worth more seconds than any of them.
-          if (!lattice && placements != null && packedHere > 0 && leftOver > 0 && IsLastChanceFor(size, sizes) && LastChanceBudget(effort) > 0)
+          if (!lattice && !shaped && placements != null && packedHere > 0 && leftOver > 0 && IsLastChanceFor(size, sizes) && LastChanceBudget(effort) > 0)
           {
             var (retryPl, retryBy, retryW, retryH, retrySeamsSnapped, retrySeamsGivenUp, retryCommonEdges, retryCommonLineFallbacks) = PackOneSheet(
               loaded,
@@ -896,7 +910,7 @@ namespace DeepNestSharp.RasterNest
 
           // Wastes least = fills most of its own sheet. Comparing the waste AREA instead would hand it to
           // the smallest size every time, for being small rather than for being well used.
-          double sheetArea = Math.Max(1e-9, (double)packW * packH);
+          double sheetArea = Math.Max(1e-9, shaped ? ShapeArea(size.Shape) : (double)packW * packH);
           double placedArea = placedBySrc.Sum(kv => kv.Value * Math.Abs(loadedById[kv.Key].Nfp.Area));
           double utilization = placedArea / sheetArea;
           bool isBetter;
@@ -943,7 +957,10 @@ namespace DeepNestSharp.RasterNest
         // A sheet of big parts can come back half empty with parts still waiting that would fit in the gap:
         // the engine packs a strip and the sheet keeps what lands inside it, so which parts those are is
         // decided by the order along the strip, not by what fits. Offer the waiting ones one at a time.
-        if (FillUpEnabled && (NestProfiles.For(effort)?.FillUp ?? true) && !cancel.IsCancellationRequested)
+        // A shaped sheet was packed from the whole pool, fillers included, and the passes below only know
+        // rectangles.
+        bool shapedSheet = bestSize.Shape != null;
+        if (!shapedSheet && FillUpEnabled && (NestProfiles.For(effort)?.FillUp ?? true) && !cancel.IsCancellationRequested)
         {
           var fill = FillUp(
             loaded, loadedById, pool, bestPlacements, bestPlacedBySrc, bestW, bestH, margin,
@@ -992,6 +1009,11 @@ namespace DeepNestSharp.RasterNest
           margin,
           commonLineGap,
           geometryTolerance);
+        if (shapedSheet)
+        {
+          deferred += DropOutsideShape(bestPlacements, bestPlacedBySrc, bestSize.Shape, margin);
+        }
+
         if (bestPlacements.Count == 0)
         {
           break; // nothing on this sheet survived the check, so another sheet of it would fare no better
@@ -1004,7 +1026,7 @@ namespace DeepNestSharp.RasterNest
 
         // The counted parts are on and judged fit: what room they left goes to the parts that fill the
         // sheets. Rows laid around them are clear by construction; a search (several fillers) is judged again.
-        if (!rowsOnly && !cancel.IsCancellationRequested)
+        if (!rowsOnly && !shapedSheet && !cancel.IsCancellationRequested)
         {
           var topped = TopUpWithFillers(
             loaded, loadedById, pool, bestPlacements, bestPlacedBySrc, bestW, bestH, margin,
@@ -1025,6 +1047,7 @@ namespace DeepNestSharp.RasterNest
         sheetLayouts.Add(bestPlacements);
         sheetCommonEdges.Add(bestCommonEdges ?? new List<CommonEdgeIntent>());
         sheetSizes.Add((bestW, bestH));
+        sheetShapes.Add(bestSize.Shape);
         Deduct(pool, bestPlacedBySrc);
         bestSize.TakeOne();
 
@@ -1036,6 +1059,7 @@ namespace DeepNestSharp.RasterNest
           sheetLayouts.Add(clone.Placements);
           sheetCommonEdges.Add(clone.CommonEdges);
           sheetSizes.Add((bestW, bestH));
+          sheetShapes.Add(bestSize.Shape);
           Deduct(pool, bestPlacedBySrc);
           bestSize.TakeOne();
           progress?.Report((totalParts - pool.Values.Sum(), totalParts, sheetLayouts.Count, 1.0));
@@ -1138,7 +1162,7 @@ namespace DeepNestSharp.RasterNest
         // made by compaction or hole filling into cuts that the planner never selected.
         System.Threading.Interlocked.Add(ref DiagSeamsSnapped, commonEdges.Count);
 
-        var sheet = Sheet.NewSheet(i + 1, sheetSizes[i].W, sheetSizes[i].H);
+        var sheet = MakeSheet(i + 1, sheetSizes[i].W, sheetSizes[i].H, sheetShapes[i]);
         var sheetPlacement = new SheetPlacement(
           placementType: PlacementTypeEnum.BoundingBox,
           sheet: sheet,

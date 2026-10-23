@@ -426,6 +426,12 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Format personnalisé…</value>
   </data>
+  <data name="Menu_SheetFromDrawing" xml:space="preserve">
+    <value>Tôle depuis un dessin (DXF, CHF)…</value>
+  </data>
+  <data name="Msg_SheetShapeUnreadable" xml:space="preserve">
+    <value>Impossible de lire la tôle {0} : {1}</value>
+  </data>
   <data name="Menu_Exit" xml:space="preserve">
     <value>Quitter</value>
   </data>

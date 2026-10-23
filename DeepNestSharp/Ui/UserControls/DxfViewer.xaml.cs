@@ -99,6 +99,7 @@ namespace DeepNestSharp.Ui.UserControls
     private double dragStartY;
     private RasterNest.DragCollisionCache dragCache; // valid only for the drag in progress; null = query the live placements
     private double currentSheetW;
+    private ISheet currentSheet; // the sheet on screen: its outline is the edge when it was read from a drawing
     private double currentSheetH;
 
     // Measure tool: first clicked point (canvas/inch coords), whether the segment is fixed, and the
@@ -1039,7 +1040,7 @@ namespace DeepNestSharp.Ui.UserControls
       double h = sheetPlacement.Sheet.HeightCalculated;
       var drawing = new DrawingGroup();
       double pen = Math.Max(w, h) / 300.0;
-      drawing.Children.Add(new GeometryDrawing(Brushes.White, new Pen(SheetStroke, pen), new RectangleGeometry(new Rect(0, 0, w, h))));
+      drawing.Children.Add(new GeometryDrawing(Brushes.White, new Pen(SheetStroke, pen), SheetGeometry(sheetPlacement.Sheet, w, h)));
       foreach (var pp in sheetPlacement.PartPlacements)
       {
         drawing.Children.Add(new GeometryDrawing(this.TypeFill(pp), new Pen(PartStroke, pen / 2), BuildPlacedGeometry(pp, h)));
@@ -1136,6 +1137,7 @@ namespace DeepNestSharp.Ui.UserControls
       double w = sheet.WidthCalculated;
       double h = sheet.HeightCalculated;
       this.currentSheetW = w;
+      this.currentSheet = sheet;
       this.currentSheetH = h;
       this.canvas.Width = w;
       this.canvas.Height = h;
@@ -1162,7 +1164,7 @@ namespace DeepNestSharp.Ui.UserControls
       }
 
       // Sheet background + outline.
-      var sheetGeo = new RectangleGeometry(new Rect(0, 0, w, h));
+      var sheetGeo = SheetGeometry(sheetPlacement.Sheet, w, h);
       this.canvas.Children.Add(new System.Windows.Shapes.Path
       {
         Data = sheetGeo,
@@ -1488,6 +1490,29 @@ namespace DeepNestSharp.Ui.UserControls
         {
           ctx.BeginFigure(Tx(a.X, a.Y), false, false);
           ctx.LineTo(Tx(b.X, b.Y), true, false);
+        }
+      }
+
+      geometry.Freeze();
+      return geometry;
+    }
+
+    /// <summary>The sheet as drawn: its own outline and holes when it was read from a drawing, else the rectangle.</summary>
+    private static Geometry SheetGeometry(ISheet sheet, double w, double h)
+    {
+      if (!DeepNestLib.IO.SheetShape.IsShaped(sheet))
+      {
+        return new RectangleGeometry(new Rect(0, 0, w, h));
+      }
+
+      var geometry = new StreamGeometry { FillRule = FillRule.EvenOdd };
+      using (var ctx = geometry.Open())
+      {
+        Point Tx(double x, double y) => new Point(x, h - y);
+        AppendContour(ctx, sheet, Tx);
+        foreach (var hole in sheet.Children ?? new List<INfp>())
+        {
+          AppendContour(ctx, hole, Tx);
         }
       }
 
@@ -3147,7 +3172,8 @@ namespace DeepNestSharp.Ui.UserControls
       if (this.dragCache != null && ReferenceEquals(candidate, this.selectedPp) && ReferenceEquals(exclude, this.selectedPp))
       {
         var (bMinX, bMinY, bMaxX, bMaxY) = this.dragCache.BoundsAt(candidate.X, candidate.Y);
-        if (RasterNest.PlacementAcceptance.IsOutsideUsableArea(bMinX, bMinY, bMaxX, bMaxY, this.currentSheetW, this.currentSheetH, this.SheetEdgeMargin))
+        if (RasterNest.PlacementAcceptance.IsOutsideUsableArea(bMinX, bMinY, bMaxX, bMaxY, this.currentSheetW, this.currentSheetH, this.SheetEdgeMargin)
+          || RasterNest.SparrowNestService.IsOutsideShape(candidate, this.currentSheet, this.SheetEdgeMargin))
         {
           return false;
         }
@@ -4620,7 +4646,8 @@ namespace DeepNestSharp.Ui.UserControls
     /// same margin the nester packed to. Without it a part could be dragged right to the sheet edge and the
     /// nest would quietly stop honouring what the job asked for.</summary>
     private bool OutOfSheet(IPartPlacement pp)
-      => RasterNest.PlacementAcceptance.IsOutsideUsableArea(pp, this.currentSheetW, this.currentSheetH, this.SheetEdgeMargin);
+      => RasterNest.PlacementAcceptance.IsOutsideUsableArea(pp, this.currentSheetW, this.currentSheetH, this.SheetEdgeMargin)
+        || RasterNest.SparrowNestService.IsOutsideShape(pp, this.currentSheet, this.SheetEdgeMargin);
 
 
 
@@ -4691,6 +4718,17 @@ namespace DeepNestSharp.Ui.UserControls
       }
 
       MarkInvalidCommonEdgeRecords(sheet, validRecordCount, unfit);
+
+      // On a sheet read from a drawing the box is not the edge: a part off the metal, or within the margin of
+      // the outline or of a hole, is as unfit as one in the margin of a rectangle.
+      foreach (var pp in sheet.PartPlacements)
+      {
+        if (RasterNest.SparrowNestService.IsOutsideShape(pp, sheet.Sheet, this.SheetEdgeMargin))
+        {
+          unfit.OutsideMargin.Add(pp);
+          unfit.All.Add(pp);
+        }
+      }
 
       return unfit;
     }

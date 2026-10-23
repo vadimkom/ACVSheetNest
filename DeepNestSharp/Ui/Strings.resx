@@ -426,6 +426,12 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Custom size…</value>
   </data>
+  <data name="Menu_SheetFromDrawing" xml:space="preserve">
+    <value>Sheet from a drawing (DXF, CHF)…</value>
+  </data>
+  <data name="Msg_SheetShapeUnreadable" xml:space="preserve">
+    <value>The sheet {0} could not be read: {1}</value>
+  </data>
   <data name="Menu_Exit" xml:space="preserve">
     <value>Exit</value>
   </data>

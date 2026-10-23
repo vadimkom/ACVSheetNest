@@ -118,31 +118,32 @@ namespace DeepNestSharp.Ui.Views
 
     public IMainViewModel ViewModel => (IMainViewModel)DataContext;
 
-    // US stock sheet sizes most used in sheet-metal fabrication (mill/service-center standards),
-    // width = the LONG side (matches the machine bed orientation; the nester grows the pack along
-    // the long axis so the remnant is a full short-dimension strip). Grouped by the SHORT side
-    // (36 / 48 / 60 / 72), then by length — the menu draws a separator between groups.
+    // US stock sheet sizes most used in sheet-metal fabrication (mill/service-center standards).
+    // The sheet STANDS: width = the short side, height = the long one, as the shop asked (2026-10-23); the
+    // nester packs along whichever side is longer, and measured on the flat patterns a standing sheet nests
+    // the same number of sheets as a lying one. Grouped by the SHORT side (36 / 48 / 60 / 72), then by
+    // length — the menu draws a separator between groups.
     private static readonly SheetPreset[] SheetPresets =
     {
-      new SheetPreset("96 × 36 in   (8 × 3 ft)", 96, 36),
-      new SheetPreset("120 × 36 in   (10 × 3 ft)", 120, 36),
-      new SheetPreset("96 × 48 in   (8 × 4 ft)", 96, 48),
-      new SheetPreset("120 × 48 in   (10 × 4 ft)", 120, 48),
-      new SheetPreset("144 × 48 in   (12 × 4 ft)", 144, 48),
-      new SheetPreset("96 × 60 in   (8 × 5 ft)", 96, 60),
-      new SheetPreset("120 × 60 in   (10 × 5 ft)", 120, 60),
-      new SheetPreset("144 × 60 in   (12 × 5 ft)", 144, 60),
-      new SheetPreset("120 × 72 in   (10 × 6 ft)", 120, 72),
-      new SheetPreset("144 × 72 in   (12 × 6 ft)", 144, 72),
+      new SheetPreset("36 × 96 in   (3 × 8 ft)", 36, 96),
+      new SheetPreset("36 × 120 in   (3 × 10 ft)", 36, 120),
+      new SheetPreset("48 × 96 in   (4 × 8 ft)", 48, 96),
+      new SheetPreset("48 × 120 in   (4 × 10 ft)", 48, 120),
+      new SheetPreset("48 × 144 in   (4 × 12 ft)", 48, 144),
+      new SheetPreset("60 × 96 in   (5 × 8 ft)", 60, 96),
+      new SheetPreset("60 × 120 in   (5 × 10 ft)", 60, 120),
+      new SheetPreset("60 × 144 in   (5 × 12 ft)", 60, 144),
+      new SheetPreset("72 × 120 in   (6 × 10 ft)", 72, 120),
+      new SheetPreset("72 × 144 in   (6 × 12 ft)", 72, 144),
     };
 
-    // The metric sizes the shop actually stocks (mm), width = the LONG side. Anything else is typed in under
-    // Custom size, and can be remembered there as one of "My sheets".
+    // The metric sizes the shop actually stocks (mm), standing like the ones above. Anything else is typed in
+    // under Custom size, and can be remembered there as one of "My sheets".
     private static readonly SheetPreset[] SheetPresetsMm =
     {
-      new SheetPreset("2000 × 1000 mm", 2000, 1000),
-      new SheetPreset("2500 × 1250 mm", 2500, 1250),
-      new SheetPreset("1250 × 500 mm", 1250, 500),
+      new SheetPreset("1000 × 2000 mm", 1000, 2000),
+      new SheetPreset("1250 × 2500 mm", 1250, 2500),
+      new SheetPreset("500 × 1250 mm", 500, 1250),
     };
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -1443,12 +1444,12 @@ namespace DeepNestSharp.Ui.Views
       int lastShortSide = -1;
       foreach (var preset in this.unitsMm ? SheetPresetsMm : SheetPresets)
       {
-        if (!this.unitsMm && lastShortSide >= 0 && preset.Height != lastShortSide)
+        if (!this.unitsMm && lastShortSide >= 0 && preset.Width != lastShortSide)
         {
           menu.Items.Add(new Separator()); // visual break between the 48-wide and 60-wide groups
         }
 
-        lastShortSide = preset.Height;
+        lastShortSide = preset.Width;
         var size = preset;
         var item = new MenuItem { Header = size.Name };
         item.Click += (_, __) => this.AddSheetOfSize(size.Width, size.Height, 1);
@@ -1471,6 +1472,10 @@ namespace DeepNestSharp.Ui.Views
         }
       };
       menu.Items.Add(custom);
+
+      var fromDrawing = new MenuItem { Header = Localization.Get("Menu_SheetFromDrawing") };
+      fromDrawing.Click += (_, __) => this.AddSheetsFromDrawings();
+      menu.Items.Add(fromDrawing);
 
       menu.PlacementTarget = sender as UIElement;
       menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
@@ -1520,8 +1525,13 @@ namespace DeepNestSharp.Ui.Views
       dialog.PrefillForEdit(row.Width, row.Height, row.Quantity, row.Unlimited, row.Priority);
       if (dialog.ShowDialog() == true)
       {
-        row.Width = dialog.SheetWidth;
-        row.Height = dialog.SheetHeight;
+        // A sheet read from a drawing keeps the box round its outline: the size is the drawing's, not typed.
+        if (string.IsNullOrEmpty(row.ShapePath))
+        {
+          row.Width = dialog.SheetWidth;
+          row.Height = dialog.SheetHeight;
+        }
+
         row.Quantity = dialog.SheetQuantity;
         row.Unlimited = dialog.SheetUnlimited;
         row.Priority = dialog.SheetPriority;
@@ -1529,17 +1539,18 @@ namespace DeepNestSharp.Ui.Views
       }
     }
 
-    private void AddSheetOfSize(int width, int height, int quantity, bool unlimited = false, int priority = 5)
+    private ISheetLoadInfo AddSheetOfSize(int width, int height, int quantity, bool unlimited = false, int priority = 5, string shapePath = null)
     {
       if (lastNestConsumed != null)
       {
         ClearNestResult();
       }
 
+      ISheetLoadInfo sheet = null;
       if (ViewModel.ActiveDocument is NestProjectViewModel doc && doc.AddSheetCommand.CanExecute(null))
       {
         doc.AddSheetCommand.Execute(null);
-        var sheet = doc.ProjectInfo.SheetLoadInfos.LastOrDefault();
+        sheet = doc.ProjectInfo.SheetLoadInfos.LastOrDefault();
         if (sheet != null)
         {
           sheet.Width = width;
@@ -1547,10 +1558,54 @@ namespace DeepNestSharp.Ui.Views
           sheet.Quantity = quantity;
           sheet.Unlimited = unlimited;
           sheet.Priority = priority;
+          sheet.ShapePath = shapePath;
         }
 
         this.sheetsListView.Items.Refresh();
       }
+
+      return sheet;
+    }
+
+    /// <summary>
+    /// Sheets of any shape: each chosen drawing (DXF or CHF) is one offcut, its largest contour the edge and the
+    /// contours inside it holes. It goes in at priority 1, as offcuts are cut first, one piece in stock.
+    /// </summary>
+    private void AddSheetsFromDrawings()
+    {
+      var dialog = new Microsoft.Win32.OpenFileDialog
+      {
+        Filter = "Drawings (*.dxf;*.chf)|*.dxf;*.chf;*.DXF;*.CHF|All files (*.*)|*.*",
+        Multiselect = true,
+      };
+      if (!DeepNestSharp.Ui.Services.FileIoService.Show(dialog))
+      {
+        return;
+      }
+
+      foreach (string path in dialog.FileNames)
+      {
+        DeepNestLib.INfp shape;
+        try
+        {
+          shape = DeepNestLib.IO.SheetShape.Load(path);
+        }
+        catch (Exception ex)
+        {
+          ViewModel.MessageService.DisplayMessageBox(
+            Localization.Format("Msg_SheetShapeUnreadable", System.IO.Path.GetFileName(path), ex.GetBaseException().Message),
+            Localization.Get("Btn_AddSheet"),
+            DeepNestLib.MessageBoxIcon.Warning);
+          continue;
+        }
+
+        // Rounded as the layouts are matched back to their rows ("used / in stock", cut sheets).
+        int w = (int)Math.Round(shape.MaxX);
+        int h = (int)Math.Round(shape.MaxY);
+        this.AddSheetOfSize(Math.Max(1, w), Math.Max(1, h), 1, priority: 1, shapePath: path);
+      }
+
+      this.SortSheetsByPriority();
     }
 
     private sealed class SheetPreset
@@ -2355,14 +2410,46 @@ namespace DeepNestSharp.Ui.Views
       // EVERY sheet entry participates. For each sheet the engine packs the pending work onto every size
       // still in stock and cuts whichever filled most of its own sheet, so list order decides nothing; a
       // size marked Unlimited never runs down, and its Quantity is carried along only to be ignored.
-      var sheetStock = project.SheetLoadInfos
+      var stockRows = project.SheetLoadInfos
         .Where(s => s.Width > 0 && s.Height > 0 && (s.Unlimited || s.Quantity > 0))
+        .ToList();
+      var sheetStock = stockRows
         .Select(s => (s.Width, s.Height, s.Quantity, s.Unlimited, s.Priority))
         .ToList();
       if (sheetStock.Count == 0)
       {
         ViewModel.MessageService.DisplayMessageBox(Localization.Get("Msg_AddSheetsFirst"), Localization.Get("Title_Nest"), DeepNestLib.MessageBoxIcon.Information);
         return;
+      }
+
+      // Sheets read from a drawing (offcuts of any shape) go to the engine with their outline. The drawing is
+      // read again on every nest, as the parts are, so a file that has gone stops the nest and says which.
+      var sheetShapes = new List<DeepNestLib.INfp>();
+      foreach (var row in stockRows)
+      {
+        DeepNestLib.INfp shape = null;
+        if (!string.IsNullOrEmpty(row.ShapePath))
+        {
+          try
+          {
+            shape = DeepNestLib.IO.SheetShape.Load(row.ShapePath);
+
+            // The drawing may have been changed since it was added: its box is the row's size.
+            row.Width = Math.Max(1, (int)Math.Round(shape.MaxX));
+            row.Height = Math.Max(1, (int)Math.Round(shape.MaxY));
+            sheetStock[sheetShapes.Count] = (row.Width, row.Height, row.Quantity, row.Unlimited, row.Priority);
+          }
+          catch (Exception ex)
+          {
+            ViewModel.MessageService.DisplayMessageBox(
+              Localization.Format("Msg_SheetShapeUnreadable", System.IO.Path.GetFileName(row.ShapePath), ex.GetBaseException().Message),
+              Localization.Get("Title_Nest"),
+              DeepNestLib.MessageBoxIcon.Warning);
+            return;
+          }
+        }
+
+        sheetShapes.Add(shape);
       }
 
       // Total sheets the job may use — only meaningful when every size is counted, which is why the
@@ -2515,7 +2602,8 @@ namespace DeepNestSharp.Ui.Views
             effort: runEffort,
             commonLineMaxClusterParts: config.CommonLineMaxClusterParts,
             candidateCallback: candidateCallback,
-            seedOffset: this.runSeedOffset);
+            seedOffset: this.runSeedOffset,
+            stockShapes: sheetShapes);
           return (r, err);
         });
 

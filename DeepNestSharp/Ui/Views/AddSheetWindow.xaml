@@ -32,10 +32,10 @@
                Text="Sheet size in millimeters (width = the long side)." Foreground="{StaticResource Brush.TextMuted}" />
 
     <TextBlock x:Name="widthLabel" Grid.Row="1" Grid.Column="0" Text="Width (mm)" VerticalAlignment="Center" Margin="0,0,10,6" />
-    <xctk:IntegerUpDown x:Name="widthUpDown" Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="25000" Value="3000" Margin="0,0,0,6" />
+    <xctk:IntegerUpDown x:Name="widthUpDown" Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="25000" Value="1500" Margin="0,0,0,6" />
 
     <TextBlock x:Name="heightLabel" Grid.Row="2" Grid.Column="0" Text="Height (mm)" VerticalAlignment="Center" Margin="0,0,10,6" />
-    <xctk:IntegerUpDown x:Name="heightUpDown" Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="25000" Value="1500" Margin="0,0,0,6" />
+    <xctk:IntegerUpDown x:Name="heightUpDown" Grid.Row="2" Grid.Column="1" Minimum="1" Maximum="25000" Value="3000" Margin="0,0,0,6" />
 
     <TextBlock x:Name="qtyLabel" Grid.Row="3" Grid.Column="0" Text="Quantity" VerticalAlignment="Center" Margin="0,0,10,6" />
     <xctk:IntegerUpDown x:Name="qtyUpDown" Grid.Row="3" Grid.Column="1" Minimum="1" Maximum="100000" Value="1" Margin="0,0,0,6" />

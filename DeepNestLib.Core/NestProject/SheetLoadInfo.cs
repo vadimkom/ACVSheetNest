@@ -41,6 +41,12 @@ namespace DeepNestLib.NestProject
     /// </summary>
     public virtual int Priority { get; set; } = 5;
 
+    /// <summary>
+    /// Gets or sets the drawing the sheet's outline comes from (an offcut of any shape); null for a rectangle.
+    /// A settable property, like <see cref="Unlimited"/>, so older files load without it.
+    /// </summary>
+    public virtual string ShapePath { get; set; }
+
     public override string ToJson(bool writeIndented = false)
     {
       var options = new JsonSerializerOptions();

@@ -167,7 +167,7 @@ namespace DeepNestSharp.Reports
       int totalSheets = layouts.Sum(l => l.Count);
       int totalParts = layouts.Sum(l => l.Count * l.Sheet.PartPlacements.Count);
       double placedArea = layouts.Sum(l => l.Count * l.Sheet.PartPlacements.Sum(p => Math.Abs(p.Part.NetArea)));
-      double stockArea = layouts.Sum(l => l.Count * l.Sheet.Sheet.WidthCalculated * l.Sheet.Sheet.HeightCalculated);
+      double stockArea = layouts.Sum(l => l.Count * SheetArea(l.Sheet.Sheet));
       double overallUtil = stockArea <= 0 ? 0 : placedArea / stockArea * 100.0;
 
       // Total quantity per source part across the whole job (mirrored copies listed separately —
@@ -409,7 +409,19 @@ namespace DeepNestSharp.Reports
         double ox = boxX + ((boxW - (sheetW * scale)) / 2.0);
         double oy = boxY + ((boxH - (sheetH * scale)) / 2.0);
 
-        c.Rect(ox, oy, sheetW * scale, sheetH * scale, 0.8);
+        if (DeepNestLib.IO.SheetShape.IsShaped(sp.Sheet))
+        {
+          // An offcut read from a drawing: its own outline and holes, not the box round it.
+          c.Polygon(sp.Sheet.Points.Select(p => (ox + (p.X * scale), oy + (p.Y * scale))), fill: false);
+          foreach (var hole in sp.Sheet.Children ?? new List<INfp>())
+          {
+            c.Polygon(hole.Points.Select(p => (ox + (p.X * scale), oy + (p.Y * scale))), fill: false);
+          }
+        }
+        else
+        {
+          c.Rect(ox, oy, sheetW * scale, sheetH * scale, 0.8);
+        }
         foreach (var pp in sp.PartPlacements)
         {
           var poly = pp.PlacedPart;
@@ -594,9 +606,15 @@ namespace DeepNestSharp.Reports
       c.Text(395, 16, 8, bold: false, LF("Rep_Page", page, of));
     }
 
+    /// <summary>The metal of a sheet: its box, or for a sheet read from a drawing its outline less its holes.</summary>
+    private static double SheetArea(ISheet sheet)
+      => DeepNestLib.IO.SheetShape.IsShaped(sheet)
+        ? RasterNest.SparrowNestService.ShapeArea(sheet)
+        : sheet.WidthCalculated * sheet.HeightCalculated;
+
     private static double Util(ISheetPlacement sp)
     {
-      double area = sp.Sheet.WidthCalculated * sp.Sheet.HeightCalculated;
+      double area = SheetArea(sp.Sheet);
       return area <= 0 ? 0 : sp.PartPlacements.Sum(p => Math.Abs(p.Part.NetArea)) / area * 100.0;
     }
 

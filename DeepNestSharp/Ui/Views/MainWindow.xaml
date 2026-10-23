@@ -401,14 +401,19 @@
                 <GridViewColumn x:Name="colHeaderSheetDimensions" Header="Размеры листа (Ширина × Высота), мм" Width="230">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
-                      <TextBlock FontWeight="Bold" FontSize="13" VerticalAlignment="Center" Margin="4,0">
-                        <TextBlock.Text>
-                          <MultiBinding StringFormat="{}{0} × {1}">
-                            <Binding Path="Width" Mode="OneWay" />
-                            <Binding Path="Height" Mode="OneWay" />
-                          </MultiBinding>
-                        </TextBlock.Text>
-                      </TextBlock>
+                      <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
+                        <TextBlock FontWeight="Bold" FontSize="13" VerticalAlignment="Center">
+                          <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} × {1}">
+                              <Binding Path="Width" Mode="OneWay" />
+                              <Binding Path="Height" Mode="OneWay" />
+                            </MultiBinding>
+                          </TextBlock.Text>
+                        </TextBlock>
+                        <!-- A sheet of any shape, read from a drawing: its file, beside the box round it. -->
+                        <TextBlock Text="{Binding ShapeName, Mode=OneWay}" Margin="8,0,0,0" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource Brush.TextMuted}" ToolTip="{Binding ShapePath, Mode=OneWay}" />
+                      </StackPanel>
                     </DataTemplate>
                   </GridViewColumn.CellTemplate>
                 </GridViewColumn>

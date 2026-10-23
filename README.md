@@ -34,7 +34,8 @@ This is the acvent.bg fork of [ManuelMRosa/SheetNest](https://github.com/ManuelM
 - A kit **multiplier**.
 - **Material and thickness** per job.
 - **Sheet priority**: offcuts and remnants are used first and listed first.
-- Metric sheets by default.
+- **Offcuts of any shape**: Add sheet → "Sheet from a drawing (DXF, CHF)…" takes the largest contour of a drawing as the sheet's edge and the contours inside it as holes. Parts go only on the metal, keeping the margin from the edge and from the holes; such a sheet is packed with no-fit polygons rather than by the engine (a few hundred parts in about a second), and the layout and report show its real outline.
+- Metric sheets by default; the standard sizes stand: 1000 × 2000, 1250 × 2500, 500 × 1250.
 
 **Nesting**
 - **Fill-up**: big parts still waiting are offered to each finished sheet before a new one is started. A real three-sheet job now nests on two.

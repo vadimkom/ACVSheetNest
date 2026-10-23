@@ -90,7 +90,7 @@
 
     /// <summary>Shows the dialog; if the shell still refuses where it was told to open (a drive that went
     /// between the check and the call, a network folder that no longer answers), shows it again without.</summary>
-    private static bool Show(FileDialog dialog)
+    internal static bool Show(FileDialog dialog)
     {
       try
       {

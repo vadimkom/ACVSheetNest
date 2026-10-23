@@ -41,7 +41,7 @@ When resuming:
   - `nest-profiles.json` (Draft/Nest engine settings);
   - `shapes/`, `autosave/`, crash logs.
 - The user's CHF drawings: `E:/chf` (578 files, used to verify the CHF reader).
-- Rust toolchain for rebuilding Sparrow: `%USERPROFILE%/.cargo`. See BUILDING.md.
+- Rust toolchain for rebuilding Sparrow: not installed on this machine (checked 2026-10-23: no `.cargo`, no MSVC build tools). See BUILDING.md. Sparrow sources at 961ec31 are cloned in `C:/src/sparrow`.
 - Do not kill the user's running SheetNest without asking. Stop only the test instances you started, by their own process id. The MSI scripts up to 1.1.40 closed every running SheetNest (which killed the user's open job on 2026-10-15); from 1.1.41 they do not.
 - Each running copy autosaves to `%LOCALAPPDATA%/SheetNest/autosave/recovery-{pid}.dnest`; recovery is offered only for a copy that is no longer running. Screenshot automation: `assets/demo/take-screenshots.ps1` (-language, -width, -height).
 
@@ -171,7 +171,12 @@ Last verified (2026-10-21, 1.1.49): core 1087/1089; app 492/492 with the engine 
 - Material and thickness are set per project (`ProjectInfo.Material/Thickness`) and remembered for the next job.
   - Materials: black, galvanized, stainless, aluminium; densities 7.85 / 7.85 / 7.93 / 2.70.
   - Thickness: 0.6, 0.7, 0.8, 1, 1.2, 1.5, 2, 3, 4, 5, or typed.
-- Standard metric sheets: 2000×1000, 2500×1250, 1250×500. Anything else via "Custom size".
+- Standard sheets stand (since 1.1.52, the user's request): 1000×2000, 1250×2500, 500×1250 mm; the inch list likewise short side first; Custom size opens at 1500×3000. Anything else via "Custom size". The engine packs along the longer side either way: on the flat patterns 1000×2000 gave the same 8 sheets as 2000×1000, 1250×2500 the same 4.
+- **Sheets from a drawing** (Add sheet → "Sheet from a drawing (DXF, CHF)…", `SheetShape.Load`, `ISheetLoadInfo.ShapePath`): an offcut of any shape. The largest closed contour is the edge, closed contours inside it are holes, anything outside is dropped; moved so its box starts at 0,0. The row's W×H is the rounded box (rounded like the "used / in stock" and cut-sheet matching), priority 1, quantity 1; the file is read again on every nest, as parts are.
+  - Packed by `SparrowNestService.PackShapedSheet` (`RasterNest/ShapedSheetPacker.cs`), not by Sparrow (a strip packer; patching it needs Rust): no-fit polygons with Clipper Minkowski sums, per part and angle; the position that keeps the pack shortest along the long side, then lowest across. Counted parts by priority and size first, fillers after. Fill-up, top-up, last chance and the common-line planner are skipped on such a sheet; `DeferUnfit` and `DropOutsideShape` still judge it. A drawing that is a plain rectangle goes to Sparrow as usual.
+  - Measured: the L-shaped test offcut with a hole takes 245 parts (flat patterns + 300 discs) in 1.1 s (`ShapedSheetFixture`).
+  - The layout, thumbnails and report draw the outline and holes (`SheetShape.IsShaped`), utilisation is over the metal, and the editor paints a part red off the metal or inside the margin of the edge or a hole (`IsOutsideShape`).
+  - Not done: the offcut line (`OffcutOptions`) still measures the box; a shaped and a rectangular sheet with the same rounded box share the "used / in stock" count.
 - Part sizes load in `Task.Run` once, and the notification goes back to the asking thread's context. A report of missing sizes on the user's PC could not be reproduced; ask for a screenshot if it recurs.
 
 **Import**

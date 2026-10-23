@@ -426,6 +426,12 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Индивидуален размер…</value>
   </data>
+  <data name="Menu_SheetFromDrawing" xml:space="preserve">
+    <value>Лист от чертеж (DXF, CHF)…</value>
+  </data>
+  <data name="Msg_SheetShapeUnreadable" xml:space="preserve">
+    <value>Листът {0} не може да бъде прочетен: {1}</value>
+  </data>
   <data name="Menu_Exit" xml:space="preserve">
     <value>Изход</value>
   </data>
