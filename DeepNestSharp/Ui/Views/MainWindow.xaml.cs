@@ -1589,6 +1589,21 @@ namespace DeepNestSharp.Ui.Views
       };
       menu.Items.Add(custom);
 
+      // A round offcut by its diameter: drawn as a circle once and added as a sheet from a drawing.
+      var round = new MenuItem { Header = Localization.Get("Menu_RoundSheet") };
+      round.Click += (_, __) =>
+      {
+        var dialog = new AddSheetWindow(this.unitsMm) { Owner = this };
+        dialog.UseRound();
+        if (dialog.ShowDialog() == true)
+        {
+          string path = DeepNestLib.IO.SheetShape.RoundSheetFile(dialog.SheetWidth, this.unitsMm ? "mm" : "in");
+          this.AddSheetOfSize(dialog.SheetWidth, dialog.SheetWidth, dialog.SheetQuantity, dialog.SheetUnlimited, dialog.SheetPriority, path);
+          this.SortSheetsByPriority();
+        }
+      };
+      menu.Items.Add(round);
+
       var fromDrawing = new MenuItem { Header = Localization.Get("Menu_SheetFromDrawing") };
       fromDrawing.Click += (_, __) => this.AddSheetsFromDrawings();
       menu.Items.Add(fromDrawing);

@@ -323,6 +323,22 @@ namespace DeepNestSharp.CiTests.RasterNest
       watch.ElapsedMilliseconds.Should().BeLessThan(30000);
     }
 
+    /// <summary>A round sheet given by its diameter is a circle drawn once and read back as a sheet of that shape.</summary>
+    [Fact]
+    public void RoundSheetByDiameterIsACircle()
+    {
+      string path = SheetShape.RoundSheetFile(500, "mm");
+      Path.GetFileName(path).Should().Be("Ø500 mm.dxf");
+      SheetShape.RoundSheetFile(500, "mm").Should().Be(path, "the same diameter reuses its drawing");
+
+      var shape = SheetShape.Load(path);
+      shape.MinX.Should().BeApproximately(0, 1e-6);
+      shape.MaxX.Should().BeApproximately(500, 0.05);
+      shape.MaxY.Should().BeApproximately(500, 0.05);
+      Math.Abs(shape.Area).Should().BeApproximately(Math.PI * 250 * 250, 200, "a circle (less its chords), not its box");
+      SheetShape.IsShaped(shape).Should().BeTrue();
+    }
+
     private static string FindTestData()
     {
       for (var d = new DirectoryInfo(AppContext.BaseDirectory); d != null; d = d.Parent)

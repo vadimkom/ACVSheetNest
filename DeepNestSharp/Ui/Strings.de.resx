@@ -426,6 +426,18 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Eigene Größe…</value>
   </data>
+  <data name="Menu_RoundSheet" xml:space="preserve">
+    <value>Rundes Blech (Durchmesser)…</value>
+  </data>
+  <data name="Sheet_Dlg_RoundTitle" xml:space="preserve">
+    <value>Rundes Blech</value>
+  </data>
+  <data name="Sheet_Dlg_RoundHeader" xml:space="preserve">
+    <value>Ein runder Rest: sein Durchmesser.</value>
+  </data>
+  <data name="Sheet_Dlg_Diameter" xml:space="preserve">
+    <value>Durchmesser ({0})</value>
+  </data>
   <data name="Fill_Even" xml:space="preserve">
     <value>Füllen: gleich viele</value>
   </data>

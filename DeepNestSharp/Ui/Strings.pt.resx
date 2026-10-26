@@ -426,6 +426,18 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Tamanho personalizado…</value>
   </data>
+  <data name="Menu_RoundSheet" xml:space="preserve">
+    <value>Chapa redonda (diâmetro)…</value>
+  </data>
+  <data name="Sheet_Dlg_RoundTitle" xml:space="preserve">
+    <value>Chapa redonda</value>
+  </data>
+  <data name="Sheet_Dlg_RoundHeader" xml:space="preserve">
+    <value>Uma sobra redonda: o seu diâmetro.</value>
+  </data>
+  <data name="Sheet_Dlg_Diameter" xml:space="preserve">
+    <value>Diâmetro ({0})</value>
+  </data>
   <data name="Fill_Even" xml:space="preserve">
     <value>Preencher: igual de cada</value>
   </data>

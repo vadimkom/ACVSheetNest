@@ -426,6 +426,18 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Custom size…</value>
   </data>
+  <data name="Menu_RoundSheet" xml:space="preserve">
+    <value>Round sheet (diameter)…</value>
+  </data>
+  <data name="Sheet_Dlg_RoundTitle" xml:space="preserve">
+    <value>Round sheet</value>
+  </data>
+  <data name="Sheet_Dlg_RoundHeader" xml:space="preserve">
+    <value>A round offcut: its diameter.</value>
+  </data>
+  <data name="Sheet_Dlg_Diameter" xml:space="preserve">
+    <value>Diameter ({0})</value>
+  </data>
   <data name="Fill_Even" xml:space="preserve">
     <value>Fill: as many of each</value>
   </data>

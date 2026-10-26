@@ -426,6 +426,18 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Произвольный размер…</value>
   </data>
+  <data name="Menu_RoundSheet" xml:space="preserve">
+    <value>Круглый лист (диаметр)…</value>
+  </data>
+  <data name="Sheet_Dlg_RoundTitle" xml:space="preserve">
+    <value>Круглый лист</value>
+  </data>
+  <data name="Sheet_Dlg_RoundHeader" xml:space="preserve">
+    <value>Круглый остаток: его диаметр.</value>
+  </data>
+  <data name="Sheet_Dlg_Diameter" xml:space="preserve">
+    <value>Диаметр ({0})</value>
+  </data>
   <data name="Fill_Even" xml:space="preserve">
     <value>Заполнение: поровну</value>
   </data>

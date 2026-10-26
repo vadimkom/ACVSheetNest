@@ -54,6 +54,29 @@ namespace DeepNestLib.IO
       return outer;
     }
 
+    /// <summary>
+    /// The drawing of a round sheet of <paramref name="diameter"/> (an offcut, a disc left from a bigger job),
+    /// written once to <c>%LOCALAPPDATA%\SheetNest\sheets</c> and reused: <c>Ø500 mm.dxf</c>. Such a sheet is
+    /// then a sheet from a drawing like any other.
+    /// </summary>
+    public static string RoundSheetFile(double diameter, string unit)
+    {
+      string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SheetNest", "sheets");
+      Directory.CreateDirectory(folder);
+      string size = diameter.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+      string path = Path.Combine(folder, $"Ø{size} {unit}.dxf");
+      if (!File.Exists(path))
+      {
+        var dxf = new IxMilia.Dxf.DxfFile();
+        dxf.Header.Version = IxMilia.Dxf.DxfAcadVersion.R2007;
+        double r = diameter / 2.0;
+        dxf.Entities.Add(new IxMilia.Dxf.Entities.DxfCircle(new IxMilia.Dxf.DxfPoint(r, r, 0), r) { Layer = "0" });
+        dxf.Save(path, true);
+      }
+
+      return path;
+    }
+
     /// <summary>Whether a sheet's outline is anything but a plain rectangle without holes.</summary>
     public static bool IsShaped(INfp sheet)
     {

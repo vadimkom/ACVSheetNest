@@ -68,6 +68,26 @@ namespace DeepNestSharp.Ui.Views
       this.cancelButton.Content = Localization.Get("Btn_Cancel");
     }
 
+    /// <summary>
+    /// A round sheet: one size, its diameter, in the width field (<see cref="SheetWidth"/>); no height and
+    /// nothing to remember as a preset. Offcuts are cut first, so it opens at the highest priority.
+    /// </summary>
+    public void UseRound()
+    {
+      string unit = this.isUnitsMm ? Localization.Get("Unit_Mm") : Localization.Get("Unit_In");
+      this.isRound = true;
+      this.Title = Localization.Get("Sheet_Dlg_RoundTitle");
+      this.headerText.Text = Localization.Get("Sheet_Dlg_RoundHeader");
+      this.widthLabel.Text = string.Format(Localization.Get("Sheet_Dlg_Diameter"), unit);
+      this.widthUpDown.Value = this.isUnitsMm ? 800 : 30;
+      this.heightLabel.Visibility = Visibility.Collapsed;
+      this.heightUpDown.Visibility = Visibility.Collapsed;
+      this.rememberCheck.Visibility = Visibility.Collapsed;
+      this.priorityCombo.SelectedValue = 1;
+    }
+
+    private bool isRound;
+
     /// <summary>Reuses the dialog to EDIT an existing stock row: pre-filled values, edit wording.</summary>
     public void PrefillForEdit(int width, int height, int quantity, bool unlimited = false, int priority = 5)
     {
@@ -108,7 +128,7 @@ namespace DeepNestSharp.Ui.Views
       this.qtyUpDown.CommitInput();
 
       this.SheetWidth = this.widthUpDown.Value ?? (this.isUnitsMm ? 1500 : 60);
-      this.SheetHeight = this.heightUpDown.Value ?? (this.isUnitsMm ? 3000 : 120);
+      this.SheetHeight = this.isRound ? this.SheetWidth : this.heightUpDown.Value ?? (this.isUnitsMm ? 3000 : 120);
       this.SheetQuantity = this.qtyUpDown.Value ?? 1;
       this.SheetUnlimited = this.unlimitedCheck.IsChecked == true;
       this.SheetPriority = (this.priorityCombo.SelectedValue as int?) ?? 5;

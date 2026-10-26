@@ -426,6 +426,18 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Format personnalisé…</value>
   </data>
+  <data name="Menu_RoundSheet" xml:space="preserve">
+    <value>Tôle ronde (diamètre)…</value>
+  </data>
+  <data name="Sheet_Dlg_RoundTitle" xml:space="preserve">
+    <value>Tôle ronde</value>
+  </data>
+  <data name="Sheet_Dlg_RoundHeader" xml:space="preserve">
+    <value>Une chute ronde : son diamètre.</value>
+  </data>
+  <data name="Sheet_Dlg_Diameter" xml:space="preserve">
+    <value>Diamètre ({0})</value>
+  </data>
   <data name="Fill_Even" xml:space="preserve">
     <value>Remplir : autant de chaque</value>
   </data>
