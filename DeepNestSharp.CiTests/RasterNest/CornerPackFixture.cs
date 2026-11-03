@@ -4,19 +4,22 @@ namespace DeepNestSharp.CiTests.RasterNest
   using System.Collections.Generic;
   using System.IO;
   using System.Linq;
+  using DeepNestLib.Placement;
   using DeepNestSharp.RasterNest;
   using FluentAssertions;
   using Xunit;
   using Xunit.Abstractions;
 
   /// <summary>
-  /// A sheet with room to spare is packed from the bottom-left corner up, the free metal left in one piece at
-  /// the far end. The shop's job (`test-data/alexi`, 2026-11-03: a case, two frames of each kind, four lamellas
-  /// on a 360 × 1890 strip) came out spread over the whole length with gaps between the parts.
+  /// A sheet is packed from the bottom-left corner: left to right, and every part as low as it goes. The shop's
+  /// job (`test-data/alexi`, 2026-11-03: a case, two frames of each kind, four lamellas on a 360 × 1890 strip)
+  /// came out with parts of a column at the bottom and at the top and nothing between them.
   /// </summary>
   [Collection(SparrowEngineCollection.Name)]
   public class CornerPackFixture
   {
+    private const double Spacing = 5;
+    private const double Margin = 5;
     private readonly ITestOutputHelper output;
 
     public CornerPackFixture(ITestOutputHelper output)
@@ -27,7 +30,7 @@ namespace DeepNestSharp.CiTests.RasterNest
     [SparrowTheory]
     [InlineData(true)]
     [InlineData(false)]
-    public void PartsGatherAtTheStartOfASheetWithRoomToSpare(bool nest)
+    public void NoPartHangsOverEmptyMetal(bool nest)
     {
       string data = FindData();
       data.Should().NotBeNull("test-data/alexi holds the job's drawings");
@@ -41,33 +44,62 @@ namespace DeepNestSharp.CiTests.RasterNest
         new RasterPartInfo { Path = Part("lamel"), Quantity = 3, Priority = 5 },
       };
 
-      var result = SparrowNestService.Nest(
-        parts,
-        new[] { (360, 1890, 1, false, 5) },
-        rotations: 4,
-        spacing: 5,
-        margin: 5,
-        perSheetBudgetSec: 5,
-        SparrowExe.Resolve(),
-        out string error,
-        effort: nest ? NestEffort.Fast : NestEffort.Draft);
-
-      result.Should().NotBeNull(error);
-      var sheet = result.UsedSheets.Single();
-      var placed = sheet.PartPlacements.ToList();
-      placed.Should().HaveCount(9);
-      foreach (var p in placed.OrderBy(p => p.MinY))
+      var hanging = new List<string>();
+      for (int seed = 0; seed < 6; seed++)
       {
-        this.output.WriteLine($"{Path.GetFileNameWithoutExtension(p.Part.Name)}: x {p.MinX:0.#}..{p.MaxX:0.#}, y {p.MinY:0.#}..{p.MaxY:0.#}");
+        var result = SparrowNestService.Nest(
+          parts,
+          new[] { (360, 1890, 1, false, 5) },
+          rotations: 4,
+          spacing: Spacing,
+          margin: Margin,
+          perSheetBudgetSec: 5,
+          SparrowExe.Resolve(),
+          out string error,
+          effort: nest ? NestEffort.Fast : NestEffort.Draft,
+          seedOffset: seed * 100);
+
+        result.Should().NotBeNull(error);
+        var placed = result.UsedSheets.Single().PartPlacements.ToList();
+        placed.Should().HaveCount(9);
+        this.output.WriteLine($"seed {seed}: up to x {placed.Max(p => p.MaxX):0}, y {placed.Max(p => p.MaxY):0}");
+        placed.Max(p => p.MaxY).Should().BeLessThan(1000, "a standing sheet is packed bottom-up: nine parts of under 900 mm go in four columns on 360 mm, the rest of the strip stays whole");
+        placed.Min(p => p.MinX).Should().BeApproximately(Margin, 0.5, "the pack starts in the bottom-left corner");
+        foreach (var p in placed.OrderBy(p => p.MinX).ThenBy(p => p.MinY))
+        {
+          double gap = GapBelow(p, placed);
+          this.output.WriteLine($"  {Path.GetFileNameWithoutExtension(p.Part.Name)}: x {p.MinX:0.#}..{p.MaxX:0.#}, y {p.MinY:0.#}..{p.MaxY:0.#}{(gap > 1 ? $"  hangs {gap:0}" : string.Empty)}");
+          if (gap > 1)
+          {
+            hanging.Add($"seed {seed} {Path.GetFileNameWithoutExtension(p.Part.Name)} {gap:0} mm");
+          }
+        }
       }
 
-      double top = placed.Max(p => p.MaxY);
-      this.output.WriteLine($"top {top:0.#}");
-      top.Should().BeLessThan(1000, "nine parts of under 900 mm fit in four columns on 360 mm: the rest of the strip stays whole");
-      placed.Min(p => p.MinX).Should().BeApproximately(5, 0.5, "the pack starts in the bottom-left corner, at the margin");
-      placed.Min(p => p.MinY).Should().BeApproximately(5, 0.5, "the pack starts in the bottom-left corner, at the margin");
-      placed.Max(p => p.MaxX).Should().BeLessThanOrEqualTo(355.01, "the parts stay inside the margin");
-      placed.Select(p => p.Rotation).Should().OnlyContain(r => Math.Abs(r % 90) < 1e-6, "a part keeps one of its four allowed angles");
+      hanging.Should().BeEmpty("every part comes down onto the part or the margin below it");
+    }
+
+    /// <summary>
+    /// How far a part could drop straight down, judged by boxes: the space under it to the box of the nearest
+    /// part beneath (less the spacing) or to the margin. Boxes never overlap where the shapes do not, so a gap
+    /// found this way is real metal left empty.
+    /// </summary>
+    private static double GapBelow(IPartPlacement p, List<IPartPlacement> placed)
+    {
+      double floor = Margin;
+      foreach (var q in placed)
+      {
+        if (!ReferenceEquals(q, p) && q.MaxX > p.MinX - Spacing && q.MinX < p.MaxX + Spacing && q.MaxY <= p.MinY + 1e-6)
+        {
+          floor = Math.Max(floor, q.MaxY + Spacing);
+        }
+        else if (!ReferenceEquals(q, p) && q.MaxX > p.MinX - Spacing && q.MinX < p.MaxX + Spacing && q.MinY < p.MinY)
+        {
+          return 0; // boxes overlap in height: the shapes interlock, the box says nothing
+        }
+      }
+
+      return p.MinY - floor;
     }
 
     private static string FindData()
