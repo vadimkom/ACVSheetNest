@@ -1928,4 +1928,40 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Upd_WillRestart" xml:space="preserve">
     <value>SheetNest se cerrará, instalará la actualización y se abrirá de nuevo. Si pregunta por guardar el trabajo, responda como siempre; si lo deja abierto, la actualización se instalará al cerrarlo.</value>
   </data>
+  <data name="Btn_VirtualSheets" xml:space="preserve">
+    <value>⚠ Falta material…</value>
+  </data>
+  <data name="Tip_VirtualSheets" xml:space="preserve">
+    <value>Las piezas que no cupieron, en chapas estándar virtuales: cuánto comprar. Se pueden guardar como trabajo para más tarde.</value>
+  </data>
+  <data name="Title_VirtualSheets" xml:space="preserve">
+    <value>Falta material: chapas virtuales</value>
+  </data>
+  <data name="Virtual_Header" xml:space="preserve">
+    <value>{0} piezas no cupieron en el stock. Anidadas en {1} chapas virtuales {2} × {3} {4}: eso es lo que hay que comprar. Estas chapas solo se muestran: no se cortan, no se exportan ni cuentan en los totales del informe.</value>
+  </data>
+  <data name="Virtual_TooBig" xml:space="preserve">
+    <value>{0} piezas no caben ni en una chapa así.</value>
+  </data>
+  <data name="Virtual_FileSuffix" xml:space="preserve">
+    <value> - resto</value>
+  </data>
+  <data name="Btn_SaveForLater" xml:space="preserve">
+    <value>Guardar para más tarde…</value>
+  </data>
+  <data name="Msg_SavedForLater" xml:space="preserve">
+    <value>Guardado: {0}. Ábralo y anide cuando llegue el material.</value>
+  </data>
+  <data name="Msg_NoVirtualSheets" xml:space="preserve">
+    <value>En este anidado no sobra nada.</value>
+  </data>
+  <data name="Msg_VirtualHint" xml:space="preserve">
+    <value>Faltan: {0} chapas {1} × {2} (botón «Falta material» en Anidado).</value>
+  </data>
+  <data name="Rep_ToBuy" xml:space="preserve">
+    <value>Comprar</value>
+  </data>
+  <data name="Rep_ToBuySheets" xml:space="preserve">
+    <value>{0} uds. {1} × {2} {3}</value>
+  </data>
 </root>

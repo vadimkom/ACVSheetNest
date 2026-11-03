@@ -111,7 +111,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-10-23, 1.1.57): core 1087/1089; app 499/499 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
+Last verified (2026-11-03, 1.1.60): core 1087/1089; app 507/507 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
@@ -122,12 +122,14 @@ Last verified (2026-10-23, 1.1.57): core 1087/1089; app 499/499 with the engine 
   - Both read `nest-profiles.json` on every press. The file is written with defaults on first run; nonsense values fall back to defaults; an unreadable file gives defaults plus a message.
   - Normal/Best still exist in code for tests but are not in the UI.
 - **Fill-up** (`SparrowNestService.FillUp`): after the best sheet size is chosen, it offers waiting large parts (≥5% of the sheet, area permitting) one at a time, largest first, up to 4 packs. A part stays only if the whole set still fits. Sheets with common-line parts are left alone. It took `test1` from 3 sheets to 2.
+- **Part priority is kept** (`SparrowNestService.PriorityFirst`, since 1.1.60, the user: "if I set a priority, it matters"). The engine is priority-blind and a sheet keeps what lands inside the strip, so after a pack, when a part of a better priority waits while a worse one is on the sheet, the sheet is packed again with all parts of that priority and better, and the worse copies on it less enough room (worst priority and biggest first; 10 %, then +30 % a try, up to 4 packs). Fill-up then adds back what fits. The cap job (`test-data/priority`, 125 % of one 1250×1250) left a side of priority 1 off with lamellas of 5 on; now all four sides and all four uprights (3) go on (`PriorityFirstFixture`, fails without it).
 - Sheet priority: higher-priority stock (offcuts) is consumed first, listed first, and shown first in the viewer, report and export. A worse-priority size is not run through Sparrow once a better one has packed.
 - Parallel searches: Auto = cores / threads per search, at most 8. `sparrow.exe` runs at BelowNormal priority. The result does not depend on concurrency.
 - The variants list holds only finished nests of the whole job, one per press, no duplicates. The best is starred: all parts placed, then fewest sheets, then highest utilisation. Per-sheet attempts only draw in the preview.
 - **Sheet quantities stay as entered** (since 1.1.51). A nest only reports what it used: `ConsumeStock` returns counts by size and the badge reads "used / in stock".
   - Up to 1.1.50 a nest took its sheets off the quantities and gave them back on the next nest. That summed up: a sheet added after a nest came on top of the ones it held, and the user saw "2/3".
   - Projects saved that way carry `SheetsKeptWhole = false`. On opening they get the sheets back once (`ReturnStock`).
+- **Not enough material → virtual sheets** (since 1.1.60, the user's request). When the stock runs out (no unlimited size) the parts left over (`LeftOverJob.Owed`: populations less what the result placed, by drawing and hand) are laid by a Draft nest on unlimited virtual 1250×2500 mm (48×96 in) sheets, cached per result (`MainWindow.virtualNests`). The "not enough sheets" message says how many; the Layout step shows "⚠ Не хватило материала…" (`VirtualSheetsWindow`, its own viewer). Shown only: not in the plan, export, cut ticking or totals; the report adds "Докупить: N шт. 1250 × 2500" (`ReportShortage`). "Сохранить на потом…" writes the project with only what is owed (spares folded in, mirrored apart, fill rows dropped), the virtual sheets as stock, no nest (`LeftOverJob.ProjectJson`; `LeftOverJobFixture`). Not clicked through in the running app.
 - **Cut sheets, nest the rest** (`CutSheets.DeductParts/TakeCutSheets`): ticked sheets' parts come off the order (mirrored from the mirrored count, others from quantity, then from spares). The cut sheets come off the quantities for good, the only place sheets leave the stock. A part quantity may be 0; such rows are not sent to the engine.
 - **Move a part between sheets** (`DxfViewer.MoveSelectedTo`): only between single-copy sheets without common cutting. The part goes to the first free spot bottom-left, or stays red in place. An emptied sheet returns to stock (`SheetRemoved`). One undo step.
 - **Fill the sheets** (`IDetailLoadInfo.FillSheets`; "Fill the sheets" in + Shape and in the part's "…"): a row with no count, e.g. a sheet of washers. The operator picks sheets as usual; the nest puts on as many as fit after every counted part.

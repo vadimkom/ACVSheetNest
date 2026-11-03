@@ -968,6 +968,23 @@ namespace DeepNestSharp.RasterNest
         // A shaped sheet was packed from the whole pool, fillers included, and the passes below only know
         // rectangles.
         bool shapedSheet = bestSize.Shape != null;
+
+        // The engine is priority-blind: a part of a better priority can land outside the sheet while worse ones
+        // are on it. Give it the room of the worse ones first.
+        if (!shapedSheet && !cancel.IsCancellationRequested)
+        {
+          var kept = PriorityFirst(
+            loaded, loadedById, pool, bestPlacements, bestPlacedBySrc, bestW, bestH, margin,
+            effort, WatchdogSeconds(perSheetBudgetSec, effort), sparrowExePath, cancel,
+            commonLineGap, geometryTolerance, commonLineMaxClusterParts, seedOffset);
+          if (kept.Placements != null)
+          {
+            bestPlacements = kept.Placements;
+            bestPlacedBySrc = kept.PlacedBySrc;
+            bestCommonEdges = kept.CommonEdges;
+          }
+        }
+
         if (!shapedSheet && FillUpEnabled && (NestProfiles.For(effort)?.FillUp ?? true) && !cancel.IsCancellationRequested)
         {
           var fill = FillUp(
@@ -1569,6 +1586,119 @@ namespace DeepNestSharp.RasterNest
 
       return keptPlacements == null ? (null, null, null) : (keptPlacements, current, keptEdges);
     }
+
+    /// <summary>
+    /// Puts back on the sheet the parts of a better priority that the pack left off while parts of a worse
+    /// priority went on: the worse ones, worst and biggest first, make room for them, a few at a time, until
+    /// every better part still waiting is on. Null when nothing was out of order or no pack managed it.
+    /// </summary>
+    /// <remarks>
+    /// The engine is handed a sheet and a half of parts, best priority first, and keeps what lands inside the
+    /// sheet; where each lands is the order along its strip, not the priority. An operator's job of 125 % of
+    /// the one sheet in stock (2026-11-02) gave the four sides priority 1, and one side came back uncut while
+    /// twelve lamellas of priority 5 were on the sheet. Fill-up then adds back what the room allows.
+    /// </remarks>
+    private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySrc, List<CommonEdgeIntent> CommonEdges) PriorityFirst(
+      List<Loaded> loaded,
+      Dictionary<int, Loaded> loadedById,
+      Dictionary<int, int> pool,
+      List<IPartPlacement> placements,
+      Dictionary<int, int> placedBySrc,
+      int w,
+      int h,
+      double margin,
+      NestEffort effort,
+      int hardTimeoutSec,
+      string exe,
+      CancellationToken cancel,
+      double commonLineGap,
+      double geometryTolerance,
+      int commonLineMaxClusterParts,
+      int seedOffset)
+    {
+      if (placements == null || placedBySrc == null || placedBySrc.Count == 0
+        || placedBySrc.Keys.Any(k => loadedById[k].RequiresMergedLines))
+      {
+        return (null, null, null);
+      }
+
+      int On(Dictionary<int, int> on, int src) => on.TryGetValue(src, out int n) ? n : 0;
+      double Area(int src) => Math.Abs(loadedById[src].Nfp.Area);
+      int worstOn = placedBySrc.Keys.Where(k => !loadedById[k].Fill).Select(k => loadedById[k].Priority).DefaultIfEmpty(int.MinValue).Max();
+      var missed = pool.Keys
+        .Where(k => !loadedById[k].Fill && !loadedById[k].RequiresMergedLines
+          && loadedById[k].Priority < worstOn
+          && pool[k] > On(placedBySrc, k)
+          && FitsOnSheet(loadedById[k], w, h, margin))
+        .ToList();
+      if (missed.Count == 0)
+      {
+        return (null, null, null);
+      }
+
+      // Every part of the missed priorities, and of better ones, that is waiting must go on; worse parts give way.
+      int bar = missed.Max(k => loadedById[k].Priority);
+      var wanted = pool.Keys.Where(k => !loadedById[k].Fill && loadedById[k].Priority <= bar && pool[k] > 0 && FitsOnSheet(loadedById[k], w, h, margin))
+        .ToDictionary(k => k, k => pool[k]);
+      double need = missed.Sum(k => (pool[k] - On(placedBySrc, k)) * Area(k));
+
+      // The worse copies on the sheet, worst priority first, then the biggest: the fewest to take off.
+      var worse = placedBySrc
+        .Where(kv => loadedById[kv.Key].Priority > bar)
+        .SelectMany(kv => Enumerable.Repeat(kv.Key, kv.Value))
+        .OrderByDescending(k => loadedById[k].Priority)
+        .ThenByDescending(Area)
+        .ThenBy(k => k)
+        .ToList();
+      for (int attempt = 0; attempt < 4 && !cancel.IsCancellationRequested; attempt++)
+      {
+        // Room for what is missing, a little more each time a pack still left one off.
+        double free = need * (1.1 + (0.3 * attempt));
+        var batch = new Dictionary<int, int>(wanted);
+        double freed = 0;
+        foreach (int k in worse)
+        {
+          if (freed < free)
+          {
+            freed += Area(k);
+            continue;
+          }
+
+          batch[k] = On(batch, k) + 1;
+        }
+
+        Interlocked.Increment(ref DiagFillAttempts);
+        var (pl, by, _, _, _, _, edges, _) = PackOneSheet(
+          loaded,
+          batch,
+          w,
+          h,
+          margin,
+          IterationBudget(effort),
+          SearchWorkers(effort),
+          hardTimeoutSec,
+          TriesFor(1, true, effort),
+          exe,
+          cancel,
+          null,
+          commonLineGap,
+          geometryTolerance,
+          effort,
+          commonLineMaxClusterParts,
+          out _,
+          seedOffset: seedOffset + 100 + attempt);
+        if (pl != null && by != null && wanted.All(kv => On(by, kv.Key) >= kv.Value))
+        {
+          Interlocked.Increment(ref DiagPriorityRestored);
+          return (pl, by.Where(kv => kv.Value > 0).ToDictionary(kv => kv.Key, kv => kv.Value), edges);
+        }
+      }
+
+      return (null, null, null);
+    }
+
+    /// <summary>Sheets on which <see cref="PriorityFirst"/> put the better parts back (diagnostics).</summary>
+    internal static int DiagPriorityRestored;
 
     /// <summary>
     /// Adds the parts that fill the sheets (no count) around the counted parts a sheet was packed with, the

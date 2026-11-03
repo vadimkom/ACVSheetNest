@@ -31,7 +31,8 @@ namespace DeepNestSharp.Reports
       int unplacedCount,
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
-      ReportMaterial material = null)
+      ReportMaterial material = null,
+      ReportShortage shortage = null)
     {
       var pdf = new MiniPdf();
       GenerateReport(
@@ -43,7 +44,8 @@ namespace DeepNestSharp.Reports
         unplacedCount,
         units,
         partColours,
-        material);
+        material,
+        shortage);
 
       File.WriteAllBytes(path, pdf.Build());
     }
@@ -53,7 +55,8 @@ namespace DeepNestSharp.Reports
       int unplacedCount,
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
-      ReportMaterial material = null)
+      ReportMaterial material = null,
+      ReportShortage shortage = null)
     {
       var pdf = new MiniPdf();
       GenerateReport(
@@ -65,7 +68,8 @@ namespace DeepNestSharp.Reports
         unplacedCount,
         units,
         partColours,
-        material);
+        material,
+        shortage);
 
       return pdf.Build();
     }
@@ -75,7 +79,8 @@ namespace DeepNestSharp.Reports
       int unplacedCount,
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
-      ReportMaterial material = null)
+      ReportMaterial material = null,
+      ReportShortage shortage = null)
     {
       var doc = new System.Windows.Documents.FixedDocument();
       GenerateReport(
@@ -97,7 +102,8 @@ namespace DeepNestSharp.Reports
         unplacedCount,
         units,
         partColours,
-        material);
+        material,
+        shortage);
 
       return doc;
     }
@@ -107,7 +113,8 @@ namespace DeepNestSharp.Reports
       int unplacedCount,
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
-      ReportMaterial material = null)
+      ReportMaterial material = null,
+      ReportShortage shortage = null)
     {
       var pages = new List<System.Windows.FrameworkElement>();
       GenerateReport(
@@ -121,7 +128,8 @@ namespace DeepNestSharp.Reports
         unplacedCount,
         units,
         partColours,
-        material);
+        material,
+        shortage);
 
       return pages;
     }
@@ -132,7 +140,8 @@ namespace DeepNestSharp.Reports
       int unplacedCount,
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
-      ReportMaterial material = null)
+      ReportMaterial material = null,
+      ReportShortage shortage = null)
     {
       if (layouts == null || layouts.Count == 0)
       {
@@ -142,8 +151,8 @@ namespace DeepNestSharp.Reports
       // A parts list that does not fit carries on over extra pages, so neither the page count in the footers
       // nor the page a layout starts on (the cutting plan's Page column) is known until the list is laid out.
       // A dry run on blank canvases finds both; the real run then prints them.
-      var dry = Render(() => new NullCanvas(), layouts, unplacedCount, units, partColours, null, 0, material);
-      Render(newPage, layouts, unplacedCount, units, partColours, dry.LayoutPages, dry.Pages, material);
+      var dry = Render(() => new NullCanvas(), layouts, unplacedCount, units, partColours, null, 0, material, shortage);
+      Render(newPage, layouts, unplacedCount, units, partColours, dry.LayoutPages, dry.Pages, material, shortage);
     }
 
     private static (int Pages, List<int> LayoutPages) Render(
@@ -154,7 +163,8 @@ namespace DeepNestSharp.Reports
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours,
       IReadOnlyList<int> layoutPages,
       int pageCount,
-      ReportMaterial material)
+      ReportMaterial material,
+      ReportShortage shortage)
     {
       int page = 0;
       var layoutStarts = new List<int>();
@@ -318,6 +328,12 @@ namespace DeepNestSharp.Reports
         if (unplacedCount > 0)
         {
           JRow(L("Rep_NotPlaced"), unplacedCount.ToString(CultureInfo.InvariantCulture), warn: true);
+        }
+
+        // What the stock ran short of: the parts left over laid on virtual sheets, to say how many to buy.
+        if (shortage != null && shortage.Sheets > 0)
+        {
+          JRow(L("Rep_ToBuy"), LF("Rep_ToBuySheets", shortage.Sheets, Num(shortage.Width), Num(shortage.Height), UnitWord(units)), warn: true);
         }
 
         // CUTTING PLAN — one row per layout, table form: what to cut, on what, how many times.

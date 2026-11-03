@@ -1928,4 +1928,40 @@ Abrir a página de download?</value>
   <data name="Upd_WillRestart" xml:space="preserve">
     <value>O SheetNest vai fechar, instalar a atualização e abrir de novo. Se perguntar sobre salvar o trabalho, responda como de costume; se deixá-lo aberto, a atualização será instalada ao fechá-lo.</value>
   </data>
+  <data name="Btn_VirtualSheets" xml:space="preserve">
+    <value>⚠ Falta material…</value>
+  </data>
+  <data name="Tip_VirtualSheets" xml:space="preserve">
+    <value>As peças que não couberam, em chapas padrão virtuais: quanto comprar. Podem ser salvas como trabalho para depois.</value>
+  </data>
+  <data name="Title_VirtualSheets" xml:space="preserve">
+    <value>Falta material: chapas virtuais</value>
+  </data>
+  <data name="Virtual_Header" xml:space="preserve">
+    <value>{0} peças não couberam no estoque. Encaixadas em {1} chapas virtuais {2} × {3} {4}: é o que precisa comprar. Estas chapas só aparecem: não são cortadas, exportadas nem contadas nos totais do relatório.</value>
+  </data>
+  <data name="Virtual_TooBig" xml:space="preserve">
+    <value>{0} peças não cabem nem numa chapa assim.</value>
+  </data>
+  <data name="Virtual_FileSuffix" xml:space="preserve">
+    <value> - resto</value>
+  </data>
+  <data name="Btn_SaveForLater" xml:space="preserve">
+    <value>Salvar para depois…</value>
+  </data>
+  <data name="Msg_SavedForLater" xml:space="preserve">
+    <value>Salvo: {0}. Abra e encaixe quando o material chegar.</value>
+  </data>
+  <data name="Msg_NoVirtualSheets" xml:space="preserve">
+    <value>Neste encaixe não sobra nada.</value>
+  </data>
+  <data name="Msg_VirtualHint" xml:space="preserve">
+    <value>Faltam: {0} chapas {1} × {2} (botão «Falta material» em Encaixe).</value>
+  </data>
+  <data name="Rep_ToBuy" xml:space="preserve">
+    <value>Comprar</value>
+  </data>
+  <data name="Rep_ToBuySheets" xml:space="preserve">
+    <value>{0} un. {1} × {2} {3}</value>
+  </data>
 </root>

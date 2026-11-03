@@ -1928,4 +1928,40 @@ Open the download page?</value>
   <data name="Upd_WillRestart" xml:space="preserve">
     <value>SheetNest will now close, install the update and start again. If it asks to save the job, answer as usual; if you keep it open, the update installs when you close it.</value>
   </data>
+  <data name="Btn_VirtualSheets" xml:space="preserve">
+    <value>⚠ Not enough material…</value>
+  </data>
+  <data name="Tip_VirtualSheets" xml:space="preserve">
+    <value>The parts left uncut, laid on virtual standard sheets: how many to buy. Save them as a job for later.</value>
+  </data>
+  <data name="Title_VirtualSheets" xml:space="preserve">
+    <value>Not enough material: virtual sheets</value>
+  </data>
+  <data name="Virtual_Header" xml:space="preserve">
+    <value>{0} parts did not fit on the stock. Laid on {1} virtual sheets {2} × {3} {4}: that is what to buy. These sheets are shown only: they are not cut, exported or counted in the report&apos;s totals.</value>
+  </data>
+  <data name="Virtual_TooBig" xml:space="preserve">
+    <value>{0} parts do not fit even on such a sheet.</value>
+  </data>
+  <data name="Virtual_FileSuffix" xml:space="preserve">
+    <value> - left over</value>
+  </data>
+  <data name="Btn_SaveForLater" xml:space="preserve">
+    <value>Save for later…</value>
+  </data>
+  <data name="Msg_SavedForLater" xml:space="preserve">
+    <value>Saved: {0}. Open it and nest when the material comes.</value>
+  </data>
+  <data name="Msg_NoVirtualSheets" xml:space="preserve">
+    <value>Nothing is left over on this layout.</value>
+  </data>
+  <data name="Msg_VirtualHint" xml:space="preserve">
+    <value>Missing: {0} sheets {1} × {2} (see &quot;Not enough material&quot; in Layout).</value>
+  </data>
+  <data name="Rep_ToBuy" xml:space="preserve">
+    <value>To buy</value>
+  </data>
+  <data name="Rep_ToBuySheets" xml:space="preserve">
+    <value>{0} sheets {1} × {2} {3}</value>
+  </data>
 </root>

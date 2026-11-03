@@ -172,6 +172,7 @@ namespace DeepNestSharp.Ui.Views
       // The strip of layouts under the layout drawing, where cut sheets are ticked off.
       this.layoutStripItems.ItemsSource = this.layoutCutItems;
       this.dxfViewer.LayoutsChanged += (_, __) => this.RefreshLayoutStrip();
+      this.dxfViewer.LayoutsChanged += (_, __) => this.RefreshShortageButton();
       this.dxfViewer.SheetIndexChanged += this.OnLayoutShown;
       this.dxfViewer.PartRenameRequested += this.OnPartRenameRequested;
       this.nestDxfViewer.PartRenameRequested += this.OnPartRenameRequested;
@@ -893,6 +894,181 @@ namespace DeepNestSharp.Ui.Views
       session.LastMaterial = doc.ProjectInfo.Material;
       session.LastThickness = doc.ProjectInfo.Thickness;
       session.Save();
+    }
+
+    /// <summary>Virtual nests already made, one per result, so the window opens at once and the report can say what to buy.</summary>
+    private readonly System.Runtime.CompilerServices.ConditionalWeakTable<INestResult, INestResult> virtualNests = new();
+
+    /// <summary>The standard sheet the parts left over are laid on: 1250 × 2500 mm (48 × 96 in), standing.</summary>
+    private (int W, int H) VirtualSheetSize => this.unitsMm ? (1250, 2500) : (48, 96);
+
+    /// <summary>
+    /// What a result left uncut, as the engine takes it: every counted population less the copies the result
+    /// placed (matched by drawing and hand, in row order). Rows that fill the sheets are never owed.
+    /// </summary>
+    private List<RasterPartInfo> LeftOver(IProjectInfo project, INestResult result)
+      => LeftOverJob.Owed(this.Populations(project), result);
+
+    /// <summary>
+    /// The parts a result left uncut, laid on as many virtual standard sheets as they take (a quick Draft nest):
+    /// what the stock ran short of. Null when nothing is owed. Kept per result.
+    /// </summary>
+    private async Task<INestResult> VirtualNestFor(INestResult result)
+    {
+      if (result == null || (result.UnplacedParts?.Count ?? 0) == 0)
+      {
+        return null;
+      }
+
+      if (this.virtualNests.TryGetValue(result, out var known))
+      {
+        return known;
+      }
+
+      var project = (ViewModel.ActiveDocument as NestProjectViewModel)?.ProjectInfo;
+      string exe = ResolveSparrowExe();
+      if (project == null || exe == null)
+      {
+        return null;
+      }
+
+      var left = this.LeftOver(project, result);
+      if (left.Count == 0)
+      {
+        return null;
+      }
+
+      var cfg = ViewModel.SvgNestConfigViewModel.SvgNestConfig;
+      double unitScale = this.unitsMm ? CommonLineDefaults.InchesToMillimeters : 1.0;
+      var (w, h) = this.VirtualSheetSize;
+      var nest = await Task.Run(() => SparrowNestService.Nest(
+        left,
+        new[] { (w, h, 1, true, 5) },
+        cfg.Rotations,
+        cfg.Spacing,
+        cfg.SheetSpacing,
+        5,
+        exe,
+        out _,
+        effort: NestEffort.Draft,
+        geometryTolerance: CommonLineDefaults.DefaultGeometryToleranceInches * unitScale,
+        commonLineGap: cfg.CommonLineGapInches * unitScale,
+        commonLineMaxClusterParts: cfg.CommonLineMaxClusterParts));
+      if (nest == null || nest.UsedSheets.Count == 0)
+      {
+        return null;
+      }
+
+      this.virtualNests.AddOrUpdate(result, nest);
+      return nest;
+    }
+
+    /// <summary>What the report says to buy for the layout on screen, once its virtual nest is known.</summary>
+    private Reports.ReportShortage CurrentShortage()
+    {
+      var result = this.dxfViewer?.Result;
+      if (result == null || !this.virtualNests.TryGetValue(result, out var nest))
+      {
+        return null;
+      }
+
+      var (w, h) = this.VirtualSheetSize;
+      return new Reports.ReportShortage(nest.UsedSheets.Count, w, h);
+    }
+
+    /// <summary>The "not enough material" button shows while the layout on screen left parts uncut.</summary>
+    private void RefreshShortageButton()
+    {
+      if (this.btnVirtualSheets != null)
+      {
+        this.btnVirtualSheets.Visibility = (this.dxfViewer?.Result?.UnplacedParts?.Count ?? 0) > 0 ? Visibility.Visible : Visibility.Collapsed;
+      }
+    }
+
+    private async void OnVirtualSheets(object sender, RoutedEventArgs e)
+    {
+      var result = this.dxfViewer?.Result;
+      var project = (ViewModel.ActiveDocument as NestProjectViewModel)?.ProjectInfo;
+      if (result == null || project == null)
+      {
+        return;
+      }
+
+      INestResult nest;
+      var cursor = this.Cursor;
+      this.Cursor = System.Windows.Input.Cursors.Wait;
+      try
+      {
+        nest = await this.VirtualNestFor(result);
+      }
+      finally
+      {
+        this.Cursor = cursor;
+      }
+
+      if (nest == null)
+      {
+        ViewModel.MessageService.DisplayMessageBox(Localization.Get("Msg_NoVirtualSheets"), Localization.Get("Title_VirtualSheets"), DeepNestLib.MessageBoxIcon.Information);
+        return;
+      }
+
+      var (w, h) = this.VirtualSheetSize;
+      int parts = nest.UsedSheets.Sum(s => s.PartPlacements.Count);
+      string header = Localization.Format("Virtual_Header", parts, nest.UsedSheets.Count, w, h, this.unitsMm ? Localization.Get("Unit_Mm") : Localization.Get("Unit_In"));
+      if ((nest.UnplacedParts?.Count ?? 0) > 0)
+      {
+        header += " " + Localization.Format("Virtual_TooBig", nest.UnplacedParts.Count);
+      }
+
+      var window = new VirtualSheetsWindow(
+        nest,
+        header,
+        viewer =>
+        {
+          viewer.PartColours = this.dxfViewer.PartColours;
+          viewer.DefaultPartSpacing = this.dxfViewer.DefaultPartSpacing;
+          viewer.SheetEdgeMargin = this.dxfViewer.SheetEdgeMargin;
+          viewer.PartSpacings = this.dxfViewer.PartSpacings;
+        },
+        () => this.SaveForLater(project, result, nest))
+      {
+        Owner = this,
+      };
+      window.ShowDialog();
+    }
+
+    /// <summary>
+    /// Writes the parts a result left uncut as a job of their own: the same project with each row's quantity
+    /// cut down to what is still owed (spares included, mirrored copies apart), the rows owed nothing and the
+    /// rows that fill the sheets left out, and the virtual sheets as its stock. No nest is kept with it.
+    /// </summary>
+    private void SaveForLater(IProjectInfo project, INestResult result, INestResult nest)
+    {
+      string current = ViewModel.ActiveDocument?.FilePath;
+      string folder = string.IsNullOrEmpty(current) ? null : System.IO.Path.GetDirectoryName(current);
+      string name = (string.IsNullOrEmpty(current) ? "job" : System.IO.Path.GetFileNameWithoutExtension(current)) + Localization.Get("Virtual_FileSuffix") + ".dnest";
+      var dialog = new Microsoft.Win32.SaveFileDialog
+      {
+        Filter = DeepNestLib.NestProject.ProjectInfo.FileDialogFilter,
+        FileName = name,
+        InitialDirectory = DeepNestSharp.Ui.Services.FileIoService.UsableFolder(folder),
+      };
+      if (!DeepNestSharp.Ui.Services.FileIoService.Show(dialog))
+      {
+        return;
+      }
+
+      try
+      {
+        var (w, h) = this.VirtualSheetSize;
+        string json = LeftOverJob.ProjectJson(project.ToJson(), this.LeftOver(project, result), nest.UsedSheets.Count, w, h);
+        System.IO.File.WriteAllText(dialog.FileName, json);
+        ViewModel.MessageService.DisplayMessageBox(Localization.Format("Msg_SavedForLater", dialog.FileName), Localization.Get("Title_VirtualSheets"), DeepNestLib.MessageBoxIcon.Information);
+      }
+      catch (Exception ex)
+      {
+        ViewModel.MessageService.DisplayMessageBox(ex.GetBaseException().Message, Localization.Get("Title_VirtualSheets"), DeepNestLib.MessageBoxIcon.Warning);
+      }
     }
 
     /// <summary>The job's material for the report: its name, gauge and density, or null when none is chosen.</summary>
@@ -2432,53 +2608,14 @@ namespace DeepNestSharp.Ui.Views
       this.UpdateSummaryBadges(); // "Fill the sheets" may have been ticked: the fill switch shows from two such parts
     }
 
-    private async void OnNest(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// The rows of the job as the engine takes them: a counted row as its quantity plus spares, a second, mirrored
+    /// population for its mirrored count, a row that fills the sheets as one copy marked to fill. Rows left out or
+    /// without a drawing are not sent, nor a population of none.
+    /// </summary>
+    private List<RasterPartInfo> Populations(IProjectInfo project)
     {
-      if (this.nestCts != null)
-      {
-        return;
-      }
-
-      // Set by "fill an offcut" for this one run: fill the stock with the parts instead of nesting a count.
-      double? fillMinShare = this.pendingFillMinShare;
-      this.pendingFillMinShare = null;
-
-      // The button pressed says what kind of nest this is: a draft for a quote, or the layout to cut. Both
-      // are read from the operator's profile file now, so an edit to it counts from this press on.
-      var runEffort = ReferenceEquals(sender, this.btnNestDraft)
-        ? DeepNestSharp.RasterNest.NestEffort.Draft
-        : DeepNestSharp.RasterNest.NestEffort.Fast;
-      string profileError = DeepNestSharp.RasterNest.NestProfiles.Load(
-        System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "SheetNest"));
-      if (profileError != null)
-      {
-        ViewModel.MessageService.DisplayMessageBox(
-          Localization.Format("Msg_ProfileFileBad", DeepNestSharp.RasterNest.NestProfiles.FileName, profileError),
-          Localization.Get("Title_Nest"),
-          DeepNestLib.MessageBoxIcon.Warning);
-      }
-
-      this.lastRunWasDraft = runEffort == DeepNestSharp.RasterNest.NestEffort.Draft;
-
-      // If there is already a nest result, discard it and return the sheets it used to the stock
-      // before recalculating from scratch.
-      if (!ViewModel.NestMonitorViewModel.TopNestResults.IsEmpty || lastNestConsumed != null)
-      {
-        ClearNestResult();
-      }
-
-      // SheetNest has ONE engine: sparrow, run as a bundled native subprocess.
-      var project = (ViewModel.ActiveDocument as NestProjectViewModel)?.ProjectInfo;
-      if (project == null || project.DetailLoadInfos.Count == 0)
-      {
-        ViewModel.MessageService.DisplayMessageBox(Localization.Get("Msg_AddPartsFirst"), Localization.Get("Title_Nest"), DeepNestLib.MessageBoxIcon.Information);
-        return;
-      }
-
-      // Read the UI-bound project data on the UI thread, then do the heavy nest off-thread so the app
-      // stays responsive (it was freezing because the whole nest ran on the UI thread).
-
-      var parts = project.DetailLoadInfos
+      return project.DetailLoadInfos
         .Where(o => o.IsIncluded && !string.IsNullOrWhiteSpace(o.Path))
         .SelectMany(o =>
         {
@@ -2539,6 +2676,55 @@ namespace DeepNestSharp.Ui.Views
           return populations;
         })
         .ToList();
+    }
+
+    private async void OnNest(object sender, RoutedEventArgs e)
+    {
+      if (this.nestCts != null)
+      {
+        return;
+      }
+
+      // Set by "fill an offcut" for this one run: fill the stock with the parts instead of nesting a count.
+      double? fillMinShare = this.pendingFillMinShare;
+      this.pendingFillMinShare = null;
+
+      // The button pressed says what kind of nest this is: a draft for a quote, or the layout to cut. Both
+      // are read from the operator's profile file now, so an edit to it counts from this press on.
+      var runEffort = ReferenceEquals(sender, this.btnNestDraft)
+        ? DeepNestSharp.RasterNest.NestEffort.Draft
+        : DeepNestSharp.RasterNest.NestEffort.Fast;
+      string profileError = DeepNestSharp.RasterNest.NestProfiles.Load(
+        System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "SheetNest"));
+      if (profileError != null)
+      {
+        ViewModel.MessageService.DisplayMessageBox(
+          Localization.Format("Msg_ProfileFileBad", DeepNestSharp.RasterNest.NestProfiles.FileName, profileError),
+          Localization.Get("Title_Nest"),
+          DeepNestLib.MessageBoxIcon.Warning);
+      }
+
+      this.lastRunWasDraft = runEffort == DeepNestSharp.RasterNest.NestEffort.Draft;
+
+      // If there is already a nest result, discard it and return the sheets it used to the stock
+      // before recalculating from scratch.
+      if (!ViewModel.NestMonitorViewModel.TopNestResults.IsEmpty || lastNestConsumed != null)
+      {
+        ClearNestResult();
+      }
+
+      // SheetNest has ONE engine: sparrow, run as a bundled native subprocess.
+      var project = (ViewModel.ActiveDocument as NestProjectViewModel)?.ProjectInfo;
+      if (project == null || project.DetailLoadInfos.Count == 0)
+      {
+        ViewModel.MessageService.DisplayMessageBox(Localization.Get("Msg_AddPartsFirst"), Localization.Get("Title_Nest"), DeepNestLib.MessageBoxIcon.Information);
+        return;
+      }
+
+      // Read the UI-bound project data on the UI thread, then do the heavy nest off-thread so the app
+      // stays responsive (it was freezing because the whole nest ran on the UI thread).
+
+      var parts = this.Populations(project);
       // EVERY sheet entry participates. For each sheet the engine packs the pending work onto every size
       // still in stock and cuts whichever filled most of its own sheet, so list order decides nothing; a
       // size marked Unlimited never runs down, and its Quantity is carried along only to be ignored.
@@ -2797,10 +2983,21 @@ namespace DeepNestSharp.Ui.Views
         if (unplacedCount > 0)
         {
           bool anyUnlimited = project.SheetLoadInfos.Any(s => s.Unlimited);
+
+          // The stock ran out: lay what is left on virtual standard sheets, to say how many to buy. Shown with the
+          // "not enough material" button and in the report; nothing of it is cut or exported.
+          string toBuy = string.Empty;
+          if (!anyUnlimited && await this.VirtualNestFor(result) is INestResult shortfall)
+          {
+            var (vw, vh) = this.VirtualSheetSize;
+            toBuy = " " + Localization.Format("Msg_VirtualHint", shortfall.UsedSheets.Count, vw, vh);
+            this.RefreshShortageButton();
+          }
+
           ViewModel.MessageService.DisplayMessageBox(
             anyUnlimited
               ? Localization.Format("Msg_PartsDoNotFit", unplacedCount)
-              : Localization.Format("Msg_NotEnoughSheets", unplacedCount, sheetQty),
+              : Localization.Format("Msg_NotEnoughSheets", unplacedCount, sheetQty) + toBuy,
             anyUnlimited ? Localization.Get("Title_PartsDoNotFit") : Localization.Get("Title_NotEnoughSheets"),
             DeepNestLib.MessageBoxIcon.Warning);
         }
@@ -3003,7 +3200,8 @@ namespace DeepNestSharp.Ui.Views
           selected.UnplacedParts?.Count ?? 0,
           this.unitsMm ? "mm" : "in",
           this.dxfViewer?.PartColours,
-          this.CurrentReportMaterial());
+          this.CurrentReportMaterial(),
+          this.CurrentShortage());
       }
       catch (System.Exception ex)
       {
@@ -4035,7 +4233,7 @@ namespace DeepNestSharp.Ui.Views
       var colours = this.dxfViewer?.PartColours ?? PartColors.Build(plan.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
       int unplacedCount = selected.UnplacedParts?.Count ?? 0;
 
-      var pages = Reports.NestReportPdf.BuildWpfPages(plan, unplacedCount, units, colours, this.CurrentReportMaterial());
+      var pages = Reports.NestReportPdf.BuildWpfPages(plan, unplacedCount, units, colours, this.CurrentReportMaterial(), this.CurrentShortage());
       if (this.reportPagesStackPanel != null)
       {
         this.reportPagesStackPanel.Children.Clear();
@@ -4246,7 +4444,7 @@ namespace DeepNestSharp.Ui.Views
       var colours = this.dxfViewer?.PartColours ?? PartColors.Build(plan.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
       int unplacedCount = selected.UnplacedParts?.Count ?? 0;
 
-      var doc = Reports.NestReportPdf.BuildFixedDocument(plan, unplacedCount, units, colours, this.CurrentReportMaterial());
+      var doc = Reports.NestReportPdf.BuildFixedDocument(plan, unplacedCount, units, colours, this.CurrentReportMaterial(), this.CurrentShortage());
 
       var printDlg = new System.Windows.Controls.PrintDialog();
       if (printDlg.ShowDialog() == true)
