@@ -13,11 +13,11 @@ namespace DeepNestSharp.Ui.Converters
   /// <summary>
   /// The small picture of a stock row: the sheet in proportion, and for a sheet read from a drawing its real
   /// outline and holes, so an odd-shaped offcut can be told apart from the rectangle round it before nesting.
-  /// Bound to ShapePath, Width and Height. Drawings are cached by path and time written.
+  /// Bound to ShapePath, Width, Height and ShapeTurns. Drawings are cached by path, time written and turn.
   /// </summary>
   public class SheetPreviewConverter : IMultiValueConverter
   {
-    private static readonly Dictionary<(string Path, DateTime Written), ImageSource> Cache = new Dictionary<(string, DateTime), ImageSource>();
+    private static readonly Dictionary<(string Path, DateTime Written, int Turns), ImageSource> Cache = new Dictionary<(string, DateTime, int), ImageSource>();
     private static readonly Brush Fill = Frozen(new SolidColorBrush(Color.FromRgb(0xE4, 0xE8, 0xEC)));
     private static readonly Brush Stroke = Frozen(new SolidColorBrush(Color.FromRgb(0x44, 0x44, 0x44)));
 
@@ -26,10 +26,11 @@ namespace DeepNestSharp.Ui.Converters
       string path = values.Length > 0 ? values[0] as string : null;
       int w = values.Length > 1 && values[1] is int width ? width : 0;
       int h = values.Length > 2 && values[2] is int height ? height : 0;
+      int turns = values.Length > 3 && values[3] is int t ? t : 0;
 
       if (!string.IsNullOrEmpty(path))
       {
-        return FromDrawing(path);
+        return FromDrawing(path, turns);
       }
 
       if (w <= 0 || h <= 0)
@@ -42,7 +43,7 @@ namespace DeepNestSharp.Ui.Converters
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => null;
 
-    private static ImageSource FromDrawing(string path)
+    private static ImageSource FromDrawing(string path, int turns)
     {
       DateTime written;
       try
@@ -59,7 +60,7 @@ namespace DeepNestSharp.Ui.Converters
         return null;
       }
 
-      if (Cache.TryGetValue((path, written), out var cached))
+      if (Cache.TryGetValue((path, written, turns), out var cached))
       {
         return cached;
       }
@@ -69,7 +70,7 @@ namespace DeepNestSharp.Ui.Converters
       {
         // Bounded like the part thumbnails: a locked file is retried for seconds, and a picture is not worth
         // freezing the window for. On timeout nothing is cached, so it can still appear on a later refresh.
-        var load = System.Threading.Tasks.Task.Run(() => SheetShape.Load(path));
+        var load = System.Threading.Tasks.Task.Run(() => SheetShape.Load(path, turns));
         if (!load.Wait(1500))
         {
           return null;
@@ -94,7 +95,7 @@ namespace DeepNestSharp.Ui.Converters
         image = null;
       }
 
-      Cache[(path, written)] = image;
+      Cache[(path, written, turns)] = image;
       return image;
     }
 

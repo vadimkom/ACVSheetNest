@@ -29,6 +29,9 @@ namespace DeepNestSharp.Ui.Converters
 
     /// <summary>Hands the thumbnails the job's part colours. The whole cache goes: it is keyed by path, and
     /// the image now depends on the colour too.</summary>
+    /// <summary>The drawings changed on disk: every thumbnail is drawn again from its file.</summary>
+    public static void Forget() => Cache.Clear();
+
     public static void SetColours(IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours)
     {
       colours = partColours;

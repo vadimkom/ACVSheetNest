@@ -472,6 +472,18 @@ namespace DeepNestSharp.Domain.Models
       }
     }
 
+    /// <summary>The drawing changed on disk: forget its shape, so the row's sketch, size and area are read again.</summary>
+    public void Reload()
+    {
+      this.nfp = null;
+      this.netArea = null;
+      OnPropertyChanged(nameof(PreviewSource));
+      OnPropertyChanged(nameof(SizeLabel));
+      OnPropertyChanged(nameof(NetArea));
+      OnPropertyChanged(nameof(IsExists));
+      NotifyCommonCuttingCapabilityChanged();
+    }
+
     public async Task<INfp> LoadAsync()
     {
       INfp cached = this.nfp;

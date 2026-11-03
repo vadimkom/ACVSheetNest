@@ -1838,6 +1838,51 @@ namespace DeepNestSharp.Ui.Views
       }
     }
 
+    /// <summary>
+    /// Turns a stock row a quarter turn: 1250 × 2500 becomes 2500 × 1250. A sheet read from a drawing turns its
+    /// outline and holes with it (<see cref="ISheetLoadInfo.ShapeTurns"/>), so an offcut lying the other way round
+    /// is nested as it lies. A nest on screen goes, as with any change to the stock.
+    /// </summary>
+    private void OnRotateSheet(object sender, RoutedEventArgs e)
+    {
+      if (!((sender as Button)?.Tag is ISheetLoadInfo row))
+      {
+        return;
+      }
+
+      if (lastNestConsumed != null)
+      {
+        ClearNestResult();
+      }
+
+      if (string.IsNullOrEmpty(row.ShapePath))
+      {
+        (row.Width, row.Height) = (row.Height, row.Width);
+      }
+      else
+      {
+        int turns = (row.ShapeTurns + 1) % 4;
+        try
+        {
+          var shape = DeepNestLib.IO.SheetShape.Load(row.ShapePath, turns);
+          row.ShapeTurns = turns;
+          row.Width = Math.Max(1, (int)Math.Round(shape.MaxX));
+          row.Height = Math.Max(1, (int)Math.Round(shape.MaxY));
+        }
+        catch (Exception ex)
+        {
+          ViewModel.MessageService.DisplayMessageBox(
+            Localization.Format("Msg_SheetShapeUnreadable", System.IO.Path.GetFileName(row.ShapePath), ex.GetBaseException().Message),
+            Localization.Get("Btn_AddSheet"),
+            DeepNestLib.MessageBoxIcon.Warning);
+          return;
+        }
+      }
+
+      this.sheetsListView.Items.Refresh();
+      this.UpdateSummaryBadges();
+    }
+
     /// <summary>Double-click on a stock row opens the same Edit sheet dialog as the ✎ button.</summary>
     private void OnSheetsListDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
@@ -1969,6 +2014,93 @@ namespace DeepNestSharp.Ui.Views
       public int Width { get; }
 
       public int Height { get; }
+    }
+
+    /// <summary>
+    /// Reads the job's drawings from disk again, after they were changed in CAD: the parts' sketches and sizes,
+    /// the copies made of them (a flipped part, a part split out of a drawing of several) and the sheets drawn
+    /// from a drawing. A nest on screen goes, after asking: its export reads the drawings back, and the new
+    /// shapes would be cut where the old ones were laid.
+    /// </summary>
+    private void OnReloadDrawings(object sender, RoutedEventArgs e)
+    {
+      if (!(ViewModel.ActiveDocument is NestProjectViewModel doc) || doc.ProjectInfo == null || this.nestCts != null)
+      {
+        return;
+      }
+
+      bool hasNest = ViewModel.NestMonitorViewModel.SelectedItem != null || !ViewModel.NestMonitorViewModel.TopNestResults.IsEmpty;
+      if (hasNest && ViewModel.MessageService.DisplayOkCancel(
+        Localization.Get("Msg_ReloadDropsNest"),
+        Localization.Get("Menu_ReloadDrawings"),
+        DeepNestLib.MessageBoxIcon.Question) != DeepNestLib.MessageBoxResult.OK)
+      {
+        return;
+      }
+
+      int read = 0, missing = 0;
+      foreach (var row in doc.ProjectInfo.DetailLoadInfos)
+      {
+        bool flipped = row.Flip != DeepNestLib.NestProject.PartFlip.None && !string.IsNullOrEmpty(row.UnflippedPath);
+
+        // A part split out of a drawing of several is cut out of it again, then flipped again if it was.
+        if (!string.IsNullOrEmpty(row.SourceDxfPath) && System.IO.File.Exists(row.SourceDxfPath))
+        {
+          string rebuilt = DeepNestLib.IO.DxfPartSplitter.Rebuild(row.SourceDxfPath, row.PartIndex);
+          if (!string.IsNullOrEmpty(rebuilt))
+          {
+            if (flipped)
+            {
+              row.UnflippedPath = rebuilt;
+            }
+            else
+            {
+              row.Path = rebuilt;
+            }
+          }
+        }
+
+        if (flipped && System.IO.File.Exists(row.UnflippedPath))
+        {
+          try
+          {
+            row.Path = DeepNestLib.IO.PartMirror.Write(row.UnflippedPath, row.Flip);
+          }
+          catch (Exception)
+          {
+            // The original no longer reads; the row shows as missing.
+          }
+        }
+
+        if (row is DeepNestSharp.Domain.Models.ObservableDetailLoadInfo observable)
+        {
+          observable.Reload();
+        }
+
+        if (System.IO.File.Exists(row.Path))
+        {
+          read++;
+        }
+        else
+        {
+          missing++;
+        }
+      }
+
+      if (hasNest)
+      {
+        this.ClearNestResult();
+      }
+
+      DeepNestSharp.Ui.Converters.PartPreviewConverter.Forget();
+      this.ApplyPartColours(doc.ProjectInfo.DetailLoadInfos);
+      this.partsListView.Items.Refresh();
+      this.sheetsListView.Items.Refresh();
+      this.UpdateSummaryBadges();
+      this.statusBarNestPhaseText.Text = missing == 0
+        ? Localization.Format("Msg_DrawingsReloaded", read)
+        : Localization.Format("Msg_DrawingsReloadedMissing", read, missing);
+      this.statusBarNestPhaseText.Visibility = Visibility.Visible;
     }
 
     private async void OnAddPartClicked(object sender, RoutedEventArgs e)
@@ -2791,7 +2923,7 @@ namespace DeepNestSharp.Ui.Views
         {
           try
           {
-            shape = DeepNestLib.IO.SheetShape.Load(row.ShapePath);
+            shape = DeepNestLib.IO.SheetShape.Load(row.ShapePath, row.ShapeTurns);
 
             // The drawing may have been changed since it was added: its box is the row's size.
             row.Width = Math.Max(1, (int)Math.Round(shape.MaxX));
@@ -3520,6 +3652,18 @@ namespace DeepNestSharp.Ui.Views
     private void OnGoToLayout(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Layout);
 
     private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.Key == Key.F5 && Keyboard.Modifiers == ModifierKeys.None)
+      {
+        this.OnReloadDrawings(this, new RoutedEventArgs());
+        e.Handled = true;
+        return;
+      }
+
+      this.WorkflowKeys(e);
+    }
+
+    private void WorkflowKeys(KeyEventArgs e)
     {
       if (Keyboard.Modifiers == ModifierKeys.Control)
       {

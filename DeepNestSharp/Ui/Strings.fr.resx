@@ -426,6 +426,27 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Format personnalisé…</value>
   </data>
+  <data name="Tip_RotateSheet" xml:space="preserve">
+    <value>Tourner la tôle de 90° : 1250 × 2500 devient 2500 × 1250. Une tôle issue d'un dessin tourne avec son contour.</value>
+  </data>
+  <data name="Menu_ReloadDrawings" xml:space="preserve">
+    <value>Recharger les dessins depuis le disque</value>
+  </data>
+  <data name="Btn_ReloadDrawings" xml:space="preserve">
+    <value>⟳ Recharger</value>
+  </data>
+  <data name="Tip_ReloadDrawings" xml:space="preserve">
+    <value>Relire les dessins modifiés dans la CAO (F5).</value>
+  </data>
+  <data name="Msg_ReloadDropsNest" xml:space="preserve">
+    <value>L'imbrication affichée vient des anciens dessins et sera effacée : imbriquez à nouveau après le rechargement. Recharger ?</value>
+  </data>
+  <data name="Msg_DrawingsReloaded" xml:space="preserve">
+    <value>Dessins rechargés : {0}.</value>
+  </data>
+  <data name="Msg_DrawingsReloadedMissing" xml:space="preserve">
+    <value>Dessins rechargés : {0} ; introuvables : {1}.</value>
+  </data>
   <data name="Menu_RoundSheet" xml:space="preserve">
     <value>Tôle ronde (diamètre)…</value>
   </data>

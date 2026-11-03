@@ -426,6 +426,27 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Tamaño personalizado…</value>
   </data>
+  <data name="Tip_RotateSheet" xml:space="preserve">
+    <value>Girar la chapa 90°: 1250 × 2500 pasa a 2500 × 1250. Una chapa de un dibujo gira con su contorno.</value>
+  </data>
+  <data name="Menu_ReloadDrawings" xml:space="preserve">
+    <value>Recargar dibujos del disco</value>
+  </data>
+  <data name="Btn_ReloadDrawings" xml:space="preserve">
+    <value>⟳ Recargar</value>
+  </data>
+  <data name="Tip_ReloadDrawings" xml:space="preserve">
+    <value>Volver a leer los dibujos cambiados en CAD (F5).</value>
+  </data>
+  <data name="Msg_ReloadDropsNest" xml:space="preserve">
+    <value>El anidado en pantalla es de los dibujos antiguos y se borrará: anide de nuevo tras recargar. ¿Recargar?</value>
+  </data>
+  <data name="Msg_DrawingsReloaded" xml:space="preserve">
+    <value>Dibujos recargados: {0}.</value>
+  </data>
+  <data name="Msg_DrawingsReloadedMissing" xml:space="preserve">
+    <value>Dibujos recargados: {0}; no encontrados: {1}.</value>
+  </data>
   <data name="Menu_RoundSheet" xml:space="preserve">
     <value>Chapa redonda (diámetro)…</value>
   </data>

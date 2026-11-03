@@ -62,6 +62,12 @@ namespace DeepNestSharp.Domain.Models
       }
     }
 
+    public int ShapeTurns
+    {
+      get => sheetLoadInfo.ShapeTurns;
+      set => SetProperty(nameof(ShapeTurns), () => sheetLoadInfo.ShapeTurns, v => sheetLoadInfo.ShapeTurns = v, value);
+    }
+
     /// <summary>Gets the drawing's file name for a sheet of any shape, empty for a rectangle.</summary>
     public string ShapeName => string.IsNullOrEmpty(ShapePath) ? string.Empty : System.IO.Path.GetFileName(ShapePath);
 

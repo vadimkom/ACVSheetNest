@@ -17,7 +17,7 @@ namespace DeepNestLib.IO
     /// Reads the sheet's outline from <paramref name="path"/>, moved so the box round it starts at the origin.
     /// Throws when the file cannot be read or has no closed contour.
     /// </summary>
-    public static INfp Load(string path)
+    public static INfp Load(string path, int quarterTurns = 0)
     {
       var detail = new NestExecutionHelper().LoadRawDetail(new FileInfo(path));
       if (detail == null || !detail.TryConvertToNfp(0, out INfp raw) || raw?.Points == null || raw.Points.Length < 3)
@@ -25,7 +25,39 @@ namespace DeepNestLib.IO
         throw new InvalidDataException("The drawing has no closed contour to take as the sheet's edge.");
       }
 
-      return Normalise(raw);
+      return Normalise(Turned(raw, quarterTurns));
+    }
+
+    /// <summary>The outline and its holes turned by quarter turns counter-clockwise: (x, y) → (−y, x) each.</summary>
+    public static INfp Turned(INfp raw, int quarterTurns)
+    {
+      int turns = ((quarterTurns % 4) + 4) % 4;
+      if (turns == 0)
+      {
+        return raw;
+      }
+
+      SvgPoint Turn(SvgPoint p)
+      {
+        double x = p.X, y = p.Y;
+        for (int i = 0; i < turns; i++)
+        {
+          (x, y) = (-y, x);
+        }
+
+        return new SvgPoint(x, y);
+      }
+
+      var turned = new NoFitPolygon(raw.Points.Select(Turn));
+      foreach (var child in raw.Children ?? new List<INfp>())
+      {
+        if (child?.Points != null)
+        {
+          turned.Children.Add(new NoFitPolygon(child.Points.Select(Turn)));
+        }
+      }
+
+      return turned;
     }
 
     /// <summary>The outline with its holes, the box round it moved to the origin; outside contours dropped.</summary>

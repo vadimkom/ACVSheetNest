@@ -47,6 +47,9 @@ namespace DeepNestLib.NestProject
     /// </summary>
     public virtual string ShapePath { get; set; }
 
+    /// <summary>Gets or sets the quarter turns the drawing of a shaped sheet is turned by; see <see cref="ISheetLoadInfo.ShapeTurns"/>.</summary>
+    public virtual int ShapeTurns { get; set; }
+
     public override string ToJson(bool writeIndented = false)
     {
       var options = new JsonSerializerOptions();

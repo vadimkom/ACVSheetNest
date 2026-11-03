@@ -426,6 +426,27 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Индивидуален размер…</value>
   </data>
+  <data name="Tip_RotateSheet" xml:space="preserve">
+    <value>Завъртане на листа на 90°: 1250 × 2500 става 2500 × 1250. Лист от чертеж се завърта заедно с контура.</value>
+  </data>
+  <data name="Menu_ReloadDrawings" xml:space="preserve">
+    <value>Презареди чертежите от диска</value>
+  </data>
+  <data name="Btn_ReloadDrawings" xml:space="preserve">
+    <value>⟳ Презареди</value>
+  </data>
+  <data name="Tip_ReloadDrawings" xml:space="preserve">
+    <value>Прочетете чертежите отново, ако са променени в CAD (F5).</value>
+  </data>
+  <data name="Msg_ReloadDropsNest" xml:space="preserve">
+    <value>Разкроят на екрана е по старите чертежи и ще бъде изчистен: след презареждане разкроете отново. Презареждане?</value>
+  </data>
+  <data name="Msg_DrawingsReloaded" xml:space="preserve">
+    <value>Чертежите са презаредени: {0}.</value>
+  </data>
+  <data name="Msg_DrawingsReloadedMissing" xml:space="preserve">
+    <value>Чертежите са презаредени: {0}; не са намерени: {1}.</value>
+  </data>
   <data name="Menu_RoundSheet" xml:space="preserve">
     <value>Кръгъл лист (диаметър)…</value>
   </data>

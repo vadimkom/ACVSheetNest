@@ -323,6 +323,26 @@ namespace DeepNestSharp.CiTests.RasterNest
       watch.ElapsedMilliseconds.Should().BeLessThan(30000);
     }
 
+    /// <summary>An offcut turned a quarter turn lies the other way round: its box swaps, its hole goes with it.</summary>
+    [Fact]
+    public void AnOffcutTurnedAQuarterTurnLiesTheOtherWay()
+    {
+      string path = this.WriteLSheet();
+      var turned = SheetShape.Load(path, 1);
+
+      turned.MinX.Should().BeApproximately(0, 1e-9);
+      turned.MinY.Should().BeApproximately(0, 1e-9);
+      turned.MaxX.Should().BeApproximately(600, 1e-9, "1000 x 600 turned is 600 x 1000");
+      turned.MaxY.Should().BeApproximately(1000, 1e-9);
+      turned.Children.Should().HaveCount(1, "the hole turns with the sheet");
+      Math.Abs(turned.Area).Should().BeApproximately(Math.Abs(SheetShape.Load(path).Area), 1e-6);
+
+      // Turned counter-clockwise: the hole at x 150..250 near the bottom left ends near the bottom right.
+      turned.Children[0].MinX.Should().BeApproximately(600 - 250, 1e-9);
+      turned.Children[0].MinY.Should().BeApproximately(150, 1e-9);
+      SheetShape.Load(path, 4).MaxX.Should().BeApproximately(1000, 1e-9, "four turns are none");
+    }
+
     /// <summary>A round sheet given by its diameter is a circle drawn once and read back as a sheet of that shape.</summary>
     [Fact]
     public void RoundSheetByDiameterIsACircle()

@@ -111,7 +111,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-11-03, 1.1.61): core 1087/1089; app 509/509 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
+Last verified (2026-11-03, 1.1.62): core 1087/1089; app 511/511 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
@@ -181,6 +181,7 @@ Last verified (2026-11-03, 1.1.61): core 1087/1089; app 509/509 with the engine 
   - Thickness: 0.6, 0.7, 0.8, 1, 1.2, 1.5, 2, 3, 4, 5, or typed.
 - Default part spacing in mm is 4 (since 1.1.56, the user's choice; was 6.35 = ¼"). A stored 6.35 from an older build becomes 4 once (`SessionState.SpacingFourMillimetresVersion`, settings version 2; the effort reset keeps its own `EffortResetVersion` = 1). Projects keep the spacing they were saved with, part rows too.
 - Standard sheets stand (since 1.1.52, the user's request): 1000×2000, 1250×2500, 500×1250 mm; the inch list likewise short side first; Custom size opens at 1500×3000. Anything else via "Custom size". The engine packs along the longer side either way: on the flat patterns 1000×2000 gave the same 8 sheets as 2000×1000, 1250×2500 the same 4.
+- **Turn a sheet** ("⟲" on a stock row, `MainWindow.OnRotateSheet`, since 1.1.62): a rectangle swaps W and H; a sheet from a drawing keeps `ISheetLoadInfo.ShapeTurns` (quarter turns CCW) and `SheetShape.Load(path, turns)` turns its outline and holes before moving the box to 0,0; the sketch binds the turns too. A nest on screen is cleared. Tested: `ShapedSheetFixture.AnOffcutTurnedAQuarterTurnLiesTheOtherWay`.
 - **Sheets from a drawing** (Add sheet → "Sheet from a drawing (DXF, CHF)…", `SheetShape.Load`, `ISheetLoadInfo.ShapePath`): an offcut of any shape. The largest closed contour is the edge, closed contours inside it are holes, anything outside is dropped; moved so its box starts at 0,0. The row's W×H is the rounded box (rounded like the "used / in stock" and cut-sheet matching), priority 1, quantity 1; the file is read again on every nest, as parts are.
   - The Sheets table has a sketch column (`SheetPreviewConverter`, since 1.1.53): every row in proportion, a drawn sheet with its outline and holes, cached by path and time written.
   - **Round sheets by diameter** (Add sheet → "Круглый лист (диаметр)…", since 1.1.59): `AddSheetWindow.UseRound` asks the diameter (priority 1), `SheetShape.RoundSheetFile` writes a circle once to `%LOCALAPPDATA%/SheetNest/sheets/Ø500 mm.dxf` and the row is a sheet from that drawing. Its size is fixed by the drawing: to change a diameter, add a new round sheet.
@@ -223,6 +224,7 @@ Last verified (2026-11-03, 1.1.61): core 1087/1089; app 509/509 with the engine 
 - `.dnest` writes sheets through `SheetPlacementJsonConverter`, so computed members (PolygonsForExport, Hull, Simplify) are not saved: 4.4 MB → ~1.4 MB. `SvgPoint.Marked` is still written, because the golden JSON tests need it.
 - Projects are not zipped (native zlib is unreliable on the shop PC).
 - **Drawings found beside the project** (`ProjectPaths.Relocate`, called by `ProjectInfo.Load`, since 1.1.61): a part, its unflipped or source drawing, or a sheet's ShapePath missing at its path is looked for by file name in the folder the .dnest was opened from and every folder below (unreadable ones skipped); of several, the one sharing the most trailing folders with the old path. The saved nest's strings equal to a moved path are rewritten too (the DXF export reads drawings back by Part.Name). Paths that exist, or match nothing, stay (`ProjectPathsFixture`).
+- **Reload drawings from disk** (File → "Перечитать чертежи с диска", F5, "⟳ Перечитать" on the Parts step; `MainWindow.OnReloadDrawings`, since 1.1.62): parts split out of a drawing are cut out again (`DxfPartSplitter.Rebuild`), flipped parts rewritten from the original (`PartMirror.Write`), each row forgets its shape (`ObservableDetailLoadInfo.Reload`: sketch, size, area) and the thumbnails are redrawn (`PartPreviewConverter.Forget`); sheet sketches follow the file's time. A nest on screen is cleared after asking: the export reads drawings back, so new shapes would be cut where old ones were laid. Nesting itself always reads the files afresh; the common-line catalogs are content-addressed (`ReloadDrawingsFixture`).
 - File dialogs skip a folder that no longer exists, such as a pulled flash drive, and retry without it if the shell refuses. A failed save shows a message instead of crashing.
 
 **Languages**

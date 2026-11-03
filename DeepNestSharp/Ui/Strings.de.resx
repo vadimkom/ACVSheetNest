@@ -426,6 +426,27 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Eigene Größe…</value>
   </data>
+  <data name="Tip_RotateSheet" xml:space="preserve">
+    <value>Blech um 90° drehen: 1250 × 2500 wird 2500 × 1250. Ein Blech aus einer Zeichnung dreht seine Kontur mit.</value>
+  </data>
+  <data name="Menu_ReloadDrawings" xml:space="preserve">
+    <value>Zeichnungen neu laden</value>
+  </data>
+  <data name="Btn_ReloadDrawings" xml:space="preserve">
+    <value>⟳ Neu laden</value>
+  </data>
+  <data name="Tip_ReloadDrawings" xml:space="preserve">
+    <value>Die Zeichnungen neu einlesen, wenn sie in CAD geändert wurden (F5).</value>
+  </data>
+  <data name="Msg_ReloadDropsNest" xml:space="preserve">
+    <value>Die angezeigte Verschachtelung stammt aus den alten Zeichnungen und wird verworfen: nach dem Neuladen neu verschachteln. Neu laden?</value>
+  </data>
+  <data name="Msg_DrawingsReloaded" xml:space="preserve">
+    <value>Zeichnungen neu geladen: {0}.</value>
+  </data>
+  <data name="Msg_DrawingsReloadedMissing" xml:space="preserve">
+    <value>Zeichnungen neu geladen: {0}; nicht gefunden: {1}.</value>
+  </data>
   <data name="Menu_RoundSheet" xml:space="preserve">
     <value>Rundes Blech (Durchmesser)…</value>
   </data>

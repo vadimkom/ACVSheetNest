@@ -426,6 +426,27 @@
   <data name="Menu_CustomSize" xml:space="preserve">
     <value>Custom size…</value>
   </data>
+  <data name="Tip_RotateSheet" xml:space="preserve">
+    <value>Turn the sheet a quarter turn: 1250 × 2500 becomes 2500 × 1250. A sheet from a drawing turns its outline with it.</value>
+  </data>
+  <data name="Menu_ReloadDrawings" xml:space="preserve">
+    <value>Reload drawings from disk</value>
+  </data>
+  <data name="Btn_ReloadDrawings" xml:space="preserve">
+    <value>⟳ Reload</value>
+  </data>
+  <data name="Tip_ReloadDrawings" xml:space="preserve">
+    <value>Read the drawings again after changing them in CAD (F5).</value>
+  </data>
+  <data name="Msg_ReloadDropsNest" xml:space="preserve">
+    <value>The nest on screen was made from the old drawings and is cleared: nest again after reloading. Reload?</value>
+  </data>
+  <data name="Msg_DrawingsReloaded" xml:space="preserve">
+    <value>Drawings reloaded: {0}.</value>
+  </data>
+  <data name="Msg_DrawingsReloadedMissing" xml:space="preserve">
+    <value>Drawings reloaded: {0}; not found: {1}.</value>
+  </data>
   <data name="Menu_RoundSheet" xml:space="preserve">
     <value>Round sheet (diameter)…</value>
   </data>

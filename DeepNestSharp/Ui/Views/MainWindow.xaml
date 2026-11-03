@@ -82,6 +82,8 @@
             <MenuItem x:Name="recentEmptyItem" Header="(пусто)" IsEnabled="False" />
           </MenuItem>
           <Separator />
+          <MenuItem x:Name="menuReloadDrawings" Header="{ui:Tr Menu_ReloadDrawings}" InputGestureText="F5" Click="OnReloadDrawings" />
+          <Separator />
           <MenuItem x:Name="menuSave" Header="Сохранить" Command="{Binding ActiveDocumentSaveCommand}" />
           <MenuItem x:Name="menuSaveAs" Header="Сохранить как..." Command="{Binding ActiveDocumentSaveAsCommand}" />
           <Separator />
@@ -159,6 +161,7 @@
               <Button x:Name="btnAddPart" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddPart}" />
               <Button x:Name="btnAddShape" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_AddShape}" Click="OnAddShapeClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddShape}" />
               <Button x:Name="btnFillRemnant" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_FillRemnant}" Click="OnFillRemnantClicked" Margin="3,0" ToolTip="{ui:Tr Tip_FillRemnant}" />
+              <Button x:Name="btnReloadDrawings" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_ReloadDrawings}" Click="OnReloadDrawings" Margin="3,0" ToolTip="{ui:Tr Tip_ReloadDrawings}" />
               <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
               <TextBlock x:Name="lblMultiplier" Text="Множитель (комплектов):" VerticalAlignment="Center" Margin="0,0,4,0" Style="{DynamicResource CaptionText}" />
               <xctk:IntegerUpDown x:Name="partsMultiplierUpDown" Value="1" Minimum="1" Maximum="10000" Width="55" VerticalAlignment="Center" Margin="0,0,3,0"
@@ -416,6 +419,7 @@
                               <Binding Path="ShapePath" Mode="OneWay" />
                               <Binding Path="Width" Mode="OneWay" />
                               <Binding Path="Height" Mode="OneWay" />
+                              <Binding Path="ShapeTurns" Mode="OneWay" />
                             </MultiBinding>
                           </Image.Source>
                         </Image>
@@ -496,12 +500,14 @@
                 </GridViewColumn>
 
                 <!-- Actions -->
-                <GridViewColumn x:Name="colHeaderSheetActions" Header="Действия" Width="160">
+                <GridViewColumn x:Name="colHeaderSheetActions" Header="Действия" Width="200">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Button Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_EditSheet}" Margin="2,0"
                                 Click="OnEditSheet" Tag="{Binding}" ToolTip="{ui:Tr Tip_EditSheet}" />
+                        <Button Style="{DynamicResource ModernButton}" Content="⟲" Margin="2,0" MinWidth="30"
+                                Click="OnRotateSheet" Tag="{Binding}" ToolTip="{ui:Tr Tip_RotateSheet}" />
                         <Button Style="{DynamicResource IconButton}" Content="✕" Margin="4,0,0,0"
                                 ToolTip="{ui:Tr Tip_RemoveSheet}"
                                 Command="{Binding DataContext.ActiveDocument.RemoveSheetCommand, RelativeSource={RelativeSource AncestorType=Window}}"
