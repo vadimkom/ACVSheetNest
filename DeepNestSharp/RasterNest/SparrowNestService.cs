@@ -409,6 +409,27 @@ namespace DeepNestSharp.RasterNest
         return null;
       }
 
+      // A standing sheet is packed from the bottom up: see StandingSheets.cs.
+      Dictionary<int, INfp> upright = null;
+      Dictionary<INfp, INfp> uprightByTurned = null;
+      if (NestTurned(sizes, loaded))
+      {
+        upright = TurnForEngine(sizes, loaded);
+        uprightByTurned = new Dictionary<INfp, INfp>(ReferenceEqualityComparer.Instance);
+        foreach (var l in loaded)
+        {
+          uprightByTurned[l.Nfp] = upright[l.Source];
+        }
+
+        if (candidateCallback != null)
+        {
+          var shown = candidateCallback;
+          candidateCallback = candidate => shown(TurnedBack(candidate, upright, uprightByTurned, null));
+        }
+      }
+
+      INestResult AsTheSheetsStand(INestResult r) => upright == null ? r : TurnedBack(r, upright, uprightByTurned, (loaded.ToDictionary(l => l.Source), margin));
+
       bool filling = loaded.Any(l => l.Fill);
       if (filling)
       {
@@ -459,7 +480,7 @@ namespace DeepNestSharp.RasterNest
         seedOffset);
       if (result == null || !filling)
       {
-        return result;
+        return AsTheSheetsStand(result);
       }
 
       // The filling parts that found no room were never asked for: only what is still owed of the counted
@@ -467,7 +488,7 @@ namespace DeepNestSharp.RasterNest
       var fillOutlines = new HashSet<INfp>(loaded.Where(l => l.Fill).Select(l => l.Nfp), ReferenceEqualityComparer.Instance);
       var owed = result.UnplacedParts.Where(p => !fillOutlines.Contains(p)).ToList();
       int placed = result.UsedSheets.Sum(s => s.PartPlacements.Count);
-      return new NestResult(placed + owed.Count, (SheetPlacementCollection)result.UsedSheets, owed, PlacementTypeEnum.BoundingBox, 0, 0);
+      return AsTheSheetsStand(new NestResult(placed + owed.Count, (SheetPlacementCollection)result.UsedSheets, owed, PlacementTypeEnum.BoundingBox, 0, 0));
     }
 
     /// <summary>The priority parts that fill the sheets nest at: after every part ordered by count (1-10).</summary>

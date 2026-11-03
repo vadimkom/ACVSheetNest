@@ -111,7 +111,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-11-03, 1.1.62): core 1087/1089; app 511/511 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
+Last verified (2026-11-03, 1.1.63): core 1087/1089 (1.1.62); app 513/513 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
@@ -180,7 +180,8 @@ Last verified (2026-11-03, 1.1.62): core 1087/1089; app 511/511 with the engine 
   - Materials: black, galvanized, stainless, aluminium; densities 7.85 / 7.85 / 7.93 / 2.70.
   - Thickness: 0.6, 0.7, 0.8, 1, 1.2, 1.5, 2, 3, 4, 5, or typed.
 - Default part spacing in mm is 4 (since 1.1.56, the user's choice; was 6.35 = ¼"). A stored 6.35 from an older build becomes 4 once (`SessionState.SpacingFourMillimetresVersion`, settings version 2; the effort reset keeps its own `EffortResetVersion` = 1). Projects keep the spacing they were saved with, part rows too.
-- Standard sheets stand (since 1.1.52, the user's request): 1000×2000, 1250×2500, 500×1250 mm; the inch list likewise short side first; Custom size opens at 1500×3000. Anything else via "Custom size". The engine packs along the longer side either way: on the flat patterns 1000×2000 gave the same 8 sheets as 2000×1000, 1250×2500 the same 4.
+- Standard sheets stand (since 1.1.52, the user's request): 1000×2000, 1250×2500, 500×1250 mm; the inch list likewise short side first; Custom size opens at 1500×3000. Anything else via "Custom size".
+- **Standing sheets are packed bottom-up** (`RasterNest/StandingSheets.cs`, since 1.1.63). Sparrow shortens its strip along X, so from 1.1.52 a standing sheet came out in columns from left to right over its whole height (the shop's 360 × 1890 job, `test-data/alexi`: two columns, 1860 mm long). When most of the stock stands (by area) and no part is common-cut, the job is nested turned a quarter turn clockwise (sizes swapped, sheet outlines turned, each part's geometry turned −90° so its angles mean the same), turned back, and the parts slid left then down (`RasterCompact`, not on shaped sheets). That job now ends at 859 mm (`CornerPackFixture`).
 - **Turn a sheet** ("⟲" on a stock row, `MainWindow.OnRotateSheet`, since 1.1.62): a rectangle swaps W and H; a sheet from a drawing keeps `ISheetLoadInfo.ShapeTurns` (quarter turns CCW) and `SheetShape.Load(path, turns)` turns its outline and holes before moving the box to 0,0; the sketch binds the turns too. A nest on screen is cleared. Tested: `ShapedSheetFixture.AnOffcutTurnedAQuarterTurnLiesTheOtherWay`.
 - **Sheets from a drawing** (Add sheet → "Sheet from a drawing (DXF, CHF)…", `SheetShape.Load`, `ISheetLoadInfo.ShapePath`): an offcut of any shape. The largest closed contour is the edge, closed contours inside it are holes, anything outside is dropped; moved so its box starts at 0,0. The row's W×H is the rounded box (rounded like the "used / in stock" and cut-sheet matching), priority 1, quantity 1; the file is read again on every nest, as parts are.
   - The Sheets table has a sketch column (`SheetPreviewConverter`, since 1.1.53): every row in proportion, a drawn sheet with its outline and holes, cached by path and time written.
