@@ -233,6 +233,9 @@ namespace DeepNestLib.NestProject
     public void Load(ISvgNestConfig config, string filePath)
     {
       var source = LoadFromFile(config, filePath);
+
+      // Copied to a flash drive or another PC, the drawings are no longer where the project says: look beside it.
+      ProjectPaths.Relocate(source, System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(filePath)));
       Load(source);
     }
 

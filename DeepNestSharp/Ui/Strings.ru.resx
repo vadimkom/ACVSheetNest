@@ -1928,20 +1928,8 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Upd_WillRestart" xml:space="preserve">
     <value>Сейчас SheetNest закроется, установит обновление и запустится снова. Если спросит про сохранение задания — ответьте как обычно; если оставите программу открытой, обновление установится, когда её закроете.</value>
   </data>
-  <data name="Btn_VirtualSheets" xml:space="preserve">
-    <value>⚠ Не хватило материала…</value>
-  </data>
-  <data name="Tip_VirtualSheets" xml:space="preserve">
-    <value>Не поместившиеся детали на виртуальных стандартных листах: сколько докупить. Можно сохранить их отдельным заданием на потом.</value>
-  </data>
   <data name="Title_VirtualSheets" xml:space="preserve">
     <value>Не хватило материала: виртуальные листы</value>
-  </data>
-  <data name="Virtual_Header" xml:space="preserve">
-    <value>{0} дет. не поместились на склад. Они разложены на {1} виртуальных листа {2} × {3} {4}: столько нужно докупить. Эти листы только для показа: не режутся, не экспортируются и не входят в итоги отчёта.</value>
-  </data>
-  <data name="Virtual_TooBig" xml:space="preserve">
-    <value>{0} дет. не помещаются даже на такой лист.</value>
   </data>
   <data name="Virtual_FileSuffix" xml:space="preserve">
     <value> - остаток</value>
@@ -1955,13 +1943,22 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Msg_NoVirtualSheets" xml:space="preserve">
     <value>В этой раскладке ничего не осталось.</value>
   </data>
-  <data name="Msg_VirtualHint" xml:space="preserve">
-    <value>Не хватает: {0} листов {1} × {2} (кнопка «Не хватило материала» на шаге «Раскладка»).</value>
-  </data>
   <data name="Rep_ToBuy" xml:space="preserve">
     <value>Докупить</value>
   </data>
   <data name="Rep_ToBuySheets" xml:space="preserve">
     <value>{0} шт. {1} × {2} {3}</value>
+  </data>
+  <data name="Dxf_VirtualSheet" xml:space="preserve">
+    <value>Нет материала {0}</value>
+  </data>
+  <data name="Dxf_VirtualNote" xml:space="preserve">
+    <value>нет материала: не режется</value>
+  </data>
+  <data name="Tip_VirtualSheets" xml:space="preserve">
+    <value>Не поместившиеся детали — на красных виртуальных листах в конце ленты. Сохраните их отдельным заданием, чтобы разложить, когда появится материал.</value>
+  </data>
+  <data name="Msg_VirtualHint" xml:space="preserve">
+    <value>Не хватает: {0} листов {1} × {2}; остаток — на красных виртуальных листах в конце ленты.</value>
   </data>
 </root>

@@ -1928,20 +1928,8 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   <data name="Upd_WillRestart" xml:space="preserve">
     <value>SheetNest ще се затвори, ще инсталира обновлението и ще се стартира отново. Ако попита за запазване на задачата, отговорете както обикновено; ако оставите програмата отворена, обновлението ще се инсталира, когато я затворите.</value>
   </data>
-  <data name="Btn_VirtualSheets" xml:space="preserve">
-    <value>⚠ Не стигна материал…</value>
-  </data>
-  <data name="Tip_VirtualSheets" xml:space="preserve">
-    <value>Неразположените детайли върху виртуални стандартни листове: колко да се купи. Може да се запазят като отделна задача за по-късно.</value>
-  </data>
   <data name="Title_VirtualSheets" xml:space="preserve">
     <value>Не стигна материал: виртуални листове</value>
-  </data>
-  <data name="Virtual_Header" xml:space="preserve">
-    <value>{0} дет. не се побраха в склада. Разположени са на {1} виртуални листа {2} × {3} {4}: толкова трябва да се купи. Тези листове са само за показ: не се режат, не се експортират и не влизат в итога на отчета.</value>
-  </data>
-  <data name="Virtual_TooBig" xml:space="preserve">
-    <value>{0} дет. не се побират дори на такъв лист.</value>
   </data>
   <data name="Virtual_FileSuffix" xml:space="preserve">
     <value> - остатък</value>
@@ -1955,13 +1943,22 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   <data name="Msg_NoVirtualSheets" xml:space="preserve">
     <value>В това разположение нищо не е останало.</value>
   </data>
-  <data name="Msg_VirtualHint" xml:space="preserve">
-    <value>Липсват: {0} листа {1} × {2} (бутон „Не стигна материал“ в стъпка „Разкрой“).</value>
-  </data>
   <data name="Rep_ToBuy" xml:space="preserve">
     <value>За купуване</value>
   </data>
   <data name="Rep_ToBuySheets" xml:space="preserve">
     <value>{0} бр. {1} × {2} {3}</value>
+  </data>
+  <data name="Dxf_VirtualSheet" xml:space="preserve">
+    <value>Няма материал {0}</value>
+  </data>
+  <data name="Dxf_VirtualNote" xml:space="preserve">
+    <value>няма материал: не се реже</value>
+  </data>
+  <data name="Tip_VirtualSheets" xml:space="preserve">
+    <value>Неразположените детайли са на червените виртуални листове в края на лентата. Запазете ги като отделна задача за по-късно.</value>
+  </data>
+  <data name="Msg_VirtualHint" xml:space="preserve">
+    <value>Липсват: {0} листа {1} × {2}; остатъкът е на червените виртуални листове в края на лентата.</value>
   </data>
 </root>

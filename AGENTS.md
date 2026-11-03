@@ -111,7 +111,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-11-03, 1.1.60): core 1087/1089; app 507/507 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
+Last verified (2026-11-03, 1.1.61): core 1087/1089; app 509/509 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
@@ -129,7 +129,7 @@ Last verified (2026-11-03, 1.1.60): core 1087/1089; app 507/507 with the engine 
 - **Sheet quantities stay as entered** (since 1.1.51). A nest only reports what it used: `ConsumeStock` returns counts by size and the badge reads "used / in stock".
   - Up to 1.1.50 a nest took its sheets off the quantities and gave them back on the next nest. That summed up: a sheet added after a nest came on top of the ones it held, and the user saw "2/3".
   - Projects saved that way carry `SheetsKeptWhole = false`. On opening they get the sheets back once (`ReturnStock`).
-- **Not enough material → virtual sheets** (since 1.1.60, the user's request). When the stock runs out (no unlimited size) the parts left over (`LeftOverJob.Owed`: populations less what the result placed, by drawing and hand) are laid by a Draft nest on unlimited virtual 1250×2500 mm (48×96 in) sheets, cached per result (`MainWindow.virtualNests`). The "not enough sheets" message says how many; the Layout step shows "⚠ Не хватило материала…" (`VirtualSheetsWindow`, its own viewer). Shown only: not in the plan, export, cut ticking or totals; the report adds "Докупить: N шт. 1250 × 2500" (`ReportShortage`). "Сохранить на потом…" writes the project with only what is owed (spares folded in, mirrored apart, fill rows dropped), the virtual sheets as stock, no nest (`LeftOverJob.ProjectJson`; `LeftOverJobFixture`). Not clicked through in the running app.
+- **Not enough material → virtual sheets** (since 1.1.60/61, the user's request). When the stock runs out (no unlimited size) the parts left over (`LeftOverJob.Owed`: populations less what the result placed, by drawing and hand) are laid by a Draft nest on unlimited virtual 1250×2500 mm (48×96 in) sheets, cached per result (`MainWindow.virtualNests`, made in the background for a result shown later). They go at the end of the strips of layouts, red, "Нет материала N" (`DxfViewer.VirtualSheetsFor`, `SheetGroup.IsVirtual`): browsed like the rest, read-only, never in `GetProductionPlan`/`GetDistinctLayoutSheets` (so not in the export or the report's plan), not tickable as cut, not in `FindUnfitLayouts` (`VirtualSheetsInTheStripFixture`). The "not enough sheets" message says how many; the report adds "Докупить: N шт. 1250 × 2500" (`ReportShortage`). "Сохранить на потом…" on the Layout step writes the project with only what is owed (spares folded in, mirrored apart, fill rows dropped), the virtual sheets as stock, no nest (`LeftOverJob.ProjectJson`; `LeftOverJobFixture`). Not clicked through in the running app.
 - **Cut sheets, nest the rest** (`CutSheets.DeductParts/TakeCutSheets`): ticked sheets' parts come off the order (mirrored from the mirrored count, others from quantity, then from spares). The cut sheets come off the quantities for good, the only place sheets leave the stock. A part quantity may be 0; such rows are not sent to the engine.
 - **Move a part between sheets** (`DxfViewer.MoveSelectedTo`): only between single-copy sheets without common cutting. The part goes to the first free spot bottom-left, or stays red in place. An emptied sheet returns to stock (`SheetRemoved`). One undo step.
 - **Fill the sheets** (`IDetailLoadInfo.FillSheets`; "Fill the sheets" in + Shape and in the part's "…"): a row with no count, e.g. a sheet of washers. The operator picks sheets as usual; the nest puts on as many as fit after every counted part.
@@ -222,6 +222,7 @@ Last verified (2026-11-03, 1.1.60): core 1087/1089; app 507/507 with the engine 
 **Saving**
 - `.dnest` writes sheets through `SheetPlacementJsonConverter`, so computed members (PolygonsForExport, Hull, Simplify) are not saved: 4.4 MB → ~1.4 MB. `SvgPoint.Marked` is still written, because the golden JSON tests need it.
 - Projects are not zipped (native zlib is unreliable on the shop PC).
+- **Drawings found beside the project** (`ProjectPaths.Relocate`, called by `ProjectInfo.Load`, since 1.1.61): a part, its unflipped or source drawing, or a sheet's ShapePath missing at its path is looked for by file name in the folder the .dnest was opened from and every folder below (unreadable ones skipped); of several, the one sharing the most trailing folders with the old path. The saved nest's strings equal to a moved path are rewritten too (the DXF export reads drawings back by Part.Name). Paths that exist, or match nothing, stay (`ProjectPathsFixture`).
 - File dialogs skip a folder that no longer exists, such as a pulled flash drive, and retry without it if the shell refuses. A failed save shows a message instead of crashing.
 
 **Languages**

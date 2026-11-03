@@ -659,7 +659,7 @@
                       </ItemsControl.ItemsPanel>
                       <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                          <Border Margin="3" Padding="5,4" Width="130" Background="White" BorderThickness="1"
+                          <Border x:Name="nestCard" Margin="3" Padding="5,4" Width="130" Background="White" BorderThickness="1"
                                   BorderBrush="{DynamicResource Brush.Border}" CornerRadius="3" Cursor="Hand"
                                   MouseLeftButtonUp="OnNestLayoutCardClick" ToolTip="{ui:Tr Tip_LayoutCard}">
                             <StackPanel>
@@ -667,6 +667,12 @@
                               <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                           </Border>
+                          <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsVirtual}" Value="True">
+                              <Setter TargetName="nestCard" Property="Background" Value="#FDECEC" />
+                              <Setter TargetName="nestCard" Property="BorderBrush" Value="#C62828" />
+                            </DataTrigger>
+                          </DataTemplate.Triggers>
                         </DataTemplate>
                       </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -691,8 +697,8 @@
           <DockPanel>
             <!-- Right: Export & Print Buttons -->
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-              <!-- Shown while the layout left parts uncut: them on virtual standard sheets, and "save for later". -->
-              <Button x:Name="btnVirtualSheets" Style="{DynamicResource ModernButton}" Margin="3,0" Content="{ui:Tr Btn_VirtualSheets}" Click="OnVirtualSheets" ToolTip="{ui:Tr Tip_VirtualSheets}" Visibility="Collapsed" Foreground="#B00020" />
+              <!-- Shown while the layout left parts uncut (they are on the red virtual sheets in the strip): save them as a job for later. -->
+              <Button x:Name="btnVirtualSheets" Style="{DynamicResource ModernButton}" Margin="3,0" Content="{ui:Tr Btn_SaveForLater}" Click="OnSaveLeftOver" ToolTip="{ui:Tr Tip_VirtualSheets}" Visibility="Collapsed" Foreground="#B00020" />
               <Button x:Name="btnExportDxf" Style="{DynamicResource ModernButton}" Margin="3,0" Content="📁 Экспорт в DXF" Click="OnExportDxf" ToolTip="{ui:Tr Tip_ExportDxf}" />
               <Button x:Name="btnExportPdf" Style="{DynamicResource ModernButton}" Margin="3,0" Content="📄 Экспорт отчёта (PDF)" Click="OnNestReportPdf" ToolTip="{ui:Tr Tip_ExportPdf}" />
               <Button x:Name="btnPrintReport" Style="{DynamicResource PrimaryButton}" Margin="3,0" Content="🖨️ Печать отчета..." Click="OnPrintReport" ToolTip="{ui:Tr Tip_PrintReport}" />
@@ -755,6 +761,7 @@
                               </Grid>
                               <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
                               <TextBlock Text="{Binding SizeText}" FontSize="10" Foreground="{DynamicResource Brush.TextMuted}" />
+                              <TextBlock Text="{ui:Tr Dxf_VirtualNote}" Foreground="#C62828" FontWeight="SemiBold" Margin="0,3,0,0" TextWrapping="Wrap" Visibility="{Binding VirtualVisibility}" />
                               <CheckBox Content="{ui:Tr Lbl_SheetCut}" IsChecked="{Binding IsCut}" Margin="0,3,0,0"
                                         Visibility="{Binding SingleVisibility}" />
                               <StackPanel Orientation="Horizontal" Margin="0,3,0,0" Visibility="{Binding MultiVisibility}">
@@ -767,6 +774,10 @@
                           <DataTemplate.Triggers>
                             <DataTrigger Binding="{Binding IsCurrent}" Value="True">
                               <Setter TargetName="card" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsVirtual}" Value="True">
+                              <Setter TargetName="card" Property="Background" Value="#FDECEC" />
+                              <Setter TargetName="card" Property="BorderBrush" Value="#C62828" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsAnyCut}" Value="True">
                               <Setter TargetName="card" Property="Background" Value="#E8F5E9" />

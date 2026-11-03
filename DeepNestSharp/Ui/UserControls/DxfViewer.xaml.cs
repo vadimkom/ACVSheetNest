@@ -42,6 +42,10 @@ namespace DeepNestSharp.Ui.UserControls
 
     private static readonly Brush SheetFill = Frozen(Color.FromRgb(0xFA, 0xFA, 0xFA));
     private static readonly Brush SheetStroke = Frozen(Color.FromRgb(0x88, 0x88, 0x88));
+
+    // A virtual sheet (the stock ran short) is tinted red, so it is never taken for one to cut.
+    private static readonly Brush VirtualSheetFill = Frozen(Color.FromRgb(0xFD, 0xEC, 0xEC));
+    private static readonly Brush VirtualSheetStroke = Frozen(Color.FromRgb(0xC6, 0x28, 0x28));
     private static readonly Brush PartStroke = Frozen(Color.FromRgb(0x10, 0x10, 0x10));
     private static readonly Brush PartFill = Frozen(Color.FromArgb(0xC0, 0xB4, 0xB8, 0xBC)); // aluminum gray
     private static readonly Brush HoleFill = Frozen(Color.FromRgb(0xFA, 0xFA, 0xFA));
@@ -386,6 +390,24 @@ namespace DeepNestSharp.Ui.UserControls
     {
       this.BuildGroupsInNestOrder();
       this.PutPriorityStockFirst();
+      this.AddVirtualSheets();
+    }
+
+    /// <summary>
+    /// The sheets the stock ran short of, for the result on screen: what it left over, laid on standard sheets.
+    /// Null when it left nothing. Asked each time the layouts are built; set by the window, which makes them.
+    /// </summary>
+    public Func<INestResult, INestResult> VirtualSheetsFor { get; set; }
+
+    /// <summary>The virtual sheets go last, one layout each, after every sheet that is cut.</summary>
+    private void AddVirtualSheets()
+    {
+      var shortfall = this.Result == null ? null : this.VirtualSheetsFor?.Invoke(this.Result);
+      int n = 0;
+      foreach (var sp in shortfall?.UsedSheets ?? Enumerable.Empty<ISheetPlacement>())
+      {
+        this.groups.Add(new SheetGroup { Representative = sp, Count = 1, Name = Localization.Format("Dxf_VirtualSheet", ++n), IsVirtual = true });
+      }
     }
 
     /// <summary>
@@ -484,7 +506,7 @@ namespace DeepNestSharp.Ui.UserControls
     /// how many to cut) instead of one DXF per physical sheet.</summary>
     public IReadOnlyList<ISheetPlacement> GetDistinctLayoutSheets()
     {
-      return this.groups.Select(g => g.Representative).Where(s => s != null).ToList();
+      return this.groups.Where(g => !g.IsVirtual).Select(g => g.Representative).Where(s => s != null).ToList();
     }
 
     /// <summary>The full production plan — one entry per distinct layout with its cut count. Used by
@@ -492,7 +514,7 @@ namespace DeepNestSharp.Ui.UserControls
     public IReadOnlyList<(ISheetPlacement Sheet, int Count, string Name)> GetProductionPlan()
     {
       return this.groups
-        .Where(g => g.Representative != null)
+        .Where(g => g.Representative != null && !g.IsVirtual)
         .Select(g => (g.Representative, g.Count, g.Name))
         .ToList();
     }
@@ -999,6 +1021,9 @@ namespace DeepNestSharp.Ui.UserControls
 
       public ImageSource Thumbnail { get; init; }
 
+      /// <summary>A sheet the stock ran short of (see <see cref="SheetGroup.IsVirtual"/>).</summary>
+      public bool IsVirtual { get; init; }
+
       /// <summary>The sheets cut to it, one per copy: the nest's own sheets, or the plan's layout repeated
       /// where the plan condensed several near-equal sheets into one.</summary>
       public IReadOnlyList<ISheetPlacement> Sheets { get; init; }
@@ -1023,7 +1048,8 @@ namespace DeepNestSharp.Ui.UserControls
           Count = g.Count,
           Width = g.Representative.Sheet.WidthCalculated,
           Height = g.Representative.Sheet.HeightCalculated,
-          Thumbnail = this.Thumbnail(g.Representative),
+          Thumbnail = this.Thumbnail(g.Representative, g.IsVirtual),
+          IsVirtual = g.IsVirtual,
           Sheets = g.Members != null && g.Members.Count == g.Count
             ? g.Members.ToList()
             : Enumerable.Repeat(g.Representative, g.Count).ToList(),
@@ -1034,13 +1060,13 @@ namespace DeepNestSharp.Ui.UserControls
     }
 
     /// <summary>The sheet and its parts in their colours, as a picture that scales to any size.</summary>
-    private ImageSource Thumbnail(ISheetPlacement sheetPlacement)
+    private ImageSource Thumbnail(ISheetPlacement sheetPlacement, bool isVirtual = false)
     {
       double w = sheetPlacement.Sheet.WidthCalculated;
       double h = sheetPlacement.Sheet.HeightCalculated;
       var drawing = new DrawingGroup();
       double pen = Math.Max(w, h) / 300.0;
-      drawing.Children.Add(new GeometryDrawing(Brushes.White, new Pen(SheetStroke, pen), SheetGeometry(sheetPlacement.Sheet, w, h)));
+      drawing.Children.Add(new GeometryDrawing(isVirtual ? VirtualSheetFill : Brushes.White, new Pen(isVirtual ? VirtualSheetStroke : SheetStroke, isVirtual ? pen * 2 : pen), SheetGeometry(sheetPlacement.Sheet, w, h)));
       foreach (var pp in sheetPlacement.PartPlacements)
       {
         drawing.Children.Add(new GeometryDrawing(this.TypeFill(pp), new Pen(PartStroke, pen / 2), BuildPlacedGeometry(pp, h)));
@@ -1089,6 +1115,10 @@ namespace DeepNestSharp.Ui.UserControls
       /// the cut file and from the reopened project. Better to not offer it than to lose it quietly.</para>
       /// </summary>
       public bool IsEditable => this.Members != null;
+
+      /// <summary>A sheet the stock ran short of: what is left over, laid on a standard sheet to show what to buy.
+      /// Shown and browsed like the rest; never in the plan, the export, the report or the cut sheets.</summary>
+      public bool IsVirtual { get; set; }
     }
 
     private void Render()
@@ -1132,6 +1162,10 @@ namespace DeepNestSharp.Ui.UserControls
       this.sheetLabel.Text = group.Count > 1
         ? Localization.Format("Dxf_NestN", idx + 1, this.groups.Count) + $"  ({group.Count})"
         : Localization.Format("Dxf_NestN", idx + 1, this.groups.Count);
+      if (group.IsVirtual)
+      {
+        this.sheetLabel.Text = group.Name + "  (" + Localization.Get("Dxf_VirtualNote") + ")";
+      }
       this.sheetNav.Visibility = this.ShowSheetNav && (this.groups.Count > 1 || group.Count > 1) ? Visibility.Visible : Visibility.Collapsed;
 
       double w = sheet.WidthCalculated;
@@ -1168,8 +1202,8 @@ namespace DeepNestSharp.Ui.UserControls
       this.canvas.Children.Add(new System.Windows.Shapes.Path
       {
         Data = sheetGeo,
-        Fill = SheetFill,
-        Stroke = SheetStroke,
+        Fill = group.IsVirtual ? VirtualSheetFill : SheetFill,
+        Stroke = group.IsVirtual ? VirtualSheetStroke : SheetStroke,
         StrokeThickness = stroke,
       });
 
@@ -4661,7 +4695,7 @@ namespace DeepNestSharp.Ui.UserControls
       var unfit = new List<(string Layout, int Parts, int Overlapping, int InMargin)>();
       for (int i = 0; i < this.groups.Count; i++)
       {
-        var found = this.UnfitOn(this.groups[i]);
+        var found = this.groups[i].IsVirtual ? null : this.UnfitOn(this.groups[i]);
         if (found != null && found.All.Count > 0)
         {
           unfit.Add((

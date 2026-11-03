@@ -1928,20 +1928,8 @@ Downloadseite öffnen?</value>
   <data name="Upd_WillRestart" xml:space="preserve">
     <value>SheetNest schließt sich jetzt, installiert das Update und startet neu. Fragt es nach dem Speichern, antworten Sie wie gewohnt; bleibt das Programm offen, wird das Update beim Schließen installiert.</value>
   </data>
-  <data name="Btn_VirtualSheets" xml:space="preserve">
-    <value>⚠ Material reicht nicht…</value>
-  </data>
-  <data name="Tip_VirtualSheets" xml:space="preserve">
-    <value>Die nicht platzierten Teile auf virtuellen Standardblechen: wie viel nachzukaufen ist. Als Auftrag für später speichern.</value>
-  </data>
   <data name="Title_VirtualSheets" xml:space="preserve">
     <value>Material reicht nicht: virtuelle Bleche</value>
-  </data>
-  <data name="Virtual_Header" xml:space="preserve">
-    <value>{0} Teile passten nicht auf den Bestand. Auf {1} virtuellen Blechen {2} × {3} {4} verschachtelt: so viel ist nachzukaufen. Diese Bleche werden nur angezeigt: nicht geschnitten, nicht exportiert, nicht in den Summen des Berichts.</value>
-  </data>
-  <data name="Virtual_TooBig" xml:space="preserve">
-    <value>{0} Teile passen nicht einmal auf ein solches Blech.</value>
   </data>
   <data name="Virtual_FileSuffix" xml:space="preserve">
     <value> - Rest</value>
@@ -1955,13 +1943,22 @@ Downloadseite öffnen?</value>
   <data name="Msg_NoVirtualSheets" xml:space="preserve">
     <value>Bei diesem Layout bleibt nichts übrig.</value>
   </data>
-  <data name="Msg_VirtualHint" xml:space="preserve">
-    <value>Es fehlen: {0} Bleche {1} × {2} (Schaltfläche „Material reicht nicht“ im Layout).</value>
-  </data>
   <data name="Rep_ToBuy" xml:space="preserve">
     <value>Nachkaufen</value>
   </data>
   <data name="Rep_ToBuySheets" xml:space="preserve">
     <value>{0} Stk. {1} × {2} {3}</value>
+  </data>
+  <data name="Dxf_VirtualSheet" xml:space="preserve">
+    <value>Kein Material {0}</value>
+  </data>
+  <data name="Dxf_VirtualNote" xml:space="preserve">
+    <value>kein Material: wird nicht geschnitten</value>
+  </data>
+  <data name="Tip_VirtualSheets" xml:space="preserve">
+    <value>Die nicht platzierten Teile liegen auf den roten virtuellen Blechen am Ende der Leiste. Als Auftrag für später speichern.</value>
+  </data>
+  <data name="Msg_VirtualHint" xml:space="preserve">
+    <value>Es fehlen: {0} Bleche {1} × {2}; der Rest liegt auf den roten virtuellen Blechen am Ende der Leiste.</value>
   </data>
 </root>

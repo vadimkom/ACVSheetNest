@@ -167,6 +167,8 @@ namespace DeepNestSharp.Ui.Views
       // Offcuts and remnants given a high priority are cut first, so they are listed first: the stock table
       // and the layouts of a nest both put them at the top.
       this.dxfViewer.SheetPriority = this.StockPriorityOf;
+      this.dxfViewer.VirtualSheetsFor = this.VirtualSheetsOf;
+      this.nestDxfViewer.VirtualSheetsFor = this.VirtualSheetsOf;
       this.nestDxfViewer.SheetPriority = this.StockPriorityOf;
 
       // The strip of layouts under the layout drawing, where cut sheets are ticked off.
@@ -985,7 +987,65 @@ namespace DeepNestSharp.Ui.Views
       }
     }
 
-    private async void OnVirtualSheets(object sender, RoutedEventArgs e)
+    /// <summary>Results whose virtual sheets are being made, so a layout rebuilt meanwhile does not start another.</summary>
+    private readonly HashSet<INestResult> virtualPending = new HashSet<INestResult>(ReferenceEqualityComparer.Instance);
+
+    /// <summary>
+    /// What the viewers append to the strip of layouts: the virtual sheets of the result on screen. Made in the
+    /// background the first time a result that left parts over is shown; the viewers are rebuilt when they are.
+    /// </summary>
+    private INestResult VirtualSheetsOf(INestResult result)
+    {
+      if (result == null || (result.UnplacedParts?.Count ?? 0) == 0)
+      {
+        return null;
+      }
+
+      if (this.virtualNests.TryGetValue(result, out var known))
+      {
+        return known;
+      }
+
+      if (this.virtualPending.Add(result))
+      {
+        this.Dispatcher.BeginInvoke(new Action(async () =>
+        {
+          try
+          {
+            if (await this.VirtualNestFor(result) != null)
+            {
+              this.ShowVirtualSheets(result);
+            }
+          }
+          catch (Exception)
+          {
+            // A shortfall that cannot be laid out is only not shown; the nest itself stands.
+          }
+          finally
+          {
+            this.virtualPending.Remove(result);
+          }
+        }));
+      }
+
+      return null;
+    }
+
+    /// <summary>Rebuilds the viewers still showing <paramref name="result"/>, now that its virtual sheets exist.</summary>
+    private void ShowVirtualSheets(INestResult result)
+    {
+      foreach (var viewer in new[] { this.dxfViewer, this.nestDxfViewer })
+      {
+        if (viewer != null && ReferenceEquals(viewer.Result, result))
+        {
+          viewer.ReloadLayouts();
+        }
+      }
+
+      this.RefreshShortageButton();
+    }
+
+    private async void OnSaveLeftOver(object sender, RoutedEventArgs e)
     {
       var result = this.dxfViewer?.Result;
       var project = (ViewModel.ActiveDocument as NestProjectViewModel)?.ProjectInfo;
@@ -1012,30 +1072,10 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
-      var (w, h) = this.VirtualSheetSize;
-      int parts = nest.UsedSheets.Sum(s => s.PartPlacements.Count);
-      string header = Localization.Format("Virtual_Header", parts, nest.UsedSheets.Count, w, h, this.unitsMm ? Localization.Get("Unit_Mm") : Localization.Get("Unit_In"));
-      if ((nest.UnplacedParts?.Count ?? 0) > 0)
-      {
-        header += " " + Localization.Format("Virtual_TooBig", nest.UnplacedParts.Count);
-      }
-
-      var window = new VirtualSheetsWindow(
-        nest,
-        header,
-        viewer =>
-        {
-          viewer.PartColours = this.dxfViewer.PartColours;
-          viewer.DefaultPartSpacing = this.dxfViewer.DefaultPartSpacing;
-          viewer.SheetEdgeMargin = this.dxfViewer.SheetEdgeMargin;
-          viewer.PartSpacings = this.dxfViewer.PartSpacings;
-        },
-        () => this.SaveForLater(project, result, nest))
-      {
-        Owner = this,
-      };
-      window.ShowDialog();
+      this.ShowVirtualSheets(result);
+      this.SaveForLater(project, result, nest);
     }
+
 
     /// <summary>
     /// Writes the parts a result left uncut as a job of their own: the same project with each row's quantity
@@ -2991,6 +3031,7 @@ namespace DeepNestSharp.Ui.Views
           {
             var (vw, vh) = this.VirtualSheetSize;
             toBuy = " " + Localization.Format("Msg_VirtualHint", shortfall.UsedSheets.Count, vw, vh);
+            this.ShowVirtualSheets(result);
             this.RefreshShortageButton();
           }
 
@@ -3966,9 +4007,14 @@ namespace DeepNestSharp.Ui.Views
 
       public string OfCountText => Localization.Format("Cut_OfCount", this.Count);
 
-      public Visibility SingleVisibility => this.Count == 1 ? Visibility.Visible : Visibility.Collapsed;
+      /// <summary>A sheet the stock ran short of: shown, never ticked as cut.</summary>
+      public bool IsVirtual => this.Layout.IsVirtual;
 
-      public Visibility MultiVisibility => this.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+      public Visibility SingleVisibility => this.Count == 1 && !this.IsVirtual ? Visibility.Visible : Visibility.Collapsed;
+
+      public Visibility VirtualVisibility => this.IsVirtual ? Visibility.Visible : Visibility.Collapsed;
+
+      public Visibility MultiVisibility => this.Count > 1 && !this.IsVirtual ? Visibility.Visible : Visibility.Collapsed;
 
       public int CutCount
       {
