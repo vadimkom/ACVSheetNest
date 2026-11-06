@@ -72,7 +72,7 @@ namespace DeepNestLib.IO
       // drawing while preserving both.  Parse the same immutable byte snapshot whose digest keys the
       // cache, otherwise a saved CommonBoundarySpan could validate against stale geometry and suppress
       // the newly loaded outside contour during export.
-      byte[] sourceBytes = File.ReadAllBytes(fullPath);
+      byte[] sourceBytes = DxfPartSplitter.ReadAllBytesShared(fullPath);
       string contentFingerprint = Convert.ToHexString(SHA256.HashData(sourceBytes));
       var key = new CatalogCacheKey(
         fullPath,
@@ -134,7 +134,7 @@ namespace DeepNestLib.IO
       }
 
       string fullPath = Path.GetFullPath(path);
-      byte[] sourceBytes = File.ReadAllBytes(fullPath);
+      byte[] sourceBytes = DxfPartSplitter.ReadAllBytesShared(fullPath);
       DxfFile file = DrawingFile.Load(sourceBytes);
       DxfContourCatalog catalog = Create(
         fullPath,

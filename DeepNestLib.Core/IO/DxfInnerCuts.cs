@@ -36,7 +36,7 @@ namespace DeepNestLib.IO
         }
 
         var segments = new List<(DxfPoint, DxfPoint)>();
-        foreach (var entity in DxfFile.Load(path).Entities.Where(DxfParser.IsInnerCut))
+        foreach (var entity in DrawingFile.Load(path).Entities.Where(DxfParser.IsInnerCut))
         {
           switch (entity)
           {

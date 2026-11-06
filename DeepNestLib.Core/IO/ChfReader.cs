@@ -348,7 +348,7 @@ namespace DeepNestLib.IO
   /// goes through here, so a CHF part nests, exports its bends and shares cuts like a DXF one.</summary>
   public static class DrawingFile
   {
-    public static DxfFile Load(string path) => Load(File.ReadAllBytes(path));
+    public static DxfFile Load(string path) => Load(DxfPartSplitter.ReadAllBytesShared(path));
 
     public static DxfFile Load(byte[] bytes)
     {

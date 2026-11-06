@@ -10,9 +10,9 @@ When resuming:
 1. Run `git status --short --branch` and `git log -5 --oneline`.
 2. Read this file; open other documents only as the task needs them.
 3. The user asked to keep an eye on the originals. Check, and mention anything worth taking:
-   - `git fetch origin` and `git log 9d9c1cd..origin/main` for ManuelMRosa/SheetNest (9d9c1cd was its head on 2026-10-14);
-   - our pull requests #12–#15 there (`gh pr list --repo ManuelMRosa/SheetNest --author vadimkom --state all`);
-   - `git ls-remote https://github.com/JeroenGar/sparrow.git HEAD` for the engine (we build on `961ec31`; its head was `1fe3e31` on 2026-10-14).
+   - `git log 7dca814..main` on ManuelMRosa/SheetNest (7dca814 was its head on 2026-11-04);
+   - our pull requests there (`gh pr list --repo ManuelMRosa/SheetNest --author vadimkom --state all`);
+   - `git ls-remote https://github.com/JeroenGar/sparrow.git HEAD` for the engine (we build on `961ec31`; its head was `6067f00` on 2026-11-04, 47 commits ahead: 0.3.0 on jagua-rs 1.1.0, a new input format, Rust 1.90; our patch and job writer would need porting, and Rust is not installed here).
 4. Keep existing changes and work on the current branch (`main`).
 5. If the user only asks to work on SheetNest, summarise the state and ask what they want. Earlier commits are not pending tasks.
 
@@ -27,7 +27,8 @@ When resuming:
   - Build those branches in the worktree `C:/src/sn-upstream`, based on `origin/main`.
   - Upstream targets .NET 6. Build it with the SDK 10 here and run its tests with `DOTNET_ROLL_FORWARD=Major`.
   - Baseline: core 1034/1037; the app suite fails `PartCardSizeFixture` on upstream main too.
-  - Open pull requests: #12 DXF endpoint grid, #13 elliptical arcs, #14 file dialog on a pulled drive, #15 smaller `.dnest`. Fill-up was not offered: `SparrowNestService` has diverged too far.
+  - Taken on 2026-11-04: #13 elliptical arcs, #14 file dialog on a pulled drive, #15 smaller `.dnest`, and of #12 the `FlatDxfJoiner` half (7dca814; #12 closed, the reader overlaps a grid `DxfParser` got in upstream 1.1.13). None open. Fill-up was not offered: `SparrowNestService` has diverged too far.
+- `forgejo` = https://g.vkom.top/vadim/ACVSheetNest: the user's own Forgejo on FreeBSD (behind Caddy, by IP list), a second copy of `main` and the tags since 2026-11-04. Releases and the update check stay on GitHub. The user pushes there with their own login.
 - Historic upstream: https://github.com/9swampy/DeepNestSharp.
 - Commit identity: `git -c user.name="vadim" -c user.email="komarov.v@gmail.com" commit ...`. No global identity is configured.
 - Every MSI handed to the user gets a new version number. Releases on the fork feed the in-app update check (`UpdateChecker`, `releases/latest`).
@@ -111,7 +112,7 @@ Other switches:
 - `SHEETNEST_NEST_*` overrides the profile file.
 - `NestSpeedBenchFixture` benches a project (`SHEETNEST_BENCH_PROJECT`, `SHEETNEST_SPARROW_ARGS`, `SHEETNEST_DUMP_JOBS`).
 
-Last verified (2026-11-03, 1.1.63): core 1087/1089 (1.1.62); app 513/513 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
+Last verified (2026-11-04): core 1090/1092 (after the shared reads; app suite not rerun); 2026-11-03, 1.1.63: app 513/513 with the engine (SPARROW_EXE + bench DXF dir), common-line benches included.
 
 ## How things work (decisions worth knowing)
 
@@ -195,7 +196,7 @@ Last verified (2026-11-03, 1.1.63): core 1087/1089 (1.1.62); app 513/513 with th
 - Part sizes load in `Task.Run` once, and the notification goes back to the asking thread's context. A report of missing sizes on the user's PC could not be reproduced; ask for a screenshot if it recurs.
 
 **Import**
-- `DrawingFile.Load` recognises CHF by content. An empty file gives a clear error.
+- `DrawingFile.Load` recognises CHF by content. An empty file gives a clear error. Drawings are read with `DxfPartSplitter.ReadAllBytesShared`, so one still open in the CAD program reads too (import, export, inner cuts, the common-line catalogs; upstream baaf56d plus `DrawingFile`, 2026-11-04).
 - **CHF (SC2000)**: the whole format, verified against `E:/chf` (572/572 import, 6 empty).
   - Graph kinds: 8 contour, 9 group, 10 text.
   - Elements: 2 line, 3 arc, 4 circle, 6 polyline with bulges, 7 spline.
