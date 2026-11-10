@@ -1021,6 +1021,13 @@ namespace DeepNestSharp.RasterNest
           }
         }
 
+        // What still has room on the sheet as it lies goes into it without a search: the fill-up packs are
+        // few, and a part left over beside empty metal is the one thing the operator sees at once.
+        if (!shapedSheet && !cancel.IsCancellationRequested)
+        {
+          DiagFreeRoomPlaced += PutIntoFreeRoom(pool, loadedById, bestPlacements, bestPlacedBySrc, bestW, bestH, margin);
+        }
+
         // Only the size/attempt that was actually kept ever gets cut — every other stock size tried for
         // this sheet, and the first attempt when the last-chance retry beat it, are thrown away just like
         // a losing search candidate, and their seam counts go with them.
@@ -1520,9 +1527,11 @@ namespace DeepNestSharp.RasterNest
     /// by their order along the strip. With a few big parts that strands one: an operator's order of a
     /// 1354 x 1210 front, a 1354 x 688 top and two 649 x 1209 sides on 2500 x 1250 came out on three sheets,
     /// the front alone on the first with a side's worth of room beside it, because the top came next along
-    /// the strip and did not fit. Only parts of a twentieth of the sheet or more are offered: a small part
-    /// left over is one the strip ran out of room for, and searching again for each would cost a laser-side
-    /// PC minutes for nothing. A sheet with common cutting keeps the search its references were set on.
+    /// the strip and did not fit. A part whose box goes into the empty metal as the sheet lies is offered
+    /// first, whatever its size (the door panels of 290 x 425, 4 % of the sheet, went uncut beside a band of
+    /// 1250 x 570). Otherwise only parts of a twentieth of the sheet or more: a small part with no room is one
+    /// the strip ran out of room for, and searching again for each would cost a laser-side PC minutes for
+    /// nothing. A sheet with common cutting keeps the search its references were set on.
     /// </remarks>
     private static (List<IPartPlacement> Placements, Dictionary<int, int> PlacedBySrc, List<CommonEdgeIntent> CommonEdges) FillUp(
       List<Loaded> loaded,
@@ -1555,54 +1564,73 @@ namespace DeepNestSharp.RasterNest
       double used = current.Sum(kv => kv.Value * Area(kv.Key));
       List<IPartPlacement> keptPlacements = null;
       List<CommonEdgeIntent> keptEdges = null;
-      var candidates = pool.Keys
+      double bigShare = NestProfiles.For(effort)?.FillUpMinShare ?? BigPartShare;
+      int maxAttempts = NestProfiles.For(effort)?.FillUpMaxAttempts ?? MaxFillAttempts;
+      var pending = pool.Keys
         .Where(k => Waiting(k, current) > 0
           && !loadedById[k].RequiresMergedLines && !loadedById[k].Fill
-          && Area(k) >= (NestProfiles.For(effort)?.FillUpMinShare ?? BigPartShare) * usable
           && FitsOnSheet(loadedById[k], w, h, margin))
-        .OrderByDescending(Area)
-        .ThenBy(k => k)
         .ToList();
+      double spacing = RoomSpacing(placedBySrc.Keys.Concat(pending), loadedById);
+      var refused = new HashSet<int>();
+
+      // Which part is offered next. One whose box goes into the sheet's empty metal as it lies first: room
+      // is there, and a pack that rearranges the sheet usually finds more of it (the door panels went on four
+      // in a row where the box alone set them beside the first one lying). Only then the big parts by area,
+      // which a pack may make room for, as before; a small one with no room is not worth a pack.
+      int Next()
+      {
+        var open = pending.Where(k => !refused.Contains(k) && Waiting(k, current) > 0 && used + Area(k) <= usable).ToList();
+        if (open.Count == 0)
+        {
+          return -1;
+        }
+
+        var room = new FreeRoom(keptPlacements ?? placements, spacing, w, h, margin);
+        var roomy = open.Where(k => SpotFor(loadedById[k], room) != null).ToList();
+        var pick = roomy.Count > 0
+          ? roomy.OrderBy(k => loadedById[k].Priority).ThenByDescending(Area).ThenBy(k => k)
+          : open.Where(k => Area(k) >= bigShare * usable).OrderByDescending(Area).ThenBy(k => k);
+        return pick.DefaultIfEmpty(-1).First();
+      }
 
       int attempts = 0;
-      foreach (int src in candidates)
+      for (int src; attempts < maxAttempts && !cancel.IsCancellationRequested && (src = Next()) >= 0;)
       {
-        while (attempts < (NestProfiles.For(effort)?.FillUpMaxAttempts ?? MaxFillAttempts) && !cancel.IsCancellationRequested && Waiting(src, current) > 0 && used + Area(src) <= usable)
+        attempts++;
+        Interlocked.Increment(ref DiagFillAttempts);
+        var batch = new Dictionary<int, int>(current);
+        batch[src] = (batch.TryGetValue(src, out int n) ? n : 0) + 1;
+        var (pl, by, _, _, _, _, edges, _) = PackOneSheet(
+          loaded,
+          batch,
+          w,
+          h,
+          margin,
+          IterationBudget(effort),
+          SearchWorkers(effort),
+          hardTimeoutSec,
+          TriesFor(1, true, effort),
+          exe,
+          cancel,
+          null,
+          commonLineGap,
+          geometryTolerance,
+          effort,
+          commonLineMaxClusterParts,
+          out _,
+          seedOffset: seedOffset);
+        if (pl == null || by == null || by.Values.Sum() < batch.Values.Sum())
         {
-          attempts++;
-          Interlocked.Increment(ref DiagFillAttempts);
-          var batch = new Dictionary<int, int>(current);
-          batch[src] = (batch.TryGetValue(src, out int n) ? n : 0) + 1;
-          var (pl, by, _, _, _, _, edges, _) = PackOneSheet(
-            loaded,
-            batch,
-            w,
-            h,
-            margin,
-            IterationBudget(effort),
-            SearchWorkers(effort),
-            hardTimeoutSec,
-            TriesFor(1, true, effort),
-            exe,
-            cancel,
-            null,
-            commonLineGap,
-            geometryTolerance,
-            effort,
-            commonLineMaxClusterParts,
-            out _,
-            seedOffset: seedOffset);
-          if (pl == null || by == null || by.Values.Sum() < batch.Values.Sum())
-          {
-            break; // this one does not go on with the rest; a smaller one still might
-          }
-
-          current = by;
-          Interlocked.Increment(ref DiagFillKept);
-          keptPlacements = pl;
-          keptEdges = edges;
-          used += Area(src);
+          refused.Add(src); // this one does not go on with the rest; a smaller one still might
+          continue;
         }
+
+        current = by;
+        Interlocked.Increment(ref DiagFillKept);
+        keptPlacements = pl;
+        keptEdges = edges;
+        used += Area(src);
       }
 
       return keptPlacements == null ? (null, null, null) : (keptPlacements, current, keptEdges);
