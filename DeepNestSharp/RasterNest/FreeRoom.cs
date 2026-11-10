@@ -92,6 +92,38 @@ namespace DeepNestSharp.RasterNest
 
         return null;
       }
+
+      /// <summary>The area of the largest empty rectangle of whole cells: the biggest clean offcut.</summary>
+      public double LargestEmpty()
+      {
+        var heights = new int[this.nx];
+        var stack = new int[this.nx + 1];
+        long best = 0;
+        for (int j = 0; j < this.ny; j++)
+        {
+          for (int i = 0; i < this.nx; i++)
+          {
+            bool isTaken = this.taken[j + 1, i + 1] - this.taken[j, i + 1] - this.taken[j + 1, i] + this.taken[j, i] != 0;
+            heights[i] = isTaken ? 0 : heights[i] + 1;
+          }
+
+          int top = 0;
+          for (int i = 0; i <= this.nx; i++)
+          {
+            int hgt = i < this.nx ? heights[i] : 0;
+            while (top > 0 && heights[stack[top - 1]] >= hgt)
+            {
+              int tall = heights[stack[--top]];
+              int left = top > 0 ? stack[top - 1] + 1 : 0;
+              best = Math.Max(best, (long)tall * (i - left));
+            }
+
+            stack[top++] = i;
+          }
+        }
+
+        return best * this.cell * this.cell;
+      }
     }
 
     /// <summary>The widest spacing any of these parts keeps, which every box is grown by.</summary>
@@ -106,14 +138,17 @@ namespace DeepNestSharp.RasterNest
     /// them; which fits more depends on the band, so <see cref="PutIntoFreeRoom"/> tries all four.
     /// </summary>
     private static (int Angle, INfp Turned, double X, double Y)? SpotFor(Loaded part, FreeRoom room, int rule = 0)
+      => SpotFor(part.Nfp, LatticeAngles(part), room, rule);
+
+    private static (int Angle, INfp Turned, double X, double Y)? SpotFor(INfp outline, List<int> angles, FreeRoom room, int rule)
     {
       bool leftFirst = (rule & 1) != 0;
       bool acrossTie = (rule & 2) != 0;
       (int Angle, INfp Turned, double X, double Y)? best = null;
       (double, double, double) bestKey = default;
-      foreach (int angle in LatticeAngles(part))
+      foreach (int angle in angles)
       {
-        var turned = angle == 0 ? part.Nfp : part.Nfp.Rotate(angle);
+        var turned = angle == 0 ? outline : outline.Rotate(angle);
         double bw = turned.MaxX - turned.MinX;
         double bh = turned.MaxY - turned.MinY;
         var spot = room.Spot(bw, bh, leftFirst);

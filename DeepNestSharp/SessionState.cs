@@ -99,6 +99,10 @@ namespace DeepNestSharp
     /// machine, not per project: it trades speed against how hard THIS computer works, never the nest.</summary>
     public int NestConcurrency { get; set; } = 0;
 
+    /// <summary>Parts laid from the right edge of the sheet, the offcut left at the left (2026-11-10, the
+    /// user: "our laser cuts from right to left"). Per machine, like the laser it suits.</summary>
+    public bool NestFromRight { get; set; }
+
     /// <summary>Cut the last sheet's leftover off as a rectangular offcut; null = default (off).</summary>
     public bool? PreferRectangularOffcut { get; set; }
 

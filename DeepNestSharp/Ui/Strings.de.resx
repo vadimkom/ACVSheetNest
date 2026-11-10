@@ -1211,6 +1211,18 @@ Downloadseite öffnen?</value>
   <data name="Settings_Concurrency_Tip" xml:space="preserve">
     <value>Wie viele Schachtelsuchen gleichzeitig laufen. Weniger hält einen langsamen Rechner reaktionsfähig; mehr ist auf einem schnellen eher fertig. Das Layout selbst ist in beiden Fällen gleich.</value>
   </data>
+  <data name="Settings_Direction" xml:space="preserve">
+    <value>Schachteln von:</value>
+  </data>
+  <data name="Settings_Direction_Left" xml:space="preserve">
+    <value>Links nach rechts</value>
+  </data>
+  <data name="Settings_Direction_Right" xml:space="preserve">
+    <value>Rechts nach links</value>
+  </data>
+  <data name="Settings_Direction_Tip" xml:space="preserve">
+    <value>Von welcher Blechkante aus die Teile gelegt werden. Wählen Sie die Seite, an der der Laser zu schneiden beginnt: der Rest bleibt auf der anderen Seite.</value>
+  </data>
   <data name="Settings_Effort" xml:space="preserve">
     <value>Schachtelaufwand:</value>
   </data>

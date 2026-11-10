@@ -334,7 +334,8 @@ namespace DeepNestSharp.RasterNest
       Action<INestResult>? candidateCallback = null,
       int seedOffset = 0,
       IReadOnlyList<INfp> stockShapes = null,
-      bool fillAsKit = true)
+      bool fillAsKit = true,
+      bool fromRight = false)
     {
       error = null;
       // These values are already expressed in the caller's active drawing units. Substituting inch
@@ -409,6 +410,14 @@ namespace DeepNestSharp.RasterNest
         return null;
       }
 
+      // A laser that cuts from the right gets its parts packed from the right: see CutDirection.cs.
+      var mirroredBack = fromRight ? MirrorForEngine(sizes, loaded) : null;
+      if (mirroredBack != null && candidateCallback != null)
+      {
+        var shownMirrored = candidateCallback;
+        candidateCallback = candidate => shownMirrored(mirroredBack(candidate));
+      }
+
       // A standing sheet is packed from the bottom up: see StandingSheets.cs.
       Dictionary<int, INfp> upright = null;
       Dictionary<INfp, INfp> uprightByTurned = null;
@@ -428,7 +437,11 @@ namespace DeepNestSharp.RasterNest
         }
       }
 
-      INestResult AsTheSheetsStand(INestResult r) => upright == null ? r : TurnedBack(r, upright, uprightByTurned, (loaded.ToDictionary(l => l.Source), margin));
+      INestResult AsTheSheetsStand(INestResult r)
+      {
+        var standing = upright == null ? r : TurnedBack(r, upright, uprightByTurned, (loaded.ToDictionary(l => l.Source), margin));
+        return mirroredBack == null ? standing : mirroredBack(standing);
+      }
 
       bool filling = loaded.Any(l => l.Fill);
       if (filling)
@@ -524,7 +537,8 @@ namespace DeepNestSharp.RasterNest
       double geometryTolerance = CommonLineDefaults.DefaultGeometryToleranceInches,
       int commonLineMaxClusterParts = CommonLineDefaults.AutoMaxClusterParts,
       Action<INestResult>? candidateCallback = null,
-      int seedOffset = 0)
+      int seedOffset = 0,
+      bool fromRight = false)
     {
       error = null;
       if (!double.IsFinite(commonLineGap) || commonLineGap <= 0D || !double.IsFinite(geometryTolerance)
@@ -620,8 +634,16 @@ namespace DeepNestSharp.RasterNest
 
       var job = loaded.Where(l => chosen.ContainsKey(l.Source)).Select(l => l.WithQty(chosen[l.Source] * pieces)).ToList();
       var stock = new List<StockSize> { new StockSize { W = pieceW, H = pieceH, Remaining = pieces, Priority = 1 } };
+      var mirroredBack = fromRight ? MirrorForEngine(stock, job) : null;
+      if (mirroredBack != null && candidateCallback != null)
+      {
+        var shownMirrored = candidateCallback;
+        candidateCallback = candidate => shownMirrored(mirroredBack(candidate));
+      }
+
       var result = RunNestBody(
         job, stock, margin, perSheetBudgetSec, sparrowExePath, cancel, progress, effort, commonLineGap, geometryTolerance, commonLineMaxClusterParts, out error, candidateCallback, seedOffset);
+      result = mirroredBack == null ? result : mirroredBack(result);
       if (result == null || result.UnplacedParts.Count == 0)
       {
         return result;

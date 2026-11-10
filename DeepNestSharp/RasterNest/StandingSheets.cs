@@ -117,18 +117,32 @@ namespace DeepNestSharp.RasterNest
         // lays parts against the edge from several sides anyway.
         if (settle != null && !SheetShape.IsShaped(sheet) && parts.Count > 0)
         {
-          var items = parts.Select(pp => new CompactItem
+          void Slide()
           {
-            Poly = pp.Part,
-            X = pp.X,
-            Y = pp.Y,
-            Spacing = settle.Value.Loaded.TryGetValue(pp.Source, out var l) ? l.EffSpacing : 0,
-          }).ToList();
-          RasterCompact.Compact(items, sheet.MaxX - sheet.MinX, sheet.MaxY - sheet.MinY, settle.Value.Margin);
-          for (int k = 0; k < parts.Count; k++)
+            var items = parts.Select(pp => new CompactItem
+            {
+              Poly = pp.Part,
+              X = pp.X,
+              Y = pp.Y,
+              Spacing = settle.Value.Loaded.TryGetValue(pp.Source, out var l) ? l.EffSpacing : 0,
+            }).ToList();
+            RasterCompact.Compact(items, sheet.MaxX - sheet.MinX, sheet.MaxY - sheet.MinY, settle.Value.Margin);
+            for (int k = 0; k < parts.Count; k++)
+            {
+              parts[k].X = items[k].X;
+              parts[k].Y = items[k].Y;
+            }
+          }
+
+          Slide();
+          double gap = parts.Max(pp => settle.Value.Loaded.TryGetValue(pp.Source, out var l) ? Math.Max(l.EffSpacing, l.FitSpacing) : 0);
+          TallColumnsFirst(parts, gap, settle.Value.Margin);
+
+          // Laid again by boxes on a grid, the parts stand up to a cell further apart than they need: slid
+          // together again on their shapes.
+          if (TidyOffcut(parts, settle.Value.Loaded, upright, gap, (int)Math.Round(sheet.MaxX - sheet.MinX), (int)Math.Round(sheet.MaxY - sheet.MinY), settle.Value.Margin))
           {
-            parts[k].X = items[k].X;
-            parts[k].Y = items[k].Y;
+            Slide();
           }
         }
 
@@ -142,6 +156,164 @@ namespace DeepNestSharp.RasterNest
 
       var unplaced = turned.UnplacedParts.Select(n => uprightByTurned.TryGetValue(n, out var u) ? u : n).ToList();
       return new NestResult(turned.TotalParts, collection, unplaced, PlacementTypeEnum.BoundingBox, 0, 0);
+    }
+
+    /// <summary>
+    /// The columns of a sheet, left to right: runs of parts whose boxes overlap across. Two columns are told
+    /// apart only where their boxes stand at least <paramref name="gap"/> apart, so each stays clear of the
+    /// others wherever it is moved across.
+    /// </summary>
+    private static List<(double MinX, double MaxX, double Top, List<IPartPlacement> Parts)> Columns(IEnumerable<IPartPlacement> parts, double gap)
+    {
+      var columns = new List<(double MinX, double MaxX, double Top, List<IPartPlacement> Parts)>();
+      foreach (var p in parts.OrderBy(p => p.MinX))
+      {
+        if (columns.Count > 0 && p.MinX < columns[^1].MaxX + gap - 1e-6)
+        {
+          var c = columns[^1];
+          c.Parts.Add(p);
+          columns[^1] = (c.MinX, Math.Max(c.MaxX, p.MaxX), Math.Max(c.Top, p.MaxY), c.Parts);
+        }
+        else
+        {
+          columns.Add((p.MinX, p.MaxX, p.MaxY, new List<IPartPlacement> { p }));
+        }
+      }
+
+      return columns;
+    }
+
+    /// <summary>
+    /// Stands the columns of a standing sheet tallest first, from the left: the metal left over the parts is
+    /// then a staircase (a strip across the top and a step down at the right) instead of a comb of gaps over
+    /// the short columns. The door job (2026-11-10): strips 1915 and 1775 long, each with a panel over it,
+    /// came out tall, short, short, tall; the operator lays the two tall ones first and the two short ones
+    /// after. The columns are set side by side from the left margin <paramref name="gap"/> apart, each at its
+    /// own height. Returns whether anything moved.
+    /// </summary>
+    private static bool TallColumnsFirst(List<IPartPlacement> parts, double gap, double margin)
+    {
+      var columns = Columns(parts, gap);
+      if (columns.Count < 2)
+      {
+        return false;
+      }
+
+      // Heights within half a millimetre are one height; those keep the order they had.
+      var order = columns.OrderByDescending(c => Math.Round(c.Top * 2) / 2).ToList();
+      if (order.SequenceEqual(columns))
+      {
+        return false;
+      }
+
+      double x = Math.Max(margin, columns[0].MinX);
+      foreach (var c in order)
+      {
+        double shift = x - c.MinX;
+        foreach (var p in c.Parts)
+        {
+          p.X += shift;
+        }
+
+        x = c.MaxX + shift + gap;
+      }
+
+      return true;
+    }
+
+    /// <summary>Most parts a standing sheet is laid again by boxes for a cleaner offcut.</summary>
+    private const int MaxTidied = 30;
+
+    /// <summary>
+    /// Lays each column of a standing sheet again by boxes from the bottom-left corner, its widest parts first
+    /// (or its tallest), the rest of the sheet staying as it is, and keeps the layout whose largest empty
+    /// rectangle is the biggest, when all the column's parts go back on and that piece grows by a twentieth.
+    /// The door job (2026-11-10): beside the two tall columns the operator puts the two wide panels side by
+    /// side at the bottom and the two narrow 1775 strips over them, which leaves 190 × 2060 clean at the
+    /// right; the strips standing with the panels over them left a sliver. Boxes are kept a spacing apart, so
+    /// whatever the shapes nothing comes closer; parts that interlock lose that by boxes, and such a layout
+    /// seldom wins. Returns whether anything was laid again.
+    /// </summary>
+    private static bool TidyOffcut(List<IPartPlacement> parts, IReadOnlyDictionary<int, Loaded> loaded, Dictionary<int, INfp> upright, double gap, int w, int h, double margin)
+    {
+      if (parts.Count < 2 || parts.Count > MaxTidied
+        || parts.Any(p => !loaded.TryGetValue(p.Source, out var l) || l.RequiresMergedLines || !upright.ContainsKey(p.Source)))
+      {
+        return false;
+      }
+
+      var columns = Columns(parts, gap);
+      if (columns.Count < 2)
+      {
+        return false;
+      }
+
+      bool changed = false;
+      foreach (var column in columns.Where(c => c.Parts.Count > 1))
+      {
+        var others = parts.Except(column.Parts).ToList();
+        double bestScore = new FreeRoom(parts, gap, w, h, margin).LargestEmpty() * 1.05;
+        List<IPartPlacement> best = null;
+        var orders = new[]
+        {
+          column.Parts.OrderByDescending(p => Math.Round(p.MaxX - p.MinX)).ThenByDescending(p => p.MaxY - p.MinY).ThenBy(p => p.Source).ToList(),
+          column.Parts.OrderByDescending(p => Math.Round(p.MaxY - p.MinY)).ThenByDescending(p => p.MaxX - p.MinX).ThenBy(p => p.Source).ToList(),
+        };
+        foreach (var order in orders)
+        {
+          for (int rule = 0; rule < 4; rule++)
+          {
+            // A column laid again stands no taller than it did, so the tops still step down to the right; two
+            // cells over are the grid's rounding, which the slide afterwards takes back.
+            var laid = Lay(others, order, rule);
+            double score = laid == null || laid.Max(p => p.MaxY) > column.Top + (2.0 * Math.Max(w, h) / FreeRoomCells)
+              ? -1
+              : new FreeRoom(others.Concat(laid), gap, w, h, margin).LargestEmpty();
+            if (score > bestScore)
+            {
+              (best, bestScore) = (laid, score);
+            }
+          }
+        }
+
+        if (best != null)
+        {
+          parts.RemoveAll(p => column.Parts.Contains(p));
+          parts.AddRange(best);
+          changed = true;
+        }
+      }
+
+      return changed;
+
+      // The parts in this order, each where the rule puts its box; null when one does not go on.
+      List<IPartPlacement> Lay(List<IPartPlacement> fixedParts, List<IPartPlacement> order, int rule)
+      {
+        var layout = new List<IPartPlacement>(fixedParts);
+        var laid = new List<IPartPlacement>();
+        foreach (var p in order)
+        {
+          var spot = SpotFor(upright[p.Source], LatticeAngles(loaded[p.Source]), new FreeRoom(layout, gap, w, h, margin), rule);
+          if (spot == null)
+          {
+            return null;
+          }
+
+          var placed = new PartPlacement(spot.Value.Turned)
+          {
+            Id = p.Id,
+            X = spot.Value.X,
+            Y = spot.Value.Y,
+            Rotation = spot.Value.Angle,
+            Source = p.Source,
+            IsMirrored = p.IsMirrored,
+          };
+          layout.Add(placed);
+          laid.Add(placed);
+        }
+
+        return laid;
+      }
     }
   }
 }

@@ -26,7 +26,8 @@ namespace DeepNestSharp.Ui.Views
       double commonLineGapInches = DeepNestLib.Placement.CommonLineDefaults.DefaultGapInches,
       DeepNestSharp.RasterNest.NestEffort effort = DeepNestSharp.RasterNest.NestEffortDefaults.Default,
       int commonLineMaxClusterParts = DeepNestLib.Placement.CommonLineDefaults.DefaultMaxClusterParts,
-      int concurrencyLimit = 0)
+      int concurrencyLimit = 0,
+      bool nestFromRight = false)
     {
       this.config = config;
       this.commonLineGapInches = NormalizeCommonLineGapInches(commonLineGapInches);
@@ -48,6 +49,7 @@ namespace DeepNestSharp.Ui.Views
       }
 
       this.concurrencyCombo.SelectedIndex = System.Math.Clamp(concurrencyLimit, 0, DeepNestSharp.RasterNest.SparrowNestService.MaxConcurrencyLimit);
+      this.directionCombo.SelectedIndex = nestFromRight ? 1 : 0;
       this.effortCombo.SelectedIndex = (int)effort;
       this.spacingUpDown.Value = System.Math.Max(0, config.Spacing);
       this.marginUpDown.Value = System.Math.Max(0, config.SheetSpacing);
@@ -126,7 +128,10 @@ namespace DeepNestSharp.Ui.Views
       : DeepNestSharp.RasterNest.NestEffortDefaults.Default;
 
     /// <summary>The most nesting searches run at once; 0 = automatic. Persisted by the caller (SessionState).</summary>
-    internal int ConcurrencyLimit => this.concurrencyCombo.SelectedItem is ComboBoxItem c && c.Tag is int n ? n : 0;
+    /// <summary>Parts laid from the right edge of the sheet, for a laser that cuts from right to left.</summary>
+    internal bool NestFromRight => this.directionCombo.SelectedIndex == 1;
+
+    internal int ConcurrencyLimit =>this.concurrencyCombo.SelectedItem is ComboBoxItem c && c.Tag is int n ? n : 0;
 
     private void OnEffortChanged(object sender, SelectionChangedEventArgs e) => this.UpdateConcurrencyAutoText();
 
@@ -252,6 +257,9 @@ namespace DeepNestSharp.Ui.Views
       if (this.effortItem2 != null) this.effortItem2.Content = Localization.Get("Settings_Effort_Best");
       if (this.concurrencyLabel != null) this.concurrencyLabel.Text = Localization.Get("Settings_Concurrency");
       this.UpdateConcurrencyAutoText();
+      if (this.directionLabel != null) this.directionLabel.Text = Localization.Get("Settings_Direction");
+      if (this.directionItemLeft != null) this.directionItemLeft.Content = Localization.Get("Settings_Direction_Left");
+      if (this.directionItemRight != null) this.directionItemRight.Content = Localization.Get("Settings_Direction_Right");
       if (this.groupCommonLine != null) this.groupCommonLine.Header = Localization.Get("Settings_Group_CommonLine");
       if (this.btnResetCommonLineGap != null) this.btnResetCommonLineGap.Content = Localization.Get("Settings_Reset");
       if (this.clusterPartsLabel != null) this.clusterPartsLabel.Text = Localization.Get("Settings_MaxCluster");

@@ -25,6 +25,7 @@
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="rotationsLabel" Grid.Row="0" Grid.Column="0" Text="Default part rotations:" VerticalAlignment="Center" Margin="0,0,10,6" />
@@ -59,6 +60,13 @@
         <TextBlock x:Name="concurrencyLabel" Grid.Row="4" Grid.Column="0" Text="Parallel searches:" VerticalAlignment="Center" Margin="0,6,10,0" />
         <ComboBox Grid.Row="4" Grid.Column="1" x:Name="concurrencyCombo" Width="200" HorizontalAlignment="Left" Margin="0,6,0,0"
                   ToolTip="{ui:Tr Settings_Concurrency_Tip}" />
+
+        <TextBlock x:Name="directionLabel" Grid.Row="5" Grid.Column="0" Text="Nest from:" VerticalAlignment="Center" Margin="0,6,10,0" />
+        <ComboBox Grid.Row="5" Grid.Column="1" x:Name="directionCombo" Width="200" HorizontalAlignment="Left" Margin="0,6,0,0"
+                  ToolTip="{ui:Tr Settings_Direction_Tip}">
+          <ComboBoxItem x:Name="directionItemLeft">Left to right</ComboBoxItem>
+          <ComboBoxItem x:Name="directionItemRight">Right to left</ComboBoxItem>
+        </ComboBox>
       </Grid>
     </GroupBox>
 

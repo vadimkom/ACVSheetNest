@@ -1211,6 +1211,18 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Settings_Concurrency_Tip" xml:space="preserve">
     <value>Nombre de recherches d'imbrication lancées en même temps. Moins garde un ordinateur lent réactif ; plus finit plus tôt sur un ordinateur rapide. L'imbrication obtenue est la même dans les deux cas.</value>
   </data>
+  <data name="Settings_Direction" xml:space="preserve">
+    <value>Imbriquer depuis :</value>
+  </data>
+  <data name="Settings_Direction_Left" xml:space="preserve">
+    <value>De gauche à droite</value>
+  </data>
+  <data name="Settings_Direction_Right" xml:space="preserve">
+    <value>De droite à gauche</value>
+  </data>
+  <data name="Settings_Direction_Tip" xml:space="preserve">
+    <value>Bord de la tôle à partir duquel les pièces sont posées. Choisissez le côté où le laser commence à couper : la chute reste de l&apos;autre côté.</value>
+  </data>
   <data name="Settings_Effort" xml:space="preserve">
     <value>Effort d'imbrication :</value>
   </data>

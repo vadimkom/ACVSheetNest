@@ -90,6 +90,10 @@
     /// instead of hanging on by a bridge at the corners (drawing units).</summary>
     public double EdgeOverlap { get; set; }
 
+    /// <summary>The job is nested from the right edge (<c>SessionState.NestFromRight</c>), so the free metal
+    /// is at the left: the remnant across X is the mirror image of the usual one.</summary>
+    public bool FromRight { get; set; }
+
     public OffcutLimits Limits => new OffcutLimits(this.MinX, this.MinY, this.MaxX, this.MaxY);
   }
 
@@ -106,7 +110,9 @@
     /// <summary>
     /// The cut positions on each axis, or null per axis when that direction is off or its free strip
     /// is too small. CutX splits the width at [CutX..w]; CutY splits the height at [CutY..h].
-    /// The "End" axis is the sheet's LONG axis (the engine packs along it).
+    /// The "End" axis is the sheet's LONG axis (the engine packs along it). Nested from the right
+    /// (<see cref="OffcutOptions.FromRight"/>), CutX is measured from the right edge; <see cref="Remnants"/>
+    /// turns it into sheet coordinates.
     /// </summary>
     public static (double? CutX, double? CutY) CutPositions(ISheetPlacement sheetPlacement, OffcutOptions options)
     {
@@ -122,7 +128,7 @@
       double extentY = 0;
       foreach (var pp in sheetPlacement.PartPlacements)
       {
-        extentX = System.Math.Max(extentX, pp.MaxX);
+        extentX = System.Math.Max(extentX, options.FromRight ? w - pp.MinX : pp.MaxX);
         extentY = System.Math.Max(extentY, pp.MaxY);
       }
 
@@ -227,10 +233,7 @@
         return null;
       }
 
-      var (cutX, cutY) = CutPositions(sheetPlacement, options);
-      double w = sheetPlacement.Sheet.WidthCalculated;
-      double h = sheetPlacement.Sheet.HeightCalculated;
-      var rects = RemnantRects(cutX, cutY, w, h, options.EdgeOverlap);
+      var rects = Remnants(sheetPlacement, options);
       if (rects.Count == 0)
       {
         return null;
@@ -243,6 +246,42 @@
       }
 
       return lines;
+    }
+
+    /// <summary>
+    /// The remnant rectangles of a placed sheet in sheet coordinates, what the viewer draws and the export
+    /// cuts. Nested from the right, the free metal is at the left, so the rectangles of the usual case are
+    /// mirrored left for right.
+    /// </summary>
+    public static IReadOnlyList<RemnantRect> Remnants(ISheetPlacement sheetPlacement, OffcutOptions options)
+    {
+      if (options == null || sheetPlacement?.Sheet == null)
+      {
+        return System.Array.Empty<RemnantRect>();
+      }
+
+      var (cutX, cutY) = CutPositions(sheetPlacement, options);
+      double w = sheetPlacement.Sheet.WidthCalculated;
+      double h = sheetPlacement.Sheet.HeightCalculated;
+      var rects = RemnantRects(cutX, cutY, w, h, options.EdgeOverlap);
+      if (!options.FromRight)
+      {
+        return rects;
+      }
+
+      var mirrored = new List<RemnantRect>(rects.Count);
+      foreach (var r in rects)
+      {
+        var c = r.Cut;
+        mirrored.Add(new RemnantRect(
+          w - r.X - r.W,
+          r.Y,
+          r.W,
+          r.H,
+          new OffcutLine { X1 = w - c.X1, Y1 = c.Y1, X2 = w - c.X2, Y2 = c.Y2 }));
+      }
+
+      return mirrored;
     }
 
     /// <summary>

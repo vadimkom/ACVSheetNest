@@ -1211,6 +1211,18 @@ Abrir a página de download?</value>
   <data name="Settings_Concurrency_Tip" xml:space="preserve">
     <value>Quantas buscas de encaixe rodam ao mesmo tempo. Menos mantém um computador lento responsivo; mais termina antes num rápido. O encaixe resultante é o mesmo nos dois casos.</value>
   </data>
+  <data name="Settings_Direction" xml:space="preserve">
+    <value>Encaixar a partir de:</value>
+  </data>
+  <data name="Settings_Direction_Left" xml:space="preserve">
+    <value>Da esquerda para a direita</value>
+  </data>
+  <data name="Settings_Direction_Right" xml:space="preserve">
+    <value>Da direita para a esquerda</value>
+  </data>
+  <data name="Settings_Direction_Tip" xml:space="preserve">
+    <value>De qual borda da chapa as peças são colocadas. Escolha o lado por onde o laser começa a cortar: a sobra fica do outro lado.</value>
+  </data>
   <data name="Settings_Effort" xml:space="preserve">
     <value>Esforço de encaixe:</value>
   </data>

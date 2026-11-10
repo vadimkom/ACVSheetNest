@@ -1385,12 +1385,10 @@ namespace DeepNestSharp.Ui.UserControls
         return;
       }
 
-      var (cutX, cutY) = RasterNest.OffcutGeometry.CutPositions(sheetPlacement, this.OffcutOptions);
-
-      // Draw the SAME cut the export writes (single source: OffcutGeometry.RemnantRects), edge overlap
+      // Draw the SAME cut the export writes (single source: OffcutGeometry.Remnants), edge overlap
       // included, so the line visibly runs past the sheet exactly as far as it will on the machine.
       // Empty list = no offcut worth advertising.
-      foreach (var r in RasterNest.OffcutGeometry.RemnantRects(cutX, cutY, w, h, this.OffcutOptions.EdgeOverlap))
+      foreach (var r in RasterNest.OffcutGeometry.Remnants(sheetPlacement, this.OffcutOptions))
       {
         // Sheet coords are Y-up; the canvas flips Y, so a rect at sheet [r.Y..r.Y+r.H] lands at canvas
         // top [h-(r.Y+r.H)].

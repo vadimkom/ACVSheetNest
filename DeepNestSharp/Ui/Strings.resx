@@ -1211,6 +1211,18 @@ Open the download page?</value>
   <data name="Settings_Concurrency_Tip" xml:space="preserve">
     <value>How many nesting searches run at the same time. Fewer keeps a slow computer responsive; more finishes sooner on a fast one. The nest itself comes out the same either way.</value>
   </data>
+  <data name="Settings_Direction" xml:space="preserve">
+    <value>Nest from:</value>
+  </data>
+  <data name="Settings_Direction_Left" xml:space="preserve">
+    <value>Left to right</value>
+  </data>
+  <data name="Settings_Direction_Right" xml:space="preserve">
+    <value>Right to left</value>
+  </data>
+  <data name="Settings_Direction_Tip" xml:space="preserve">
+    <value>Which edge of the sheet the parts are laid from. Set it to the side the laser starts cutting from: the offcut is left at the other side.</value>
+  </data>
   <data name="Settings_Effort" xml:space="preserve">
     <value>Nesting effort:</value>
   </data>

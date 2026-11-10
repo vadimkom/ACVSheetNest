@@ -1211,6 +1211,18 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Settings_Concurrency_Tip" xml:space="preserve">
     <value>Сколько поисков раскладки идёт одновременно. Меньше — слабый компьютер не тормозит, больше — быстрее на мощном. Сама раскладка от этого не меняется.</value>
   </data>
+  <data name="Settings_Direction" xml:space="preserve">
+    <value>Раскладка:</value>
+  </data>
+  <data name="Settings_Direction_Left" xml:space="preserve">
+    <value>Слева направо</value>
+  </data>
+  <data name="Settings_Direction_Right" xml:space="preserve">
+    <value>Справа налево</value>
+  </data>
+  <data name="Settings_Direction_Tip" xml:space="preserve">
+    <value>От какого края листа кладутся детали. Ставьте сторону, с которой лазер начинает резать: обрезок останется с другой стороны.</value>
+  </data>
   <data name="Settings_Effort" xml:space="preserve">
     <value>Усилие поиска:</value>
   </data>

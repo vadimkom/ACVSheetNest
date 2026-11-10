@@ -1211,6 +1211,18 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Settings_Concurrency_Tip" xml:space="preserve">
     <value>Cuántas búsquedas de anidado se ejecutan a la vez. Menos mantiene ágil un ordenador lento; más termina antes en uno rápido. El anidado resultante es el mismo en ambos casos.</value>
   </data>
+  <data name="Settings_Direction" xml:space="preserve">
+    <value>Anidar desde:</value>
+  </data>
+  <data name="Settings_Direction_Left" xml:space="preserve">
+    <value>De izquierda a derecha</value>
+  </data>
+  <data name="Settings_Direction_Right" xml:space="preserve">
+    <value>De derecha a izquierda</value>
+  </data>
+  <data name="Settings_Direction_Tip" xml:space="preserve">
+    <value>Desde qué borde de la chapa se colocan las piezas. Elija el lado por el que el láser empieza a cortar: el retal queda al otro lado.</value>
+  </data>
   <data name="Settings_Effort" xml:space="preserve">
     <value>Esfuerzo de anidado:</value>
   </data>

@@ -85,7 +85,8 @@ namespace DeepNestSharp.Ui.Views
     private double sessionCommonLineGapInches = CommonLineDefaults.DefaultGapInches;
     private int sessionCommonLineMaxClusterParts = CommonLineDefaults.DefaultMaxClusterParts;
 
-    private DeepNestSharp.RasterNest.NestEffort nestEffort = DeepNestSharp.RasterNest.NestEffortDefaults.Default; // how hard the nester searches (SessionState)
+    private bool nestFromRight; // parts laid from the right edge (SessionState.NestFromRight)
+    private DeepNestSharp.RasterNest.NestEffort nestEffort =DeepNestSharp.RasterNest.NestEffortDefaults.Default; // how hard the nester searches (SessionState)
     private bool lastRunWasDraft; // the variant being added came from the Draft button, and is labelled so
     private bool preferRectOffcut; // cut the last sheet's leftover off as a rectangular offcut (SessionState)
     private int offcutDirection; // 0 = end, 1 = side, 2 = both (SessionState.OffcutDirection)
@@ -298,6 +299,7 @@ namespace DeepNestSharp.Ui.Views
 
         this.nestEffort = DeepNestSharp.RasterNest.NestEffortDefaults.FromPersisted(session.NestEffort);
         SparrowNestService.ConcurrencyLimit = System.Math.Clamp(session.NestConcurrency, 0, SparrowNestService.MaxConcurrencyLimit);
+        this.nestFromRight = session.NestFromRight;
 
         // Global default rotations (plain in-memory config property — resets to 4 without this).
         if (session.DefaultRotations > 0)
@@ -694,7 +696,8 @@ namespace DeepNestSharp.Ui.Views
         commonLineGapInches: cfg.CommonLineGapInches,
         effort: this.nestEffort,
         commonLineMaxClusterParts: cfg.CommonLineMaxClusterParts,
-        concurrencyLimit: SparrowNestService.ConcurrencyLimit)
+        concurrencyLimit: SparrowNestService.ConcurrencyLimit,
+        nestFromRight: this.nestFromRight)
       {
         Owner = this,
         LibraryFolder = session.EffectiveLibraryFolder,
@@ -738,6 +741,8 @@ namespace DeepNestSharp.Ui.Views
       session.NestEffort = (int)this.nestEffort;
       SparrowNestService.ConcurrencyLimit = dialog.ConcurrencyLimit;
       session.NestConcurrency = dialog.ConcurrencyLimit;
+      this.nestFromRight = dialog.NestFromRight;
+      session.NestFromRight = this.nestFromRight;
       string library = dialog.LibraryFolder;
       session.LibraryFolder = string.IsNullOrWhiteSpace(library) || string.Equals(library, DeepNestLib.IO.PartLibrary.DefaultFolder, StringComparison.OrdinalIgnoreCase) ? null : library;
       session.Save();
@@ -955,7 +960,8 @@ namespace DeepNestSharp.Ui.Views
         effort: NestEffort.Draft,
         geometryTolerance: CommonLineDefaults.DefaultGeometryToleranceInches * unitScale,
         commonLineGap: cfg.CommonLineGapInches * unitScale,
-        commonLineMaxClusterParts: cfg.CommonLineMaxClusterParts));
+        commonLineMaxClusterParts: cfg.CommonLineMaxClusterParts,
+        fromRight: this.nestFromRight));
       if (nest == null || nest.UsedSheets.Count == 0)
       {
         return null;
@@ -2901,6 +2907,7 @@ namespace DeepNestSharp.Ui.Views
       // still in stock and cuts whichever filled most of its own sheet, so list order decides nothing; a
       // size marked Unlimited never runs down, and its Quantity is carried along only to be ignored.
       bool fillToMaximum = project.FillToMaximum;
+      bool fromRight = this.nestFromRight;
       var stockRows = project.SheetLoadInfos
         .Where(s => s.Width > 0 && s.Height > 0 && (s.Unlimited || s.Quantity > 0))
         .ToList();
@@ -3071,7 +3078,8 @@ namespace DeepNestSharp.Ui.Views
               commonLineGap: config.CommonLineGapInches * unitScale,
               commonLineMaxClusterParts: config.CommonLineMaxClusterParts,
               candidateCallback: candidateCallback,
-              seedOffset: this.runSeedOffset);
+              seedOffset: this.runSeedOffset,
+              fromRight: fromRight);
             return (filled, fillError == SparrowNestService.NothingFits
               ? Localization.Format("Msg_FillNothing", piece.Width, piece.Height)
               : fillError);
@@ -3095,7 +3103,8 @@ namespace DeepNestSharp.Ui.Views
             candidateCallback: candidateCallback,
             seedOffset: this.runSeedOffset,
             stockShapes: sheetShapes,
-            fillAsKit: !fillToMaximum);
+            fillAsKit: !fillToMaximum,
+            fromRight: fromRight);
           return (r, err);
         });
 
@@ -3584,6 +3593,7 @@ namespace DeepNestSharp.Ui.Views
         MaxX = limits.MaxX > 0 ? limits.MaxX : -1,
         MaxY = limits.MaxY > 0 ? limits.MaxY : -1,
         EdgeOverlap = System.Math.Max(0, edgeOverlap),
+        FromRight = this.nestFromRight,
       };
     }
 
