@@ -1,0 +1,11 @@
+[package]
+name = "nest-io"
+description = "DXF/CHF/SVG import and DXF/SVG/PDF export ported from DeepNestLib.Core IO"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+nest-geom.workspace = true
+thiserror.workspace = true
+serde.workspace = true

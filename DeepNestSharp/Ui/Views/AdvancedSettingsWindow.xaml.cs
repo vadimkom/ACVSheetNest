@@ -27,6 +27,7 @@ namespace DeepNestSharp.Ui.Views
       DeepNestSharp.RasterNest.NestEffort effort = DeepNestSharp.RasterNest.NestEffortDefaults.Default,
       int commonLineMaxClusterParts = DeepNestLib.Placement.CommonLineDefaults.DefaultMaxClusterParts,
       int concurrencyLimit = 0,
+      bool useRNestEngine = false,
       bool nestFromRight = false)
     {
       this.config = config;
@@ -50,6 +51,7 @@ namespace DeepNestSharp.Ui.Views
 
       this.concurrencyCombo.SelectedIndex = System.Math.Clamp(concurrencyLimit, 0, DeepNestSharp.RasterNest.SparrowNestService.MaxConcurrencyLimit);
       this.directionCombo.SelectedIndex = nestFromRight ? 1 : 0;
+      this.engineCombo.SelectedIndex = useRNestEngine ? 1 : 0;
       this.effortCombo.SelectedIndex = (int)effort;
       this.spacingUpDown.Value = System.Math.Max(0, config.Spacing);
       this.marginUpDown.Value = System.Math.Max(0, config.SheetSpacing);
@@ -130,6 +132,9 @@ namespace DeepNestSharp.Ui.Views
     /// <summary>The most nesting searches run at once; 0 = automatic. Persisted by the caller (SessionState).</summary>
     /// <summary>Parts laid from the right edge of the sheet, for a laser that cuts from right to left.</summary>
     internal bool NestFromRight => this.directionCombo.SelectedIndex == 1;
+
+    /// <summary>The RNest engine instead of sparrow.</summary>
+    internal bool UseRNestEngine => this.engineCombo.SelectedIndex == 1;
 
     internal int ConcurrencyLimit =>this.concurrencyCombo.SelectedItem is ComboBoxItem c && c.Tag is int n ? n : 0;
 

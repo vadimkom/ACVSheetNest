@@ -6333,6 +6333,13 @@ namespace DeepNestSharp.RasterNest
     /// hard the machine works, never the nest.</summary>
     internal static int ConcurrencyLimit { get; set; }
 
+    /// <summary>The operator's choice of nesting engine (Advanced Settings): false = sparrow.exe, true =
+    /// rnest-sparrow.exe, our own engine behind the same command line and the same job and solution files.</summary>
+    internal static bool UseRNestEngine { get; set; }
+
+    /// <summary>File name of the RNest engine, looked for beside the app like sparrow.exe.</summary>
+    internal const string RNestEngineExe = "rnest-sparrow.exe";
+
     /// <summary>The most a setting can usefully ask for: a wave never holds more searches than this.</summary>
     internal const int MaxConcurrencyLimit = WaveSize;
 
@@ -6420,6 +6427,12 @@ namespace DeepNestSharp.RasterNest
     /// SHEETNEST_NEST_TRIES for experiments. Always ≥2 so a single unlucky run can't stand.</summary>
     private static int NestTries(NestEffort effort)
     {
+      if (UseRNestEngine)
+      {
+        // The RNest engine has no random seed: every race would return the same nest.
+        return 1;
+      }
+
       var env = Environment.GetEnvironmentVariable("SHEETNEST_NEST_TRIES");
       if (int.TryParse(env, NumberStyles.Integer, CultureInfo.InvariantCulture, out int n) && n >= 1)
       {

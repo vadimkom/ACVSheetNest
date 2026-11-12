@@ -265,6 +265,14 @@ Values that must not move (with `SHEETNEST_BENCH_EFFORT=Fast`):
 
 They need `SPARROW_EXE` and `SHEETNEST_MIXED_COMMON_LINE_DXF_DIR` with `test2.dxf`, `Hodgson.dxf` and `inhole.dxf`. The user has hardly used common cutting and has no feedback on it.
 
+## RNest: the second engine
+
+`RNestEngine/` is our own nesting engine in Rust, a separate Cargo workspace. It builds `rnest-sparrow.exe`, a drop-in for `sparrow.exe` (same command line, same `job.json` and `final_job.json`). The operator picks the engine in Advanced Settings → Nesting engine (`SparrowNestService.UseRNestEngine`, saved as `SessionState.NestEngine`); with RNest one try runs instead of a race of seeds. Sparrow is 0.1 to 13 % denser, RNest 1.5 to 30 times faster (2026-11-12, five jobs).
+
+- Build: `pwsh RNestEngineuild.ps1` (needs Rust), which copies the exe to `SparrowEngine`; the app project ships it when it is there and falls back to Sparrow when it is not.
+- Description: `RNestEngine/README.md`. State, what was not checked and what to improve: `RNestEngine/HANDOVER.md`.
+- Not checked: the switch in the window, and the CI fixtures through RNest.
+
 ## Open items
 
 - The mixed common-line bench gives 31 edges instead of the reference 21. Decide whether to update the reference or find the cause.

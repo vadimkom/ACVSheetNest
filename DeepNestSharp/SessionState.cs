@@ -99,6 +99,9 @@ namespace DeepNestSharp
     /// machine, not per project: it trades speed against how hard THIS computer works, never the nest.</summary>
     public int NestConcurrency { get; set; } = 0;
 
+    /// <summary>The nesting engine: 0 = sparrow, 1 = RNest (rnest-sparrow.exe). Per machine.</summary>
+    public int NestEngine { get; set; } = 0;
+
     /// <summary>Parts laid from the right edge of the sheet, the offcut left at the left (2026-11-10, the
     /// user: "our laser cuts from right to left"). Per machine, like the laser it suits.</summary>
     public bool NestFromRight { get; set; }

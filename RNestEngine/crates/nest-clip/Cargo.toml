@@ -1,0 +1,10 @@
+[package]
+name = "nest-clip"
+description = "Clipper (polygon boolean ops) wrapper matching DeepNestClipper usage"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+clipper2.workspace = true
+nest-geom.workspace = true

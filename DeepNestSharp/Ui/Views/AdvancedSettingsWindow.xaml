@@ -26,6 +26,7 @@
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="rotationsLabel" Grid.Row="0" Grid.Column="0" Text="Default part rotations:" VerticalAlignment="Center" Margin="0,0,10,6" />
@@ -66,6 +67,13 @@
                   ToolTip="{ui:Tr Settings_Direction_Tip}">
           <ComboBoxItem x:Name="directionItemLeft">Left to right</ComboBoxItem>
           <ComboBoxItem x:Name="directionItemRight">Right to left</ComboBoxItem>
+        </ComboBox>
+
+        <TextBlock x:Name="engineLabel" Grid.Row="6" Grid.Column="0" Text="Nesting engine:" VerticalAlignment="Center" Margin="0,6,10,0" />
+        <ComboBox Grid.Row="6" Grid.Column="1" x:Name="engineCombo" Width="200" HorizontalAlignment="Left" Margin="0,6,0,0"
+                  ToolTip="Sparrow packs tighter and takes longer. RNest is our own engine: much faster, a little less dense.">
+          <ComboBoxItem>Sparrow</ComboBoxItem>
+          <ComboBoxItem>RNest</ComboBoxItem>
         </ComboBox>
       </Grid>
     </GroupBox>

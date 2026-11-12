@@ -1,0 +1,9 @@
+[package]
+name = "nest-geom"
+description = "2D geometry primitives and utilities ported from DeepNestLib.Core (ACVSheetNest)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde.workspace = true

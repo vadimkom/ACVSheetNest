@@ -299,6 +299,7 @@ namespace DeepNestSharp.Ui.Views
 
         this.nestEffort = DeepNestSharp.RasterNest.NestEffortDefaults.FromPersisted(session.NestEffort);
         SparrowNestService.ConcurrencyLimit = System.Math.Clamp(session.NestConcurrency, 0, SparrowNestService.MaxConcurrencyLimit);
+        SparrowNestService.UseRNestEngine = session.NestEngine == 1;
         this.nestFromRight = session.NestFromRight;
 
         // Global default rotations (plain in-memory config property — resets to 4 without this).
@@ -697,6 +698,7 @@ namespace DeepNestSharp.Ui.Views
         effort: this.nestEffort,
         commonLineMaxClusterParts: cfg.CommonLineMaxClusterParts,
         concurrencyLimit: SparrowNestService.ConcurrencyLimit,
+        useRNestEngine: SparrowNestService.UseRNestEngine,
         nestFromRight: this.nestFromRight)
       {
         Owner = this,
@@ -741,6 +743,8 @@ namespace DeepNestSharp.Ui.Views
       session.NestEffort = (int)this.nestEffort;
       SparrowNestService.ConcurrencyLimit = dialog.ConcurrencyLimit;
       session.NestConcurrency = dialog.ConcurrencyLimit;
+      SparrowNestService.UseRNestEngine = dialog.UseRNestEngine;
+      session.NestEngine = dialog.UseRNestEngine ? 1 : 0;
       this.nestFromRight = dialog.NestFromRight;
       session.NestFromRight = this.nestFromRight;
       string library = dialog.LibraryFolder;
@@ -3283,6 +3287,16 @@ namespace DeepNestSharp.Ui.Views
       if (!string.IsNullOrWhiteSpace(env) && System.IO.File.Exists(env))
       {
         return env;
+      }
+
+      if (SparrowNestService.UseRNestEngine)
+      {
+        // Same command line, same job and solution files; falls back to sparrow if it is not installed.
+        var rnest = System.IO.Path.Combine(System.AppContext.BaseDirectory, SparrowNestService.RNestEngineExe);
+        if (System.IO.File.Exists(rnest))
+        {
+          return rnest;
+        }
       }
 
       var beside = System.IO.Path.Combine(System.AppContext.BaseDirectory, "sparrow.exe");

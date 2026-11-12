@@ -1,0 +1,21 @@
+[package]
+name = "nest-sparrow"
+description = "Drop-in for sparrow.exe: reads a jagua-rs strip-packing job, nests it with our engine, writes sparrow's solution JSON"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "rnest-sparrow"
+path = "src/main.rs"
+
+[[bin]]
+name = "rnest-make-job"
+path = "src/make_job.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+nest-geom.workspace = true
+nest-io.workspace = true
+nest-engine.workspace = true

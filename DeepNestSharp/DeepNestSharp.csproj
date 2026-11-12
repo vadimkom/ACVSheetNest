@@ -70,6 +70,9 @@
     <Content Include="..\SparrowEngine\sparrow.exe" Link="sparrow.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\SparrowEngine\rnest-sparrow.exe" Link="rnest-sparrow.exe" Condition="Exists('..\SparrowEngine\rnest-sparrow.exe')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
