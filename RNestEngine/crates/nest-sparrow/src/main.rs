@@ -157,6 +157,7 @@ fn main() {
         r.sheets.iter().flat_map(|s| &s.placements).filter_map(|p| bounds_of(&p.outer)).map(|b| b.max_x).fold(0.0, f64::max)
     };
     let run = |length: f64| -> Option<nest_engine::NestResult> {
+        if std::env::var("RNEST_TRACE").is_ok() { eprintln!("[rnest] try length {length:.2}"); }
         let sheets = vec![SheetLoadInfo { width: length, height: job.strip_height, quantity: 1, ..Default::default() }];
         let r = nest(&sheets, &parts, |name: &str| details.get(name).cloned().unwrap_or_default(), config.clone()).ok()?;
         let placed: usize = r.sheets.iter().map(|s| s.placements.len()).sum();

@@ -363,6 +363,18 @@ mod tests {
         assert!(p.y <= 1e-6, "y={} should be at bottom", p.y);
     }
 
+    /// One part has only a handful of different genes; the genetic search used to
+    /// wait forever for a population of new ones.
+    #[test]
+    fn a_one_part_job_ends_under_the_genetic_search() {
+        let sheets = vec![SheetLoadInfo { width: 100.0, height: 50.0, quantity: 1, source: None, ..Default::default() }];
+        let parts = vec![DetailLoadInfo { name: "a".into(), quantity: 1, allowed_rotations: vec![0.0, 90.0, 180.0, 270.0], ..Default::default() }];
+        let catalogue = |_name: &str| -> RawDetail { rect_detail(30.0, 20.0) };
+        let cfg = Config { populations: 2, generations: 3, ..Config::default() };
+        let result = nest(&sheets, &parts, catalogue, cfg).expect("nest");
+        assert_eq!(result.sheets[0].placements.len(), 1);
+    }
+
     #[test]
     fn mirrored_quantity_creates_copies() {
         let sheets = vec![SheetLoadInfo { width: 100.0, height: 50.0, quantity: 1, source: None, ..Default::default() }];

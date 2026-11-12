@@ -42,7 +42,7 @@ This builds the release exe and copies it to `SparrowEngine\rnest-sparrow.exe`.
 build the engine before the app. Without the file the app still works and uses
 Sparrow whatever the setting says.
 
-Tests: `cargo test --release --workspace` in `RNestEngine` (94 tests).
+Tests: `cargo test --release --workspace` in `RNestEngine` (95 tests).
 
 ## How SheetNest calls it
 

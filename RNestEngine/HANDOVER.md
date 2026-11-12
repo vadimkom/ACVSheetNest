@@ -6,7 +6,7 @@ what to improve.
 
 ## State
 
-- The engine builds and its 94 tests pass in this folder (`cargo test --release --workspace`).
+- The engine builds and its 95 tests pass in this folder (`cargo test --release --workspace`).
 - `rnest-sparrow.exe` runs the same `job.json` as `sparrow.exe` and writes the
   same solution file. Compared on five jobs (table in the README): Sparrow is
   0.1 to 12.7 % denser, RNest 1.5 to 30 times faster.
@@ -20,8 +20,9 @@ what to improve.
 
 - **SheetNest end to end through RNest.** The fixtures `FillSheetsFixture`,
   `LeftOverJobFixture`, `NestExtentFixture` and `CornerPackFixture` were started
-  with `SPARROW_EXE` pointing at `rnest-sparrow.exe`; the run was still going
-  when this was written and its result was not seen. Those fixtures race eight
+  with `SPARROW_EXE` pointing at `rnest-sparrow.exe`; the first run hung: the
+  genetic search waited forever on a job of one part (fixed, with a test). The
+  rerun had not finished when this was written. Those fixtures race eight
   seeds, which is eight identical runs for this engine.
 - **The switch in the window** was not opened or clicked. The saved setting,
   the fallback to Sparrow when the exe is missing, and the single try were only

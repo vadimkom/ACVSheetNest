@@ -1194,7 +1194,11 @@ fn ga_nest(
     let mut best: Option<(f64, NestResult, Gene)> = None;
     let mut batch: Vec<Gene> = vec![adam.clone()];
     ancestors.insert(key(&adam));
-    while batch.len() < population_size {
+    // A job of one or two parts has fewer different genes than the population
+    // asks for: stop looking for new ones after a bounded number of draws.
+    let mut draws = 0usize;
+    while batch.len() < population_size && draws < population_size * 20 {
+        draws += 1;
         let mutant = mutate(&adam, &mut rng);
         let k = key(&mutant);
         if !ancestors.insert(k) { continue; }
