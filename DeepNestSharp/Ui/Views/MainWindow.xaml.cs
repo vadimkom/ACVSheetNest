@@ -86,6 +86,7 @@ namespace DeepNestSharp.Ui.Views
     private int sessionCommonLineMaxClusterParts = CommonLineDefaults.DefaultMaxClusterParts;
 
     private bool nestFromRight; // parts laid from the right edge (SessionState.NestFromRight)
+    private int nestMode; // what the Nest button runs: 0 = Nest, 1 = Draft (SessionState.NestMode)
     private DeepNestSharp.RasterNest.NestEffort nestEffort =DeepNestSharp.RasterNest.NestEffortDefaults.Default; // how hard the nester searches (SessionState)
     private bool lastRunWasDraft; // the variant being added came from the Draft button, and is labelled so
     private bool preferRectOffcut; // cut the last sheet's leftover off as a rectangular offcut (SessionState)
@@ -301,6 +302,8 @@ namespace DeepNestSharp.Ui.Views
         SparrowNestService.ConcurrencyLimit = System.Math.Clamp(session.NestConcurrency, 0, SparrowNestService.MaxConcurrencyLimit);
         SparrowNestService.UseRNestEngine = session.NestEngine == 1;
         this.nestFromRight = session.NestFromRight;
+        this.nestMode = session.NestMode == 1 ? 1 : 0;
+        this.RefreshNestModeButton();
 
         // Global default rotations (plain in-memory config property — resets to 4 without this).
         if (session.DefaultRotations > 0)
@@ -2873,9 +2876,11 @@ namespace DeepNestSharp.Ui.Views
 
       // The button pressed says what kind of nest this is: a draft for a quote, or the layout to cut. Both
       // are read from the operator's profile file now, so an edit to it counts from this press on.
-      var runEffort = ReferenceEquals(sender, this.btnNestDraft)
+      int runMode = this.EffectiveNestMode;
+      var runEffort = runMode == 1
         ? DeepNestSharp.RasterNest.NestEffort.Draft
         : DeepNestSharp.RasterNest.NestEffort.Fast;
+      SparrowNestService.RNestPopulation = runMode == 2 ? 1 : runMode == 3 ? 5 : 0;
       string profileError = DeepNestSharp.RasterNest.NestProfiles.Load(
         System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "SheetNest"));
       if (profileError != null)
@@ -2975,7 +2980,7 @@ namespace DeepNestSharp.Ui.Views
 
       // Both buttons rest while a nest runs: either would only start a second one.
       this.btnStartNest.IsEnabled = false;
-      this.btnNestDraft.IsEnabled = false;
+      this.btnNestMode.IsEnabled = false;
 
       nestCts = new System.Threading.CancellationTokenSource();
       this.cancelNestButton.Content = Localization.Get("Btn_StopNest");
@@ -3261,7 +3266,7 @@ namespace DeepNestSharp.Ui.Views
         nestCts.Dispose();
         nestCts = null;
         this.btnStartNest.IsEnabled = true;
-        this.btnNestDraft.IsEnabled = true;
+        this.btnNestMode.IsEnabled = true;
       }
     }
 
@@ -3302,6 +3307,71 @@ namespace DeepNestSharp.Ui.Views
       var beside = System.IO.Path.Combine(System.AppContext.BaseDirectory, "sparrow.exe");
       return System.IO.File.Exists(beside) ? beside : null;
     }
+
+    /// <summary>The arrow beside Nest: a menu of the two modes. Picking one remembers it and runs it.</summary>
+    private void OnNestModeMenu(object sender, RoutedEventArgs e)
+    {
+      var menu = new System.Windows.Controls.ContextMenu { PlacementTarget = this.btnNestMode, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+      menu.Items.Add(this.NestModeItem(0, Localization.Get("Btn_NestCut")));
+      menu.Items.Add(this.NestModeItem(1, Localization.Get("Btn_NestDraft")));
+      if (SparrowNestService.UseRNestEngine)
+      {
+        // The RNest engine's search effort: population 1 (quick) or 5 (careful).
+        menu.Items.Add(new System.Windows.Controls.Separator());
+        menu.Items.Add(this.NestModeItem(2, Localization.Get("Mode_RNestQuick")));
+        menu.Items.Add(this.NestModeItem(3, Localization.Get("Mode_RNestCareful")));
+      }
+
+      menu.IsOpen = true;
+    }
+
+    private System.Windows.Controls.MenuItem NestModeItem(int mode, string header)
+    {
+      var item = new System.Windows.Controls.MenuItem
+      {
+        Header = header,
+        IsCheckable = true,
+        IsChecked = this.nestMode == mode,
+        ToolTip = Localization.Get("Tip_NestModeMenu"),
+      };
+      item.Click += (s, e) =>
+      {
+        this.SetNestMode(mode);
+        this.OnNest(this.btnStartNest, new RoutedEventArgs());
+      };
+      return item;
+    }
+
+    private void SetNestMode(int mode)
+    {
+      this.nestMode = mode;
+      var session = SessionState.Load();
+      session.NestMode = mode;
+      session.Save();
+      this.RefreshNestModeButton();
+    }
+
+    /// <summary>The main button names the mode it will run.</summary>
+    private void RefreshNestModeButton()
+    {
+      if (this.btnStartNest == null)
+      {
+        return;
+      }
+
+      int mode = this.EffectiveNestMode;
+      this.btnStartNest.Content = Localization.Get(mode switch
+      {
+        1 => "Btn_NestDraft",
+        2 => "Mode_RNestQuick",
+        3 => "Mode_RNestCareful",
+        _ => "Btn_NestCut",
+      });
+      this.btnStartNest.ToolTip = Localization.Get(mode == 1 ? "Tip_NestDraft" : "Tip_StartNest");
+    }
+
+    /// <summary>The mode that actually runs: the RNest modes fall back to Nest when Sparrow is the engine.</summary>
+    private int EffectiveNestMode => this.nestMode >= 2 && !SparrowNestService.UseRNestEngine ? 0 : this.nestMode;
 
     private void OnCancelNest(object sender, RoutedEventArgs e)
     {

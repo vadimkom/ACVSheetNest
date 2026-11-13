@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -1993,5 +1993,14 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   </data>
   <data name="Msg_VirtualHint" xml:space="preserve">
     <value>Faltan: {0} chapas {1} × {2}; el resto está en las chapas virtuales rojas al final de la tira.</value>
+  </data>
+  <data name="Tip_NestModeMenu" xml:space="preserve">
+    <value>Elija qué ejecuta el botón Nest: Nest o Draft. La elección se recuerda.</value>
+  </data>
+  <data name="Mode_RNestQuick" xml:space="preserve">
+    <value>Rápido (RNest, población 1)</value>
+  </data>
+  <data name="Mode_RNestCareful" xml:space="preserve">
+    <value>Cuidadoso (RNest, población 5)</value>
   </data>
 </root>

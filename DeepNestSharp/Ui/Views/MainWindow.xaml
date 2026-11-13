@@ -554,10 +554,11 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
               <!-- Two buttons, two jobs: a draft in seconds for a quote, and the layout that gets cut.
                    Both are tuned in %LOCALAPPDATA%\SheetNest\nest-profiles.json. -->
-              <Button x:Name="btnNestDraft" Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_NestDraft}" Click="OnNest"
-                      Padding="10,4" ToolTip="{ui:Tr Tip_NestDraft}" Margin="2,0,4,0" />
+              <!-- The main part runs the mode last chosen in the arrow's menu (Nest or Draft). -->
               <Button x:Name="btnStartNest" Style="{DynamicResource PrimaryButton}" Content="{ui:Tr Btn_NestCut}" Click="OnNest"
-                      Padding="12,4" ToolTip="{ui:Tr Tip_StartNest}" Margin="0,0,4,0" />
+                      Padding="12,4" ToolTip="{ui:Tr Tip_StartNest}" Margin="2,0,0,0" />
+              <Button x:Name="btnNestMode" Style="{DynamicResource PrimaryButton}" Content="▾" Click="OnNestModeMenu"
+                      Padding="8,4" Margin="1,0,4,0" ToolTip="{ui:Tr Tip_NestModeMenu}" />
               <Button x:Name="cancelNestButton" Style="{DynamicResource DangerButton}" Margin="4,0" Content="■  Остановить"
                       Click="OnCancelNest" Visibility="Collapsed" ToolTip="{ui:Tr Tip_CancelNest}" />
               <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />

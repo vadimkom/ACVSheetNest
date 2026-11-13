@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -1993,5 +1993,14 @@ Open the download page?</value>
   </data>
   <data name="Msg_VirtualHint" xml:space="preserve">
     <value>Missing: {0} sheets {1} × {2}; what is left over is on the red virtual sheets at the end of the strip.</value>
+  </data>
+  <data name="Tip_NestModeMenu" xml:space="preserve">
+    <value>Choose what the Nest button runs: Nest or Draft. The choice is remembered.</value>
+  </data>
+  <data name="Mode_RNestQuick" xml:space="preserve">
+    <value>Quick (RNest, population 1)</value>
+  </data>
+  <data name="Mode_RNestCareful" xml:space="preserve">
+    <value>Careful (RNest, population 5)</value>
   </data>
 </root>

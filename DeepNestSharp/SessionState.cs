@@ -102,6 +102,11 @@ namespace DeepNestSharp
     /// <summary>The nesting engine: 0 = sparrow, 1 = RNest (rnest-sparrow.exe). Per machine.</summary>
     public int NestEngine { get; set; } = 0;
 
+    /// <summary>The mode the Nest button runs, last chosen from its arrow menu: 0 = Nest (the layout to cut),
+    /// 1 = Draft (the quick quote), 2 = RNest quick (population 1), 3 = RNest careful (population 5). The
+    /// last two need the RNest engine; otherwise they run as Nest. Per machine, like the other choices.</summary>
+    public int NestMode { get; set; }
+
     /// <summary>Parts laid from the right edge of the sheet, the offcut left at the left (2026-11-10, the
     /// user: "our laser cuts from right to left"). Per machine, like the laser it suits.</summary>
     public bool NestFromRight { get; set; }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -1993,5 +1993,14 @@ Abrir a página de download?</value>
   </data>
   <data name="Msg_VirtualHint" xml:space="preserve">
     <value>Faltam: {0} chapas {1} × {2}; o resto está nas chapas virtuais vermelhas no fim da faixa.</value>
+  </data>
+  <data name="Tip_NestModeMenu" xml:space="preserve">
+    <value>Escolha o que o botão Nest executa: Nest ou Draft. A escolha fica guardada.</value>
+  </data>
+  <data name="Mode_RNestQuick" xml:space="preserve">
+    <value>Rápido (RNest, população 1)</value>
+  </data>
+  <data name="Mode_RNestCareful" xml:space="preserve">
+    <value>Cuidadoso (RNest, população 5)</value>
   </data>
 </root>

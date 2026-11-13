@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -1993,5 +1993,14 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   </data>
   <data name="Msg_VirtualHint" xml:space="preserve">
     <value>Липсват: {0} листа {1} × {2}; остатъкът е на червените виртуални листове в края на лентата.</value>
+  </data>
+  <data name="Tip_NestModeMenu" xml:space="preserve">
+    <value>Изберете какво да пуска бутонът Nest: Nest или Draft. Изборът се запомня.</value>
+  </data>
+  <data name="Mode_RNestQuick" xml:space="preserve">
+    <value>Бърз (RNest, популация 1)</value>
+  </data>
+  <data name="Mode_RNestCareful" xml:space="preserve">
+    <value>Внимателен (RNest, популация 5)</value>
   </data>
 </root>

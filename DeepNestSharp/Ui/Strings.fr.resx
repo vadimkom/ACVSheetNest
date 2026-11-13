@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype">
     <value>text/microsoft-resx</value>
@@ -1993,5 +1993,14 @@ Ouvrir la page de téléchargement ?</value>
   </data>
   <data name="Msg_VirtualHint" xml:space="preserve">
     <value>Il manque : {0} tôles {1} × {2} ; le reste est sur les tôles virtuelles rouges en fin de bande.</value>
+  </data>
+  <data name="Tip_NestModeMenu" xml:space="preserve">
+    <value>Choisir ce que lance le bouton Nest : Nest ou Draft. Le choix est mémorisé.</value>
+  </data>
+  <data name="Mode_RNestQuick" xml:space="preserve">
+    <value>Rapide (RNest, population 1)</value>
+  </data>
+  <data name="Mode_RNestCareful" xml:space="preserve">
+    <value>Soigneux (RNest, population 5)</value>
   </data>
 </root>
