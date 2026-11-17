@@ -75,17 +75,21 @@
     <!-- Row 0: Menu Bar -->
     <DockPanel Grid.Row="0" Background="{DynamicResource Brush.Window}">
       <Menu Background="Transparent" VerticalAlignment="Center">
-        <MenuItem x:Name="menuFile" Header="_Файл">
+        <MenuItem x:Name="menuFile" Header="_Файл" SubmenuOpened="OnFileMenuOpened">
           <MenuItem x:Name="menuNewProject" Header="Новый проект" Command="{Binding CreateNestProjectCommand}" />
           <MenuItem x:Name="menuOpenProject" Header="Открыть проект..." Command="{Binding LoadNestProjectCommand}" />
           <MenuItem x:Name="recentProjectsMenu" Header="Последние проекты" SubmenuOpened="OnRecentProjectsOpened">
             <MenuItem x:Name="recentEmptyItem" Header="(пусто)" IsEnabled="False" />
           </MenuItem>
+          <MenuItem x:Name="menuOpenLast" Header="{ui:Tr Menu_OpenLast}" Click="OnOpenLastProject" />
           <Separator />
+          <MenuItem x:Name="menuUndo" Header="{ui:Tr Menu_Undo}" InputGestureText="Ctrl+Z" Click="OnUndo" />
+          <MenuItem x:Name="menuRevert" Header="{ui:Tr Menu_Revert}" Click="OnRevertToSaved" />
           <MenuItem x:Name="menuReloadDrawings" Header="{ui:Tr Menu_ReloadDrawings}" InputGestureText="F5" Click="OnReloadDrawings" />
           <Separator />
           <MenuItem x:Name="menuSave" Header="Сохранить" Command="{Binding ActiveDocumentSaveCommand}" />
           <MenuItem x:Name="menuSaveAs" Header="Сохранить как..." Command="{Binding ActiveDocumentSaveAsCommand}" />
+          <MenuItem x:Name="menuSaveWithDrawings" Header="{ui:Tr Menu_SaveWithDrawings}" Click="OnSaveWithDrawings" />
           <Separator />
           <MenuItem x:Name="menuExit" Header="Выход" Command="{Binding ExitCommand}" />
         </MenuItem>

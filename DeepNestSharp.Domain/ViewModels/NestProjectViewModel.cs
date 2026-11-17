@@ -169,7 +169,7 @@ namespace DeepNestSharp.Domain.ViewModels
       System.Collections.Generic.IReadOnlyList<DeepNestLib.IO.DxfPartSplitter.SplitPartFile> parts = SplitOrNothing(filePath);
       if (parts.Count == 0)
       {
-        observableProjectInfo?.DetailLoadInfos.Add(new DetailLoadInfo() { Path = filePath });
+        observableProjectInfo?.DetailLoadInfos.Add(new DetailLoadInfo() { Path = filePath, Rotations = DetailLoadInfo.NewPartRotations });
         return;
       }
 
@@ -181,6 +181,7 @@ namespace DeepNestSharp.Domain.ViewModels
           Quantity = part.Quantity,
           SourceDxfPath = filePath,
           PartIndex = part.PartIndex,
+          Rotations = DetailLoadInfo.NewPartRotations,
         });
       }
     }

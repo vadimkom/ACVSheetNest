@@ -1997,4 +1997,46 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Tip_NestModeMenu" xml:space="preserve">
     <value>Choisir ce que lance le bouton Nest : Nest ou Draft. Le choix est mémorisé.</value>
   </data>
+  <data name="Menu_Revert" xml:space="preserve">
+    <value>Revenir à la version enregistrée</value>
+  </data>
+  <data name="Menu_SaveWithDrawings" xml:space="preserve">
+    <value>Enregistrer avec les dessins...</value>
+  </data>
+  <data name="Menu_Undo" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="Msg_NothingToUndo" xml:space="preserve">
+    <value>Rien à annuler.</value>
+  </data>
+  <data name="Msg_PackMissing" xml:space="preserve">
+    <value>{0} dessins illisibles, non copiés :</value>
+  </data>
+  <data name="Msg_RevertConfirm" xml:space="preserve">
+    <value>Abandonner toutes les modifications et rouvrir {0} tel qu&apos;il a été enregistré ?</value>
+  </data>
+  <data name="Msg_RevertNoFile" xml:space="preserve">
+    <value>Le projet n&apos;a pas encore été enregistré.</value>
+  </data>
+  <data name="Msg_SavedWithDrawings" xml:space="preserve">
+    <value>Enregistré : {0}.
+{1} dessins copiés dans {2}.
+Transportez le projet avec ce dossier.</value>
+  </data>
+  <data name="Msg_Undone" xml:space="preserve">
+    <value>Dernière modification annulée.</value>
+  </data>
+  <data name="Pack_FolderSuffix" xml:space="preserve">
+    <value> dessins</value>
+  </data>
+  <data name="Menu_OpenLast" xml:space="preserve">
+    <value>Ouvrir le dernier projet</value>
+  </data>
+  <data name="Msg_NoLastProject" xml:space="preserve">
+    <value>Aucun dernier projet n&apos;a encore été conservé.</value>
+  </data>
+  <data name="Tip_OpenLast" xml:space="preserve">
+    <value>{0}
+conservé le {1}</value>
+  </data>
 </root>

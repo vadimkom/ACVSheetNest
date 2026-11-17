@@ -226,7 +226,8 @@ namespace DeepNestSharp
     /// </summary>
     public static void PushRecentProject(string path)
     {
-      if (string.IsNullOrWhiteSpace(path))
+      // The kept last project and the autosaves are the app’s own files, never a recent project.
+      if (string.IsNullOrWhiteSpace(path) || LastProject.IsOwnFile(path))
       {
         return;
       }

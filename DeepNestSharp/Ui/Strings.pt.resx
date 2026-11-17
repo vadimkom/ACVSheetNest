@@ -1997,4 +1997,46 @@ Abrir a página de download?</value>
   <data name="Tip_NestModeMenu" xml:space="preserve">
     <value>Escolha o que o botão Nest executa: Nest ou Draft. A escolha fica guardada.</value>
   </data>
+  <data name="Menu_Revert" xml:space="preserve">
+    <value>Voltar ao salvo</value>
+  </data>
+  <data name="Menu_SaveWithDrawings" xml:space="preserve">
+    <value>Salvar com os desenhos...</value>
+  </data>
+  <data name="Menu_Undo" xml:space="preserve">
+    <value>Desfazer</value>
+  </data>
+  <data name="Msg_NothingToUndo" xml:space="preserve">
+    <value>Nada para desfazer.</value>
+  </data>
+  <data name="Msg_PackMissing" xml:space="preserve">
+    <value>{0} desenhos não puderam ser lidos nem copiados:</value>
+  </data>
+  <data name="Msg_RevertConfirm" xml:space="preserve">
+    <value>Descartar todas as alterações e abrir {0} como foi salvo pela última vez?</value>
+  </data>
+  <data name="Msg_RevertNoFile" xml:space="preserve">
+    <value>O projeto ainda não foi salvo.</value>
+  </data>
+  <data name="Msg_SavedWithDrawings" xml:space="preserve">
+    <value>Salvo: {0}.
+{1} desenhos copiados para {2}.
+Leve o projeto junto com essa pasta.</value>
+  </data>
+  <data name="Msg_Undone" xml:space="preserve">
+    <value>Última alteração desfeita.</value>
+  </data>
+  <data name="Pack_FolderSuffix" xml:space="preserve">
+    <value> desenhos</value>
+  </data>
+  <data name="Menu_OpenLast" xml:space="preserve">
+    <value>Abrir o último projeto</value>
+  </data>
+  <data name="Msg_NoLastProject" xml:space="preserve">
+    <value>Ainda não há último projeto guardado.</value>
+  </data>
+  <data name="Tip_OpenLast" xml:space="preserve">
+    <value>{0}
+guardado em {1}</value>
+  </data>
 </root>

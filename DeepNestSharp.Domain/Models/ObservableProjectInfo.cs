@@ -182,6 +182,30 @@
       OnPropertyChanged(nameof(SheetLoadInfos));
     }
 
+    /// <summary>
+    /// Puts back the rows, material and fill choice of an earlier state (Ctrl+Z). The nest kept with the project
+    /// stays: an undo changes the job, not the layouts on screen.
+    /// </summary>
+    public void Restore(ProjectInfo source)
+    {
+      source.LastNestResultJson = this.wrappedProjectInfo.LastNestResultJson;
+      source.SheetsKeptWhole = this.wrappedProjectInfo.SheetsKeptWhole;
+      this.Load(source);
+      if (this.detailLoadInfos != null)
+      {
+        this.detailLoadInfos.IsDirtyChanged -= this.DetailLoadInfos_IsDirtyChanged;
+      }
+
+      this.detailLoadInfos = null;
+      this.sheetLoadInfos = null;
+      OnPropertyChanged(nameof(DetailLoadInfos));
+      OnPropertyChanged(nameof(SheetLoadInfos));
+      OnPropertyChanged(nameof(Material));
+      OnPropertyChanged(nameof(Thickness));
+      OnPropertyChanged(nameof(FillToMaximum));
+      IsDirtyChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     public void Load(ProjectInfo source)
     {
       wrappedProjectInfo.Load(source);

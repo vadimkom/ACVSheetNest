@@ -1997,4 +1997,46 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
   <data name="Tip_NestModeMenu" xml:space="preserve">
     <value>Изберете какво да пуска бутонът Nest: Nest или Draft. Изборът се запомня.</value>
   </data>
+  <data name="Menu_Revert" xml:space="preserve">
+    <value>Върни запазеното</value>
+  </data>
+  <data name="Menu_SaveWithDrawings" xml:space="preserve">
+    <value>Запази с чертежите...</value>
+  </data>
+  <data name="Menu_Undo" xml:space="preserve">
+    <value>Отмени</value>
+  </data>
+  <data name="Msg_NothingToUndo" xml:space="preserve">
+    <value>Няма какво да се отмени.</value>
+  </data>
+  <data name="Msg_PackMissing" xml:space="preserve">
+    <value>Чертежи, които не можаха да се прочетат и копират: {0}:</value>
+  </data>
+  <data name="Msg_RevertConfirm" xml:space="preserve">
+    <value>Да се отменят ли всички промени и да се отвори {0} както е запазен последно?</value>
+  </data>
+  <data name="Msg_RevertNoFile" xml:space="preserve">
+    <value>Проектът още не е запазен: няма към какво да се върне.</value>
+  </data>
+  <data name="Msg_SavedWithDrawings" xml:space="preserve">
+    <value>Запазено: {0}.
+Копирани чертежи: {1}, в папка {2}.
+Пренасяйте проекта заедно с тази папка.</value>
+  </data>
+  <data name="Msg_Undone" xml:space="preserve">
+    <value>Последната промяна е отменена.</value>
+  </data>
+  <data name="Pack_FolderSuffix" xml:space="preserve">
+    <value> чертежи</value>
+  </data>
+  <data name="Menu_OpenLast" xml:space="preserve">
+    <value>Отвори последния проект</value>
+  </data>
+  <data name="Msg_NoLastProject" xml:space="preserve">
+    <value>Още няма запазен последен проект.</value>
+  </data>
+  <data name="Tip_OpenLast" xml:space="preserve">
+    <value>{0}
+запазен {1}</value>
+  </data>
 </root>

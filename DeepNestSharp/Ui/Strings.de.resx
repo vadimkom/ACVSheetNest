@@ -1997,4 +1997,46 @@ Downloadseite öffnen?</value>
   <data name="Tip_NestModeMenu" xml:space="preserve">
     <value>Wählen, was der Nest-Button startet: Nest oder Draft. Die Wahl wird gemerkt.</value>
   </data>
+  <data name="Menu_Revert" xml:space="preserve">
+    <value>Gespeicherte Version wiederherstellen</value>
+  </data>
+  <data name="Menu_SaveWithDrawings" xml:space="preserve">
+    <value>Mit Zeichnungen speichern...</value>
+  </data>
+  <data name="Menu_Undo" xml:space="preserve">
+    <value>Rückgängig</value>
+  </data>
+  <data name="Msg_NothingToUndo" xml:space="preserve">
+    <value>Nichts rückgängig zu machen.</value>
+  </data>
+  <data name="Msg_PackMissing" xml:space="preserve">
+    <value>{0} Zeichnungen konnten nicht gelesen und nicht kopiert werden:</value>
+  </data>
+  <data name="Msg_RevertConfirm" xml:space="preserve">
+    <value>Alle Änderungen verwerfen und {0} im zuletzt gespeicherten Stand öffnen?</value>
+  </data>
+  <data name="Msg_RevertNoFile" xml:space="preserve">
+    <value>Das Projekt wurde noch nicht gespeichert.</value>
+  </data>
+  <data name="Msg_SavedWithDrawings" xml:space="preserve">
+    <value>Gespeichert: {0}.
+{1} Zeichnungen kopiert nach {2}.
+Das Projekt zusammen mit diesem Ordner weitergeben.</value>
+  </data>
+  <data name="Msg_Undone" xml:space="preserve">
+    <value>Letzte Änderung rückgängig gemacht.</value>
+  </data>
+  <data name="Pack_FolderSuffix" xml:space="preserve">
+    <value> Zeichnungen</value>
+  </data>
+  <data name="Menu_OpenLast" xml:space="preserve">
+    <value>Letztes Projekt öffnen</value>
+  </data>
+  <data name="Msg_NoLastProject" xml:space="preserve">
+    <value>Es wurde noch kein letztes Projekt gesichert.</value>
+  </data>
+  <data name="Tip_OpenLast" xml:space="preserve">
+    <value>{0}
+gesichert {1}</value>
+  </data>
 </root>

@@ -1997,4 +1997,46 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Tip_NestModeMenu" xml:space="preserve">
     <value>Elija qué ejecuta el botón Nest: Nest o Draft. La elección se recuerda.</value>
   </data>
+  <data name="Menu_Revert" xml:space="preserve">
+    <value>Volver a lo guardado</value>
+  </data>
+  <data name="Menu_SaveWithDrawings" xml:space="preserve">
+    <value>Guardar con los dibujos...</value>
+  </data>
+  <data name="Menu_Undo" xml:space="preserve">
+    <value>Deshacer</value>
+  </data>
+  <data name="Msg_NothingToUndo" xml:space="preserve">
+    <value>Nada que deshacer.</value>
+  </data>
+  <data name="Msg_PackMissing" xml:space="preserve">
+    <value>{0} dibujos no se pudieron leer ni copiar:</value>
+  </data>
+  <data name="Msg_RevertConfirm" xml:space="preserve">
+    <value>¿Descartar todos los cambios y abrir {0} tal como se guardó por última vez?</value>
+  </data>
+  <data name="Msg_RevertNoFile" xml:space="preserve">
+    <value>El proyecto aún no se ha guardado.</value>
+  </data>
+  <data name="Msg_SavedWithDrawings" xml:space="preserve">
+    <value>Guardado: {0}.
+{1} dibujos copiados en {2}.
+Lleve el proyecto junto con esa carpeta.</value>
+  </data>
+  <data name="Msg_Undone" xml:space="preserve">
+    <value>Último cambio deshecho.</value>
+  </data>
+  <data name="Pack_FolderSuffix" xml:space="preserve">
+    <value> dibujos</value>
+  </data>
+  <data name="Menu_OpenLast" xml:space="preserve">
+    <value>Abrir el último proyecto</value>
+  </data>
+  <data name="Msg_NoLastProject" xml:space="preserve">
+    <value>Todavía no se ha guardado ningún último proyecto.</value>
+  </data>
+  <data name="Tip_OpenLast" xml:space="preserve">
+    <value>{0}
+guardado {1}</value>
+  </data>
 </root>

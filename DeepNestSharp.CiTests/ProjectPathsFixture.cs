@@ -63,5 +63,52 @@ namespace DeepNestSharp.CiTests
       JsonNode.Parse(opened.LastNestResultJson)["UsedSheets"][0]["Part"]["Name"].GetValue<string>()
         .Should().Be(Path.Combine(job, "parts", "side.dxf"), "the saved nest reads the drawing back for the DXF");
     }
+
+    /// <summary>Saved with its drawings, a job carried to another PC opens there with every drawing found
+    /// (the user, 2026-11-17: "save the project with its parts, to move it to another computer").</summary>
+    [Fact]
+    public void AProjectSavedWithItsDrawingsOpensWhereverTheFolderGoes()
+    {
+      string here = Path.Combine(this.flash, "office");
+      Directory.CreateDirectory(Path.Combine(here, "a"));
+      Directory.CreateDirectory(Path.Combine(here, "b"));
+      string sideA = Path.Combine(here, "a", "side.dxf");
+      string sideB = Path.Combine(here, "b", "side.dxf");
+      string offcut = Path.Combine(here, "offcut.dxf");
+      File.WriteAllText(sideA, "A");
+      File.WriteAllText(sideB, "B");
+      File.WriteAllText(offcut, "O");
+      File.WriteAllText(sideA + DeepNestLib.IO.ShapeRecord.Suffix, "{}");
+
+      var project = new ProjectInfo(new SvgNestConfig());
+      project.DetailLoadInfos.Add(new DetailLoadInfo { Path = sideA, Quantity = 2 });
+      project.DetailLoadInfos.Add(new DetailLoadInfo { Path = sideB, Quantity = 1 });
+      project.DetailLoadInfos.Add(new DetailLoadInfo { Path = Path.Combine(here, "gone.dxf") });
+      project.SheetLoadInfos.Add(new SheetLoadInfo(800, 600, 1) { ShapePath = offcut });
+      project.LastNestResultJson = new JsonObject { ["Part"] = new JsonObject { ["Name"] = sideB } }.ToJsonString();
+
+      string packed = Path.Combine(this.flash, "usb");
+      var copy = ProjectInfo.FromJson(new SvgNestConfig(), project.ToJson());
+      var (copied, missing) = ProjectPaths.Pack(copy, Path.Combine(packed, "cap files"));
+      File.WriteAllText(Path.Combine(packed, "cap.dnest"), copy.ToJson());
+
+      copied.Should().Be(3);
+      missing.Should().Equal(Path.Combine(here, "gone.dxf"));
+      project.DetailLoadInfos[0].Path.Should().Be(sideA, "the open project is not touched");
+
+      // Another PC: the folder lands somewhere else and the office is gone.
+      string there = Path.Combine(this.flash, "laser", "jobs");
+      Directory.CreateDirectory(Path.GetDirectoryName(there));
+      Directory.Move(packed, there);
+      Directory.Delete(here, true);
+
+      var opened = new ProjectInfo(new SvgNestConfig());
+      opened.Load(new SvgNestConfig(), Path.Combine(there, "cap.dnest"));
+      File.ReadAllText(opened.DetailLoadInfos[0].Path).Should().Be("A");
+      File.ReadAllText(opened.DetailLoadInfos[1].Path).Should().Be("B", "two drawings of one name stay apart");
+      File.Exists(opened.DetailLoadInfos[0].Path + DeepNestLib.IO.ShapeRecord.Suffix).Should().BeTrue();
+      File.ReadAllText(opened.SheetLoadInfos.Single().ShapePath).Should().Be("O");
+      JsonNode.Parse(opened.LastNestResultJson)["Part"]["Name"].GetValue<string>().Should().Be(opened.DetailLoadInfos[1].Path);
+    }
   }
 }

@@ -1997,4 +1997,46 @@ Open the download page?</value>
   <data name="Tip_NestModeMenu" xml:space="preserve">
     <value>Choose what the Nest button runs: Nest or Draft. The choice is remembered.</value>
   </data>
+  <data name="Menu_Revert" xml:space="preserve">
+    <value>Revert to saved</value>
+  </data>
+  <data name="Menu_SaveWithDrawings" xml:space="preserve">
+    <value>Save with drawings...</value>
+  </data>
+  <data name="Menu_Undo" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="Msg_NothingToUndo" xml:space="preserve">
+    <value>Nothing to undo.</value>
+  </data>
+  <data name="Msg_PackMissing" xml:space="preserve">
+    <value>{0} drawings could not be read and were not copied:</value>
+  </data>
+  <data name="Msg_RevertConfirm" xml:space="preserve">
+    <value>Discard all changes and open {0} as it was last saved?</value>
+  </data>
+  <data name="Msg_RevertNoFile" xml:space="preserve">
+    <value>The project has not been saved yet: there is nothing to go back to.</value>
+  </data>
+  <data name="Msg_SavedWithDrawings" xml:space="preserve">
+    <value>Saved {0}.
+{1} drawings copied to {2}.
+Carry the project together with that folder.</value>
+  </data>
+  <data name="Msg_Undone" xml:space="preserve">
+    <value>Last change undone.</value>
+  </data>
+  <data name="Pack_FolderSuffix" xml:space="preserve">
+    <value> files</value>
+  </data>
+  <data name="Menu_OpenLast" xml:space="preserve">
+    <value>Open the last project</value>
+  </data>
+  <data name="Msg_NoLastProject" xml:space="preserve">
+    <value>No last project has been kept yet.</value>
+  </data>
+  <data name="Tip_OpenLast" xml:space="preserve">
+    <value>{0}
+kept {1}</value>
+  </data>
 </root>

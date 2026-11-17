@@ -644,6 +644,7 @@ namespace DeepNestSharp.Ui.Views
           doc.ProjectInfo.LastNestResultJson =
             (ViewModel.NestMonitorViewModel.SelectedItem as NestResult)?.ToJson(false) ?? string.Empty;
           Autosave.Write(doc.TextContent, doc.FilePath);
+          this.KeepLastProject(doc);
         }
       }
       catch
@@ -1219,6 +1220,13 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
+      // The job being replaced is kept as the last project, whatever was answered about saving it.
+      if (this.historyDoc != null && !ReferenceEquals(this.historyDoc, doc))
+      {
+        this.KeepLastProject(this.historyDoc);
+      }
+
+      this.StartHistory(doc);
       this.nestRuns.Clear();
       this.runSeedOffset = 0;
       this.UpdateSummaryBadges();
@@ -1490,6 +1498,7 @@ namespace DeepNestSharp.Ui.Views
 
       // A close that reaches this point is CLEAN (saved, discarded by choice, or nothing dirty) —
       // the autosave snapshot must not trigger a bogus recovery prompt on the next start.
+      this.KeepLastProject(ViewModel.ActiveDocument as NestProjectViewModel);
       Autosave.Clear();
 
       // Sheet stock is deliberately NOT part of the session anymore — the app starts empty and each
@@ -1600,6 +1609,10 @@ namespace DeepNestSharp.Ui.Views
       if (this.recentEmptyItem != null) this.recentEmptyItem.Header = Localization.Get("Menu_RecentEmpty");
       if (this.menuSave != null) this.menuSave.Header = Localization.Get("Menu_Save");
       if (this.menuSaveAs != null) this.menuSaveAs.Header = Localization.Get("Menu_SaveAs");
+      if (this.menuSaveWithDrawings != null) this.menuSaveWithDrawings.Header = Localization.Get("Menu_SaveWithDrawings");
+      if (this.menuRevert != null) this.menuRevert.Header = Localization.Get("Menu_Revert");
+      if (this.menuUndo != null) this.menuUndo.Header = Localization.Get("Menu_Undo");
+      if (this.menuOpenLast != null) this.menuOpenLast.Header = Localization.Get("Menu_OpenLast");
       if (this.menuExit != null) this.menuExit.Header = Localization.Get("Menu_Exit");
       if (this.menuSettings != null) this.menuSettings.Header = Localization.Get("Menu_Settings");
       if (this.menuOffcut != null) this.menuOffcut.Header = Localization.Get("Menu_Offcut");
@@ -3735,6 +3748,11 @@ namespace DeepNestSharp.Ui.Views
       {
         this.OnReloadDrawings(this, new RoutedEventArgs());
         e.Handled = true;
+        return;
+      }
+
+      if (this.UndoKey(e))
+      {
         return;
       }
 

@@ -77,6 +77,14 @@ namespace DeepNestSharp.CiTests
       RotationCodes.PermittedSet(SessionState.JobRotations(-1, 0)).Should().Equal(0, 90);
     }
 
+    /// <summary>A part added to the list starts at 0° + 90°, selected in Edit Part (the user, 2026-11-17).</summary>
+    [Fact]
+    public void ANewPartStartsAtZeroAndNinety()
+    {
+      DeepNestLib.NestProject.DetailLoadInfo.NewPartRotations.Should().Be(RotationCodes.RotZeroAnd90);
+      RotationCodes.PermittedSet(DeepNestLib.NestProject.DetailLoadInfo.NewPartRotations).Should().Equal(0, 90);
+    }
+
     [Fact]
     public void TheFourWayCodeIsTheFourSquareOrientations()
       => RotationCodes.PermittedSet(4).Should().BeEquivalentTo(new[] { 0, 90, 180, 270 });
