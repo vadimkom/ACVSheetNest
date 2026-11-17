@@ -1997,10 +1997,4 @@ Downloadseite öffnen?</value>
   <data name="Tip_NestModeMenu" xml:space="preserve">
     <value>Wählen, was der Nest-Button startet: Nest oder Draft. Die Wahl wird gemerkt.</value>
   </data>
-  <data name="Mode_RNestQuick" xml:space="preserve">
-    <value>Schnell (RNest, Population 1)</value>
-  </data>
-  <data name="Mode_RNestCareful" xml:space="preserve">
-    <value>Sorgfältig (RNest, Population 5)</value>
-  </data>
 </root>

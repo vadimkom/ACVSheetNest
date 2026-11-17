@@ -154,10 +154,10 @@ namespace DeepNestSharp.Ui.Views
         System.Globalization.CultureInfo.CurrentCulture, Localization.Get("Settings_Concurrency_Auto"), auto);
     }
 
-    /// <summary>The chosen global rotation code (1/2/4/8/36) — persisted by the caller.</summary>
+    /// <summary>The chosen global rotation code (1/2/1002/4/8/36) — persisted by the caller.</summary>
     public int Rotations => this.rotationsCombo.SelectedItem is ComboBoxItem item
       ? int.Parse((string)item.Tag, System.Globalization.CultureInfo.InvariantCulture)
-      : 4;
+      : DeepNestSharp.RasterNest.RotationCodes.RotZeroAnd90;
 
     private void SelectRotations(int code)
     {
@@ -170,7 +170,7 @@ namespace DeepNestSharp.Ui.Views
         }
       }
 
-      this.rotationsCombo.SelectedIndex = 2; // 90° steps — the engine default
+      this.rotationsCombo.SelectedIndex = 2; // 0° + 90° — the default
     }
 
     private void OnAutosaveToggled(object sender, RoutedEventArgs e)

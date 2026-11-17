@@ -6340,10 +6340,6 @@ namespace DeepNestSharp.RasterNest
     /// <summary>File name of the RNest engine, looked for beside the app like sparrow.exe.</summary>
     internal const string RNestEngineExe = "rnest-sparrow.exe";
 
-    /// <summary>The GA population the RNest engine searches with (its RNEST_POPULATIONS): 1 = quick, 5 =
-    /// careful, as the operator picks in the Nest menu. 0 = the engine's own default. Ignored by Sparrow.</summary>
-    internal static int RNestPopulation { get; set; }
-
     /// <summary>The most a setting can usefully ask for: a wave never holds more searches than this.</summary>
     internal const int MaxConcurrencyLimit = WaveSize;
 
@@ -6629,11 +6625,6 @@ namespace DeepNestSharp.RasterNest
         UseShellExecute = false,
         CreateNoWindow = true,
       };
-      if (UseRNestEngine && RNestPopulation > 0)
-      {
-        psi.Environment["RNEST_POPULATIONS"] = RNestPopulation.ToString(CultureInfo.InvariantCulture);
-      }
-
       psi.ArgumentList.Add("-i");
       psi.ArgumentList.Add(inputPath);
       psi.ArgumentList.Add("--max-iterations"); // deterministic budget; also forces the failure-based

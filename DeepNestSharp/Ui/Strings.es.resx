@@ -1997,10 +1997,4 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Tip_NestModeMenu" xml:space="preserve">
     <value>Elija qué ejecuta el botón Nest: Nest o Draft. La elección se recuerda.</value>
   </data>
-  <data name="Mode_RNestQuick" xml:space="preserve">
-    <value>Rápido (RNest, población 1)</value>
-  </data>
-  <data name="Mode_RNestCareful" xml:space="preserve">
-    <value>Cuidadoso (RNest, población 5)</value>
-  </data>
 </root>

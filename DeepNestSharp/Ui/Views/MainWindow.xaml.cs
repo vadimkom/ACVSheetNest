@@ -227,6 +227,7 @@ namespace DeepNestSharp.Ui.Views
       // with an empty Sheets tab because each launch is usually a different job — sheet stock
       // belongs to (and travels with) each saved .dnest project.
       var session = SessionState.Load();
+      int storedSettingsVersion = session?.SettingsVersion ?? 0; // before any Save below stamps it
       this.unitsMm = session?.UnitsMm ?? true;
       Localization.CurrentLanguage = Localization.NormalizeLanguage(session?.Language);
       Localization.LanguageChanged -= this.ApplyLocalization;
@@ -305,11 +306,10 @@ namespace DeepNestSharp.Ui.Views
         this.nestMode = session.NestMode == 1 ? 1 : 0;
         this.RefreshNestModeButton();
 
-        // Global default rotations (plain in-memory config property — resets to 4 without this).
-        if (session.DefaultRotations > 0)
-        {
-          cfg.Rotations = session.DefaultRotations;
-        }
+        // Global default rotations, which every part follows until it is given its own. The default is 0° and
+        // 90° (2026-11-16, the user: "all parts by default 0 and 90 degrees"). A 4 stored by an older build was
+        // the old default written back on every OK of Advanced Settings, not a choice, and becomes 0°+90° once.
+        cfg.Rotations = SessionState.JobRotations(session.DefaultRotations, storedSettingsVersion);
 
         if (session.PreferRectangularOffcut.HasValue)
         {
@@ -338,6 +338,10 @@ namespace DeepNestSharp.Ui.Views
         this.offcutMaxX = session.OffcutMaxX;
         this.offcutMaxY = session.OffcutMaxY;
         this.offcutEdgeOverlap = session.OffcutEdgeOverlap;
+      }
+      else
+      {
+        cfg.Rotations = SessionState.JobRotations(-1, SessionState.CurrentSettingsVersion); // first run: the default
       }
 
       // Create the initial document only AFTER restoring the session. ProjectInfo snapshots the
@@ -2876,11 +2880,9 @@ namespace DeepNestSharp.Ui.Views
 
       // The button pressed says what kind of nest this is: a draft for a quote, or the layout to cut. Both
       // are read from the operator's profile file now, so an edit to it counts from this press on.
-      int runMode = this.EffectiveNestMode;
-      var runEffort = runMode == 1
+      var runEffort = this.nestMode == 1
         ? DeepNestSharp.RasterNest.NestEffort.Draft
         : DeepNestSharp.RasterNest.NestEffort.Fast;
-      SparrowNestService.RNestPopulation = runMode == 2 ? 1 : runMode == 3 ? 5 : 0;
       string profileError = DeepNestSharp.RasterNest.NestProfiles.Load(
         System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "SheetNest"));
       if (profileError != null)
@@ -3314,14 +3316,6 @@ namespace DeepNestSharp.Ui.Views
       var menu = new System.Windows.Controls.ContextMenu { PlacementTarget = this.btnNestMode, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
       menu.Items.Add(this.NestModeItem(0, Localization.Get("Btn_NestCut")));
       menu.Items.Add(this.NestModeItem(1, Localization.Get("Btn_NestDraft")));
-      if (SparrowNestService.UseRNestEngine)
-      {
-        // The RNest engine's search effort: population 1 (quick) or 5 (careful).
-        menu.Items.Add(new System.Windows.Controls.Separator());
-        menu.Items.Add(this.NestModeItem(2, Localization.Get("Mode_RNestQuick")));
-        menu.Items.Add(this.NestModeItem(3, Localization.Get("Mode_RNestCareful")));
-      }
-
       menu.IsOpen = true;
     }
 
@@ -3359,19 +3353,9 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
-      int mode = this.EffectiveNestMode;
-      this.btnStartNest.Content = Localization.Get(mode switch
-      {
-        1 => "Btn_NestDraft",
-        2 => "Mode_RNestQuick",
-        3 => "Mode_RNestCareful",
-        _ => "Btn_NestCut",
-      });
-      this.btnStartNest.ToolTip = Localization.Get(mode == 1 ? "Tip_NestDraft" : "Tip_StartNest");
+      this.btnStartNest.Content = Localization.Get(this.nestMode == 1 ? "Btn_NestDraft" : "Btn_NestCut");
+      this.btnStartNest.ToolTip = Localization.Get(this.nestMode == 1 ? "Tip_NestDraft" : "Tip_StartNest");
     }
-
-    /// <summary>The mode that actually runs: the RNest modes fall back to Nest when Sparrow is the engine.</summary>
-    private int EffectiveNestMode => this.nestMode >= 2 && !SparrowNestService.UseRNestEngine ? 0 : this.nestMode;
 
     private void OnCancelNest(object sender, RoutedEventArgs e)
     {

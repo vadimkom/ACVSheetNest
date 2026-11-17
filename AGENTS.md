@@ -117,7 +117,7 @@ Last verified (2026-11-10): app 518/518 with the engine (tidy offcut, nesting di
 ## How things work (decisions worth knowing)
 
 **Nesting**
-- Two buttons:
+- One split button (since 1.1.66): the main part runs the mode last picked in its ▾ menu, Nest or Draft (`MainWindow.OnNestModeMenu`, `SessionState.NestMode`, per machine). RNest quick/careful items (population 1/5) were tried in 1.1.67 and taken out again in 1.1.68 at the user's request.
   - **⚡ Draft** (`NestEffort.Draft`): a rough nest for a quote. 100 iterations, 1 try, no last-chance pass, coarse engine flags, fill-up up to 2 packs. Its variants are marked "draft".
   - **▶ Nest** (`NestEffort.Fast`, the old Fast numbers).
   - Both read `nest-profiles.json` on every press. The file is written with defaults on first run; nonsense values fall back to defaults; an unreadable file gives defaults plus a message.
@@ -147,6 +147,7 @@ Last verified (2026-11-10): app 518/518 with the engine (tidy offcut, nesting di
   - After a nest the row's Quantity = what went on (`CountFilledRows`); the cell shows "fill: N". Fill parts get no names on the layout or in the DXF (`DxfExporter.UnnamedParts`, set in `ApplyPartColours`).
 
 **Parts and sheets**
+- **Default rotation is 0° + 90°** (since 1.1.68, the user's request): the job's code (`cfg.Rotations`, Advanced Settings → default part rotations, item "0° + 90°" = `RotationCodes.RotZeroAnd90` 1002), which every part follows until given its own (issue #2: never pin it per part). `SessionState.JobRotations`: a stored 4 from a settings file older than version 3 was the old default and becomes 1002 once (`RotationInheritsTheJobFixture`).
 - Flip ↔/↕ mirrors the part itself (`PartMirror`): ticked in Edit Part ("…") and applied on OK; a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.
 - **Part names** (`IDetailLoadInfo.DisplayName`; null = the file's name). Set in "…" or by double-clicking a part on a layout (`DxfViewer.PartRenameRequested` → `MainWindow.OnPartRenameRequested`). It shows in the parts table (`ShownName`), on layouts, in the DXF and the report, via `DxfExporter.PartNames` (set in `ApplyPartColours`; `GetPartNameLabel` and the report's `DisplayName` read it). The drawing file is not renamed.
 - Both viewers get the part colours (the Nesting step's preview was grey until 1.1.49). The Nesting step has no ◀ n/m ▶ bar (`ShowSheetNav = false`): its thumbnails move between layouts.

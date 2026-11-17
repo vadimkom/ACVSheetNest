@@ -62,6 +62,21 @@ namespace DeepNestSharp.CiTests
       (8 == 36).Should().BeFalse("45 degree steps is a discrete set, whatever the label says");
     }
 
+    /// <summary>The job default is 0° and 90° (the user, 2026-11-16). An old build's stored 4 was that build's
+    /// default and gives way once; a 4 chosen in a current file, or any other choice, stays.</summary>
+    [Theory]
+    [InlineData(-1, 0, RotationCodes.RotZeroAnd90)]                                     // never saved
+    [InlineData(-1, SessionState.CurrentSettingsVersion, RotationCodes.RotZeroAnd90)]
+    [InlineData(4, 2, RotationCodes.RotZeroAnd90)]                                      // old default, migrated
+    [InlineData(4, SessionState.ZeroAnd90RotationsVersion, 4)]                           // chosen after: kept
+    [InlineData(36, 2, 36)]                                                             // a real choice: kept
+    [InlineData(2, 0, 2)]
+    public void TheJobDefaultIsZeroAndNinety(int stored, int version, int expected)
+    {
+      SessionState.JobRotations(stored, version).Should().Be(expected);
+      RotationCodes.PermittedSet(SessionState.JobRotations(-1, 0)).Should().Equal(0, 90);
+    }
+
     [Fact]
     public void TheFourWayCodeIsTheFourSquareOrientations()
       => RotationCodes.PermittedSet(4).Should().BeEquivalentTo(new[] { 0, 90, 180, 270 });
