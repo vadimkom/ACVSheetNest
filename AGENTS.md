@@ -10,7 +10,7 @@ When resuming:
 1. Run `git status --short --branch` and `git log -5 --oneline`.
 2. Read this file; open other documents only as the task needs them.
 3. The user asked to keep an eye on the originals. Check, and mention anything worth taking:
-   - `git log 7dca814..main` on ManuelMRosa/SheetNest (7dca814 was its head on 2026-11-04);
+   - `git log 7dca814..main` on ManuelMRosa/SheetNest (7dca814 was its head on 2026-11-04; fetch it by URL, see Remotes);
    - our pull requests there (`gh pr list --repo ManuelMRosa/SheetNest --author vadimkom --state all`);
    - `git ls-remote https://github.com/JeroenGar/sparrow.git HEAD` for the engine (we build on `961ec31`; its head was `6067f00` on 2026-11-04, 47 commits ahead: 0.3.0 on jagua-rs 1.1.0, a new input format, Rust 1.90; our patch and job writer would need porting).
 4. Keep existing changes and work on the current branch (`main`).
@@ -18,13 +18,14 @@ When resuming:
 
 ## Remotes and publishing
 
-- `fork` = https://github.com/vadimkom/ACVSheetNest. This is ours: push `main` there and publish releases with `gh release create`.
+This checkout (`C:/src/ACVSheetNest`, checked 2026-11-18) has two remotes, `origin` and `forgejo`, and none for upstream.
+- `origin` = https://github.com/vadimkom/ACVSheetNest. This is ours: push `main` there (`git push origin main`) and publish releases with `gh release create`.
   - GitHub CLI: `C:/Program Files/GitHub CLI/gh.exe`, signed in as `vadimkom`.
   - Ask the user before overwriting published history.
-- `origin` = https://github.com/ManuelMRosa/SheetNest. Not ours: never push there.
+- Upstream = https://github.com/ManuelMRosa/SheetNest. Not ours: never push there. No remote here; read it by URL (`git fetch https://github.com/ManuelMRosa/SheetNest main`, then `git log 7dca814..FETCH_HEAD`). `C:/src/SheetNest` is an old clone of it (origin = ManuelMRosa, last commit 2026-09-07), not the working copy.
   - Upstream has ~30 commits we do not have (colour marking, names from labels, common-cut seams); they were never merged.
-  - Fixes worth sharing go there as focused pull requests from `pr/*` branches on the fork. Ask the user before opening one.
-  - Build those branches in the worktree `C:/src/sn-upstream`, based on `origin/main`.
+  - Fixes worth sharing go there as focused pull requests from `pr/*` branches on our GitHub repo. Ask the user before opening one.
+  - Build those branches in a worktree based on upstream main (`C:/src/sn-upstream` was used; it no longer exists).
   - Upstream targets .NET 6. Build it with the SDK 10 here and run its tests with `DOTNET_ROLL_FORWARD=Major`.
   - Baseline: core 1034/1037; the app suite fails `PartCardSizeFixture` on upstream main too.
   - Taken on 2026-11-04: #13 elliptical arcs, #14 file dialog on a pulled drive, #15 smaller `.dnest`, and of #12 the `FlatDxfJoiner` half (7dca814; #12 closed, the reader overlaps a grid `DxfParser` got in upstream 1.1.13). None open. Fill-up was not offered: `SparrowNestService` has diverged too far.
@@ -42,7 +43,7 @@ When resuming:
 
 ## Paths on this machine
 
-- Code: `C:/src/SheetNest`. Installers land in the repo root as `SheetNest-x.y.z-win-x64.msi`; publish output goes to `publish-x.y.z/`.
+- Code: `C:/src/ACVSheetNest`. Installers land in the repo root as `SheetNest-x.y.z-win-x64.msi`; publish output goes to `publish-x.y.z/`.
 - Runtime data: `%LOCALAPPDATA%/SheetNest`:
   - `session.json` (language, recent projects, last material);
   - `nest-profiles.json` (Draft/Nest engine settings);
