@@ -198,6 +198,9 @@
   <data name="Col_RunTime" xml:space="preserve">
     <value>Tempo</value>
   </data>
+  <data name="Col_RunEngine" xml:space="preserve">
+    <value>Motor</value>
+  </data>
   <data name="Col_RunUtil" xml:space="preserve">
     <value>Aprov.</value>
   </data>
@@ -2038,5 +2041,29 @@ Leve o projeto junto com essa pasta.</value>
   <data name="Tip_OpenLast" xml:space="preserve">
     <value>{0}
 guardado em {1}</value>
+  </data>
+  <data name="Msg_EngineFailed" xml:space="preserve">
+    <value>O motor de encaixe "{0}" não conseguiu dispor a chapa {1}: {2}.</value>
+  </data>
+  <data name="EngineFail_NoAnswer" xml:space="preserve">
+    <value>ele parou sem resposta (código {0})</value>
+  </data>
+  <data name="EngineFail_TimedOut" xml:space="preserve">
+    <value>ele não respondeu em {0} s</value>
+  </data>
+  <data name="EngineFail_NotStarted" xml:space="preserve">
+    <value>ele não iniciou</value>
+  </data>
+  <data name="Msg_EngineFailedMore" xml:space="preserve">
+    <value>Outras falhas: {0}.</value>
+  </data>
+  <data name="Msg_EngineTryAnother" xml:space="preserve">
+    <value>Escolha outro motor no menu ▾ ao lado do botão de encaixe e execute de novo.</value>
+  </data>
+  <data name="Msg_EngineFailureKept" xml:space="preserve">
+    <value>A tarefa e a saída do motor foram guardadas para o autor:
+{0}
+
+Abrir a pasta?</value>
   </data>
 </root>

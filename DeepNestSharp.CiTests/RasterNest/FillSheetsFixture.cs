@@ -13,7 +13,7 @@ namespace DeepNestSharp.CiTests.RasterNest
   /// A part with no count ("fill the sheets", a sheet of washers): the counted parts go on first, the filler
   /// takes the room left, and what did not fit is not reported as missing. Needs the engine (SPARROW_EXE).
   /// </summary>
-  public class FillSheetsFixture
+  public class FillSheetsFixture : TempFolderFixture
   {
     private static string Part(string dir, string name, ShapeKind kind, params double[] values)
       => PartShapes.Write(dir, name, kind, values, millimetres: true);
@@ -39,7 +39,7 @@ namespace DeepNestSharp.CiTests.RasterNest
         return;
       }
 
-      string dir = Directory.CreateTempSubdirectory("sheetnest_fillsheets").FullName;
+      string dir = this.NewTempFolder("sheetnest_fillsheets");
       var parts = new List<RasterPartInfo> { new RasterPartInfo { Path = Part(dir, "m12", PartShapes.Washer, 24, 13), Quantity = 1, Fill = true } };
 
       var result = Nest(parts, (500, 250, 1, false, 5), out string error);
@@ -60,7 +60,7 @@ namespace DeepNestSharp.CiTests.RasterNest
         return;
       }
 
-      string dir = Directory.CreateTempSubdirectory("sheetnest_fillsheets").FullName;
+      string dir = this.NewTempFolder("sheetnest_fillsheets");
       var parts = new List<RasterPartInfo>
       {
         new RasterPartInfo { Path = Part(dir, "m12", PartShapes.Washer, 24, 13), Quantity = 1, Fill = true },
@@ -89,7 +89,7 @@ namespace DeepNestSharp.CiTests.RasterNest
         return;
       }
 
-      string dir = Directory.CreateTempSubdirectory("sheetnest_fillsheets").FullName;
+      string dir = this.NewTempFolder("sheetnest_fillsheets");
       var parts = new List<RasterPartInfo>
       {
         new RasterPartInfo { Path = Part(dir, "upright", PartShapes.Rectangle, 160, 40), Quantity = 1, Fill = true },
@@ -121,7 +121,7 @@ namespace DeepNestSharp.CiTests.RasterNest
         return;
       }
 
-      string dir = Directory.CreateTempSubdirectory("sheetnest_fillsheets").FullName;
+      string dir = this.NewTempFolder("sheetnest_fillsheets");
       var parts = new List<RasterPartInfo>
       {
         new RasterPartInfo { Path = Part(dir, "upright", PartShapes.Rectangle, 160, 40), Quantity = 1, Fill = true },
@@ -147,7 +147,7 @@ namespace DeepNestSharp.CiTests.RasterNest
         return;
       }
 
-      string dir = Directory.CreateTempSubdirectory("sheetnest_fillsheets").FullName;
+      string dir = this.NewTempFolder("sheetnest_fillsheets");
       var parts = new List<RasterPartInfo>
       {
         new RasterPartInfo { Path = Part(dir, "m12", PartShapes.Washer, 24, 13), Quantity = 1, Fill = true },

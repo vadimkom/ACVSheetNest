@@ -29,10 +29,10 @@ namespace DeepNestLib.NestProject
 
     public int Rotations { get; set; } = -1; // per-part: 1 fixed, 2 = 0/180, 4 = 90° steps, 36 free; -1 = unset (geometry-based suggestion in Edit Part)
 
-    /// <summary>The orientations a newly added part starts with: 0° and 90° (the app's
-    /// RotationCodes.RotZeroAnd90), the user's choice of 2026-11-17, shown selected in Edit Part. The model
-    /// itself still starts at -1, so a saved part without the field keeps following the job.</summary>
-    public const int NewPartRotations = 1002;
+    /// <summary>The orientations a newly added part starts with, shown selected in Edit Part: the four sides,
+    /// 90° steps (the user, 2026-11-17; 0° + 90° in 1.1.69-1.1.71 was a mistake). The model itself still
+    /// starts at -1, so a saved part without the field keeps following the job.</summary>
+    public const int NewPartRotations = 4;
 
     public int Priority { get; set; } = 5;   // 1-10, LOWER nests first (1 = highest); 5 = normal
 

@@ -1,0 +1,1 @@
+{"name":"job","strip_height":490,"items":[{"id":0,"demand":12,"shape":{"type":"simple_polygon","data":[[-202.5,52.5],[-52.5,52.5],[-52.5,152.5],[2.5,152.5],[2.5,-2.5],[-202.5,-2.5]]},"allowed_orientations":[0,270,180,90]}]}

@@ -9,7 +9,7 @@ namespace DeepNestSharp.CiTests.RasterNest
   /// Two buttons: Draft for a quote and Nest for the cut, each driven by a profile the operator can edit in a
   /// file. Nest is what Fast was, number for number.
   /// </summary>
-  public class NestProfilesFixture
+  public class NestProfilesFixture : TempFolderFixture
   {
     [Fact]
     public void TheNestButtonIsWhatFastWas()
@@ -37,7 +37,7 @@ namespace DeepNestSharp.CiTests.RasterNest
     [Fact]
     public void AFirstReadWritesTheDefaultsForTheOperatorToEdit()
     {
-      string dir = Directory.CreateTempSubdirectory("sheetnest_profiles").FullName;
+      string dir = this.NewTempFolder("sheetnest_profiles");
       var (draft, normal, error) = NestProfiles.Read(dir);
 
       error.Should().BeNull();
@@ -49,7 +49,7 @@ namespace DeepNestSharp.CiTests.RasterNest
     [Fact]
     public void AnEditedValueIsTakenAndANonsensicalOneFallsBack()
     {
-      string dir = Directory.CreateTempSubdirectory("sheetnest_profiles").FullName;
+      string dir = this.NewTempFolder("sheetnest_profiles");
       File.WriteAllText(
         Path.Combine(dir, NestProfiles.FileName),
         "{ // a comment is fine\n \"Draft\": { \"Iterations\": 50, \"Tries\": 0 },\n \"Normal\": { \"Iterations\": 400, \"FillUp\": false, },\n}");
@@ -67,7 +67,7 @@ namespace DeepNestSharp.CiTests.RasterNest
     [Fact]
     public void AFileThatDoesNotReadLeavesTheDefaultsAndSaysWhy()
     {
-      string dir = Directory.CreateTempSubdirectory("sheetnest_profiles").FullName;
+      string dir = this.NewTempFolder("sheetnest_profiles");
       File.WriteAllText(Path.Combine(dir, NestProfiles.FileName), "{ \"Draft\": { \"Iterations\": ");
 
       var (draft, _, error) = NestProfiles.Read(dir);

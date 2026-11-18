@@ -11,6 +11,10 @@ namespace DeepNestSharp.RasterNest
   {
     internal const int RotOnly90 = 1001;      // only 90° — always turned once
     internal const int RotZeroAnd90 = 1002;   // 0° and 90°
+
+    /// <summary>The job’s and a new part’s default: the four sides, 90° steps (the user, 2026-11-17: 0°+90° in
+    /// 1.1.68–1.1.71 was a mistake).</summary>
+    internal const int DefaultRotations = 4;
     internal const int Rot90And270 = 1003;    // 90° and 270°
 
     internal static int[] PermittedSet(int code)

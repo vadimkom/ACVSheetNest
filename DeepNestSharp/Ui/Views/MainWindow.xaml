@@ -562,7 +562,7 @@
               <Button x:Name="btnStartNest" Style="{DynamicResource PrimaryButton}" Content="{ui:Tr Btn_NestCut}" Click="OnNest"
                       Padding="12,4" ToolTip="{ui:Tr Tip_StartNest}" Margin="2,0,0,0" />
               <Button x:Name="btnNestMode" Style="{DynamicResource PrimaryButton}" Content="▾" Click="OnNestModeMenu"
-                      Padding="8,4" Margin="1,0,4,0" ToolTip="{ui:Tr Tip_NestModeMenu}" />
+                      Padding="0,4" MinWidth="0" Width="34" Margin="1,0,4,0" ToolTip="{ui:Tr Tip_NestModeMenu}" />
               <Button x:Name="cancelNestButton" Style="{DynamicResource DangerButton}" Margin="4,0" Content="■  Остановить"
                       Click="OnCancelNest" Visibility="Collapsed" ToolTip="{ui:Tr Tip_CancelNest}" />
               <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
@@ -614,17 +614,18 @@
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                   <GridView>
-                    <GridViewColumn x:Name="colHeaderRunNum" Header="№" Width="46" DisplayMemberBinding="{Binding RunLabel}" />
-                    <GridViewColumn x:Name="colHeaderRunUtil" Header="% Утилиз." Width="90">
+                    <GridViewColumn x:Name="colHeaderRunNum" Header="№" Width="40" DisplayMemberBinding="{Binding RunLabel}" />
+                    <GridViewColumn x:Name="colHeaderRunUtil" Header="% Утилиз." Width="78">
                       <GridViewColumn.CellTemplate>
                         <DataTemplate>
                           <TextBlock Text="{Binding UtilizationText}" FontWeight="Bold" Foreground="{DynamicResource Brush.Accent}" />
                         </DataTemplate>
                       </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn x:Name="colHeaderRunPlaced" Header="Размещено" Width="95" DisplayMemberBinding="{Binding PlacedText}" />
-                    <GridViewColumn x:Name="colHeaderRunSheets" Header="Листов" Width="60" DisplayMemberBinding="{Binding SheetsText}" />
-                    <GridViewColumn x:Name="colHeaderRunTime" Header="Время" Width="75" DisplayMemberBinding="{Binding TimeText}" />
+                    <GridViewColumn x:Name="colHeaderRunPlaced" Header="Размещено" Width="80" DisplayMemberBinding="{Binding PlacedText}" />
+                    <GridViewColumn x:Name="colHeaderRunSheets" Header="Листов" Width="52" DisplayMemberBinding="{Binding SheetsText}" />
+                    <GridViewColumn x:Name="colHeaderRunTime" Header="Время" Width="68" DisplayMemberBinding="{Binding TimeText}" />
+                    <GridViewColumn x:Name="colHeaderRunEngine" Header="Движок" Width="95" DisplayMemberBinding="{Binding EngineText}" />
                   </GridView>
                 </ListView.View>
               </ListView>

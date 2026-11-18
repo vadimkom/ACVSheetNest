@@ -198,6 +198,9 @@
   <data name="Col_RunTime" xml:space="preserve">
     <value>Time</value>
   </data>
+  <data name="Col_RunEngine" xml:space="preserve">
+    <value>Engine</value>
+  </data>
   <data name="Col_RunUtil" xml:space="preserve">
     <value>Utilization</value>
   </data>
@@ -2038,5 +2041,29 @@ Carry the project together with that folder.</value>
   <data name="Tip_OpenLast" xml:space="preserve">
     <value>{0}
 kept {1}</value>
+  </data>
+  <data name="Msg_EngineFailed" xml:space="preserve">
+    <value>The nesting engine "{0}" could not lay the sheet {1}: {2}.</value>
+  </data>
+  <data name="EngineFail_NoAnswer" xml:space="preserve">
+    <value>it stopped without an answer (code {0})</value>
+  </data>
+  <data name="EngineFail_TimedOut" xml:space="preserve">
+    <value>it did not answer in {0} s</value>
+  </data>
+  <data name="EngineFail_NotStarted" xml:space="preserve">
+    <value>it did not start</value>
+  </data>
+  <data name="Msg_EngineFailedMore" xml:space="preserve">
+    <value>Other failures: {0}.</value>
+  </data>
+  <data name="Msg_EngineTryAnother" xml:space="preserve">
+    <value>Pick another engine in the ▾ menu beside the nest button and run again.</value>
+  </data>
+  <data name="Msg_EngineFailureKept" xml:space="preserve">
+    <value>The job and what the engine printed were kept for its author:
+{0}
+
+Open the folder?</value>
   </data>
 </root>

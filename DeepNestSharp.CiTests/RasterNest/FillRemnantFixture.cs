@@ -13,7 +13,7 @@ namespace DeepNestSharp.CiTests.RasterNest
   /// "What can this offcut make?": the biggest parts first, as many as go on, the smallest not tried, and
   /// the same layout on every piece. Needs the engine (SPARROW_EXE).
   /// </summary>
-  public class FillRemnantFixture
+  public class FillRemnantFixture : TempFolderFixture
   {
     private static string Part(string dir, string name, ShapeKind kind, params double[] values)
       => PartShapes.Write(dir, name, kind, values, millimetres: true);
@@ -27,7 +27,7 @@ namespace DeepNestSharp.CiTests.RasterNest
         return;
       }
 
-      string dir = Directory.CreateTempSubdirectory("sheetnest_fill").FullName;
+      string dir = this.NewTempFolder("sheetnest_fill");
       var parts = new List<RasterPartInfo>
       {
         new RasterPartInfo { Path = Part(dir, "small", PartShapes.Rectangle, 100, 100), Quantity = 1 },
@@ -64,7 +64,7 @@ namespace DeepNestSharp.CiTests.RasterNest
         return;
       }
 
-      string dir = Directory.CreateTempSubdirectory("sheetnest_fill").FullName;
+      string dir = this.NewTempFolder("sheetnest_fill");
       var parts = new List<RasterPartInfo> { new RasterPartInfo { Path = Part(dir, "big", PartShapes.Rectangle, 300, 200), Quantity = 1 } };
 
       var result = SparrowNestService.Fill(parts, 150, 150, 1, 4, 5, 5, 0.02, 5, exe, out string error, effort: NestEffort.Fast);

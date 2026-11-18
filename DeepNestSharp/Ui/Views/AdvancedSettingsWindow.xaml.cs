@@ -27,7 +27,6 @@ namespace DeepNestSharp.Ui.Views
       DeepNestSharp.RasterNest.NestEffort effort = DeepNestSharp.RasterNest.NestEffortDefaults.Default,
       int commonLineMaxClusterParts = DeepNestLib.Placement.CommonLineDefaults.DefaultMaxClusterParts,
       int concurrencyLimit = 0,
-      bool useRNestEngine = false,
       bool nestFromRight = false)
     {
       this.config = config;
@@ -51,7 +50,6 @@ namespace DeepNestSharp.Ui.Views
 
       this.concurrencyCombo.SelectedIndex = System.Math.Clamp(concurrencyLimit, 0, DeepNestSharp.RasterNest.SparrowNestService.MaxConcurrencyLimit);
       this.directionCombo.SelectedIndex = nestFromRight ? 1 : 0;
-      this.engineCombo.SelectedIndex = useRNestEngine ? 1 : 0;
       this.effortCombo.SelectedIndex = (int)effort;
       this.spacingUpDown.Value = System.Math.Max(0, config.Spacing);
       this.marginUpDown.Value = System.Math.Max(0, config.SheetSpacing);
@@ -133,9 +131,6 @@ namespace DeepNestSharp.Ui.Views
     /// <summary>Parts laid from the right edge of the sheet, for a laser that cuts from right to left.</summary>
     internal bool NestFromRight => this.directionCombo.SelectedIndex == 1;
 
-    /// <summary>The RNest engine instead of sparrow.</summary>
-    internal bool UseRNestEngine => this.engineCombo.SelectedIndex == 1;
-
     internal int ConcurrencyLimit =>this.concurrencyCombo.SelectedItem is ComboBoxItem c && c.Tag is int n ? n : 0;
 
     private void OnEffortChanged(object sender, SelectionChangedEventArgs e) => this.UpdateConcurrencyAutoText();
@@ -157,7 +152,7 @@ namespace DeepNestSharp.Ui.Views
     /// <summary>The chosen global rotation code (1/2/1002/4/8/36) — persisted by the caller.</summary>
     public int Rotations => this.rotationsCombo.SelectedItem is ComboBoxItem item
       ? int.Parse((string)item.Tag, System.Globalization.CultureInfo.InvariantCulture)
-      : DeepNestSharp.RasterNest.RotationCodes.RotZeroAnd90;
+      : DeepNestSharp.RasterNest.RotationCodes.DefaultRotations;
 
     private void SelectRotations(int code)
     {
@@ -170,7 +165,7 @@ namespace DeepNestSharp.Ui.Views
         }
       }
 
-      this.rotationsCombo.SelectedIndex = 2; // 0° + 90° — the default
+      this.rotationsCombo.SelectedItem = this.rotItem4; // 90° steps: the default
     }
 
     private void OnAutosaveToggled(object sender, RoutedEventArgs e)

@@ -8,10 +8,10 @@
     <PublishSingleFile>false</PublishSingleFile>
     <ApplicationIcon>Branding\sheetnest.ico</ApplicationIcon>
     <DebugType>embedded</DebugType>
-    <AssemblyVersion>1.1.71.0</AssemblyVersion>
+    <AssemblyVersion>1.1.77.0</AssemblyVersion>
     <FileVersion>1.1.65.0</FileVersion>
     <InformationalVersion>1.1.65</InformationalVersion>
-    <Version>1.1.71</Version>
+    <Version>1.1.77</Version>
     <!-- Only filters the .NET runtime's and packages' translated system messages: the program's own languages
          (Ui/Strings.*.resx) are built whatever this says. Of those system messages, keep Russian and Bulgarian
          (English is built in; .NET ships no Bulgarian, so that one costs nothing): the other twelve were 8 MB
@@ -71,6 +71,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SparrowEngine\rnest-sparrow.exe" Link="rnest-sparrow.exe" Condition="Exists('..\SparrowEngine\rnest-sparrow.exe')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <!-- Other engines speaking the same job.json protocol (engine-kit agents), offered in the Nest menu by name. -->
+    <Content Include="..\SparrowEngine\engines\*.exe" Link="engines\%(Filename)%(Extension)">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\THIRD_PARTY_NOTICES.md" Link="THIRD_PARTY_NOTICES.md">

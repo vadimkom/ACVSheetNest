@@ -5,7 +5,7 @@ namespace DeepNestSharp.CiTests
   using FluentAssertions;
   using Xunit;
 
-  public class UpdateCheckerFixture
+  public class UpdateCheckerFixture : TempFolderFixture
   {
     [Fact]
     public void TryParseLatest_ReadsTagAndUrl()
@@ -67,7 +67,7 @@ namespace DeepNestSharp.CiTests
     [Fact]
     public void TheInstallScriptWaitsInstallsAndStartsAgain()
     {
-      string folder = System.IO.Directory.CreateTempSubdirectory("sheetnest_update").FullName;
+      string folder = this.NewTempFolder("sheetnest_update");
       string msi = System.IO.Path.Combine(folder, "SheetNest-1.1.58-win-x64.msi");
 
       string script = UpdateChecker.WriteInstallScript(msi, 4242);

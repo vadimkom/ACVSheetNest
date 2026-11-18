@@ -62,27 +62,29 @@ namespace DeepNestSharp.CiTests
       (8 == 36).Should().BeFalse("45 degree steps is a discrete set, whatever the label says");
     }
 
-    /// <summary>The job default is 0° and 90° (the user, 2026-11-16). An old build's stored 4 was that build's
-    /// default and gives way once; a 4 chosen in a current file, or any other choice, stays.</summary>
+    /// <summary>The job default is the four sides (the user, 2026-11-17: 0° + 90° in 1.1.68-1.1.71 was a
+    /// mistake). A stored 0° + 90° from those builds was their default and gives way once; one chosen in a
+    /// current file, or any other choice, stays.</summary>
     [Theory]
-    [InlineData(-1, 0, RotationCodes.RotZeroAnd90)]                                     // never saved
-    [InlineData(-1, SessionState.CurrentSettingsVersion, RotationCodes.RotZeroAnd90)]
-    [InlineData(4, 2, RotationCodes.RotZeroAnd90)]                                      // old default, migrated
-    [InlineData(4, SessionState.ZeroAnd90RotationsVersion, 4)]                           // chosen after: kept
-    [InlineData(36, 2, 36)]                                                             // a real choice: kept
+    [InlineData(-1, 0, 4)]                                                    // never saved
+    [InlineData(-1, SessionState.CurrentSettingsVersion, 4)]
+    [InlineData(RotationCodes.RotZeroAnd90, 3, 4)]                            // 1.1.68-1.1.71 default, put back
+    [InlineData(RotationCodes.RotZeroAnd90, SessionState.FourSidesAgainVersion, RotationCodes.RotZeroAnd90)] // chosen after: kept
+    [InlineData(4, 2, 4)]
+    [InlineData(36, 2, 36)]                                                   // a real choice: kept
     [InlineData(2, 0, 2)]
-    public void TheJobDefaultIsZeroAndNinety(int stored, int version, int expected)
+    public void TheJobDefaultIsTheFourSides(int stored, int version, int expected)
     {
       SessionState.JobRotations(stored, version).Should().Be(expected);
-      RotationCodes.PermittedSet(SessionState.JobRotations(-1, 0)).Should().Equal(0, 90);
+      RotationCodes.PermittedSet(SessionState.JobRotations(-1, 0)).Should().Equal(0, 90, 180, 270);
     }
 
-    /// <summary>A part added to the list starts at 0° + 90°, selected in Edit Part (the user, 2026-11-17).</summary>
+    /// <summary>A part added to the list starts on the four sides, selected in Edit Part (the user, 2026-11-17).</summary>
     [Fact]
-    public void ANewPartStartsAtZeroAndNinety()
+    public void ANewPartStartsOnTheFourSides()
     {
-      DeepNestLib.NestProject.DetailLoadInfo.NewPartRotations.Should().Be(RotationCodes.RotZeroAnd90);
-      RotationCodes.PermittedSet(DeepNestLib.NestProject.DetailLoadInfo.NewPartRotations).Should().Equal(0, 90);
+      DeepNestLib.NestProject.DetailLoadInfo.NewPartRotations.Should().Be(RotationCodes.DefaultRotations);
+      RotationCodes.PermittedSet(DeepNestLib.NestProject.DetailLoadInfo.NewPartRotations).Should().Equal(0, 90, 180, 270);
     }
 
     [Fact]

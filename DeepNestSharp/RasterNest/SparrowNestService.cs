@@ -410,6 +410,8 @@ namespace DeepNestSharp.RasterNest
         return null;
       }
 
+      var showAsIs = candidateCallback;
+
       // A laser that cuts from the right gets its parts packed from the right: see CutDirection.cs.
       var mirroredBack = fromRight ? MirrorForEngine(sizes, loaded) : null;
       if (mirroredBack != null && candidateCallback != null)
@@ -417,6 +419,21 @@ namespace DeepNestSharp.RasterNest
         var shownMirrored = candidateCallback;
         candidateCallback = candidate => shownMirrored(mirroredBack(candidate));
       }
+
+      // A few kinds of part that all go on one sheet are laid in rows, as by hand: see RowsLayout.cs.
+      // Shown at once, and kept over the engine unless the engine is clearly better (RowsBeatEngine).
+      var rows = RowsLayout(loaded, sizes, margin, commonLineGap, geometryTolerance, fillAsKit);
+      var rowsShown = rows == null || mirroredBack == null ? rows : mirroredBack(rows);
+      var rowsJudge = loaded.ToList(); // the engine below changes the fillers counts, not their spacing
+      if (rowsShown != null)
+      {
+        showAsIs?.Invoke(rowsShown);
+      }
+
+      INestResult PreferRows(INestResult engine)
+        => rowsShown == null || cancel.IsCancellationRequested ? engine
+          : engine == null || RowsBeatEngine(rowsShown, engine, rowsJudge, margin) ? rowsShown
+          : engine;
 
       // A standing sheet is packed from the bottom up: see StandingSheets.cs.
       Dictionary<int, INfp> upright = null;
@@ -491,9 +508,15 @@ namespace DeepNestSharp.RasterNest
         out error,
         candidateCallback,
         seedOffset);
+      if (result == null && rowsShown != null && !cancel.IsCancellationRequested)
+      {
+        error = null;
+        return rowsShown;
+      }
+
       if (result == null || !filling)
       {
-        return AsTheSheetsStand(result);
+        return PreferRows(AsTheSheetsStand(result));
       }
 
       // The filling parts that found no room were never asked for: only what is still owed of the counted
@@ -501,7 +524,7 @@ namespace DeepNestSharp.RasterNest
       var fillOutlines = new HashSet<INfp>(loaded.Where(l => l.Fill).Select(l => l.Nfp), ReferenceEqualityComparer.Instance);
       var owed = result.UnplacedParts.Where(p => !fillOutlines.Contains(p)).ToList();
       int placed = result.UsedSheets.Sum(s => s.PartPlacements.Count);
-      return AsTheSheetsStand(new NestResult(placed + owed.Count, (SheetPlacementCollection)result.UsedSheets, owed, PlacementTypeEnum.BoundingBox, 0, 0));
+      return PreferRows(AsTheSheetsStand(new NestResult(placed + owed.Count, (SheetPlacementCollection)result.UsedSheets, owed, PlacementTypeEnum.BoundingBox, 0, 0)));
     }
 
     /// <summary>The priority parts that fill the sheets nest at: after every part ordered by count (1-10).</summary>
@@ -2321,6 +2344,7 @@ namespace DeepNestSharp.RasterNest
         var winners = new List<(List<IPartPlacement> Pl, Dictionary<int, int> By, int Count, double SharedLength, double Extent, double Density, int Seed, int SeamsSnapped, int SeamsGivenUp, List<CommonEdgeIntent> CommonEdges, IReadOnlyList<CommonLineFallbackNotice> CommonLineFallbacks)>();
         int bestIndex = -1, launched = 0;
         string firstTryError = null;
+        EngineFailure? firstFailure = null;
         int packIndex = System.Threading.Interlocked.Increment(ref diagPackSeq);
 
         while (launched < tries && !cancel.IsCancellationRequested)
@@ -2333,13 +2357,24 @@ namespace DeepNestSharp.RasterNest
           var wSt = new (int Count, double Density, int Seed, int SeamsSnapped, int SeamsGivenUp)?[waveSize];
           int startSeed = seedOffset + launched + 1;
           var options = new ParallelOptions { MaxDegreeOfParallelism = maxConc, CancellationToken = cancel };
+          WaveLeash? leash = ThirdPartyLeashSeconds(exe) == int.MaxValue ? null : new WaveLeash();
           Parallel.For(0, waveSize, options, j =>
           {
             int seed = startSeed + j;
             string tryDir = Path.Combine(workDir, "try" + seed.ToString(CultureInfo.InvariantCulture));
             Directory.CreateDirectory(tryDir);
             var diagRun = System.Diagnostics.Stopwatch.StartNew();
-            string outJson = RunSparrowOnce(exe, tryDir, inputPath, budget, workers, searchFlags, hardTimeoutSec, seed, cancel, aggDensity, out string tryErr);
+            string outJson = RunSparrowOnce(exe, tryDir, inputPath, budget, workers, searchFlags, hardTimeoutSec, seed, cancel, aggDensity, out string tryErr, out EngineFailure? tryFailure, leash);
+            if (outJson != null)
+            {
+              leash?.Finished(diagRun.Elapsed.TotalSeconds);
+            }
+
+            if (tryFailure != null)
+            {
+              System.Threading.Interlocked.CompareExchange(ref firstFailure, tryFailure, null);
+            }
+
             if (tryErr != null)
             {
               // Not fatal on its own: the other races may still return something. But when they ALL fail the
@@ -2421,6 +2456,7 @@ namespace DeepNestSharp.RasterNest
 
         if (winners.Count == 0)
         {
+          EngineFailures.NoteSheet(firstFailure, sheetW, sheetH);
           error = firstTryError == null
             ? "The nesting engine produced no solution."
             : "The nesting engine produced no solution: " + firstTryError;
@@ -6613,9 +6649,11 @@ namespace DeepNestSharp.RasterNest
     /// machine is, which is what made a repeated nest come back with a different offcut every time.
     /// <paramref name="hardTimeoutSec"/> is only a watchdog for a hung process — if it ever fires the
     /// result is discarded rather than used, because a truncated search is not reproducible.</summary>
-    private static string RunSparrowOnce(string exe, string workDir, string inputPath, int iterations, int workers, IReadOnlyList<string> searchFlags, int hardTimeoutSec, int seed, CancellationToken cancel, Action<double>? onDensity, out string error)
+    private static string RunSparrowOnce(string exe, string workDir, string inputPath, int iterations, int workers, IReadOnlyList<string> searchFlags, int hardTimeoutSec, int seed, CancellationToken cancel, Action<double>? onDensity, out string error, out EngineFailure? failure, WaveLeash? leash = null)
     {
       error = null;
+      failure = null;
+      hardTimeoutSec = Math.Min(hardTimeoutSec, ThirdPartyLeashSeconds(exe));
       var psi = new ProcessStartInfo
       {
         FileName = exe,
@@ -6649,6 +6687,20 @@ namespace DeepNestSharp.RasterNest
         }
       }
 
+      // The end of what the engine printed, kept for the failure folder: a crash says why at the end.
+      var output = new Queue<string>();
+      var run = Stopwatch.StartNew();
+      EngineFailure Failed(EngineFailureKind kind, int exitCode, string reason)
+      {
+        string[] lines;
+        lock (output)
+        {
+          lines = output.ToArray();
+        }
+
+        return EngineFailures.Save(exe, inputPath, psi.ArgumentList, kind, exitCode, run.Elapsed.TotalSeconds, reason, lines);
+      }
+
       Process proc;
       try
       {
@@ -6657,6 +6709,7 @@ namespace DeepNestSharp.RasterNest
       catch (Exception ex)
       {
         error = "Could not start the nesting engine: " + ex.Message;
+        failure = Failed(EngineFailureKind.NotStarted, -1, error);
         return null;
       }
 
@@ -6676,7 +6729,21 @@ namespace DeepNestSharp.RasterNest
       // UI bar can fill DURING the run (each sheet is otherwise an opaque several-second black box).
       void OnLine(string line)
       {
-        if (line == null || onDensity == null)
+        if (line == null)
+        {
+          return;
+        }
+
+        lock (output)
+        {
+          output.Enqueue(line);
+          if (output.Count > EngineFailures.OutputLines)
+          {
+            output.Dequeue();
+          }
+        }
+
+        if (onDensity == null)
         {
           return;
         }
@@ -6703,9 +6770,29 @@ namespace DeepNestSharp.RasterNest
         proc.BeginErrorReadLine();
 
         int waitMs = Math.Max(60, hardTimeoutSec) * 1000;
+        run.Restart();
         using (cancel.Register(() => TryKill(proc)))
         {
-          bool exited = proc.WaitForExit(waitMs);
+          bool exited = false;
+          string why = $"The nesting engine did not answer in {waitMs / 1000} s; stopped.";
+          var kind = EngineFailureKind.TimedOut;
+          while (!exited && !cancel.IsCancellationRequested)
+          {
+            int left = waitMs - (int)run.ElapsedMilliseconds;
+            if (left <= 0)
+            {
+              break;
+            }
+
+            exited = proc.WaitForExit(Math.Min(left, 1000));
+            if (!exited && leash != null && run.Elapsed.TotalSeconds > leash.LimitSeconds)
+            {
+              why = $"The nesting engine ran {run.Elapsed.TotalSeconds:F0} s while another try of the same sheet finished in {leash.FastestSeconds:F0} s; stopped.";
+              kind = EngineFailureKind.Outrun;
+              break;
+            }
+          }
+
           if (cancel.IsCancellationRequested)
           {
             error = "Cancelled.";
@@ -6715,19 +6802,80 @@ namespace DeepNestSharp.RasterNest
           if (!exited)
           {
             TryKill(proc);
-            error = "The nesting engine timed out.";
+            error = why;
+            failure = Failed(kind, -1, why);
             return null;
           }
         }
+
+        proc.WaitForExit(); // let the redirected streams drain
 
         string outFile = Path.Combine(workDir, "output", "final_job.json");
         if (!File.Exists(outFile))
         {
           error = $"The nesting engine produced no solution (exit {proc.ExitCode}).";
+          failure = Failed(EngineFailureKind.NoAnswer, proc.ExitCode, error);
           return null;
         }
 
         return File.ReadAllText(outFile);
+      }
+    }
+
+    /// <summary>
+    /// The watchdog for an engine that is not ours: 120 s, whatever the effort. <see cref="WatchdogSeconds"/>
+    /// is sized for Sparrow and RNest (minutes, because a kill loses the whole race); a third-party engine is
+    /// told in engine-kit/TASK.md to answer within 60 s at 300 iterations, and one of them, given a 50-part
+    /// job from the tests, ran 15 minutes on every seed without an answer (2026-11-17).
+    /// </summary>
+    internal static int ThirdPartyLeashSeconds(string exe)
+    {
+      string name = Path.GetFileName(exe ?? string.Empty);
+      return string.Equals(name, "sparrow.exe", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(name, "rnest-sparrow.exe", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(name, "sparrow", StringComparison.Ordinal)
+        ? int.MaxValue
+        : ThirdPartyEngineLeashSeconds;
+    }
+
+    /// <summary>See <see cref="ThirdPartyLeashSeconds"/>.</summary>
+    internal const int ThirdPartyEngineLeashSeconds = 120;
+
+    /// <summary>
+    /// The leash shared by the tries of one wave: once a try has come back with a solution in t seconds, a try
+    /// still running after max(60 s, 3 t) of its own time is stopped and the wave goes on without it. Each try
+    /// is timed from its own start, so a try that queued behind the others is not cut short for waiting.
+    /// Third-party engines only: Sparrow's seeds of one sheet can differ twentyfold (2.6 s against 53 s on the
+    /// uprights), so on Sparrow a leash would cut good seeds and make the nest depend on the machine's speed.
+    /// It is there for an engine that hangs on some seeds and not others, which would otherwise hold the sheet
+    /// until <see cref="ThirdPartyEngineLeashSeconds"/>.
+    /// </summary>
+    internal sealed class WaveLeash
+    {
+      private long fastestMs = long.MaxValue;
+
+      public double FastestSeconds => Interlocked.Read(ref this.fastestMs) / 1000.0;
+
+      public double LimitSeconds
+      {
+        get
+        {
+          long f = Interlocked.Read(ref this.fastestMs);
+          return f == long.MaxValue ? double.PositiveInfinity : Math.Max(60.0, 3.0 * f / 1000.0);
+        }
+      }
+
+      public void Finished(double seconds)
+      {
+        long ms = (long)(seconds * 1000);
+        long seen;
+        while (ms < (seen = Interlocked.Read(ref this.fastestMs)))
+        {
+          if (Interlocked.CompareExchange(ref this.fastestMs, ms, seen) == seen)
+          {
+            break;
+          }
+        }
       }
     }
 

@@ -198,6 +198,9 @@
   <data name="Col_RunTime" xml:space="preserve">
     <value>Temps</value>
   </data>
+  <data name="Col_RunEngine" xml:space="preserve">
+    <value>Moteur</value>
+  </data>
   <data name="Col_RunUtil" xml:space="preserve">
     <value>Utilisation</value>
   </data>
@@ -2038,5 +2041,29 @@ Transportez le projet avec ce dossier.</value>
   <data name="Tip_OpenLast" xml:space="preserve">
     <value>{0}
 conservé le {1}</value>
+  </data>
+  <data name="Msg_EngineFailed" xml:space="preserve">
+    <value>Le moteur d'imbrication « {0} » n'a pas pu disposer la tôle {1} : {2}.</value>
+  </data>
+  <data name="EngineFail_NoAnswer" xml:space="preserve">
+    <value>il s'est arrêté sans réponse (code {0})</value>
+  </data>
+  <data name="EngineFail_TimedOut" xml:space="preserve">
+    <value>il n'a pas répondu en {0} s</value>
+  </data>
+  <data name="EngineFail_NotStarted" xml:space="preserve">
+    <value>il n'a pas démarré</value>
+  </data>
+  <data name="Msg_EngineFailedMore" xml:space="preserve">
+    <value>Autres échecs : {0}.</value>
+  </data>
+  <data name="Msg_EngineTryAnother" xml:space="preserve">
+    <value>Choisissez un autre moteur dans le menu ▾ à côté du bouton d'imbrication et relancez.</value>
+  </data>
+  <data name="Msg_EngineFailureKept" xml:space="preserve">
+    <value>La tâche et la sortie du moteur ont été conservées pour son auteur :
+{0}
+
+Ouvrir le dossier ?</value>
   </data>
 </root>

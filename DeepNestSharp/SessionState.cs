@@ -16,7 +16,7 @@ namespace DeepNestSharp
     /// stamp existed. It is what lets a one-off correction to a stored preference happen exactly once
     /// instead of every time the app starts.
     /// </summary>
-    public const int CurrentSettingsVersion = 3;
+    public const int CurrentSettingsVersion = 4;
 
     /// <summary>Files older than this get a stored Fast effort forgotten once (see NestEffortDefaults.NeedsEffortReset).</summary>
     public const int EffortResetVersion = 1;
@@ -24,17 +24,17 @@ namespace DeepNestSharp
     /// <summary>Files older than this get the old 6.35 mm default part spacing replaced by 4 mm once (1.1.55).</summary>
     public const int SpacingFourMillimetresVersion = 2;
 
-    /// <summary>Files older than this get a stored 4 (90° steps, the old default) replaced by 0°+90° once (1.1.68).</summary>
-    public const int ZeroAnd90RotationsVersion = 3;
+    /// <summary>Files older than this get a stored 0°+90° (1002, the default of 1.1.68-1.1.71) put back to 90° steps once.</summary>
+    public const int FourSidesAgainVersion = 4;
 
     /// <summary>The job's rotation code, which every part follows until it is given its own: the stored choice,
-    /// else 0° and 90° (2026-11-16, the user: "all parts by default 0 and 90 degrees"). A 4 in a file older
-    /// than <see cref="ZeroAnd90RotationsVersion"/> was the old default, written back on every OK of Advanced
-    /// Settings rather than chosen, and gives way to 0°+90° once.</summary>
+    /// else the four sides. 1.1.68-1.1.71 made 0° + 90° the default, which the user then called a mistake
+    /// (2026-11-17); Advanced Settings writes its value back on every OK, so a 1002 in a file older than
+    /// <see cref="FourSidesAgainVersion"/> is that default and gives way to 90° steps once.</summary>
     internal static int JobRotations(int stored, int storedSettingsVersion)
-      => stored > 0 && !(stored == 4 && storedSettingsVersion < ZeroAnd90RotationsVersion)
+      => stored > 0 && !(stored == RasterNest.RotationCodes.RotZeroAnd90 && storedSettingsVersion < FourSidesAgainVersion)
         ? stored
-        : RasterNest.RotationCodes.RotZeroAnd90;
+        : RasterNest.RotationCodes.DefaultRotations;
 
     /// <summary>The version this file was last written by; see <see cref="CurrentSettingsVersion"/>.</summary>
     public int SettingsVersion { get; set; }
@@ -53,7 +53,7 @@ namespace DeepNestSharp
     /// <summary>Minutes between autosaves; -1 = default (5).</summary>
     public int AutosaveMinutes { get; set; } = -1;
 
-    /// <summary>Global default rotation code for unedited parts (1/2/1002/4/8/36); -1 = default (1002 = 0°+90°).</summary>
+    /// <summary>Global default rotation code for unedited parts (1/2/1002/4/8/36); -1 = default (4 = 90° steps).</summary>
     public int DefaultRotations { get; set; } = -1;
 
     /// <summary>Drawing units are millimeters (true) vs inches (false); null = default (millimeters in Europe).</summary>
@@ -111,8 +111,13 @@ namespace DeepNestSharp
     /// machine, not per project: it trades speed against how hard THIS computer works, never the nest.</summary>
     public int NestConcurrency { get; set; } = 0;
 
-    /// <summary>The nesting engine: 0 = sparrow, 1 = RNest (rnest-sparrow.exe). Per machine.</summary>
+    /// <summary>The nesting engine: 0 = sparrow, 1 = RNest (rnest-sparrow.exe), picked with the mode in the Nest
+    /// button's arrow menu (since 1.1.73; it was in Advanced Settings). Per machine.</summary>
     public int NestEngine { get; set; } = 0;
+
+    /// <summary>With <see cref="NestEngine"/> = 2: the file name of an engine from the "engines" folder beside the
+    /// app (engine-kit agents' work, 2026-11-18). An older build reads 2 as Sparrow.</summary>
+    public string? NestEngineName { get; set; }
 
     /// <summary>The mode the Nest button runs, last chosen from its arrow menu: 0 = Nest (the layout to cut),
     /// 1 = Draft (the quick quote). Per machine, like the other nesting choices.</summary>

@@ -39,6 +39,9 @@ namespace DeepNestSharp.Ui.Views
       public string PlacedText { get; set; }
       public string SheetsText { get; set; }
       public string TimeText { get; set; }
+
+      /// <summary>The engine that laid it (Sparrow, RNest, or an engine's file name); empty for a saved nest.</summary>
+      public string EngineText { get; set; } = string.Empty;
     }
 
     public class ReportSheetRow
@@ -89,6 +92,7 @@ namespace DeepNestSharp.Ui.Views
     private int nestMode; // what the Nest button runs: 0 = Nest, 1 = Draft (SessionState.NestMode)
     private DeepNestSharp.RasterNest.NestEffort nestEffort =DeepNestSharp.RasterNest.NestEffortDefaults.Default; // how hard the nester searches (SessionState)
     private bool lastRunWasDraft; // the variant being added came from the Draft button, and is labelled so
+    private string lastRunEngine = string.Empty; // the engine that laid it, for the Engine column
     private bool preferRectOffcut; // cut the last sheet's leftover off as a rectangular offcut (SessionState)
     private int offcutDirection; // 0 = end, 1 = side, 2 = both (SessionState.OffcutDirection)
     private double offcutSpacing = -1; // gap parts→offcut cut line; -1 = default to part spacing (SessionState)
@@ -301,15 +305,32 @@ namespace DeepNestSharp.Ui.Views
 
         this.nestEffort = DeepNestSharp.RasterNest.NestEffortDefaults.FromPersisted(session.NestEffort);
         SparrowNestService.ConcurrencyLimit = System.Math.Clamp(session.NestConcurrency, 0, SparrowNestService.MaxConcurrencyLimit);
-        SparrowNestService.UseRNestEngine = session.NestEngine == 1;
+        SparrowNestService.UseRNestEngine = session.NestEngine == 1 && RNestInstalled;
+        otherEngine = session.NestEngine == 2
+          ? OtherEngines().FirstOrDefault(p => string.Equals(EngineFailures.EngineName(p), session.NestEngineName, System.StringComparison.OrdinalIgnoreCase))
+          : null;
         this.nestFromRight = session.NestFromRight;
         this.nestMode = session.NestMode == 1 ? 1 : 0;
+        if (this.nestMode == 1)
+        {
+          // Draft is Sparrow's alone (2026-11-18); a Draft remembered with another engine runs on Sparrow.
+          SparrowNestService.UseRNestEngine = false;
+          otherEngine = null;
+        }
+
         this.RefreshNestModeButton();
 
         // Global default rotations, which every part follows until it is given its own. The default is 0° and
         // 90° (2026-11-16, the user: "all parts by default 0 and 90 degrees"). A 4 stored by an older build was
         // the old default written back on every OK of Advanced Settings, not a choice, and becomes 0°+90° once.
         cfg.Rotations = SessionState.JobRotations(session.DefaultRotations, storedSettingsVersion);
+        if (session.DefaultRotations > 0 && session.DefaultRotations != cfg.Rotations)
+        {
+          // Written back at once: any later save stamps the current version, and a 1002 left in the file
+          // would then read as a choice.
+          session.DefaultRotations = cfg.Rotations;
+          session.Save();
+        }
 
         if (session.PreferRectangularOffcut.HasValue)
         {
@@ -706,7 +727,6 @@ namespace DeepNestSharp.Ui.Views
         effort: this.nestEffort,
         commonLineMaxClusterParts: cfg.CommonLineMaxClusterParts,
         concurrencyLimit: SparrowNestService.ConcurrencyLimit,
-        useRNestEngine: SparrowNestService.UseRNestEngine,
         nestFromRight: this.nestFromRight)
       {
         Owner = this,
@@ -751,8 +771,6 @@ namespace DeepNestSharp.Ui.Views
       session.NestEffort = (int)this.nestEffort;
       SparrowNestService.ConcurrencyLimit = dialog.ConcurrencyLimit;
       session.NestConcurrency = dialog.ConcurrencyLimit;
-      SparrowNestService.UseRNestEngine = dialog.UseRNestEngine;
-      session.NestEngine = dialog.UseRNestEngine ? 1 : 0;
       this.nestFromRight = dialog.NestFromRight;
       session.NestFromRight = this.nestFromRight;
       string library = dialog.LibraryFolder;
@@ -1593,6 +1611,7 @@ namespace DeepNestSharp.Ui.Views
     private void ApplyLocalization()
     {
       this.FillMaterialChoices();
+      this.RefreshNestModeButton();
       if (ViewModel?.ActiveDocument is NestProjectViewModel openJob)
       {
         foreach (var part in openJob.ProjectInfo.DetailLoadInfos.OfType<ObservableDetailLoadInfo>())
@@ -1693,6 +1712,7 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderRunPlaced != null) this.colHeaderRunPlaced.Header = Localization.Get("Col_RunPlaced");
       if (this.colHeaderRunSheets != null) this.colHeaderRunSheets.Header = Localization.Get("Col_RunSheets");
       if (this.colHeaderRunTime != null) this.colHeaderRunTime.Header = Localization.Get("Col_RunTime");
+      if (this.colHeaderRunEngine != null) this.colHeaderRunEngine.Header = Localization.Get("Col_RunEngine");
 
       // Screen 4: Layout & Report
       if (this.btnBackToNesting != null) this.btnBackToNesting.Content = Localization.Get("Btn_BackToNesting");
@@ -2907,6 +2927,7 @@ namespace DeepNestSharp.Ui.Views
       }
 
       this.lastRunWasDraft = runEffort == DeepNestSharp.RasterNest.NestEffort.Draft;
+      this.lastRunEngine = EngineLabel(CurrentEngine);
 
       // If there is already a nest result, discard it and return the sheets it used to the stock
       // before recalculating from scratch.
@@ -3071,6 +3092,8 @@ namespace DeepNestSharp.Ui.Views
           }));
         };
 
+        // Sheets no try of the engine could lay, noted by the work started below (and only by it).
+        var engineFailures = EngineFailures.Collect();
         var (result, error) = await Task.Run(() =>
         {
           // The sparrow engine: dense collision-separation nesting, per-sheet, corner-compacted, with
@@ -3132,9 +3155,18 @@ namespace DeepNestSharp.Ui.Views
           return (r, err);
         });
 
+        EngineFailures.StopCollecting();
         this.runSeedOffset += 50;
 
-        if (result == null)
+        if (engineFailures.Count > 0)
+        {
+          this.ShowEngineFailure(engineFailures);
+          if (result == null)
+          {
+            return;
+          }
+        }
+        else if (result == null)
         {
           ViewModel.MessageService.DisplayMessageBox(error ?? Localization.Get("Msg_NoResult"), Localization.Get("Title_Nest"), DeepNestLib.MessageBoxIcon.Information);
           return;
@@ -3184,8 +3216,9 @@ namespace DeepNestSharp.Ui.Views
         // With an unlimited size in the stock the job never ran OUT of sheets, so telling the operator to
         // raise a quantity would send them to change a number that is already ignored: the only way a part
         // is left over then is that no sheet size is big enough to hold it.
+        // After an engine failure the parts left over are the failed sheet's: no shortage to report.
         int unplacedCount = result.UnplacedParts?.Count ?? 0;
-        if (unplacedCount > 0)
+        if (unplacedCount > 0 && engineFailures.Count == 0)
         {
           bool anyUnlimited = project.SheetLoadInfos.Any(s => s.Unlimited);
 
@@ -3309,6 +3342,11 @@ namespace DeepNestSharp.Ui.Views
         return env;
       }
 
+      if (otherEngine != null && System.IO.File.Exists(otherEngine))
+      {
+        return otherEngine;
+      }
+
       if (SparrowNestService.UseRNestEngine)
       {
         // Same command line, same job and solution files; falls back to sparrow if it is not installed.
@@ -3323,42 +3361,112 @@ namespace DeepNestSharp.Ui.Views
       return System.IO.File.Exists(beside) ? beside : null;
     }
 
-    /// <summary>The arrow beside Nest: a menu of the two modes. Picking one remembers it and runs it.</summary>
+    /// <summary>RNest ships beside the app only when it was built (it needs Rust); without it the menu
+    /// offers Sparrow's two modes alone.</summary>
+    private static bool RNestInstalled
+      => System.IO.File.Exists(System.IO.Path.Combine(System.AppContext.BaseDirectory, SparrowNestService.RNestEngineExe));
+
+    /// <summary>The menu's key for RNest; Sparrow is null, any other engine its full path.</summary>
+    private const string RNestKey = "rnest";
+
+    /// <summary>An engine from the "engines" folder beside the app, picked in the Nest menu; null = Sparrow or RNest.</summary>
+    private static string? otherEngine;
+
+    /// <summary>Engines that are neither Sparrow nor RNest (engine-kit agents' work, 2026-11-18): every .exe in
+    /// the "engines" folder beside the app, by name. Each speaks the same job.json protocol.</summary>
+    private static IReadOnlyList<string> OtherEngines()
+    {
+      string dir = System.IO.Path.Combine(System.AppContext.BaseDirectory, "engines");
+      try
+      {
+        return System.IO.Directory.Exists(dir)
+          ? System.IO.Directory.GetFiles(dir, "*.exe").OrderBy(p => System.IO.Path.GetFileName(p), System.StringComparer.OrdinalIgnoreCase).ToList()
+          : new List<string>();
+      }
+      catch (System.Exception ex) when (ex is System.IO.IOException || ex is System.UnauthorizedAccessException)
+      {
+        return new List<string>();
+      }
+    }
+
+    /// <summary>The engine the Nest button runs, as a menu key.</summary>
+    private static string? CurrentEngine => otherEngine ?? (SparrowNestService.UseRNestEngine ? RNestKey : null);
+
+    /// <summary>The arrow beside Nest: Nest for each engine installed and one Draft, Sparrow's (the user,
+    /// 2026-11-17: two with Sparrow alone, four with RNest; 2026-11-18: Nest for each engine in the "engines"
+    /// folder, and "Sparrow only" for Draft: a draft is for the report's area and cut length, and Sparrow's,
+    /// at most 2.8 s, came out 4.4 % longer than the best layout on average, opus's 1 % but up to 16 s and
+    /// with overlaps, RNest's and dsh's 9 and 13 %). Picking one remembers it and runs it.</summary>
     private void OnNestModeMenu(object sender, RoutedEventArgs e)
     {
       var menu = new System.Windows.Controls.ContextMenu { PlacementTarget = this.btnNestMode, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
-      menu.Items.Add(this.NestModeItem(0, Localization.Get("Btn_NestCut")));
-      menu.Items.Add(this.NestModeItem(1, Localization.Get("Btn_NestDraft")));
+      var engines = new List<string?> { null };
+      if (RNestInstalled)
+      {
+        engines.Add(RNestKey);
+      }
+
+      engines.AddRange(OtherEngines());
+      bool named = engines.Count > 1;
+      for (int i = 0; i < engines.Count; i++)
+      {
+        if (i > 0)
+        {
+          menu.Items.Add(new System.Windows.Controls.Separator());
+        }
+
+        menu.Items.Add(this.NestModeItem(0, engines[i], named));
+        if (engines[i] == null)
+        {
+          menu.Items.Add(this.NestModeItem(1, null, named));
+        }
+      }
+
       menu.IsOpen = true;
     }
 
-    private System.Windows.Controls.MenuItem NestModeItem(int mode, string header)
+    private static string EngineLabel(string? engine)
+      => engine == null ? "Sparrow" : engine == RNestKey ? "RNest" : EngineFailures.EngineName(engine);
+
+    private static string NestModeText(int mode, string? engine, bool named)
+      => Localization.Get(mode == 1 ? "Btn_NestDraft" : "Btn_NestCut") + (named ? "  ·  " + EngineLabel(engine) : string.Empty);
+
+    private System.Windows.Controls.MenuItem NestModeItem(int mode, string? engine, bool named)
     {
       var item = new System.Windows.Controls.MenuItem
       {
-        Header = header,
+        Header = NestModeText(mode, engine, named),
         IsCheckable = true,
-        IsChecked = this.nestMode == mode,
+        IsChecked = this.nestMode == mode && string.Equals(CurrentEngine, engine, System.StringComparison.OrdinalIgnoreCase),
         ToolTip = Localization.Get("Tip_NestModeMenu"),
       };
       item.Click += (s, e) =>
       {
-        this.SetNestMode(mode);
+        this.SetNestMode(mode, engine);
         this.OnNest(this.btnStartNest, new RoutedEventArgs());
       };
       return item;
     }
 
-    private void SetNestMode(int mode)
+    private void SetNestMode(int mode, string? engine)
     {
       this.nestMode = mode;
+      if (mode == 1)
+      {
+        engine = null; // Draft is Sparrow's alone
+      }
+
+      SparrowNestService.UseRNestEngine = engine == RNestKey && RNestInstalled;
+      otherEngine = engine != null && engine != RNestKey && System.IO.File.Exists(engine) ? engine : null;
       var session = SessionState.Load();
       session.NestMode = mode;
+      session.NestEngine = otherEngine != null ? 2 : SparrowNestService.UseRNestEngine ? 1 : 0;
+      session.NestEngineName = otherEngine == null ? null : EngineFailures.EngineName(otherEngine);
       session.Save();
       this.RefreshNestModeButton();
     }
 
-    /// <summary>The main button names the mode it will run.</summary>
+    /// <summary>The main button names the mode it will run, and the engine when it is not Sparrow.</summary>
     private void RefreshNestModeButton()
     {
       if (this.btnStartNest == null)
@@ -3366,8 +3474,49 @@ namespace DeepNestSharp.Ui.Views
         return;
       }
 
-      this.btnStartNest.Content = Localization.Get(this.nestMode == 1 ? "Btn_NestDraft" : "Btn_NestCut");
+      this.btnStartNest.Content = NestModeText(this.nestMode, CurrentEngine, CurrentEngine != null);
       this.btnStartNest.ToolTip = Localization.Get(this.nestMode == 1 ? "Tip_NestDraft" : "Tip_StartNest");
+    }
+
+    /// <summary>
+    /// The engine gave no answer for a sheet (2026-11-18, the user: "just a notice, and a log to fix it; try
+    /// another"): which engine, which sheet, why, and the folder that holds the job and the engine's output.
+    /// Nothing is laid by another engine in its place.
+    /// </summary>
+    private void ShowEngineFailure(IReadOnlyList<SheetEngineFailure> failures)
+    {
+      var f = failures[0];
+      string why = f.First.Kind switch
+      {
+        EngineFailureKind.NotStarted => Localization.Get("EngineFail_NotStarted"),
+        EngineFailureKind.NoAnswer => Localization.Format("EngineFail_NoAnswer", f.First.ExitCode),
+        _ => Localization.Format("EngineFail_TimedOut", (int)System.Math.Round(f.First.Seconds)),
+      };
+      string sheet = System.FormattableString.Invariant($"{f.SheetWidth:0.#} × {f.SheetHeight:0.#}");
+      string text = Localization.Format("Msg_EngineFailed", f.First.Engine, sheet, why);
+      if (failures.Count > 1)
+      {
+        text += " " + Localization.Format("Msg_EngineFailedMore", failures.Count - 1);
+      }
+
+      text += "\n\n" + Localization.Get("Msg_EngineTryAnother");
+      if (f.First.Folder is not string folder)
+      {
+        MessageBox.Show(this, text, Localization.Get("Title_Nest"), MessageBoxButton.OK, MessageBoxImage.Warning);
+        return;
+      }
+
+      text += "\n\n" + Localization.Format("Msg_EngineFailureKept", folder);
+      if (MessageBox.Show(this, text, Localization.Get("Title_Nest"), MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+      {
+        try
+        {
+          System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", "\"" + folder + "\"") { UseShellExecute = true });
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+        }
+      }
     }
 
     private void OnCancelNest(object sender, RoutedEventArgs e)
@@ -4174,6 +4323,7 @@ namespace DeepNestSharp.Ui.Views
         PlacedText = placed,
         SheetsText = sheets,
         TimeText = this.lastRunWasDraft ? NestElapsed() + " · " + Localization.Get("Run_Draft") : NestElapsed(),
+        EngineText = this.lastRunEngine,
       };
 
       static (int Placed, int Sheets, double Util) Rank(INestResult r)

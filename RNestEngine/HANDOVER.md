@@ -22,7 +22,8 @@ what to improve.
   `LeftOverJobFixture`, `NestExtentFixture` and `CornerPackFixture` were started
   with `SPARROW_EXE` pointing at `rnest-sparrow.exe`; the first run hung: the
   genetic search waited forever on a job of one part (fixed, with a test). The
-  rerun had not finished when this was written. Those fixtures race eight
+  rerun passed, 11 of 11 in 3.9 minutes (two `NestExtentFixture` tests ended in
+  under a millisecond, so they likely did not nest anything). Those fixtures race eight
   seeds, which is eight identical runs for this engine.
 - **The switch in the window** was not opened or clicked. The saved setting,
   the fallback to Sparrow when the exe is missing, and the single try were only

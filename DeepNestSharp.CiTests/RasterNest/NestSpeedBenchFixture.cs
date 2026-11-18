@@ -45,6 +45,10 @@ namespace DeepNestSharp.CiTests.RasterNest
       int rotations = (int)Read("SHEETNEST_BENCH_ROTATIONS", 4);
       int runs = (int)Read("SHEETNEST_BENCH_RUNS", 1);
       int qtyMult = Math.Max(1, (int)Read("SHEETNEST_BENCH_QTY_MULT", 1));
+      bool fromRight = Read("SHEETNEST_BENCH_FROM_RIGHT", 0) > 0;
+      bool useRNest = Read("SHEETNEST_BENCH_RNEST", 0) > 0;
+      bool wasRNest = SparrowNestService.UseRNestEngine;
+      SparrowNestService.UseRNestEngine = useRNest;
 
       var project = new ProjectInfo(new TestSvgNestConfig());
       project.Load(new TestSvgNestConfig(), projectPath);
@@ -53,10 +57,10 @@ namespace DeepNestSharp.CiTests.RasterNest
         .Where(o => o.IsIncluded && !string.IsNullOrWhiteSpace(o.Path))
         .SelectMany(o => new[]
         {
-          new RasterPartInfo { Path = o.Path, Quantity = (o.Quantity + o.Extra) * qtyMult, Rotations = o.Rotations, Priority = o.Priority, Spacing = o.Spacing },
+          new RasterPartInfo { Path = o.Path, Quantity = (o.Quantity + o.Extra) * qtyMult, Rotations = o.Rotations, Priority = o.Priority, Spacing = o.Spacing, Fill = o.FillSheets && Read("SHEETNEST_BENCH_NO_FILL", 0) == 0 },
           new RasterPartInfo { Path = o.Path, Quantity = o.MirrorQuantity * qtyMult, Rotations = o.Rotations, Priority = o.Priority, Spacing = o.Spacing, Mirrored = true },
         })
-        .Where(p => p.Quantity > 0)
+        .Where(p => p.Quantity > 0 || p.Fill)
         .ToList();
       var stock = project.SheetLoadInfos
         .Where(s => s.Width > 0 && s.Height > 0 && (s.Unlimited || s.Quantity > 0))
@@ -88,11 +92,36 @@ namespace DeepNestSharp.CiTests.RasterNest
 
         var sw = Stopwatch.StartNew();
         // Each run races a different set of seeds, as pressing Nest again in the window does.
-        var result = SparrowNestService.Nest(parts, stock, rotations, spacing, margin, 5, exe, out string err, effort: effort, seedOffset: (int)Read("SHEETNEST_BENCH_SEED_BASE", 0) + (50 * (r - 1)));
+        var result = SparrowNestService.Nest(parts, stock, rotations, spacing, margin, 5, exe, out string err, effort: effort, seedOffset: (int)Read("SHEETNEST_BENCH_SEED_BASE", 0) + (50 * (r - 1)), fromRight: fromRight);
         sw.Stop();
 
         log.AppendLine(FormattableString.Invariant(
           $"{r},{sw.Elapsed.TotalSeconds:F1},{SparrowNestService.DiagSparrowMs / 1000.0:F1},{SparrowNestService.DiagMapMs / 1000.0:F1},{SparrowNestService.DiagHolesMs / 1000.0:F1},{SparrowNestService.DiagLoadMs / 1000.0:F1},{SparrowNestService.DiagWaves},{SparrowNestService.DiagTries},{result?.UsedSheets.Count ?? -1},{result?.TotalPlacedCount ?? -1},{result?.UnplacedParts.Count ?? -1},{(result?.MaterialUtilization ?? 0) * 100:F1},{LastSheetFill(result):F1},{LastExtent(result):F0},{SparrowNestService.DiagTailRepacks}{(err == null ? string.Empty : " " + err)}"));
+        if (result != null)
+        {
+          foreach (var s in result.UsedSheets)
+          {
+            int unfit = PlacementAcceptance.CountUnfit(s.PartPlacements.ToList(), s.Sheet.WidthCalculated, s.Sheet.HeightCalculated, margin, (a, b) => spacing);
+            log.AppendLine(FormattableString.Invariant($"#   sheet {s.Sheet.WidthCalculated:F0}x{s.Sheet.HeightCalculated:F0}: {s.PartPlacements.Count} parts, unfit {unfit}; total parts {result.TotalPartsCount}"));
+            string svgDir = Environment.GetEnvironmentVariable("SHEETNEST_BENCH_SVG");
+            if (!string.IsNullOrEmpty(svgDir))
+            {
+              // The layout as a picture, to look at: the sheet, and every part's outline as placed (y up).
+              double sheetW = s.Sheet.WidthCalculated, sh = s.Sheet.HeightCalculated;
+              var svg = new System.Text.StringBuilder();
+              svg.Append(FormattableString.Invariant($"<svg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -10 {sheetW + 20} {sh + 20}' width='{(sheetW + 20) / 3:F0}' height='{(sh + 20) / 3:F0}'><rect x='0' y='0' width='{sheetW}' height='{sh}' fill='#eee' stroke='#000'/>"));
+              foreach (var p in s.PartPlacements)
+              {
+                var pts = string.Join(" ", p.PlacedPart.Points.Select(q => FormattableString.Invariant($"{q.X:F2},{sh - q.Y:F2}")));
+                svg.Append(FormattableString.Invariant($"<polygon points='{pts}' fill='{(p.Source % 2 == 0 ? "#9cf" : "#fc9")}' stroke='#333' stroke-width='1'/>"));
+              }
+
+              svg.Append("</svg>");
+              Directory.CreateDirectory(svgDir);
+              File.WriteAllText(Path.Combine(svgDir, FormattableString.Invariant($"run{r}-sheet{s.Sheet.Id}.svg")), svg.ToString());
+            }
+          }
+        }
       }
 
       this.output.WriteLine(log.ToString());
