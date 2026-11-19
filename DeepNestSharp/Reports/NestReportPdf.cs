@@ -421,22 +421,33 @@ namespace DeepNestSharp.Reports
         double boxX = 40, boxW = 762;
         double boxY = 28 + partsListH;
         double boxH = 522 - boxY; // clear of the layout title and its subtitle above
-        double scale = Math.Min(boxW / sheetW, boxH / sheetH);
-        double ox = boxX + ((boxW - (sheetW * scale)) / 2.0);
-        double oy = boxY + ((boxH - (sheetH * scale)) / 2.0);
+        // The picture always lies, long side across the page (the user, 1.1.82: "turn it to lie, however the
+        // sheet really stands"): a standing sheet is drawn a quarter turn clockwise, its bottom on the left.
+        // The subtitle keeps the sheet's own W × H.
+        bool turn = LiesTurned(sheetW, sheetH);
+        double drawW = turn ? sheetH : sheetW;
+        double drawH = turn ? sheetW : sheetH;
+        double scale = Math.Min(boxW / drawW, boxH / drawH);
+        double ox = boxX + ((boxW - (drawW * scale)) / 2.0);
+        double oy = boxY + ((boxH - (drawH * scale)) / 2.0);
+        (double X, double Y) At(double x, double y)
+        {
+          var (tx, ty) = Lying(x, y, sheetW, turn);
+          return (ox + (tx * scale), oy + (ty * scale));
+        }
 
         if (DeepNestLib.IO.SheetShape.IsShaped(sp.Sheet))
         {
           // An offcut read from a drawing: its own outline and holes, not the box round it.
-          c.Polygon(sp.Sheet.Points.Select(p => (ox + (p.X * scale), oy + (p.Y * scale))), fill: false);
+          c.Polygon(sp.Sheet.Points.Select(p => At(p.X, p.Y)), fill: false);
           foreach (var hole in sp.Sheet.Children ?? new List<INfp>())
           {
-            c.Polygon(hole.Points.Select(p => (ox + (p.X * scale), oy + (p.Y * scale))), fill: false);
+            c.Polygon(hole.Points.Select(p => At(p.X, p.Y)), fill: false);
           }
         }
         else
         {
-          c.Rect(ox, oy, sheetW * scale, sheetH * scale, 0.8);
+          c.Rect(ox, oy, drawW * scale, drawH * scale, 0.8);
         }
         foreach (var pp in sp.PartPlacements)
         {
@@ -447,7 +458,7 @@ namespace DeepNestSharp.Reports
           }
 
           c.Polygon(
-            poly.Points.Select(p => (ox + (p.X * scale), oy + (p.Y * scale))),
+            poly.Points.Select(p => At(p.X, p.Y)),
             fill: true,
             fillColour: colourCoded ? PartColors.For(colours, pp) : (ValueTuple<byte, byte, byte>?)null);
           if (poly.Children != null)
@@ -456,7 +467,7 @@ namespace DeepNestSharp.Reports
             {
               if (hole?.Points != null && hole.Points.Length >= 3)
               {
-                c.Polygon(hole.Points.Select(p => (ox + (p.X * scale), oy + (p.Y * scale))), fill: false, holeFill: true);
+                c.Polygon(hole.Points.Select(p => At(p.X, p.Y)), fill: false, holeFill: true);
               }
             }
           }
@@ -476,7 +487,7 @@ namespace DeepNestSharp.Reports
           }
 
           string numberText = number.ToString(CultureInfo.InvariantCulture);
-          var (nx, ny, nsize) = NumberLabel(poly, numberText, ox, oy, scale);
+          var (nx, ny, nsize) = NumberLabel(poly, numberText, ox, oy, scale, turn ? sheetW : (double?)null);
           bool lightInk = colourCoded && NeedsLightInk(PartColors.For(colours, pp));
           if (lightInk)
           {
@@ -929,9 +940,15 @@ namespace DeepNestSharp.Reports
       string text,
       double ox,
       double oy,
-      double scale)
+      double scale,
+      double? turnedSheetWidth = null)
     {
       (double cx, double cy) = Centroid(placed);
+      if (turnedSheetWidth is double sheetW)
+      {
+        (cx, cy) = Lying(cx, cy, sheetW, true);
+      }
+
       double side = Math.Min(placed.MaxX - placed.MinX, placed.MaxY - placed.MinY) * scale;
       double size = Math.Max(4.0, Math.Min(12.0, side * 0.42));
 
@@ -943,6 +960,16 @@ namespace DeepNestSharp.Reports
         oy + (cy * scale) - (0.717 * size / 2.0),
         size);
     }
+
+    /// <summary>Whether a sheet of this size is drawn a quarter turn in the report: when it stands (taller than wide).</summary>
+    internal static bool LiesTurned(double sheetWidth, double sheetHeight) => sheetHeight > sheetWidth;
+
+    /// <summary>
+    /// A point of the sheet as the report draws it: as it is, or for a standing sheet turned a quarter turn
+    /// clockwise (page y up), so the sheet's bottom edge becomes the picture's left and its left edge the top.
+    /// </summary>
+    internal static (double X, double Y) Lying(double x, double y, double sheetWidth, bool turn)
+      => turn ? (y, sheetWidth - x) : (x, y);
 
     /// <summary>Area centroid of a closed ring, falling back to the bounding-box centre for a
     /// degenerate one, which is the only case where the area is zero and there is nothing to divide

@@ -238,6 +238,7 @@ Last verified (2026-11-17, 1.1.74): app 534/534 with the engine. Earlier (2026-1
 - **No thousands separators anywhere**: the shop reads "1,913" as a decimal.
 - The PDF embeds Arial as Unicode (Type0/Identity-H). If native zlib is missing, as on the shop PC, the font is written uncompressed.
 - Report preview: "Whole page" is the default zoom; a fit mode holds on resize until the user zooms by hand.
+- Every sheet is drawn lying in the report and its preview (1.1.82, the user: "turn the picture to lie, whatever the real position of the sheet"): a standing sheet turns a quarter turn clockwise, its bottom edge on the left (`NestReportPdf.LiesTurned/Lying`, numbers too); the caption keeps the real W × H (`NestReportLyingSheetFixture`). Not looked at in a real report.
 
 **Saving**
 - `.dnest` writes sheets through `SheetPlacementJsonConverter`, so computed members (PolygonsForExport, Hull, Simplify) are not saved: 4.4 MB → ~1.4 MB. `SvgPoint.Marked` is still written, because the golden JSON tests need it.
