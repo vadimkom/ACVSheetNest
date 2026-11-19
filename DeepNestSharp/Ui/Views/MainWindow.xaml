@@ -579,7 +579,7 @@
         <!-- Two-Pane Work Area: Left = Runs/Iterations Table, Right = DxfViewer Run Preview -->
         <Grid Grid.Row="1" x:Name="nestWorkArea" SizeChanged="OnNestWorkAreaSizeChanged">
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="530" MinWidth="260" />
+            <ColumnDefinition Width="470" MinWidth="260" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" MinWidth="360" />
           </Grid.ColumnDefinitions>
@@ -630,7 +630,6 @@
                     <GridViewColumn x:Name="colHeaderRunSheets" Header="Листов" Width="60" DisplayMemberBinding="{Binding SheetsText}" />
                     <GridViewColumn x:Name="colHeaderRunTime" Header="Время" Width="56" DisplayMemberBinding="{Binding TimeText}" />
                     <GridViewColumn x:Name="colHeaderRunEngine" Header="Движок" Width="116" DisplayMemberBinding="{Binding EngineText}" />
-                    <GridViewColumn x:Name="colHeaderRunTries" Header="Прогонов" Width="76" DisplayMemberBinding="{Binding TriesText}" />
                   </GridView>
                 </ListView.View>
               </ListView>

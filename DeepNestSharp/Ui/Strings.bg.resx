@@ -2066,49 +2066,4 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
 
 Да се отвори ли папката?</value>
   </data>
-  <data name="Col_RunTries" xml:space="preserve">
-    <value>Пускания</value>
-  </data>
-  <data name="Menu_EngineStats" xml:space="preserve">
-    <value>Статистика на двигателите…</value>
-  </data>
-  <data name="Title_EngineStats" xml:space="preserve">
-    <value>Статистика на двигателите</value>
-  </data>
-  <data name="Stat_Runs" xml:space="preserve">
-    <value>Пускания</value>
-  </data>
-  <data name="Stat_Best" xml:space="preserve">
-    <value>Най-добър</value>
-  </data>
-  <data name="Stat_Dxf" xml:space="preserve">
-    <value>DXF зап.</value>
-  </data>
-  <data name="Stat_Failed" xml:space="preserve">
-    <value>Сривове</value>
-  </data>
-  <data name="Stat_Pieces" xml:space="preserve">
-    <value>Детайли, ср.</value>
-  </data>
-  <data name="Stat_Kinds" xml:space="preserve">
-    <value>Вида, ср.</value>
-  </data>
-  <data name="Stat_MaxPieces" xml:space="preserve">
-    <value>Детайли, макс.</value>
-  </data>
-  <data name="Stat_Seconds" xml:space="preserve">
-    <value>Време, с ср.</value>
-  </data>
-  <data name="Stat_LastRun" xml:space="preserve">
-    <value>Последно пускане</value>
-  </data>
-  <data name="Stat_OpenFolder" xml:space="preserve">
-    <value>Отвори папката</value>
-  </data>
-  <data name="Stat_Empty" xml:space="preserve">
-    <value>Все още няма пускания.</value>
-  </data>
-  <data name="Stat_Note" xml:space="preserve">
-    <value>Най-добър: от задачите с два или повече двигателя колко пъти е спечелил този (брои се при изчистване на списъка, отваряне на друга задача или затваряне на програмата). Всяко пускане е и ред в engine-runs.csv.</value>
-  </data>
 </root>

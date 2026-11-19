@@ -2066,49 +2066,4 @@ kept {1}</value>
 
 Open the folder?</value>
   </data>
-  <data name="Col_RunTries" xml:space="preserve">
-    <value>Runs</value>
-  </data>
-  <data name="Menu_EngineStats" xml:space="preserve">
-    <value>Engine statistics…</value>
-  </data>
-  <data name="Title_EngineStats" xml:space="preserve">
-    <value>Engine statistics</value>
-  </data>
-  <data name="Stat_Runs" xml:space="preserve">
-    <value>Runs</value>
-  </data>
-  <data name="Stat_Best" xml:space="preserve">
-    <value>Best</value>
-  </data>
-  <data name="Stat_Dxf" xml:space="preserve">
-    <value>DXF saved</value>
-  </data>
-  <data name="Stat_Failed" xml:space="preserve">
-    <value>Failed</value>
-  </data>
-  <data name="Stat_Pieces" xml:space="preserve">
-    <value>Pieces, avg</value>
-  </data>
-  <data name="Stat_Kinds" xml:space="preserve">
-    <value>Kinds, avg</value>
-  </data>
-  <data name="Stat_MaxPieces" xml:space="preserve">
-    <value>Pieces, max</value>
-  </data>
-  <data name="Stat_Seconds" xml:space="preserve">
-    <value>Time, s avg</value>
-  </data>
-  <data name="Stat_LastRun" xml:space="preserve">
-    <value>Last run</value>
-  </data>
-  <data name="Stat_OpenFolder" xml:space="preserve">
-    <value>Open folder</value>
-  </data>
-  <data name="Stat_Empty" xml:space="preserve">
-    <value>No runs counted yet.</value>
-  </data>
-  <data name="Stat_Note" xml:space="preserve">
-    <value>Best: of the jobs run with two engines or more, how many this one won (counted when the job’s list is cleared, another job is opened or the program closes). Every run is also a line in engine-runs.csv.</value>
-  </data>
 </root>

@@ -45,13 +45,6 @@ namespace DeepNestSharp.Ui.Views
 
       /// <summary>The engine and whether a Draft (<see cref="EngineStats.Key"/>): one row per key; empty for a saved nest.</summary>
       public string EngineKey { get; set; } = string.Empty;
-
-      /// <summary>How many times this engine was run on the job; the row holds the best of them.</summary>
-      public int Tries { get; set; } = 1;
-
-      public string TriesText => this.Tries > 0 && !string.IsNullOrEmpty(this.EngineKey)
-        ? this.Tries.ToString(System.Globalization.CultureInfo.InvariantCulture)
-        : string.Empty;
     }
 
     public class ReportSheetRow
@@ -1725,7 +1718,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderRunSheets != null) this.colHeaderRunSheets.Header = Localization.Get("Col_RunSheets");
       if (this.colHeaderRunTime != null) this.colHeaderRunTime.Header = Localization.Get("Col_RunTime");
       if (this.colHeaderRunEngine != null) this.colHeaderRunEngine.Header = Localization.Get("Col_RunEngine");
-      if (this.colHeaderRunTries != null) this.colHeaderRunTries.Header = Localization.Get("Col_RunTries");
 
       // Screen 4: Layout & Report
       if (this.btnBackToNesting != null) this.btnBackToNesting.Content = Localization.Get("Btn_BackToNesting");
@@ -3431,10 +3423,6 @@ namespace DeepNestSharp.Ui.Views
         menu.Items.Add(this.NestModeItem(0, engine, named));
       }
 
-      menu.Items.Add(new System.Windows.Controls.Separator());
-      var stats = new System.Windows.Controls.MenuItem { Header = Localization.Get("Menu_EngineStats") };
-      stats.Click += (s, a) => this.ShowEngineStats();
-      menu.Items.Add(stats);
       menu.IsOpen = true;
     }
 
@@ -4286,7 +4274,7 @@ namespace DeepNestSharp.Ui.Views
       }
       else
       {
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(530), MinWidth = 260 });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(470), MinWidth = 260 });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star), MinWidth = 360 });
       }
@@ -4322,7 +4310,7 @@ namespace DeepNestSharp.Ui.Views
     /// Adds a finished nest to the variants list: the best run of each engine (2026-11-19, the user: "the best
     /// runs of each engine that was run; I ran them all and could see only one"), a Draft apart from a Nest.
     /// Rows go best first (every part placed, then fewest sheets, then most material used), the best starred.
-    /// A run no better than its engine's row only counts in that row's runs; the row is selected.
+    /// A run no better than its engine's row is dropped and that row selected.
     /// </summary>
     private void AddFinishedNest(INestResult result)
     {
@@ -4331,8 +4319,6 @@ namespace DeepNestSharp.Ui.Views
       var same = this.nestRuns.FirstOrDefault(r => !string.IsNullOrEmpty(r.EngineKey) && string.Equals(r.EngineKey, key, StringComparison.OrdinalIgnoreCase));
       if (same != null && Rank(same.Result).CompareTo(Rank(result)) >= 0)
       {
-        same.Tries++;
-        this.runsListView.Items.Refresh();
         this.runsListView.SelectedItem = same;
         return;
       }
@@ -4352,7 +4338,6 @@ namespace DeepNestSharp.Ui.Views
         TimeText = this.lastRunWasDraft ? NestElapsed() + " · " + Localization.Get("Run_Draft") : NestElapsed(),
         EngineText = this.lastRunEngine,
         EngineKey = key,
-        Tries = (same?.Tries ?? 0) + 1,
       };
 
       int at = 0;

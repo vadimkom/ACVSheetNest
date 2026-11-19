@@ -2066,49 +2066,4 @@ guardado {1}</value>
 
 ¿Abrir la carpeta?</value>
   </data>
-  <data name="Col_RunTries" xml:space="preserve">
-    <value>Ejecuciones</value>
-  </data>
-  <data name="Menu_EngineStats" xml:space="preserve">
-    <value>Estadísticas de motores…</value>
-  </data>
-  <data name="Title_EngineStats" xml:space="preserve">
-    <value>Estadísticas de motores</value>
-  </data>
-  <data name="Stat_Runs" xml:space="preserve">
-    <value>Ejecuciones</value>
-  </data>
-  <data name="Stat_Best" xml:space="preserve">
-    <value>Mejor</value>
-  </data>
-  <data name="Stat_Dxf" xml:space="preserve">
-    <value>DXF guard.</value>
-  </data>
-  <data name="Stat_Failed" xml:space="preserve">
-    <value>Fallos</value>
-  </data>
-  <data name="Stat_Pieces" xml:space="preserve">
-    <value>Piezas, med.</value>
-  </data>
-  <data name="Stat_Kinds" xml:space="preserve">
-    <value>Tipos, med.</value>
-  </data>
-  <data name="Stat_MaxPieces" xml:space="preserve">
-    <value>Piezas, máx.</value>
-  </data>
-  <data name="Stat_Seconds" xml:space="preserve">
-    <value>Tiempo, s med.</value>
-  </data>
-  <data name="Stat_LastRun" xml:space="preserve">
-    <value>Última ejecución</value>
-  </data>
-  <data name="Stat_OpenFolder" xml:space="preserve">
-    <value>Abrir carpeta</value>
-  </data>
-  <data name="Stat_Empty" xml:space="preserve">
-    <value>Aún no hay ejecuciones.</value>
-  </data>
-  <data name="Stat_Note" xml:space="preserve">
-    <value>Mejor: de los trabajos con dos motores o más, cuántos ganó este (se cuenta al vaciar la lista, abrir otro trabajo o cerrar el programa). Cada ejecución es también una línea de engine-runs.csv.</value>
-  </data>
 </root>

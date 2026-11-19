@@ -2066,49 +2066,4 @@ conservé le {1}</value>
 
 Ouvrir le dossier ?</value>
   </data>
-  <data name="Col_RunTries" xml:space="preserve">
-    <value>Essais</value>
-  </data>
-  <data name="Menu_EngineStats" xml:space="preserve">
-    <value>Statistiques des moteurs…</value>
-  </data>
-  <data name="Title_EngineStats" xml:space="preserve">
-    <value>Statistiques des moteurs</value>
-  </data>
-  <data name="Stat_Runs" xml:space="preserve">
-    <value>Essais</value>
-  </data>
-  <data name="Stat_Best" xml:space="preserve">
-    <value>Meilleur</value>
-  </data>
-  <data name="Stat_Dxf" xml:space="preserve">
-    <value>DXF enreg.</value>
-  </data>
-  <data name="Stat_Failed" xml:space="preserve">
-    <value>Échecs</value>
-  </data>
-  <data name="Stat_Pieces" xml:space="preserve">
-    <value>Pièces, moy.</value>
-  </data>
-  <data name="Stat_Kinds" xml:space="preserve">
-    <value>Types, moy.</value>
-  </data>
-  <data name="Stat_MaxPieces" xml:space="preserve">
-    <value>Pièces, max</value>
-  </data>
-  <data name="Stat_Seconds" xml:space="preserve">
-    <value>Temps, s moy.</value>
-  </data>
-  <data name="Stat_LastRun" xml:space="preserve">
-    <value>Dernier essai</value>
-  </data>
-  <data name="Stat_OpenFolder" xml:space="preserve">
-    <value>Ouvrir le dossier</value>
-  </data>
-  <data name="Stat_Empty" xml:space="preserve">
-    <value>Aucun essai compté pour l’instant.</value>
-  </data>
-  <data name="Stat_Note" xml:space="preserve">
-    <value>Meilleur : parmi les travaux lancés avec deux moteurs ou plus, combien celui-ci en a gagné (compté quand la liste est vidée, un autre travail ouvert ou le programme fermé). Chaque essai est aussi une ligne de engine-runs.csv.</value>
-  </data>
 </root>
