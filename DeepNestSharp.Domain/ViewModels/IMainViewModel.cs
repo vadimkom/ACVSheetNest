@@ -36,7 +36,8 @@ namespace DeepNestSharp.Domain.ViewModels
 
     string Title { get; }
 
-    Task ExportLayoutsAsync(System.Collections.Generic.IReadOnlyList<(ISheetPlacement Sheet, int Count, System.Collections.Generic.IReadOnlyCollection<DeepNestLib.IO.OffcutLine> Offcut)> layouts);
+    /// <summary>Writes one file per layout; true when they were written.</summary>
+    Task<bool> ExportLayoutsAsync(System.Collections.Generic.IReadOnlyList<(ISheetPlacement Sheet, int Count, System.Collections.Generic.IReadOnlyCollection<DeepNestLib.IO.OffcutLine> Offcut)> layouts);
 
     void OnLoadNestProject(string filePath);
 

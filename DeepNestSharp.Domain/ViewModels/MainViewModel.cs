@@ -155,7 +155,7 @@ namespace DeepNestSharp.Domain.ViewModels
     /// size, and how many times it is cut. It used to ask for a file name once per layout, with nothing on
     /// the files to say which layout or how many to cut.
     /// </summary>
-    public async Task ExportLayoutsAsync(IReadOnlyList<(ISheetPlacement Sheet, int Count, IReadOnlyCollection<OffcutLine> Offcut)> layouts)
+    public async Task<bool> ExportLayoutsAsync(IReadOnlyList<(ISheetPlacement Sheet, int Count, IReadOnlyCollection<OffcutLine> Offcut)> layouts)
     {
       try
       {
@@ -164,14 +164,14 @@ namespace DeepNestSharp.Domain.ViewModels
           .ToList();
         if (sheets.Count == 0)
         {
-          return;
+          return false;
         }
 
         var parts = sheets.SelectMany(l => l.Sheet.PartPlacements).Select(o => o.Part).ToList();
         if (parts.ContainsDxfs() && parts.ContainsSvgs())
         {
           MessageService.DisplayMessageBox(UiText.Get("Msg_MixedSvgDxf"), UiText.Get("Title_Export"), MessageBoxIcon.Information);
-          return;
+          return false;
         }
 
         IExport probe = ExporterFactory.GetExporter(parts);
@@ -182,7 +182,7 @@ namespace DeepNestSharp.Domain.ViewModels
         var chosen = fileIoService.GetSaveFilePath(probe.SaveFileDialogFilter, suggested);
         if (string.IsNullOrWhiteSpace(chosen))
         {
-          return;
+          return false;
         }
 
         string folder = Path.GetDirectoryName(chosen);
@@ -198,7 +198,7 @@ namespace DeepNestSharp.Domain.ViewModels
               UiText.Get("Title_Export"),
               MessageBoxIcon.Question) != MessageBoxResult.OK)
         {
-          return;
+          return false;
         }
 
         for (int i = 0; i < sheets.Count; i++)
@@ -215,10 +215,13 @@ namespace DeepNestSharp.Domain.ViewModels
             MergeLinesForExport(SvgNest.Config.MergeLines, sheets[i].Sheet),
             sheets[i].Offcut);
         }
+
+        return true;
       }
       catch (Exception ex)
       {
         MessageService.DisplayMessageBox(ex.Message, UiText.Get("Title_SaveError"), MessageBoxIcon.Exclamation);
+        return false;
       }
     }
 

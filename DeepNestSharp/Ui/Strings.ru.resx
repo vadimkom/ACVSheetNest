@@ -2066,4 +2066,49 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
 
 Открыть папку?</value>
   </data>
+  <data name="Col_RunTries" xml:space="preserve">
+    <value>Прогонов</value>
+  </data>
+  <data name="Menu_EngineStats" xml:space="preserve">
+    <value>Статистика движков…</value>
+  </data>
+  <data name="Title_EngineStats" xml:space="preserve">
+    <value>Статистика движков</value>
+  </data>
+  <data name="Stat_Runs" xml:space="preserve">
+    <value>Запусков</value>
+  </data>
+  <data name="Stat_Best" xml:space="preserve">
+    <value>Лучший</value>
+  </data>
+  <data name="Stat_Dxf" xml:space="preserve">
+    <value>DXF сохр.</value>
+  </data>
+  <data name="Stat_Failed" xml:space="preserve">
+    <value>Сбоев</value>
+  </data>
+  <data name="Stat_Pieces" xml:space="preserve">
+    <value>Деталей, ср.</value>
+  </data>
+  <data name="Stat_Kinds" xml:space="preserve">
+    <value>Видов, ср.</value>
+  </data>
+  <data name="Stat_MaxPieces" xml:space="preserve">
+    <value>Деталей, макс.</value>
+  </data>
+  <data name="Stat_Seconds" xml:space="preserve">
+    <value>Время, с ср.</value>
+  </data>
+  <data name="Stat_LastRun" xml:space="preserve">
+    <value>Последний запуск</value>
+  </data>
+  <data name="Stat_OpenFolder" xml:space="preserve">
+    <value>Открыть папку</value>
+  </data>
+  <data name="Stat_Empty" xml:space="preserve">
+    <value>Пока ни одного запуска.</value>
+  </data>
+  <data name="Stat_Note" xml:space="preserve">
+    <value>Лучший: из заданий, где запускали два движка и больше, сколько раз выиграл этот (считается, когда список очищен, открыто другое задание или программа закрыта). Каждый запуск ещё и строка в engine-runs.csv.</value>
+  </data>
 </root>

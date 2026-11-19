@@ -2066,4 +2066,49 @@ gesichert {1}</value>
 
 Ordner öffnen?</value>
   </data>
+  <data name="Col_RunTries" xml:space="preserve">
+    <value>Läufe</value>
+  </data>
+  <data name="Menu_EngineStats" xml:space="preserve">
+    <value>Engine-Statistik…</value>
+  </data>
+  <data name="Title_EngineStats" xml:space="preserve">
+    <value>Engine-Statistik</value>
+  </data>
+  <data name="Stat_Runs" xml:space="preserve">
+    <value>Läufe</value>
+  </data>
+  <data name="Stat_Best" xml:space="preserve">
+    <value>Beste</value>
+  </data>
+  <data name="Stat_Dxf" xml:space="preserve">
+    <value>DXF gesp.</value>
+  </data>
+  <data name="Stat_Failed" xml:space="preserve">
+    <value>Fehler</value>
+  </data>
+  <data name="Stat_Pieces" xml:space="preserve">
+    <value>Teile, Ø</value>
+  </data>
+  <data name="Stat_Kinds" xml:space="preserve">
+    <value>Arten, Ø</value>
+  </data>
+  <data name="Stat_MaxPieces" xml:space="preserve">
+    <value>Teile, max.</value>
+  </data>
+  <data name="Stat_Seconds" xml:space="preserve">
+    <value>Zeit, s Ø</value>
+  </data>
+  <data name="Stat_LastRun" xml:space="preserve">
+    <value>Letzter Lauf</value>
+  </data>
+  <data name="Stat_OpenFolder" xml:space="preserve">
+    <value>Ordner öffnen</value>
+  </data>
+  <data name="Stat_Empty" xml:space="preserve">
+    <value>Noch keine Läufe gezählt.</value>
+  </data>
+  <data name="Stat_Note" xml:space="preserve">
+    <value>Beste: von den Aufträgen mit zwei oder mehr Engines, wie oft diese gewann (gezählt, wenn die Liste geleert, ein anderer Auftrag geöffnet oder das Programm geschlossen wird). Jeder Lauf steht auch in engine-runs.csv.</value>
+  </data>
 </root>

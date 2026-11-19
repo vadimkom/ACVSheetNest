@@ -2066,4 +2066,49 @@ guardado em {1}</value>
 
 Abrir a pasta?</value>
   </data>
+  <data name="Col_RunTries" xml:space="preserve">
+    <value>Execuções</value>
+  </data>
+  <data name="Menu_EngineStats" xml:space="preserve">
+    <value>Estatísticas dos motores…</value>
+  </data>
+  <data name="Title_EngineStats" xml:space="preserve">
+    <value>Estatísticas dos motores</value>
+  </data>
+  <data name="Stat_Runs" xml:space="preserve">
+    <value>Execuções</value>
+  </data>
+  <data name="Stat_Best" xml:space="preserve">
+    <value>Melhor</value>
+  </data>
+  <data name="Stat_Dxf" xml:space="preserve">
+    <value>DXF salvos</value>
+  </data>
+  <data name="Stat_Failed" xml:space="preserve">
+    <value>Falhas</value>
+  </data>
+  <data name="Stat_Pieces" xml:space="preserve">
+    <value>Peças, méd.</value>
+  </data>
+  <data name="Stat_Kinds" xml:space="preserve">
+    <value>Tipos, méd.</value>
+  </data>
+  <data name="Stat_MaxPieces" xml:space="preserve">
+    <value>Peças, máx.</value>
+  </data>
+  <data name="Stat_Seconds" xml:space="preserve">
+    <value>Tempo, s méd.</value>
+  </data>
+  <data name="Stat_LastRun" xml:space="preserve">
+    <value>Última execução</value>
+  </data>
+  <data name="Stat_OpenFolder" xml:space="preserve">
+    <value>Abrir pasta</value>
+  </data>
+  <data name="Stat_Empty" xml:space="preserve">
+    <value>Ainda nenhuma execução.</value>
+  </data>
+  <data name="Stat_Note" xml:space="preserve">
+    <value>Melhor: dos trabalhos com dois motores ou mais, quantos este venceu (contado ao limpar a lista, abrir outro trabalho ou fechar o programa). Cada execução também é uma linha de engine-runs.csv.</value>
+  </data>
 </root>

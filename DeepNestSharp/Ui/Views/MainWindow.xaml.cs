@@ -42,6 +42,16 @@ namespace DeepNestSharp.Ui.Views
 
       /// <summary>The engine that laid it (Sparrow, RNest, or an engine's file name); empty for a saved nest.</summary>
       public string EngineText { get; set; } = string.Empty;
+
+      /// <summary>The engine and whether a Draft (<see cref="EngineStats.Key"/>): one row per key; empty for a saved nest.</summary>
+      public string EngineKey { get; set; } = string.Empty;
+
+      /// <summary>How many times this engine was run on the job; the row holds the best of them.</summary>
+      public int Tries { get; set; } = 1;
+
+      public string TriesText => this.Tries > 0 && !string.IsNullOrEmpty(this.EngineKey)
+        ? this.Tries.ToString(System.Globalization.CultureInfo.InvariantCulture)
+        : string.Empty;
     }
 
     public class ReportSheetRow
@@ -114,6 +124,7 @@ namespace DeepNestSharp.Ui.Views
       this.Closed += (s, e) =>
       {
         this.isClosed = true;
+        this.NoteRunsJob();
 
         // An update downloaded and agreed to installs once this copy is gone (see ShowUpdateWindow).
         if (this.pendingUpdateScript != null)
@@ -1245,6 +1256,7 @@ namespace DeepNestSharp.Ui.Views
       }
 
       this.StartHistory(doc);
+      this.NoteRunsJob();
       this.nestRuns.Clear();
       this.runSeedOffset = 0;
       this.UpdateSummaryBadges();
@@ -1713,6 +1725,7 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderRunSheets != null) this.colHeaderRunSheets.Header = Localization.Get("Col_RunSheets");
       if (this.colHeaderRunTime != null) this.colHeaderRunTime.Header = Localization.Get("Col_RunTime");
       if (this.colHeaderRunEngine != null) this.colHeaderRunEngine.Header = Localization.Get("Col_RunEngine");
+      if (this.colHeaderRunTries != null) this.colHeaderRunTries.Header = Localization.Get("Col_RunTries");
 
       // Screen 4: Layout & Report
       if (this.btnBackToNesting != null) this.btnBackToNesting.Content = Localization.Get("Btn_BackToNesting");
@@ -3160,6 +3173,7 @@ namespace DeepNestSharp.Ui.Views
 
         if (engineFailures.Count > 0)
         {
+          EngineStats.NoteFailure(this.LastRunKey);
           this.ShowEngineFailure(engineFailures);
           if (result == null)
           {
@@ -3196,6 +3210,7 @@ namespace DeepNestSharp.Ui.Views
         }
 
         this.AddFinishedNest(result);
+        this.NoteRunStats(project, result);
 
         // What this nest used, by size, for the "used / in stock" badges. The quantities stay as entered: taking
         // them off summed up over several nests (a sheet added after one nest came on top of the ones it held)
@@ -3396,7 +3411,8 @@ namespace DeepNestSharp.Ui.Views
     /// 2026-11-17: two with Sparrow alone, four with RNest; 2026-11-18: Nest for each engine in the "engines"
     /// folder, and "Sparrow only" for Draft: a draft is for the report's area and cut length, and Sparrow's,
     /// at most 2.8 s, came out 4.4 % longer than the best layout on average, opus's 1 % but up to 16 s and
-    /// with overlaps, RNest's and dsh's 9 and 13 %). Picking one remembers it and runs it.</summary>
+    /// with overlaps, RNest's and dsh's 9 and 13 %). Draft first (2026-11-19). Picking one remembers it; the
+    /// button runs it. Last, the engines' statistics.</summary>
     private void OnNestModeMenu(object sender, RoutedEventArgs e)
     {
       var menu = new System.Windows.Controls.ContextMenu { PlacementTarget = this.btnNestMode, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
@@ -3408,20 +3424,17 @@ namespace DeepNestSharp.Ui.Views
 
       engines.AddRange(OtherEngines());
       bool named = engines.Count > 1;
-      for (int i = 0; i < engines.Count; i++)
+      menu.Items.Add(this.NestModeItem(1, null, named));
+      menu.Items.Add(new System.Windows.Controls.Separator());
+      foreach (string? engine in engines)
       {
-        if (i > 0)
-        {
-          menu.Items.Add(new System.Windows.Controls.Separator());
-        }
-
-        menu.Items.Add(this.NestModeItem(0, engines[i], named));
-        if (engines[i] == null)
-        {
-          menu.Items.Add(this.NestModeItem(1, null, named));
-        }
+        menu.Items.Add(this.NestModeItem(0, engine, named));
       }
 
+      menu.Items.Add(new System.Windows.Controls.Separator());
+      var stats = new System.Windows.Controls.MenuItem { Header = Localization.Get("Menu_EngineStats") };
+      stats.Click += (s, a) => this.ShowEngineStats();
+      menu.Items.Add(stats);
       menu.IsOpen = true;
     }
 
@@ -3440,11 +3453,8 @@ namespace DeepNestSharp.Ui.Views
         IsChecked = this.nestMode == mode && string.Equals(CurrentEngine, engine, System.StringComparison.OrdinalIgnoreCase),
         ToolTip = Localization.Get("Tip_NestModeMenu"),
       };
-      item.Click += (s, e) =>
-      {
-        this.SetNestMode(mode, engine);
-        this.OnNest(this.btnStartNest, new RoutedEventArgs());
-      };
+      // Picking only picks; the button runs it (2026-11-19, the user: "a plain menu to choose, run with the button").
+      item.Click += (s, e) => this.SetNestMode(mode, engine);
       return item;
     }
 
@@ -3662,7 +3672,10 @@ namespace DeepNestSharp.Ui.Views
         }
       }
 
-      await ViewModel.ExportLayoutsAsync(export);
+      if (await ViewModel.ExportLayoutsAsync(export))
+      {
+        this.NoteDxfSaved(selected);
+      }
     }
 
     /// <summary>
@@ -4112,6 +4125,7 @@ namespace DeepNestSharp.Ui.Views
 
     private void OnClearRunsClicked(object sender, RoutedEventArgs e)
     {
+      this.NoteRunsJob();
       this.nestRuns.Clear();
       this.finishedNests = 0;
       if (this.nestDxfViewer != null)
@@ -4272,7 +4286,7 @@ namespace DeepNestSharp.Ui.Views
       }
       else
       {
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(470), MinWidth = 260 });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(530), MinWidth = 260 });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star), MinWidth = 360 });
       }
@@ -4298,36 +4312,48 @@ namespace DeepNestSharp.Ui.Views
 
     private int finishedNests;
 
+    /// <summary>The key of the run just made: its engine, and whether a Draft.</summary>
+    private string LastRunKey => EngineStats.Key(this.lastRunEngine, this.lastRunWasDraft);
+
+    private static (int Placed, int Sheets, double Util) Rank(INestResult r)
+      => (r.TotalPlacedCount, -r.UsedSheets.Count, r.MaterialUtilization);
+
     /// <summary>
-    /// Adds a finished nest to the variants list, the way Solid Edge Nesting keeps its solutions: one row per
-    /// complete nest, best first (every part placed, then fewest sheets, then most material used), the best
-    /// starred. A nest that comes out the same as one already listed is not listed twice; that row is selected.
+    /// Adds a finished nest to the variants list: the best run of each engine (2026-11-19, the user: "the best
+    /// runs of each engine that was run; I ran them all and could see only one"), a Draft apart from a Nest.
+    /// Rows go best first (every part placed, then fewest sheets, then most material used), the best starred.
+    /// A run no better than its engine's row only counts in that row's runs; the row is selected.
     /// </summary>
     private void AddFinishedNest(INestResult result)
     {
-      string util = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%");
-      string placed = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}");
-      string sheets = FormattableString.Invariant($"{result.UsedSheets.Count}");
-      var same = this.nestRuns.FirstOrDefault(r => r.UtilizationText == util && r.PlacedText == placed && r.SheetsText == sheets);
-      if (same != null)
+      string key = this.LastRunKey;
+      int number = ++this.finishedNests;
+      var same = this.nestRuns.FirstOrDefault(r => !string.IsNullOrEmpty(r.EngineKey) && string.Equals(r.EngineKey, key, StringComparison.OrdinalIgnoreCase));
+      if (same != null && Rank(same.Result).CompareTo(Rank(result)) >= 0)
       {
+        same.Tries++;
+        this.runsListView.Items.Refresh();
         this.runsListView.SelectedItem = same;
         return;
       }
 
+      if (same != null)
+      {
+        this.nestRuns.Remove(same);
+      }
+
       var item = new NestRunHistoryItem
       {
-        RunNumber = ++this.finishedNests,
+        RunNumber = number,
         Result = result,
-        UtilizationText = util,
-        PlacedText = placed,
-        SheetsText = sheets,
+        UtilizationText = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%"),
+        PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
+        SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
         TimeText = this.lastRunWasDraft ? NestElapsed() + " · " + Localization.Get("Run_Draft") : NestElapsed(),
         EngineText = this.lastRunEngine,
+        EngineKey = key,
+        Tries = (same?.Tries ?? 0) + 1,
       };
-
-      static (int Placed, int Sheets, double Util) Rank(INestResult r)
-        => (r.TotalPlacedCount, -r.UsedSheets.Count, r.MaterialUtilization);
 
       int at = 0;
       while (at < this.nestRuns.Count && Rank(this.nestRuns[at].Result).CompareTo(Rank(result)) >= 0)
@@ -4343,6 +4369,46 @@ namespace DeepNestSharp.Ui.Views
 
       this.runsListView.Items.Refresh();
       this.runsListView.SelectedItem = item;
+    }
+
+    /// <summary>The run's line in the engine statistics: the engine, the job's size, what it laid, how long.</summary>
+    private void NoteRunStats(IProjectInfo project, INestResult result)
+    {
+      var rows = project?.DetailLoadInfos?.Where(p => p.IsIncluded && (p.Quantity > 0 || p.FillSheets)).ToList();
+      string? file = (ViewModel.ActiveDocument as NestProjectViewModel)?.FilePath;
+      EngineStats.NoteRun(
+        this.LastRunKey,
+        result.TotalPartsCount,
+        rows?.Count ?? 0,
+        result.TotalPlacedCount,
+        result.UsedSheets.Count,
+        result.MaterialUtilization,
+        this.nestStopwatch?.Elapsed.TotalSeconds ?? 0,
+        string.IsNullOrWhiteSpace(file) ? null : System.IO.Path.GetFileName(file));
+    }
+
+    /// <summary>
+    /// The job's list is done with (cleared, another job, closing): when two engines or more were run on it, the
+    /// starred one counts as best (<see cref="EngineStats.NoteJob"/>). Noted once per list.
+    /// </summary>
+    private void NoteRunsJob()
+    {
+      var ran = this.nestRuns.Where(r => !string.IsNullOrEmpty(r.EngineKey)).ToList();
+      if (ran.Count > 1)
+      {
+        EngineStats.NoteJob(ran.Select(r => r.EngineKey), ran[0].EngineKey); // the list is best first
+      }
+    }
+
+    /// <summary>The engine whose result is on screen goes out as DXF: counted in its statistics.</summary>
+    private void NoteDxfSaved(INestResult exported)
+    {
+      var row = this.nestRuns.FirstOrDefault(r => ReferenceEquals(r.Result, exported))
+        ?? this.runsListView.SelectedItem as NestRunHistoryItem;
+      if (row != null && !string.IsNullOrEmpty(row.EngineKey))
+      {
+        EngineStats.NoteDxf(row.EngineKey);
+      }
     }
 
     private void OnRunsListSelectionChanged(object sender, SelectionChangedEventArgs e)
