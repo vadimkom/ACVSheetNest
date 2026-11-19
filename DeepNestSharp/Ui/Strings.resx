@@ -66,12 +66,6 @@
   <data name="Btn_AddSheet" xml:space="preserve">
     <value>+ Add Sheet...</value>
   </data>
-  <data name="Btn_BackToNesting" xml:space="preserve">
-    <value>⮜ Back to Nesting</value>
-  </data>
-  <data name="Btn_BackToParts" xml:space="preserve">
-    <value>⮜ Back to Parts</value>
-  </data>
   <data name="Btn_Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -108,9 +102,6 @@
   <data name="Btn_ExportPdf" xml:space="preserve">
     <value>Export to PDF...</value>
   </data>
-  <data name="Btn_GoToLayout" xml:space="preserve">
-    <value>Go to Layout ➔</value>
-  </data>
   <data name="Btn_GoToNestingShort" xml:space="preserve">
     <value>Go to nesting</value>
   </data>
@@ -125,12 +116,6 @@
   </data>
   <data name="Btn_New" xml:space="preserve">
     <value>New</value>
-  </data>
-  <data name="Btn_NextNesting" xml:space="preserve">
-    <value>Next: Nesting ➔</value>
-  </data>
-  <data name="Btn_NextSheets" xml:space="preserve">
-    <value>Next: Sheets ➔</value>
   </data>
   <data name="Btn_OK" xml:space="preserve">
     <value>OK</value>
@@ -1418,12 +1403,6 @@ Open the download page?</value>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Pick a standard size or enter your own</value>
   </data>
-  <data name="Tip_BackToNesting" xml:space="preserve">
-    <value>Back to the nest variants (Ctrl+3)</value>
-  </data>
-  <data name="Tip_BackToParts" xml:space="preserve">
-    <value>Back to the parts (Ctrl+1)</value>
-  </data>
   <data name="Tip_CancelNest" xml:space="preserve">
     <value>Stop the nest</value>
   </data>
@@ -1466,12 +1445,6 @@ Open the download page?</value>
   <data name="Tip_FlipUpDown" xml:space="preserve">
     <value>Flip the part itself top to bottom (every copy of it). Press again to undo.</value>
   </data>
-  <data name="Tip_GoToNesting" xml:space="preserve">
-    <value>Go on to nesting (Ctrl+3)</value>
-  </data>
-  <data name="Tip_GoToSheets" xml:space="preserve">
-    <value>Go on to the sheets (Ctrl+2)</value>
-  </data>
   <data name="Tip_LayoutCard" xml:space="preserve">
     <value>Click to show this layout</value>
   </data>
@@ -1507,9 +1480,6 @@ Open the download page?</value>
   </data>
   <data name="Tip_Open" xml:space="preserve">
     <value>Open a saved project</value>
-  </data>
-  <data name="Tip_OpenLayout" xml:space="preserve">
-    <value>Go on to the final cutting drawing, DXF export and report printing (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
     <value>The part's colour: click the sketch to change it</value>

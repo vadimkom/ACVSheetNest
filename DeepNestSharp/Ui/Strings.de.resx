@@ -66,12 +66,6 @@
   <data name="Btn_AddSheet" xml:space="preserve">
     <value>+ Blech hinzufügen...</value>
   </data>
-  <data name="Btn_BackToNesting" xml:space="preserve">
-    <value>⮜ Zurück zum Schachteln</value>
-  </data>
-  <data name="Btn_BackToParts" xml:space="preserve">
-    <value>⮜ Zurück zu den Teilen</value>
-  </data>
   <data name="Btn_Cancel" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
@@ -108,9 +102,6 @@
   <data name="Btn_ExportPdf" xml:space="preserve">
     <value>Als PDF exportieren...</value>
   </data>
-  <data name="Btn_GoToLayout" xml:space="preserve">
-    <value>Zum Layout ➔</value>
-  </data>
   <data name="Btn_GoToNestingShort" xml:space="preserve">
     <value>Zum Schachteln</value>
   </data>
@@ -125,12 +116,6 @@
   </data>
   <data name="Btn_New" xml:space="preserve">
     <value>Neu</value>
-  </data>
-  <data name="Btn_NextNesting" xml:space="preserve">
-    <value>Weiter: Schachteln ➔</value>
-  </data>
-  <data name="Btn_NextSheets" xml:space="preserve">
-    <value>Weiter: Bleche ➔</value>
   </data>
   <data name="Btn_OK" xml:space="preserve">
     <value>OK</value>
@@ -1418,12 +1403,6 @@ Downloadseite öffnen?</value>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Standardgröße wählen oder eigene eingeben</value>
   </data>
-  <data name="Tip_BackToNesting" xml:space="preserve">
-    <value>Zurück zu den Schachtelvarianten (Strg+3)</value>
-  </data>
-  <data name="Tip_BackToParts" xml:space="preserve">
-    <value>Zurück zu den Teilen (Strg+1)</value>
-  </data>
   <data name="Tip_CancelNest" xml:space="preserve">
     <value>Schachteln stoppen</value>
   </data>
@@ -1466,12 +1445,6 @@ Downloadseite öffnen?</value>
   <data name="Tip_FlipUpDown" xml:space="preserve">
     <value>Das Teil selbst oben-unten spiegeln (jede Kopie davon). Nochmals drücken macht es rückgängig.</value>
   </data>
-  <data name="Tip_GoToNesting" xml:space="preserve">
-    <value>Weiter zum Schachteln (Strg+3)</value>
-  </data>
-  <data name="Tip_GoToSheets" xml:space="preserve">
-    <value>Weiter zu den Blechen (Strg+2)</value>
-  </data>
   <data name="Tip_LayoutCard" xml:space="preserve">
     <value>Klicken, um dieses Layout anzuzeigen</value>
   </data>
@@ -1507,9 +1480,6 @@ Downloadseite öffnen?</value>
   </data>
   <data name="Tip_Open" xml:space="preserve">
     <value>Gespeichertes Projekt öffnen</value>
-  </data>
-  <data name="Tip_OpenLayout" xml:space="preserve">
-    <value>Weiter zur endgültigen Schneidzeichnung, zum DXF-Export und zum Berichtsdruck (Strg+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
     <value>Farbe des Teils: zum Ändern auf die Skizze klicken</value>

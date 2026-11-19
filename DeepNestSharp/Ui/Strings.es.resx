@@ -66,12 +66,6 @@
   <data name="Btn_AddSheet" xml:space="preserve">
     <value>+ Añadir chapa...</value>
   </data>
-  <data name="Btn_BackToNesting" xml:space="preserve">
-    <value>⮜ Volver al anidado</value>
-  </data>
-  <data name="Btn_BackToParts" xml:space="preserve">
-    <value>⮜ Volver a las piezas</value>
-  </data>
   <data name="Btn_Cancel" xml:space="preserve">
     <value>Cancelar</value>
   </data>
@@ -108,9 +102,6 @@
   <data name="Btn_ExportPdf" xml:space="preserve">
     <value>Exportar a PDF...</value>
   </data>
-  <data name="Btn_GoToLayout" xml:space="preserve">
-    <value>Ir a la disposición ➔</value>
-  </data>
   <data name="Btn_GoToNestingShort" xml:space="preserve">
     <value>Ir al anidado</value>
   </data>
@@ -125,12 +116,6 @@
   </data>
   <data name="Btn_New" xml:space="preserve">
     <value>Nuevo</value>
-  </data>
-  <data name="Btn_NextNesting" xml:space="preserve">
-    <value>Siguiente: Anidado ➔</value>
-  </data>
-  <data name="Btn_NextSheets" xml:space="preserve">
-    <value>Siguiente: Chapas ➔</value>
   </data>
   <data name="Btn_OK" xml:space="preserve">
     <value>Aceptar</value>
@@ -1418,12 +1403,6 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Elegir un tamaño estándar o introducir el suyo</value>
   </data>
-  <data name="Tip_BackToNesting" xml:space="preserve">
-    <value>Volver a las variantes de anidado (Ctrl+3)</value>
-  </data>
-  <data name="Tip_BackToParts" xml:space="preserve">
-    <value>Volver a las piezas (Ctrl+1)</value>
-  </data>
   <data name="Tip_CancelNest" xml:space="preserve">
     <value>Detener el anidado</value>
   </data>
@@ -1466,12 +1445,6 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Tip_FlipUpDown" xml:space="preserve">
     <value>Voltear la propia pieza de arriba abajo (todas sus copias). Pulse de nuevo para deshacer.</value>
   </data>
-  <data name="Tip_GoToNesting" xml:space="preserve">
-    <value>Pasar al anidado (Ctrl+3)</value>
-  </data>
-  <data name="Tip_GoToSheets" xml:space="preserve">
-    <value>Pasar a las chapas (Ctrl+2)</value>
-  </data>
   <data name="Tip_LayoutCard" xml:space="preserve">
     <value>Haga clic para mostrar esta disposición</value>
   </data>
@@ -1507,9 +1480,6 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   </data>
   <data name="Tip_Open" xml:space="preserve">
     <value>Abrir un proyecto guardado</value>
-  </data>
-  <data name="Tip_OpenLayout" xml:space="preserve">
-    <value>Pasar al plano de corte final, la exportación DXF y la impresión del informe (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
     <value>Color de la pieza: haga clic en la vista para cambiarlo</value>

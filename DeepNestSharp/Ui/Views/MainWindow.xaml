@@ -162,8 +162,7 @@
         <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,6">
           <DockPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-              <TextBlock x:Name="partsCountSummary" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold" Text="Деталей: 0 (запрошено: 0 шт.)" />
-              <Button x:Name="btnGoToSheets" Style="{DynamicResource PrimaryButton}" Content="Далее: Листы ➔" Click="OnGoToSheets" Margin="4,0" ToolTip="{ui:Tr Tip_GoToSheets}" />
+              <TextBlock x:Name="partsCountSummary" VerticalAlignment="Center" Margin="12,0,4,0" FontWeight="SemiBold" Text="Деталей: 0 (запрошено: 0 шт.)" />
             </StackPanel>
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
               <Button x:Name="btnAddPart" Style="{DynamicResource PrimaryButton}" Content="+ Добавить DXF..." Click="OnAddPartClicked" Margin="3,0" ToolTip="{ui:Tr Tip_AddPart}" />
@@ -363,9 +362,7 @@
           <StackPanel>
           <DockPanel>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-              <TextBlock x:Name="sheetsCountSummary" VerticalAlignment="Center" Margin="0,0,12,0" FontWeight="SemiBold" Text="Типоразмеров: 0" />
-              <Button x:Name="btnBackToParts" Style="{DynamicResource ModernButton}" Content="⮜ Назад к моделям" Click="OnGoToParts" Margin="4,0" ToolTip="{ui:Tr Tip_BackToParts}" />
-              <Button x:Name="btnGoToNesting" Style="{DynamicResource PrimaryButton}" Content="Далее: Нестинг ➔" Click="OnGoToNesting" Margin="4,0" ToolTip="{ui:Tr Tip_GoToNesting}" />
+              <TextBlock x:Name="sheetsCountSummary" VerticalAlignment="Center" Margin="12,0,4,0" FontWeight="SemiBold" Text="Типоразмеров: 0" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
               <Button x:Name="btnAddSheet" Style="{DynamicResource PrimaryButton}" Content="+ Добавить лист..." Click="OnAddSheetMenu" Margin="3,0" ToolTip="{ui:Tr Tip_AddSheet}" />
@@ -552,12 +549,6 @@
         <!-- Nesting Control Bar -->
         <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="8,6">
           <DockPanel>
-            <!-- Right: Open Layout Button -->
-            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-              <Button x:Name="btnOpenLayoutFromNesting" Style="{DynamicResource PrimaryButton}" Content="Открыть раскладку и отчёт ➔"
-                      Click="OnGoToLayout" Margin="4,0" ToolTip="{ui:Tr Tip_OpenLayout}" />
-            </StackPanel>
-
             <!-- Left / Center: Controls & Progress -->
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
               <!-- Two buttons, two jobs: a draft in seconds for a quote, and the layout that gets cut.
@@ -726,8 +717,6 @@
                            Content="Чертеж раскладки (DXF)" IsChecked="True" Checked="OnLayoutViewTypeChanged" Margin="2,0" />
               <RadioButton x:Name="viewTypeReportRadio" GroupName="LayoutViewMode" Style="{DynamicResource ModernRadioButtonStyle}"
                            Content="Сводный отчёт" Checked="OnLayoutViewTypeChanged" Margin="2,0" />
-              <Rectangle Style="{DynamicResource ToolbarSeparator}" Margin="8,2" />
-              <Button x:Name="btnBackToNesting" Style="{DynamicResource ModernButton}" Content="⮜ Вернуться к нестингу" Click="OnGoToNesting" Margin="2,0" ToolTip="{ui:Tr Tip_BackToNesting}" />
             </StackPanel>
           </DockPanel>
         </Border>

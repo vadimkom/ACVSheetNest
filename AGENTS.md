@@ -88,7 +88,7 @@ This checkout (`C:/src/ACVSheetNest`, checked 2026-11-18) has two remotes, `orig
 - BUILDING.md: requirements, build, rebuilding Sparrow.
 - COMMON_LINE_IMPLEMENTATION.md: architecture, invariants, limits and tests of common-line cutting. Read it before touching that feature.
 - installer/RELEASING.md: testing and publishing.
-- DeepNestSharp/DeepNestSharp.csproj: the declared version. Do not infer the published version from MSI or publish folder names.
+- DeepNestSharp/DeepNestSharp.csproj: the declared version (`Version` + `AssemblyVersion`; file and informational versions follow `Version` since 1.1.81, when About still read 1.1.65). Do not infer the published version from MSI or publish folder names.
 
 ## Commands (repository root, PowerShell)
 
@@ -164,7 +164,7 @@ Last verified (2026-11-17, 1.1.74): app 534/534 with the engine. Earlier (2026-1
   - The job's code (`cfg.Rotations`) defaults to 4 again from 1.1.72; `SessionState.JobRotations` turns a stored 1002 from a settings file older than version 4 (`FourSidesAgainVersion`) into 4 once and writes the 4 back at start (`RotationInheritsTheJobFixture`; 1.1.72 did not write it back, so a later save stamped version 4 over the 1002 and kept it).
 - Flip ↔/↕ mirrors the part itself (`PartMirror`): ticked in Edit Part ("…") and applied on OK; a copy of the drawing goes in `%TEMP%\sheetnest_flip` and is rewritten when a project opens. `DetailLoadInfo.Flip/UnflippedPath` are saved.
 - **Part names** (`IDetailLoadInfo.DisplayName`; null = the file's name). Set in "…" or by double-clicking a part on a layout (`DxfViewer.PartRenameRequested` → `MainWindow.OnPartRenameRequested`). It shows in the parts table (`ShownName`), on layouts, in the DXF and the report, via `DxfExporter.PartNames` (set in `ApplyPartColours`; `GetPartNameLabel` and the report's `DisplayName` read it). The drawing file is not renamed.
-- Both viewers get the part colours (the Nesting step's preview was grey until 1.1.49). The Nesting step has no ◀ n/m ▶ bar (`ShowSheetNav = false`): its thumbnails move between layouts.
+- Both viewers get the part colours (the Nesting step's preview was grey until 1.1.49). The Nesting step has no ◀ n/m ▶ bar (`ShowSheetNav = false`): its thumbnails move between layouts. No back/next buttons on the steps since 1.1.81 (the user: they repeat the step bar at the top); the empty Layout step keeps its "go to nesting" button.
 - Parts table (user's layout, 2026-10-15): sketch, name, quantity, **Mirrored** (copies on top of the quantity), size, priority, actions "…" and ✕. No colour column: clicking the sketch changes the colour. No delete/clear buttons: Delete removes the selected rows (Ctrl/Shift for several, Ctrl+A for all, asked first when more than one).
 - Shapes (`AddShapeWindow`, `PartShapes`): a catalogue of `ShapeKind`s (rectangle, circle, washer, perforated tape), each with its parameters (label key + default in mm), optional presets (values they set and lock) and `Draw`. The dialog builds its fields from the kind, so a new shape is one class plus its texts. Files go to `%LOCALAPPDATA%\SheetNest\shapes`; adding the same shape again adds to that row. Values are in drawing units; defaults and presets are converted from mm in inch mode.
   - Washers: DIN 125-A M8/M10/M12 (hole 8.4/10.5/13, outside 16/20/24) and DIN 9021 (outside 24/30/37), or custom.

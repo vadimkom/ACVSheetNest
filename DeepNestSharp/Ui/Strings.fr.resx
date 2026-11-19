@@ -66,12 +66,6 @@
   <data name="Btn_AddSheet" xml:space="preserve">
     <value>+ Ajouter une tôle...</value>
   </data>
-  <data name="Btn_BackToNesting" xml:space="preserve">
-    <value>⮜ Retour à l'imbrication</value>
-  </data>
-  <data name="Btn_BackToParts" xml:space="preserve">
-    <value>⮜ Retour aux pièces</value>
-  </data>
   <data name="Btn_Cancel" xml:space="preserve">
     <value>Annuler</value>
   </data>
@@ -108,9 +102,6 @@
   <data name="Btn_ExportPdf" xml:space="preserve">
     <value>Exporter en PDF...</value>
   </data>
-  <data name="Btn_GoToLayout" xml:space="preserve">
-    <value>Vers le placement ➔</value>
-  </data>
   <data name="Btn_GoToNestingShort" xml:space="preserve">
     <value>Vers l'imbrication</value>
   </data>
@@ -125,12 +116,6 @@
   </data>
   <data name="Btn_New" xml:space="preserve">
     <value>Nouveau</value>
-  </data>
-  <data name="Btn_NextNesting" xml:space="preserve">
-    <value>Suivant : Imbrication ➔</value>
-  </data>
-  <data name="Btn_NextSheets" xml:space="preserve">
-    <value>Suivant : Tôles ➔</value>
   </data>
   <data name="Btn_OK" xml:space="preserve">
     <value>OK</value>
@@ -1418,12 +1403,6 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Choisir un format standard ou saisir le vôtre</value>
   </data>
-  <data name="Tip_BackToNesting" xml:space="preserve">
-    <value>Retour aux variantes d'imbrication (Ctrl+3)</value>
-  </data>
-  <data name="Tip_BackToParts" xml:space="preserve">
-    <value>Retour aux pièces (Ctrl+1)</value>
-  </data>
   <data name="Tip_CancelNest" xml:space="preserve">
     <value>Arrêter l'imbrication</value>
   </data>
@@ -1466,12 +1445,6 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Tip_FlipUpDown" xml:space="preserve">
     <value>Retourner la pièce elle-même haut-bas (toutes ses copies). Cliquez à nouveau pour annuler.</value>
   </data>
-  <data name="Tip_GoToNesting" xml:space="preserve">
-    <value>Passer à l'imbrication (Ctrl+3)</value>
-  </data>
-  <data name="Tip_GoToSheets" xml:space="preserve">
-    <value>Passer aux tôles (Ctrl+2)</value>
-  </data>
   <data name="Tip_LayoutCard" xml:space="preserve">
     <value>Cliquez pour afficher ce placement</value>
   </data>
@@ -1507,9 +1480,6 @@ Ouvrir la page de téléchargement ?</value>
   </data>
   <data name="Tip_Open" xml:space="preserve">
     <value>Ouvrir un projet enregistré</value>
-  </data>
-  <data name="Tip_OpenLayout" xml:space="preserve">
-    <value>Passer au plan de découpe final, à l'export DXF et à l'impression du rapport (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
     <value>Couleur de la pièce : cliquez sur l'aperçu pour la changer</value>

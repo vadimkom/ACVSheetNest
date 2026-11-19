@@ -66,12 +66,6 @@
   <data name="Btn_AddSheet" xml:space="preserve">
     <value>+ Добавить лист...</value>
   </data>
-  <data name="Btn_BackToNesting" xml:space="preserve">
-    <value>⮜ Назад к нестингу</value>
-  </data>
-  <data name="Btn_BackToParts" xml:space="preserve">
-    <value>⮜ Назад к моделям</value>
-  </data>
   <data name="Btn_Cancel" xml:space="preserve">
     <value>Отмена</value>
   </data>
@@ -108,9 +102,6 @@
   <data name="Btn_ExportPdf" xml:space="preserve">
     <value>Экспорт в PDF...</value>
   </data>
-  <data name="Btn_GoToLayout" xml:space="preserve">
-    <value>Перейти к раскладке ➔</value>
-  </data>
   <data name="Btn_GoToNestingShort" xml:space="preserve">
     <value>Перейти к нестингу</value>
   </data>
@@ -125,12 +116,6 @@
   </data>
   <data name="Btn_New" xml:space="preserve">
     <value>Новый</value>
-  </data>
-  <data name="Btn_NextNesting" xml:space="preserve">
-    <value>Далее: Нестинг ➔</value>
-  </data>
-  <data name="Btn_NextSheets" xml:space="preserve">
-    <value>Далее: Листы ➔</value>
   </data>
   <data name="Btn_OK" xml:space="preserve">
     <value>ОК</value>
@@ -1418,12 +1403,6 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Tip_AddSheet" xml:space="preserve">
     <value>Выбрать стандартный размер или ввести свой</value>
   </data>
-  <data name="Tip_BackToNesting" xml:space="preserve">
-    <value>Вернуться к вариантам раскладки (Ctrl+3)</value>
-  </data>
-  <data name="Tip_BackToParts" xml:space="preserve">
-    <value>Вернуться к списку деталей (Ctrl+1)</value>
-  </data>
   <data name="Tip_CancelNest" xml:space="preserve">
     <value>Остановить раскладку</value>
   </data>
@@ -1466,12 +1445,6 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Tip_FlipUpDown" xml:space="preserve">
     <value>Отразить саму деталь сверху вниз (все её копии станут зеркальными). Ещё раз — вернуть как было.</value>
   </data>
-  <data name="Tip_GoToNesting" xml:space="preserve">
-    <value>Перейти к расчёту раскладки (Ctrl+3)</value>
-  </data>
-  <data name="Tip_GoToSheets" xml:space="preserve">
-    <value>Перейти к выбору листов материала (Ctrl+2)</value>
-  </data>
   <data name="Tip_LayoutCard" xml:space="preserve">
     <value>Щёлкните, чтобы показать этот раскрой</value>
   </data>
@@ -1507,9 +1480,6 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   </data>
   <data name="Tip_Open" xml:space="preserve">
     <value>Открыть сохранённый проект</value>
-  </data>
-  <data name="Tip_OpenLayout" xml:space="preserve">
-    <value>Перейти к итоговому чертежу раскроя, экспорту в DXF и печати отчёта (Ctrl+4)</value>
   </data>
   <data name="Tip_PartColor" xml:space="preserve">
     <value>Цвет детали: щёлкните по эскизу, чтобы изменить</value>

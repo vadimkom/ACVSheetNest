@@ -1669,7 +1669,6 @@ namespace DeepNestSharp.Ui.Views
 
       // Screen 1: Parts
       if (this.btnAddPart != null) this.btnAddPart.Content = Localization.Get("Btn_AddDxf");
-      if (this.btnGoToSheets != null) this.btnGoToSheets.Content = Localization.Get("Btn_NextSheets");
       if (this.partsHintText != null) this.partsHintText.Text = Localization.Get("Hint_DragDrop");
       if (this.partsEmptyTitle != null) this.partsEmptyTitle.Text = Localization.Get("Parts_EmptyTitle");
       if (this.partsEmptySub != null) this.partsEmptySub.Text = Localization.Get("Hint_DragDrop");
@@ -1694,8 +1693,6 @@ namespace DeepNestSharp.Ui.Views
       }
 
       // Screen 2: Sheets
-      if (this.btnBackToParts != null) this.btnBackToParts.Content = Localization.Get("Btn_BackToParts");
-      if (this.btnGoToNesting != null) this.btnGoToNesting.Content = Localization.Get("Btn_NextNesting");
       if (this.btnAddSheet != null) this.btnAddSheet.Content = Localization.Get("Btn_AddSheet");
       if (this.btnDeleteSheet != null) this.btnDeleteSheet.Content = Localization.Get("Btn_DeleteSheet");
       if (this.lblSheetEdgeMargin != null) this.lblSheetEdgeMargin.Text = Localization.Get("Lbl_SheetEdgeMargin");
@@ -1709,7 +1706,6 @@ namespace DeepNestSharp.Ui.Views
 
       // Screen 3: Nesting
       if (this.cancelNestButton != null) this.cancelNestButton.Content = Localization.Get("Btn_StopNest");
-      if (this.btnOpenLayoutFromNesting != null) this.btnOpenLayoutFromNesting.Content = Localization.Get("Btn_GoToLayout");
       if (this.runsListTitle != null) this.runsListTitle.Text = Localization.Get("Lbl_RunsList");
       if (this.runsListHint != null) this.runsListHint.Text = Localization.Get("Hint_RunsList");
       if (this.colHeaderRunNum != null) this.colHeaderRunNum.Header = Localization.Get("Col_RunNum");
@@ -1720,7 +1716,6 @@ namespace DeepNestSharp.Ui.Views
       if (this.colHeaderRunEngine != null) this.colHeaderRunEngine.Header = Localization.Get("Col_RunEngine");
 
       // Screen 4: Layout & Report
-      if (this.btnBackToNesting != null) this.btnBackToNesting.Content = Localization.Get("Btn_BackToNesting");
       if (this.viewTypeDxfRadio != null) this.viewTypeDxfRadio.Content = Localization.Get("Radio_DxfView");
       if (this.viewTypeReportRadio != null) this.viewTypeReportRadio.Content = Localization.Get("Radio_ReportView");
       if (this.btnExportDxf != null) this.btnExportDxf.Content = Localization.Get("Btn_ExportDxf");
@@ -3887,10 +3882,7 @@ namespace DeepNestSharp.Ui.Views
       SetCurrentMode((WorkflowMode)Convert.ToInt32(fe.Tag));
     }
 
-    private void OnGoToParts(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Parts);
-    private void OnGoToSheets(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Sheets);
     private void OnGoToNesting(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Nesting);
-    private void OnGoToLayout(object sender, RoutedEventArgs e) => SetCurrentMode(WorkflowMode.Layout);
 
     private void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
