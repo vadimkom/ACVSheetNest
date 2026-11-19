@@ -9,6 +9,7 @@
                 <!-- Fluent (Windows 11) look for the standard controls (ThemeMode, .NET 9+, still marked experimental: WPF0001);
                      this adds the palette and keyed styles. -->
                 <ResourceDictionary Source="Ui/Themes/SheetNestTheme.xaml" />
+                <ResourceDictionary Source="Ui/Themes/FluentTweaks.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -109,8 +109,10 @@
   </Style>
 
   <!-- The four workflow steps (1. Models | 2. Sheets | 3. Nesting | 4. Layout), and the sub-view toggles
-       (e.g. DXF layout / report). Flat, with the current one tinted in the accent — the way Windows marks
-       a selected item. The default focus rectangle stays, so the keyboard user can see where they are. -->
+       (e.g. DXF layout / report). Flat, the Windows 11 way (a selector bar): the current one on a light grey with a
+       short accent bar under it. The default focus rectangle stays, so the keyboard user can see where they are. -->
+  <SolidColorBrush x:Key="Brush.SubtleHover" Color="#0A000000" />
+  <SolidColorBrush x:Key="Brush.SubtleSelected" Color="#0F000000" />
   <Style x:Key="NavModeRadioStyle" TargetType="RadioButton">
     <Setter Property="Foreground" Value="{StaticResource Brush.TextPrimary}" />
     <Setter Property="Padding" Value="14,6" />
@@ -118,19 +120,21 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="RadioButton">
-          <Border x:Name="border" Background="Transparent" BorderBrush="Transparent" BorderThickness="1"
-                  CornerRadius="4" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
-            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-          </Border>
+          <Grid>
+            <Border x:Name="border" Background="Transparent" CornerRadius="4" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <Border x:Name="pill" Width="16" Height="3" CornerRadius="1.5" Margin="0,0,0,1" VerticalAlignment="Bottom"
+                    HorizontalAlignment="Center" Background="{DynamicResource Brush.Accent}" Visibility="Collapsed" />
+          </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="border" Property="Background" Value="{DynamicResource Brush.Hover}" />
+              <Setter TargetName="border" Property="Background" Value="{DynamicResource Brush.SubtleHover}" />
             </Trigger>
             <Trigger Property="IsChecked" Value="True">
-              <Setter TargetName="border" Property="Background" Value="{DynamicResource Brush.AccentTint}" />
-              <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource Brush.Accent}" />
+              <Setter TargetName="border" Property="Background" Value="{DynamicResource Brush.SubtleSelected}" />
+              <Setter TargetName="pill" Property="Visibility" Value="Visible" />
               <Setter Property="FontWeight" Value="SemiBold" />
-              <Setter Property="Foreground" Value="{DynamicResource Brush.AccentPressed}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter Property="Foreground" Value="{DynamicResource Brush.TextMuted}" />

@@ -4272,7 +4272,7 @@ namespace DeepNestSharp.Ui.Views
       }
       else
       {
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(380), MinWidth = 260 });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(470), MinWidth = 260 });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star), MinWidth = 360 });
       }

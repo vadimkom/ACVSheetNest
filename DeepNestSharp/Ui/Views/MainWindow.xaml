@@ -75,6 +75,10 @@
     <!-- Row 0: Menu Bar -->
     <DockPanel Grid.Row="0" Background="{DynamicResource Brush.Window}">
       <Menu Background="Transparent" VerticalAlignment="Center">
+        <!-- Fluent spaces the top-level items for touch; the menu bar is a single line of text here. -->
+        <Menu.ItemContainerStyle>
+          <StaticResource ResourceKey="MenuBarItem" />
+        </Menu.ItemContainerStyle>
         <MenuItem x:Name="menuFile" Header="_Файл" SubmenuOpened="OnFileMenuOpened">
           <MenuItem x:Name="menuNewProject" Header="Новый проект" Command="{Binding CreateNestProjectCommand}" />
           <MenuItem x:Name="menuOpenProject" Header="Открыть проект..." Command="{Binding LoadNestProjectCommand}" />
@@ -209,9 +213,9 @@
               </Style>
             </ListView.ItemContainerStyle>
             <ListView.View>
-              <GridView>
+              <GridView ColumnHeaderContainerStyle="{StaticResource CompactColumnHeader}">
                 <!-- Preview Thumbnail -->
-                <GridViewColumn x:Name="colHeaderPartPreview" Header="Эскиз" Width="64">
+                <GridViewColumn x:Name="colHeaderPartPreview" Header="Эскиз" Width="72">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <!-- The sketch is drawn in the part's colour, so it is where the colour is changed too. -->
@@ -285,7 +289,7 @@
                 </GridViewColumn>
 
                 <!-- Dimensions -->
-                <GridViewColumn x:Name="colHeaderDimensions" Header="Габариты (Ш × В), мм" Width="140">
+                <GridViewColumn x:Name="colHeaderDimensions" Header="Габариты (Ш × В), мм" Width="165">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <TextBlock Text="{Binding SizeLabel, Mode=OneWay}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="4,0" />
@@ -410,9 +414,9 @@
               </Style>
             </ListView.ItemContainerStyle>
             <ListView.View>
-              <GridView>
+              <GridView ColumnHeaderContainerStyle="{StaticResource CompactColumnHeader}">
                 <!-- The sheet in proportion; an offcut read from a drawing shows its own outline and holes. -->
-                <GridViewColumn x:Name="colHeaderSheetPreview" Header="Эскиз" Width="64">
+                <GridViewColumn x:Name="colHeaderSheetPreview" Header="Эскиз" Width="72">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <Border Width="48" Height="48" Margin="2" Background="White" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
@@ -468,7 +472,7 @@
                 </GridViewColumn>
 
                 <!-- Unlimited Stock Checkbox -->
-                <GridViewColumn x:Name="colHeaderSheetUnlimited" Header="Неограниченно" Width="130">
+                <GridViewColumn x:Name="colHeaderSheetUnlimited" Header="Неограниченно" Width="165">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <CheckBox IsChecked="{Binding Unlimited, Mode=TwoWay}" Content="{ui:Tr Sheet_UnlimitedShort}"
@@ -493,7 +497,7 @@
                 </GridViewColumn>
 
                 <!-- Available / Used Status -->
-                <GridViewColumn x:Name="colHeaderSheetStatus" Header="Использовано / в наличии" Width="160">
+                <GridViewColumn x:Name="colHeaderSheetStatus" Header="Использовано / в наличии" Width="200">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <Border Style="{DynamicResource CountBadge}">
@@ -575,7 +579,7 @@
         <!-- Two-Pane Work Area: Left = Runs/Iterations Table, Right = DxfViewer Run Preview -->
         <Grid Grid.Row="1" x:Name="nestWorkArea" SizeChanged="OnNestWorkAreaSizeChanged">
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="380" MinWidth="260" />
+            <ColumnDefinition Width="470" MinWidth="260" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" MinWidth="360" />
           </Grid.ColumnDefinitions>
@@ -613,19 +617,19 @@
                   </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.View>
-                  <GridView>
+                  <GridView ColumnHeaderContainerStyle="{StaticResource CompactColumnHeader}">
                     <GridViewColumn x:Name="colHeaderRunNum" Header="№" Width="40" DisplayMemberBinding="{Binding RunLabel}" />
-                    <GridViewColumn x:Name="colHeaderRunUtil" Header="% Утилиз." Width="78">
+                    <GridViewColumn x:Name="colHeaderRunUtil" Header="% Утилиз." Width="95">
                       <GridViewColumn.CellTemplate>
                         <DataTemplate>
                           <TextBlock Text="{Binding UtilizationText}" FontWeight="Bold" Foreground="{DynamicResource Brush.Accent}" />
                         </DataTemplate>
                       </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn x:Name="colHeaderRunPlaced" Header="Размещено" Width="80" DisplayMemberBinding="{Binding PlacedText}" />
-                    <GridViewColumn x:Name="colHeaderRunSheets" Header="Листов" Width="52" DisplayMemberBinding="{Binding SheetsText}" />
+                    <GridViewColumn x:Name="colHeaderRunPlaced" Header="Размещено" Width="95" DisplayMemberBinding="{Binding PlacedText}" />
+                    <GridViewColumn x:Name="colHeaderRunSheets" Header="Листов" Width="64" DisplayMemberBinding="{Binding SheetsText}" />
                     <GridViewColumn x:Name="colHeaderRunTime" Header="Время" Width="68" DisplayMemberBinding="{Binding TimeText}" />
-                    <GridViewColumn x:Name="colHeaderRunEngine" Header="Движок" Width="95" DisplayMemberBinding="{Binding EngineText}" />
+                    <GridViewColumn x:Name="colHeaderRunEngine" Header="Движок" Width="120" DisplayMemberBinding="{Binding EngineText}" />
                   </GridView>
                 </ListView.View>
               </ListView>

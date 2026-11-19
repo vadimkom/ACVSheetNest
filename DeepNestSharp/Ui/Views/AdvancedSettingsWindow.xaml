@@ -123,7 +123,7 @@
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
           <TextBlock x:Name="partNameExportLabel" Grid.Column="0" Text="Part name text:" VerticalAlignment="Center" Margin="0,0,10,0" />
-          <ComboBox Grid.Column="1" x:Name="partNameExportCombo" Width="250" HorizontalAlignment="Left"
+          <ComboBox Grid.Column="1" x:Name="partNameExportCombo" Width="330" HorizontalAlignment="Left"
                     ToolTip="{ui:Tr Set_PartNamesTip}">
             <ComboBoxItem x:Name="partNameItemNone" Tag="None">None</ComboBoxItem>
             <ComboBoxItem x:Name="partNameItemLayer9" Tag="Paint">PAINT (engraving)</ComboBoxItem>
