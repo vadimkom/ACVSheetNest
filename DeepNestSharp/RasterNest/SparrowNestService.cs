@@ -914,6 +914,33 @@ namespace DeepNestSharp.RasterNest
             return null;
           }
 
+          // Rows are one orientation repeated, the best there is for washers and rectangles. A few large
+          // parts with hollows go tighter when each is tucked into the next one, which only a search finds:
+          // the elbow sides on a 320 x 2000 strip are 6 in rows, 7 by hand (KolenaFillFixture). So when the
+          // rows seat few, the engine is asked as well, and the sheet keeps whichever seats more once judged.
+          if (lattice && placements != null && placements.Count <= LatticeSearchMax && !cancel.IsCancellationRequested)
+          {
+            int src = batchQty.Keys.First();
+            var offer = new Dictionary<int, int> { [src] = Math.Min(pool[src], Math.Max(batchQty[src], placements.Count + 2)) };
+            var (searchPl, searchBy, searchW, searchH, _, _, searchEdges, _) = PackOneSheet(
+              loaded, offer, w, h, margin, budget, SearchWorkers(effort), hardTimeoutSec, tries, sparrowExePath, cancel,
+              onDensity, commonLineGap, geometryTolerance, effort, commonLineMaxClusterParts, out _, onCandidate: null, seedOffset: seedOffset);
+            if (!cancel.IsCancellationRequested && searchPl != null && searchBy != null && searchPl.Count > placements.Count)
+            {
+              searchEdges ??= new List<CommonEdgeIntent>();
+              DeferUnfit(searchPl, searchBy, loadedById, searchEdges, searchW, searchH, margin, commonLineGap, geometryTolerance);
+              if (searchPl.Count > placements.Count)
+              {
+                placements = searchPl;
+                placedBySrc = searchBy;
+                packW = searchW;
+                packH = searchH;
+                commonEdges = searchEdges;
+                onSheetCandidate?.Invoke(placements, placedBySrc, commonEdges);
+              }
+            }
+          }
+
           // LAST CHANCE. If this is the only sheet left and the search still has not taken everything, the
           // parts it leaves behind are not going anywhere else: they come back as unplaced. That is worth
           // paying for, and only there.
@@ -1303,6 +1330,9 @@ namespace DeepNestSharp.RasterNest
 
     /// <summary>Off until it has been measured on shop jobs: written, not yet shown to save a sheet.</summary>
     private static readonly bool TailRepackEnabled = false;
+
+    /// <summary>A sheet of one filler that rows seat this many of or fewer is searched by the engine too.</summary>
+    internal const int LatticeSearchMax = 40;
 
     /// <summary>Sheets a tail repack may take together, the last one included.</summary>
     private const int TailRepackMaxSheets = 4;
