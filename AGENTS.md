@@ -39,7 +39,7 @@ This checkout (`C:/src/ACVSheetNest`, checked 2026-11-18) has two remotes, `orig
   - On `Closed` it runs the script hidden: wait for the PID, `msiexec /i … /passive`, start `SheetNest.exe` again from `HKCU\Software\SheetNest\InstallFolder`.
   - **A release must carry the MSI as an asset**, or the button stays disabled and only "What's new" works.
   - Verified: the live check and download of 1.1.57 (54.7 MB), the script text, and the registry lookup. The full install-and-restart was not run here.
-- **Never publish a release before the user has tested the local MSI and said "выложи".** Build it, tell them where it is, and wait. Pushing a release is what reaches the laser PC through the update check.
+- **Never publish a release before the user has tested the local MSI and said "выложи".** Build it, tell them where it is, and wait. A release reaches other PCs through the update check; the laser PC is rarely online, so the user carries the MSI there on a flash drive (2026-11-20). Keep the MSI installable by hand.
 
 ## Paths on this machine
 
