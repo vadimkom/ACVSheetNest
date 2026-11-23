@@ -43,7 +43,7 @@ This checkout (`C:/src/ACVSheetNest`, checked 2026-11-18) has two remotes, `orig
 
 ## Paths on this machine
 
-- Code: `C:/src/ACVSheetNest`. Installers land in the repo root as `SheetNest-x.y.z-win-x64.msi`; publish output goes to `publish-x.y.z/`.
+- Code: `C:/src/ACVSheetNest`. Installers land in the repo root as `SheetNest-x.y.z-win-x64.msi`; publish output goes to `publish-x.y.z/`. After building a new MSI, delete the older `publish-*` folders and MSIs and keep only the newest (the user, 2026-11-23; published ones are on GitHub releases).
 - Runtime data: `%LOCALAPPDATA%/SheetNest`:
   - `session.json` (language, recent projects, last material);
   - `nest-profiles.json` (Draft/Nest engine settings);
