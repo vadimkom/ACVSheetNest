@@ -352,7 +352,7 @@
     <value>Cochez les tôles déjà découpées</value>
   </data>
   <data name="Hint_RunsList" xml:space="preserve">
-    <value>💡 Chaque clic sur Brouillon ou Imbriquer ajoute une imbrication complète de toute la commande, une ligne par moteur (les brouillons sont marqués). La meilleure est en haut (★) : toutes les pièces placées, le moins de tôles, la meilleure utilisation de la matière, la plus grande chute (le plus grand rectangle libre, L × l), le calcul le plus rapide. Clic sur un en-tête = tri. Clic sur une ligne = aperçu, double-clic = placement.</value>
+    <value>💡 Chaque clic sur Brouillon ou Imbriquer ajoute une imbrication complète de toute la commande, une ligne par moteur (un brouillon a sa propre ligne « Brouillon »). La meilleure est en haut (★) : toutes les pièces placées, le moins de tôles, la meilleure utilisation de la matière, la plus grande chute (le plus grand rectangle libre, L × l), le calcul le plus rapide. Clic sur un en-tête = tri. Clic sur une ligne = aperçu, double-clic = placement.</value>
   </data>
   <data name="Kpi_PartsPlaced" xml:space="preserve">
     <value>Pièces placées :</value>
@@ -1134,7 +1134,7 @@ Ouvrir la page de téléchargement ?</value>
     <value>Le réglage de la commande, dans Paramètres &gt; Paramètres avancés. Changez-le là et cette pièce suit.</value>
   </data>
   <data name="Run_Draft" xml:space="preserve">
-    <value>brouillon</value>
+    <value>Brouillon</value>
   </data>
   <data name="Run_Saved" xml:space="preserve">
     <value>Enregistrée</value>

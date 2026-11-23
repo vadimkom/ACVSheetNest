@@ -352,7 +352,7 @@
     <value>Tick the sheets that are already cut</value>
   </data>
   <data name="Hint_RunsList" xml:space="preserve">
-    <value>💡 Every press of Draft or Nest adds a finished nest of the whole job, one row per engine (drafts are marked). The best is on top (★): every part placed, fewest sheets, most material used, the largest offcut (the biggest clean rectangle left, W × H), the quicker run. Click a column header to sort. Click a row to preview, double-click for the layout.</value>
+    <value>💡 Every press of Draft or Nest adds a finished nest of the whole job, one row per engine (a draft is its own row, “Draft”). The best is on top (★): every part placed, fewest sheets, most material used, the largest offcut (the biggest clean rectangle left, W × H), the quicker run. Click a column header to sort. Click a row to preview, double-click for the layout.</value>
   </data>
   <data name="Kpi_PartsPlaced" xml:space="preserve">
     <value>Parts placed:</value>
@@ -1134,7 +1134,7 @@ Open the download page?</value>
     <value>Whatever the job is set to, under Settings &gt; Advanced Settings. Change it there and this part follows.</value>
   </data>
   <data name="Run_Draft" xml:space="preserve">
-    <value>draft</value>
+    <value>Draft</value>
   </data>
   <data name="Run_Saved" xml:space="preserve">
     <value>Saved</value>

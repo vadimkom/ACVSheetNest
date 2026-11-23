@@ -352,7 +352,7 @@
     <value>Markieren Sie die bereits geschnittenen Bleche</value>
   </data>
   <data name="Hint_RunsList" xml:space="preserve">
-    <value>💡 Jeder Druck auf „Entwurf“ oder „Schachteln“ fügt eine fertige Schachtelung des ganzen Auftrags hinzu, eine Zeile je Engine (Entwürfe sind markiert). Die beste steht oben (★): alle Teile platziert, wenigste Bleche, höchste Materialausnutzung, größtes Reststück (das größte freie Rechteck, B × L), schnellerer Lauf. Klick auf eine Spaltenüberschrift sortiert. Klick auf eine Zeile = Vorschau, Doppelklick = Layout.</value>
+    <value>💡 Jeder Druck auf „Entwurf“ oder „Schachteln“ fügt eine fertige Schachtelung des ganzen Auftrags hinzu, eine Zeile je Engine (ein Entwurf als eigene Zeile „Entwurf“). Die beste steht oben (★): alle Teile platziert, wenigste Bleche, höchste Materialausnutzung, größtes Reststück (das größte freie Rechteck, B × L), schnellerer Lauf. Klick auf eine Spaltenüberschrift sortiert. Klick auf eine Zeile = Vorschau, Doppelklick = Layout.</value>
   </data>
   <data name="Kpi_PartsPlaced" xml:space="preserve">
     <value>Platzierte Teile:</value>

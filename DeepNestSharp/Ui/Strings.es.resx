@@ -352,7 +352,7 @@
     <value>Marque las chapas que ya están cortadas</value>
   </data>
   <data name="Hint_RunsList" xml:space="preserve">
-    <value>💡 Cada pulsación de Borrador o Anidar añade un anidado completo de todo el pedido, una fila por motor (los borradores van marcados). El mejor está arriba (★): todas las piezas colocadas, menos chapas, más material aprovechado, el mayor retal (el mayor rectángulo libre, An × L), la ejecución más rápida. Clic en un encabezado = ordenar. Clic en una fila = vista previa, doble clic = disposición.</value>
+    <value>💡 Cada pulsación de Borrador o Anidar añade un anidado completo de todo el pedido, una fila por motor (un borrador en su propia fila «Borrador»). El mejor está arriba (★): todas las piezas colocadas, menos chapas, más material aprovechado, el mayor retal (el mayor rectángulo libre, An × L), la ejecución más rápida. Clic en un encabezado = ordenar. Clic en una fila = vista previa, doble clic = disposición.</value>
   </data>
   <data name="Kpi_PartsPlaced" xml:space="preserve">
     <value>Piezas colocadas:</value>
@@ -1134,7 +1134,7 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
     <value>Lo que tenga el pedido, en Configuración &gt; Configuración avanzada. Cámbielo allí y esta pieza lo sigue.</value>
   </data>
   <data name="Run_Draft" xml:space="preserve">
-    <value>borrador</value>
+    <value>Borrador</value>
   </data>
   <data name="Run_Saved" xml:space="preserve">
     <value>Guardado</value>

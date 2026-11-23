@@ -352,7 +352,7 @@
     <value>Marque as chapas que já foram cortadas</value>
   </data>
   <data name="Hint_RunsList" xml:space="preserve">
-    <value>💡 Cada clique em Rascunho ou Encaixar adiciona um encaixe completo de todo o pedido, uma linha por motor (rascunhos são marcados). O melhor fica no topo (★): todas as peças colocadas, menos chapas, mais material aproveitado, o maior retalho (o maior retângulo livre, L × C), a execução mais rápida. Clique num cabeçalho = ordenar. Clique numa linha = visualizar, clique duplo = layout.</value>
+    <value>💡 Cada clique em Rascunho ou Encaixar adiciona um encaixe completo de todo o pedido, uma linha por motor (um rascunho em linha própria, «Rascunho»). O melhor fica no topo (★): todas as peças colocadas, menos chapas, mais material aproveitado, o maior retalho (o maior retângulo livre, L × C), a execução mais rápida. Clique num cabeçalho = ordenar. Clique numa linha = visualizar, clique duplo = layout.</value>
   </data>
   <data name="Kpi_PartsPlaced" xml:space="preserve">
     <value>Peças colocadas:</value>
@@ -1134,7 +1134,7 @@ Abrir a página de download?</value>
     <value>O que estiver ajustado no pedido, em Configurações &gt; Configurações avançadas. Mude lá e esta peça acompanha.</value>
   </data>
   <data name="Run_Draft" xml:space="preserve">
-    <value>rascunho</value>
+    <value>Rascunho</value>
   </data>
   <data name="Run_Saved" xml:space="preserve">
     <value>Salvo</value>

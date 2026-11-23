@@ -77,8 +77,17 @@ namespace DeepNestSharp.Ui.Views
         }
       }
 
-      /// <summary>The engine that laid it (Sparrow, RNest, or an engine's file name); empty for a saved nest.</summary>
-      public string EngineText { get; set; } = string.Empty;
+      private string engineText = string.Empty;
+
+      /// <summary>A Draft run: its engine reads "Draft" (Sparrow's alone; the user, 1.1.90: no mark, call the engine Draft).</summary>
+      public bool IsDraft { get; set; }
+
+      /// <summary>The engine that laid it (Sparrow, RNest, or an engine's file name), "Draft" for a Draft; empty for a saved nest.</summary>
+      public string EngineText
+      {
+        get => this.IsDraft ? Localization.Get("Run_Draft") : this.engineText;
+        set => this.engineText = value ?? string.Empty;
+      }
 
       /// <summary>The engine and whether a Draft (<see cref="EngineStats.Key"/>): one row per key; empty for a saved nest.</summary>
       public string EngineKey { get; set; } = string.Empty;
@@ -1748,6 +1757,7 @@ namespace DeepNestSharp.Ui.Views
       if (this.runsListTitle != null) this.runsListTitle.Text = Localization.Get("Lbl_RunsList");
       if (this.runsListHint != null) this.runsListHint.Text = Localization.Get("Hint_RunsList");
       this.UpdateRunHeaders();
+      this.runsListView?.Items.Refresh(); // "Saved" and "Draft" in the rows follow the language
 
       // Screen 4: Layout & Report
       if (this.viewTypeDxfRadio != null) this.viewTypeDxfRadio.Content = Localization.Get("Radio_DxfView");
@@ -4460,7 +4470,8 @@ namespace DeepNestSharp.Ui.Views
         UtilizationText = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%"),
         PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
         SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
-        TimeText = this.lastRunWasDraft ? NestElapsed() + " · " + Localization.Get("Run_Draft") : NestElapsed(),
+        TimeText = NestElapsed(),
+        IsDraft = this.lastRunWasDraft,
         Seconds = this.nestStopwatch?.Elapsed.TotalSeconds ?? double.PositiveInfinity,
         Offcut = RasterNest.LargestOffcut.Of(result, this.dxfViewer?.DefaultPartSpacing ?? 0),
         EngineText = this.lastRunEngine,
