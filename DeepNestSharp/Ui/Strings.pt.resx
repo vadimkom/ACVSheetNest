@@ -2036,4 +2036,55 @@ guardado em {1}</value>
 
 Abrir a pasta?</value>
   </data>
+  <data name="Btn_Pictures" xml:space="preserve">
+    <value>🖼 Imagens...</value>
+  </data>
+  <data name="Btn_PicturesN" xml:space="preserve">
+    <value>🖼 Imagens ({0})...</value>
+  </data>
+  <data name="Tip_Pictures" xml:space="preserve">
+    <value>Imagens para o relatório: de arquivos ou da área de transferência. Cada uma é impressa em sua própria página após os encaixes e salva no projeto.</value>
+  </data>
+  <data name="Pic_Title" xml:space="preserve">
+    <value>Imagens para o relatório</value>
+  </data>
+  <data name="Pic_AddFiles" xml:space="preserve">
+    <value>Adicionar arquivos...</value>
+  </data>
+  <data name="Pic_Paste" xml:space="preserve">
+    <value>Colar da área de transferência</value>
+  </data>
+  <data name="Pic_Hint" xml:space="preserve">
+    <value>ou solte arquivos aqui, ou Ctrl+V</value>
+  </data>
+  <data name="Pic_Caption" xml:space="preserve">
+    <value>Legenda (título da página no relatório)</value>
+  </data>
+  <data name="Pic_Up" xml:space="preserve">
+    <value>Antes no relatório</value>
+  </data>
+  <data name="Pic_Down" xml:space="preserve">
+    <value>Depois no relatório</value>
+  </data>
+  <data name="Pic_Remove" xml:space="preserve">
+    <value>Remover a imagem</value>
+  </data>
+  <data name="Pic_Empty" xml:space="preserve">
+    <value>Ainda não há imagens. Adicione arquivos, solte-os aqui ou copie uma imagem e pressione Ctrl+V. Cada uma é impressa em sua própria página após os encaixes.</value>
+  </data>
+  <data name="Pic_NotRead" xml:space="preserve">
+    <value>Não foi possível ler como imagens:</value>
+  </data>
+  <data name="Pic_ClipboardEmpty" xml:space="preserve">
+    <value>A área de transferência não contém imagem.</value>
+  </data>
+  <data name="Pic_FileFilter" xml:space="preserve">
+    <value>Imagens</value>
+  </data>
+  <data name="Pic_AllFiles" xml:space="preserve">
+    <value>Todos os arquivos</value>
+  </data>
+  <data name="Rep_PictureN" xml:space="preserve">
+    <value>Imagem {0} de {1}</value>
+  </data>
 </root>

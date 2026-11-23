@@ -32,7 +32,8 @@ namespace DeepNestSharp.Reports
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
       ReportMaterial material = null,
-      ReportShortage shortage = null)
+      ReportShortage shortage = null,
+      IReadOnlyList<ReportPicture> pictures = null)
     {
       var pdf = new MiniPdf();
       GenerateReport(
@@ -45,7 +46,8 @@ namespace DeepNestSharp.Reports
         units,
         partColours,
         material,
-        shortage);
+        shortage,
+        pictures);
 
       File.WriteAllBytes(path, pdf.Build());
     }
@@ -56,7 +58,8 @@ namespace DeepNestSharp.Reports
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
       ReportMaterial material = null,
-      ReportShortage shortage = null)
+      ReportShortage shortage = null,
+      IReadOnlyList<ReportPicture> pictures = null)
     {
       var pdf = new MiniPdf();
       GenerateReport(
@@ -69,7 +72,8 @@ namespace DeepNestSharp.Reports
         units,
         partColours,
         material,
-        shortage);
+        shortage,
+        pictures);
 
       return pdf.Build();
     }
@@ -80,7 +84,8 @@ namespace DeepNestSharp.Reports
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
       ReportMaterial material = null,
-      ReportShortage shortage = null)
+      ReportShortage shortage = null,
+      IReadOnlyList<ReportPicture> pictures = null)
     {
       var doc = new System.Windows.Documents.FixedDocument();
       GenerateReport(
@@ -103,7 +108,8 @@ namespace DeepNestSharp.Reports
         units,
         partColours,
         material,
-        shortage);
+        shortage,
+        pictures);
 
       return doc;
     }
@@ -114,7 +120,8 @@ namespace DeepNestSharp.Reports
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
       ReportMaterial material = null,
-      ReportShortage shortage = null)
+      ReportShortage shortage = null,
+      IReadOnlyList<ReportPicture> pictures = null)
     {
       var pages = new List<System.Windows.FrameworkElement>();
       GenerateReport(
@@ -129,7 +136,8 @@ namespace DeepNestSharp.Reports
         units,
         partColours,
         material,
-        shortage);
+        shortage,
+        pictures);
 
       return pages;
     }
@@ -141,7 +149,8 @@ namespace DeepNestSharp.Reports
       string units = "in",
       IReadOnlyDictionary<string, (byte R, byte G, byte B)> partColours = null,
       ReportMaterial material = null,
-      ReportShortage shortage = null)
+      ReportShortage shortage = null,
+      IReadOnlyList<ReportPicture> pictures = null)
     {
       if (layouts == null || layouts.Count == 0)
       {
@@ -151,8 +160,8 @@ namespace DeepNestSharp.Reports
       // A parts list that does not fit carries on over extra pages, so neither the page count in the footers
       // nor the page a layout starts on (the cutting plan's Page column) is known until the list is laid out.
       // A dry run on blank canvases finds both; the real run then prints them.
-      var dry = Render(() => new NullCanvas(), layouts, unplacedCount, units, partColours, null, 0, material, shortage);
-      Render(newPage, layouts, unplacedCount, units, partColours, dry.LayoutPages, dry.Pages, material, shortage);
+      var dry = Render(() => new NullCanvas(), layouts, unplacedCount, units, partColours, null, 0, material, shortage, pictures);
+      Render(newPage, layouts, unplacedCount, units, partColours, dry.LayoutPages, dry.Pages, material, shortage, pictures);
     }
 
     private static (int Pages, List<int> LayoutPages) Render(
@@ -164,7 +173,8 @@ namespace DeepNestSharp.Reports
       IReadOnlyList<int> layoutPages,
       int pageCount,
       ReportMaterial material,
-      ReportShortage shortage)
+      ReportShortage shortage,
+      IReadOnlyList<ReportPicture> pictures)
     {
       int page = 0;
       var layoutStarts = new List<int>();
@@ -507,6 +517,21 @@ namespace DeepNestSharp.Reports
         py -= 14;
         int next = PartTable(c, py, layoutRows, 0, colours, colourCoded, units, weighMaterial);
         ContinueOnNewPages(layoutRows, next, $"{LF("Rep_LayoutN", i + 1)}: {L("Rep_PartsOnLayout")}");
+      }
+
+      // ── The job's pictures, after the layouts, a page each: as large as the page allows, never enlarged
+      // past twice their pixels (a small screenshot blown up to the page is only blur). ──
+      var shown = pictures?.Where(p => p != null && p.PixelWidth > 0 && p.PixelHeight > 0).ToList() ?? new List<ReportPicture>();
+      for (int k = 0; k < shown.Count; k++)
+      {
+        var pic = shown[k];
+        var c = NextPage();
+        string title = string.IsNullOrWhiteSpace(pic.Caption) ? LF("Rep_PictureN", k + 1, shown.Count) : pic.Caption.Trim();
+        c.Text(40, 544, 13, bold: true, Trunc(title, 110));
+        double boxX = 40, boxY = 32, boxW = 762, boxH = 498;
+        double scale = Math.Min(Math.Min(boxW / pic.PixelWidth, boxH / pic.PixelHeight), 2.0 * 72.0 / 96.0);
+        double w = pic.PixelWidth * scale, h = pic.PixelHeight * scale;
+        c.Image(boxX + ((boxW - w) / 2.0), boxY + boxH - h, w, h, pic);
       }
 
       return (page, layoutStarts);
@@ -1086,6 +1111,12 @@ namespace DeepNestSharp.Reports
         this.sb.AppendLine(FormattableString.Invariant($"h 0.5 w 0.15 0.15 0.15 RG {paint} 0 0 0 rg"));
       }
 
+      public void Image(double x, double y, double w, double h, ReportPicture picture)
+      {
+        string name = this.pdf.ImageName(picture);
+        this.sb.AppendLine(FormattableString.Invariant($"q {w:0.###} 0 0 {h:0.###} {x:0.###} {y:0.###} cm /{name} Do Q"));
+      }
+
       public byte[] ToBytes()
       {
         // Reset colors at stream start so pages are independent.
@@ -1104,6 +1135,7 @@ namespace DeepNestSharp.Reports
         new Lazy<(PdfTrueTypeFont, PdfTrueTypeFont)>(PdfTrueTypeFont.LoadSystemArial);
 
       private readonly List<PageContent> pages = new List<PageContent>();
+      private readonly List<ReportPicture> images = new List<ReportPicture>();
       private readonly PdfTrueTypeFont regular;
       private readonly PdfTrueTypeFont bold;
 
@@ -1135,14 +1167,32 @@ namespace DeepNestSharp.Reports
           : "(" + text.Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)") + ")";
       }
 
+      /// <summary>The resource name a picture is drawn by, the same for every page that shows it.</summary>
+      public string ImageName(ReportPicture picture)
+      {
+        int i = this.images.IndexOf(picture);
+        if (i < 0)
+        {
+          this.images.Add(picture);
+          i = this.images.Count - 1;
+        }
+
+        return "Im" + i.ToString(CultureInfo.InvariantCulture);
+      }
+
       public byte[] Build()
       {
         var pageStreams = this.pages.Select(p => p.ToBytes()).ToList();
 
-        // Object layout: 1 Catalog, 2 Pages, then per page i: 3+2i = content, 4+2i = page, then the fonts.
+        // Object layout: 1 Catalog, 2 Pages, then per page i: 3+2i = content, 4+2i = page, then the fonts
+        // (five objects each embedded, one each for Helvetica), then the pictures.
         int n = pageStreams.Count;
         int f1 = 3 + (2 * n);
         int f2 = this.regular != null ? f1 + 5 : f1 + 1;
+        int firstImage = this.regular != null ? f2 + 5 : f2 + 1;
+        string xobjects = this.images.Count == 0
+          ? string.Empty
+          : " /XObject << " + string.Join(" ", this.images.Select((_, i) => FormattableString.Invariant($"/Im{i} {firstImage + i} 0 R"))) + " >>";
         var objects = new List<byte[]>
         {
           Latin1("<< /Type /Catalog /Pages 2 0 R >>"),
@@ -1157,7 +1207,7 @@ namespace DeepNestSharp.Reports
           WriteBytes(obj, Latin1("\nendstream"));
           objects.Add(obj.ToArray());
           objects.Add(Latin1(FormattableString.Invariant(
-            $"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {PageW} {PageH}] /Resources << /Font << /F1 {f1} 0 R /F2 {f2} 0 R >> >> /Contents {objects.Count} 0 R >>")));
+            $"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {PageW} {PageH}] /Resources << /Font << /F1 {f1} 0 R /F2 {f2} 0 R >>{xobjects} >> /Contents {objects.Count} 0 R >>")));
         }
 
         if (this.regular != null)
@@ -1169,6 +1219,23 @@ namespace DeepNestSharp.Reports
         {
           objects.Add(Latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"));
           objects.Add(Latin1("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"));
+        }
+
+        if (objects.Count + 1 != firstImage)
+        {
+          throw new InvalidOperationException($"PDF objects out of step: pictures start at {objects.Count + 1}, not {firstImage}.");
+        }
+
+        foreach (var picture in this.images)
+        {
+          // JPEG straight into the file (DCTDecode): no zlib, which the shop PC lacks.
+          var (jpeg, width, height) = picture.PdfJpeg();
+          var obj = new MemoryStream();
+          WriteBytes(obj, Latin1(FormattableString.Invariant(
+            $"<< /Type /XObject /Subtype /Image /Width {width} /Height {height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length {jpeg.Length} >>\nstream\n")));
+          WriteBytes(obj, jpeg);
+          WriteBytes(obj, Latin1("\nendstream"));
+          objects.Add(obj.ToArray());
         }
 
         var outStream = new MemoryStream();

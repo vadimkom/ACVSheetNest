@@ -157,6 +157,18 @@
       }
     }
 
+    /// <summary>The pictures for the report. Set a whole new list (or null): the project is then unsaved.</summary>
+    public System.Collections.Generic.List<ProjectPicture> Pictures
+    {
+      get => wrappedProjectInfo.Pictures;
+      set
+      {
+        wrappedProjectInfo.Pictures = value == null || value.Count == 0 ? null : value;
+        OnPropertyChanged(nameof(Pictures));
+        IsDirtyChanged?.Invoke(this, EventArgs.Empty);
+      }
+    }
+
     private void DetailLoadInfos_IsDirtyChanged(object? sender, EventArgs e)
     {
       IsDirtyChanged?.Invoke(this, e);
@@ -190,6 +202,7 @@
     {
       source.LastNestResultJson = this.wrappedProjectInfo.LastNestResultJson;
       source.SheetsKeptWhole = this.wrappedProjectInfo.SheetsKeptWhole;
+      source.Pictures = this.wrappedProjectInfo.Pictures; // not in the history (megabytes each), not undone
       this.Load(source);
       if (this.detailLoadInfos != null)
       {

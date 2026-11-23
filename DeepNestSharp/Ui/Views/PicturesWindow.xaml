@@ -1,0 +1,49 @@
+<Window x:Class="DeepNestSharp.Ui.Views.PicturesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:DeepNestSharp.Ui"
+        Title="{ui:Tr Pic_Title}"
+        Width="720" Height="560" MinWidth="520" MinHeight="360"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        AllowDrop="True" Drop="OnDrop" DragOver="OnDragOver"
+        Background="{StaticResource Brush.Panel}">
+  <DockPanel Margin="14">
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+      <Button Style="{StaticResource ModernButton}" Content="{ui:Tr Pic_AddFiles}" Click="OnAddFiles" Margin="0,0,6,0" />
+      <Button Style="{StaticResource ModernButton}" Content="{ui:Tr Pic_Paste}" Click="OnPaste" Margin="0,0,6,0" />
+      <TextBlock Text="{ui:Tr Pic_Hint}" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{StaticResource Brush.TextMuted}" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Style="{StaticResource PrimaryButton}" Content="{ui:Tr Btn_OK}" MinWidth="96" Padding="18,6" Margin="0,0,8,0" IsDefault="True" Click="OnOk" />
+      <Button Style="{StaticResource ModernButton}" Content="{ui:Tr Btn_Cancel}" MinWidth="84" IsCancel="True" />
+    </StackPanel>
+
+    <Grid>
+      <ListBox x:Name="pictureList" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <DockPanel Margin="2,4">
+              <Border DockPanel.Dock="Left" Width="140" Height="96" Background="White" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,0,10,0">
+                <Image Source="{Binding Thumbnail}" Stretch="Uniform" Margin="2" />
+              </Border>
+              <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Style="{StaticResource ModernButton}" Content="▲" MinWidth="32" Padding="6,2" Margin="2,0" Click="OnUp" ToolTip="{ui:Tr Pic_Up}" />
+                <Button Style="{StaticResource ModernButton}" Content="▼" MinWidth="32" Padding="6,2" Margin="2,0" Click="OnDown" ToolTip="{ui:Tr Pic_Down}" />
+                <Button Style="{StaticResource ModernButton}" Content="✕" MinWidth="32" Padding="6,2" Margin="2,0" Click="OnRemove" ToolTip="{ui:Tr Pic_Remove}" />
+              </StackPanel>
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{ui:Tr Pic_Caption}" Foreground="{StaticResource Brush.TextMuted}" Margin="0,0,0,3" />
+                <TextBox Text="{Binding Caption, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" />
+                <TextBlock Text="{Binding SizeText}" Foreground="{StaticResource Brush.TextMuted}" FontSize="11" Margin="0,3,0,0" />
+              </StackPanel>
+            </DockPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <TextBlock x:Name="emptyText" Text="{ui:Tr Pic_Empty}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"
+                 TextWrapping="Wrap" MaxWidth="380" Foreground="{StaticResource Brush.TextMuted}" IsHitTestVisible="False" />
+    </Grid>
+  </DockPanel>
+</Window>

@@ -1,6 +1,7 @@
 namespace DeepNestLib.NestProject
 {
   using System;
+  using System.Collections.Generic;
   using System.IO;
   using System.Text.Json;
   using System.Text.Json.Nodes;
@@ -74,6 +75,11 @@ namespace DeepNestLib.NestProject
     [JsonInclude]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool FillToMaximum { get; set; }
+
+    /// <inheritdoc />
+    [JsonInclude]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<ProjectPicture> Pictures { get; set; }
 
     [JsonInclude]
     public ISvgNestConfig Config
@@ -168,6 +174,7 @@ namespace DeepNestLib.NestProject
       this.Material = source.Material;
       this.Thickness = source.Thickness;
       this.FillToMaximum = source.FillToMaximum;
+      this.Pictures = source.Pictures == null || source.Pictures.Count == 0 ? null : new List<ProjectPicture>(source.Pictures);
       this.CommonLineGapInches = source.CommonLineGapInches;
       this.CommonLineMaxClusterParts = source.CommonLineMaxClusterParts;
       this.DetailLoadInfos.Clear();

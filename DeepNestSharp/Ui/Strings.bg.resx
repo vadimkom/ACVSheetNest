@@ -2036,4 +2036,55 @@ SheetNest отваря проекти (*.dnest) и чертежи DXF и SC2000 
 
 Да се отвори ли папката?</value>
   </data>
+  <data name="Btn_Pictures" xml:space="preserve">
+    <value>🖼 Картинки...</value>
+  </data>
+  <data name="Btn_PicturesN" xml:space="preserve">
+    <value>🖼 Картинки ({0})...</value>
+  </data>
+  <data name="Tip_Pictures" xml:space="preserve">
+    <value>Картинки за отчета: от файлове или от клипборда. Всяка се отпечатва на своя страница след разкроите и се записва в проекта.</value>
+  </data>
+  <data name="Pic_Title" xml:space="preserve">
+    <value>Картинки за отчета</value>
+  </data>
+  <data name="Pic_AddFiles" xml:space="preserve">
+    <value>Добави файлове...</value>
+  </data>
+  <data name="Pic_Paste" xml:space="preserve">
+    <value>Постави от клипборда</value>
+  </data>
+  <data name="Pic_Hint" xml:space="preserve">
+    <value>или пуснете файлове тук, или Ctrl+V</value>
+  </data>
+  <data name="Pic_Caption" xml:space="preserve">
+    <value>Надпис (заглавие на страницата в отчета)</value>
+  </data>
+  <data name="Pic_Up" xml:space="preserve">
+    <value>По-напред в отчета</value>
+  </data>
+  <data name="Pic_Down" xml:space="preserve">
+    <value>По-назад в отчета</value>
+  </data>
+  <data name="Pic_Remove" xml:space="preserve">
+    <value>Премахни картинката</value>
+  </data>
+  <data name="Pic_Empty" xml:space="preserve">
+    <value>Още няма картинки. Добавете файлове, пуснете ги тук или копирайте картинка и натиснете Ctrl+V. Всяка се отпечатва на своя страница след разкроите.</value>
+  </data>
+  <data name="Pic_NotRead" xml:space="preserve">
+    <value>Не можаха да се прочетат като картинки:</value>
+  </data>
+  <data name="Pic_ClipboardEmpty" xml:space="preserve">
+    <value>В клипборда няма картинка.</value>
+  </data>
+  <data name="Pic_FileFilter" xml:space="preserve">
+    <value>Картинки</value>
+  </data>
+  <data name="Pic_AllFiles" xml:space="preserve">
+    <value>Всички файлове</value>
+  </data>
+  <data name="Rep_PictureN" xml:space="preserve">
+    <value>Картинка {0} от {1}</value>
+  </data>
 </root>

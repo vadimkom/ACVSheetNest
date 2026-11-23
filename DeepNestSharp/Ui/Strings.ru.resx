@@ -2036,4 +2036,55 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
 
 Открыть папку?</value>
   </data>
+  <data name="Btn_Pictures" xml:space="preserve">
+    <value>🖼 Картинки...</value>
+  </data>
+  <data name="Btn_PicturesN" xml:space="preserve">
+    <value>🖼 Картинки ({0})...</value>
+  </data>
+  <data name="Tip_Pictures" xml:space="preserve">
+    <value>Картинки для отчёта: из файлов или из буфера обмена. Каждая печатается на своей странице после раскладок и сохраняется в проекте.</value>
+  </data>
+  <data name="Pic_Title" xml:space="preserve">
+    <value>Картинки для отчёта</value>
+  </data>
+  <data name="Pic_AddFiles" xml:space="preserve">
+    <value>Добавить файлы...</value>
+  </data>
+  <data name="Pic_Paste" xml:space="preserve">
+    <value>Вставить из буфера</value>
+  </data>
+  <data name="Pic_Hint" xml:space="preserve">
+    <value>или перетащите файлы сюда, или Ctrl+V</value>
+  </data>
+  <data name="Pic_Caption" xml:space="preserve">
+    <value>Подпись (заголовок страницы в отчёте)</value>
+  </data>
+  <data name="Pic_Up" xml:space="preserve">
+    <value>Раньше в отчёте</value>
+  </data>
+  <data name="Pic_Down" xml:space="preserve">
+    <value>Позже в отчёте</value>
+  </data>
+  <data name="Pic_Remove" xml:space="preserve">
+    <value>Убрать картинку</value>
+  </data>
+  <data name="Pic_Empty" xml:space="preserve">
+    <value>Картинок пока нет. Добавьте файлы, перетащите их сюда или скопируйте картинку и нажмите Ctrl+V. Каждая печатается на своей странице после раскладок.</value>
+  </data>
+  <data name="Pic_NotRead" xml:space="preserve">
+    <value>Не удалось прочитать как картинки:</value>
+  </data>
+  <data name="Pic_ClipboardEmpty" xml:space="preserve">
+    <value>В буфере обмена нет картинки.</value>
+  </data>
+  <data name="Pic_FileFilter" xml:space="preserve">
+    <value>Картинки</value>
+  </data>
+  <data name="Pic_AllFiles" xml:space="preserve">
+    <value>Все файлы</value>
+  </data>
+  <data name="Rep_PictureN" xml:space="preserve">
+    <value>Рисунок {0} из {1}</value>
+  </data>
 </root>

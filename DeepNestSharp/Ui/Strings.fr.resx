@@ -2036,4 +2036,55 @@ conservé le {1}</value>
 
 Ouvrir le dossier ?</value>
   </data>
+  <data name="Btn_Pictures" xml:space="preserve">
+    <value>🖼 Images...</value>
+  </data>
+  <data name="Btn_PicturesN" xml:space="preserve">
+    <value>🖼 Images ({0})...</value>
+  </data>
+  <data name="Tip_Pictures" xml:space="preserve">
+    <value>Images pour le rapport : depuis des fichiers ou le presse-papiers. Chacune s&apos;imprime sur sa propre page après les imbrications et est enregistrée dans le projet.</value>
+  </data>
+  <data name="Pic_Title" xml:space="preserve">
+    <value>Images pour le rapport</value>
+  </data>
+  <data name="Pic_AddFiles" xml:space="preserve">
+    <value>Ajouter des fichiers...</value>
+  </data>
+  <data name="Pic_Paste" xml:space="preserve">
+    <value>Coller depuis le presse-papiers</value>
+  </data>
+  <data name="Pic_Hint" xml:space="preserve">
+    <value>ou déposez des fichiers ici, ou Ctrl+V</value>
+  </data>
+  <data name="Pic_Caption" xml:space="preserve">
+    <value>Légende (titre de la page du rapport)</value>
+  </data>
+  <data name="Pic_Up" xml:space="preserve">
+    <value>Plus tôt dans le rapport</value>
+  </data>
+  <data name="Pic_Down" xml:space="preserve">
+    <value>Plus tard dans le rapport</value>
+  </data>
+  <data name="Pic_Remove" xml:space="preserve">
+    <value>Retirer l&apos;image</value>
+  </data>
+  <data name="Pic_Empty" xml:space="preserve">
+    <value>Aucune image. Ajoutez des fichiers, déposez-les ici ou copiez une image et appuyez sur Ctrl+V. Chacune s&apos;imprime sur sa propre page après les imbrications.</value>
+  </data>
+  <data name="Pic_NotRead" xml:space="preserve">
+    <value>Impossible de lire comme images :</value>
+  </data>
+  <data name="Pic_ClipboardEmpty" xml:space="preserve">
+    <value>Le presse-papiers ne contient pas d&apos;image.</value>
+  </data>
+  <data name="Pic_FileFilter" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="Pic_AllFiles" xml:space="preserve">
+    <value>Tous les fichiers</value>
+  </data>
+  <data name="Rep_PictureN" xml:space="preserve">
+    <value>Image {0} sur {1}</value>
+  </data>
 </root>

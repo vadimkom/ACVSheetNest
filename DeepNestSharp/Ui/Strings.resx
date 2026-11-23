@@ -2036,4 +2036,55 @@ kept {1}</value>
 
 Open the folder?</value>
   </data>
+  <data name="Btn_Pictures" xml:space="preserve">
+    <value>🖼 Pictures...</value>
+  </data>
+  <data name="Btn_PicturesN" xml:space="preserve">
+    <value>🖼 Pictures ({0})...</value>
+  </data>
+  <data name="Tip_Pictures" xml:space="preserve">
+    <value>Pictures for the report: from files or pasted from the clipboard. Each prints on its own page after the layouts and is saved in the project.</value>
+  </data>
+  <data name="Pic_Title" xml:space="preserve">
+    <value>Pictures for the report</value>
+  </data>
+  <data name="Pic_AddFiles" xml:space="preserve">
+    <value>Add files...</value>
+  </data>
+  <data name="Pic_Paste" xml:space="preserve">
+    <value>Paste from clipboard</value>
+  </data>
+  <data name="Pic_Hint" xml:space="preserve">
+    <value>or drop files here, or Ctrl+V</value>
+  </data>
+  <data name="Pic_Caption" xml:space="preserve">
+    <value>Caption (the page title in the report)</value>
+  </data>
+  <data name="Pic_Up" xml:space="preserve">
+    <value>Earlier in the report</value>
+  </data>
+  <data name="Pic_Down" xml:space="preserve">
+    <value>Later in the report</value>
+  </data>
+  <data name="Pic_Remove" xml:space="preserve">
+    <value>Remove the picture</value>
+  </data>
+  <data name="Pic_Empty" xml:space="preserve">
+    <value>No pictures yet. Add picture files, drop them here, or copy a picture and press Ctrl+V. Each one prints on its own page after the layouts.</value>
+  </data>
+  <data name="Pic_NotRead" xml:space="preserve">
+    <value>These could not be read as pictures:</value>
+  </data>
+  <data name="Pic_ClipboardEmpty" xml:space="preserve">
+    <value>The clipboard holds no picture.</value>
+  </data>
+  <data name="Pic_FileFilter" xml:space="preserve">
+    <value>Pictures</value>
+  </data>
+  <data name="Pic_AllFiles" xml:space="preserve">
+    <value>All files</value>
+  </data>
+  <data name="Rep_PictureN" xml:space="preserve">
+    <value>Picture {0} of {1}</value>
+  </data>
 </root>

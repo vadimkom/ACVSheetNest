@@ -851,6 +851,7 @@ namespace DeepNestSharp.Ui.Views
 
     private void ShowProjectMaterial()
     {
+      this.ShowPictureCount(); // the job's other own setting shown in the window
       if (this.materialCombo == null || ViewModel?.ActiveDocument is not NestProjectViewModel doc)
       {
         return;
@@ -3606,7 +3607,8 @@ namespace DeepNestSharp.Ui.Views
           this.unitsMm ? "mm" : "in",
           this.dxfViewer?.PartColours,
           this.CurrentReportMaterial(),
-          this.CurrentShortage());
+          this.CurrentShortage(),
+          this.CurrentReportPictures());
       }
       catch (System.Exception ex)
       {
@@ -4712,7 +4714,7 @@ namespace DeepNestSharp.Ui.Views
       var colours = this.dxfViewer?.PartColours ?? PartColors.Build(plan.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
       int unplacedCount = selected.UnplacedParts?.Count ?? 0;
 
-      var pages = Reports.NestReportPdf.BuildWpfPages(plan, unplacedCount, units, colours, this.CurrentReportMaterial(), this.CurrentShortage());
+      var pages = Reports.NestReportPdf.BuildWpfPages(plan, unplacedCount, units, colours, this.CurrentReportMaterial(), this.CurrentShortage(), this.CurrentReportPictures());
       if (this.reportPagesStackPanel != null)
       {
         this.reportPagesStackPanel.Children.Clear();
@@ -4923,7 +4925,7 @@ namespace DeepNestSharp.Ui.Views
       var colours = this.dxfViewer?.PartColours ?? PartColors.Build(plan.SelectMany(l => l.Sheet.PartPlacements).Select(p => p.Part?.Name));
       int unplacedCount = selected.UnplacedParts?.Count ?? 0;
 
-      var doc = Reports.NestReportPdf.BuildFixedDocument(plan, unplacedCount, units, colours, this.CurrentReportMaterial(), this.CurrentShortage());
+      var doc = Reports.NestReportPdf.BuildFixedDocument(plan, unplacedCount, units, colours, this.CurrentReportMaterial(), this.CurrentShortage(), this.CurrentReportPictures());
 
       var printDlg = new System.Windows.Controls.PrintDialog();
       if (printDlg.ShowDialog() == true)

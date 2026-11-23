@@ -706,6 +706,7 @@
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
               <!-- Shown while the layout left parts uncut (they are on the red virtual sheets in the strip): save them as a job for later. -->
               <Button x:Name="btnVirtualSheets" Style="{DynamicResource ModernButton}" Margin="3,0" Content="{ui:Tr Btn_SaveForLater}" Click="OnSaveLeftOver" ToolTip="{ui:Tr Tip_VirtualSheets}" Visibility="Collapsed" Foreground="#B00020" />
+              <Button x:Name="btnReportPictures" Style="{DynamicResource ModernButton}" Margin="3,0" Content="{ui:Tr Btn_Pictures}" Click="OnReportPictures" ToolTip="{ui:Tr Tip_Pictures}" />
               <Button x:Name="btnExportDxf" Style="{DynamicResource ModernButton}" Margin="3,0" Content="📁 Экспорт в DXF" Click="OnExportDxf" ToolTip="{ui:Tr Tip_ExportDxf}" />
               <Button x:Name="btnExportPdf" Style="{DynamicResource ModernButton}" Margin="3,0" Content="📄 Экспорт отчёта (PDF)" Click="OnNestReportPdf" ToolTip="{ui:Tr Tip_ExportPdf}" />
               <Button x:Name="btnPrintReport" Style="{DynamicResource PrimaryButton}" Margin="3,0" Content="🖨️ Печать отчета..." Click="OnPrintReport" ToolTip="{ui:Tr Tip_PrintReport}" />

@@ -43,6 +43,9 @@
     /// than coming out as many of each, like a kit (false, the default).</summary>
     bool FillToMaximum { get; set; }
 
+    /// <summary>Gets or sets the pictures added for the report, in their order; null when there are none.</summary>
+    System.Collections.Generic.List<ProjectPicture> Pictures { get; set; }
+
     void Load(ISvgNestConfig config, string filePath);
 
     void Load(ProjectInfo source);

@@ -6,7 +6,7 @@ namespace DeepNestSharp
 
   /// <summary>
   /// Ctrl+Z for the job (the user, 2026-11-17): the parts and sheets as they stood before each change. A state
-  /// is the project's JSON without the job settings and the saved nest, so an undo puts the rows back and
+  /// is the project's JSON without the job settings, the saved nest and the report's pictures, so an undo puts the rows back and
   /// leaves Advanced Settings and the layouts on screen alone. <see cref="Note"/> is called after anything
   /// may have changed; it keeps the state before only when the project really differs.
   /// </summary>
@@ -45,6 +45,7 @@ namespace DeepNestSharp
 
       root.Remove("Config");
       root.Remove("LastNestResultJson");
+      root.Remove("Pictures"); // megabytes each, fifty deep: the report's pictures are not undone
       return root.ToJsonString();
     }
 

@@ -2036,4 +2036,55 @@ guardado {1}</value>
 
 ¿Abrir la carpeta?</value>
   </data>
+  <data name="Btn_Pictures" xml:space="preserve">
+    <value>🖼 Imágenes...</value>
+  </data>
+  <data name="Btn_PicturesN" xml:space="preserve">
+    <value>🖼 Imágenes ({0})...</value>
+  </data>
+  <data name="Tip_Pictures" xml:space="preserve">
+    <value>Imágenes para el informe: desde archivos o el portapapeles. Cada una se imprime en su propia página tras los anidados y se guarda en el proyecto.</value>
+  </data>
+  <data name="Pic_Title" xml:space="preserve">
+    <value>Imágenes para el informe</value>
+  </data>
+  <data name="Pic_AddFiles" xml:space="preserve">
+    <value>Añadir archivos...</value>
+  </data>
+  <data name="Pic_Paste" xml:space="preserve">
+    <value>Pegar del portapapeles</value>
+  </data>
+  <data name="Pic_Hint" xml:space="preserve">
+    <value>o suelte archivos aquí, o Ctrl+V</value>
+  </data>
+  <data name="Pic_Caption" xml:space="preserve">
+    <value>Pie (título de la página del informe)</value>
+  </data>
+  <data name="Pic_Up" xml:space="preserve">
+    <value>Antes en el informe</value>
+  </data>
+  <data name="Pic_Down" xml:space="preserve">
+    <value>Después en el informe</value>
+  </data>
+  <data name="Pic_Remove" xml:space="preserve">
+    <value>Quitar la imagen</value>
+  </data>
+  <data name="Pic_Empty" xml:space="preserve">
+    <value>Aún no hay imágenes. Añada archivos, suéltelos aquí o copie una imagen y pulse Ctrl+V. Cada una se imprime en su propia página tras los anidados.</value>
+  </data>
+  <data name="Pic_NotRead" xml:space="preserve">
+    <value>No se pudieron leer como imágenes:</value>
+  </data>
+  <data name="Pic_ClipboardEmpty" xml:space="preserve">
+    <value>El portapapeles no contiene ninguna imagen.</value>
+  </data>
+  <data name="Pic_FileFilter" xml:space="preserve">
+    <value>Imágenes</value>
+  </data>
+  <data name="Pic_AllFiles" xml:space="preserve">
+    <value>Todos los archivos</value>
+  </data>
+  <data name="Rep_PictureN" xml:space="preserve">
+    <value>Imagen {0} de {1}</value>
+  </data>
 </root>

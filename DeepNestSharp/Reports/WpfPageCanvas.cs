@@ -23,6 +23,11 @@ namespace DeepNestSharp.Reports
     void Rect(double x, double y, double w, double h, double lineWidth);
 
     void Polygon(IEnumerable<(double X, double Y)> pts, bool fill, bool holeFill = false, (byte R, byte G, byte B)? fillColour = null);
+
+    /// <summary>A picture stretched over the box whose bottom-left corner is (x, y), in points.</summary>
+    void Image(double x, double y, double w, double h, ReportPicture picture)
+    {
+    }
   }
 
   /// <summary>
@@ -167,6 +172,21 @@ namespace DeepNestSharp.Reports
         StrokeThickness = 0.5
       };
       this.canvas.Children.Add(path);
+    }
+
+    public void Image(double x, double y, double w, double h, ReportPicture picture)
+    {
+      var image = new System.Windows.Controls.Image
+      {
+        Source = picture.Bitmap,
+        Width = Math.Max(0, w),
+        Height = Math.Max(0, h),
+        Stretch = Stretch.Fill,
+      };
+      RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+      Canvas.SetLeft(image, x);
+      Canvas.SetTop(image, PageH - (y + h));
+      this.canvas.Children.Add(image);
     }
 
     public FrameworkElement GetPageView()

@@ -2036,4 +2036,55 @@ gesichert {1}</value>
 
 Ordner öffnen?</value>
   </data>
+  <data name="Btn_Pictures" xml:space="preserve">
+    <value>🖼 Bilder...</value>
+  </data>
+  <data name="Btn_PicturesN" xml:space="preserve">
+    <value>🖼 Bilder ({0})...</value>
+  </data>
+  <data name="Tip_Pictures" xml:space="preserve">
+    <value>Bilder für den Bericht: aus Dateien oder aus der Zwischenablage. Jedes wird nach den Belegungen auf einer eigenen Seite gedruckt und im Projekt gespeichert.</value>
+  </data>
+  <data name="Pic_Title" xml:space="preserve">
+    <value>Bilder für den Bericht</value>
+  </data>
+  <data name="Pic_AddFiles" xml:space="preserve">
+    <value>Dateien hinzufügen...</value>
+  </data>
+  <data name="Pic_Paste" xml:space="preserve">
+    <value>Aus Zwischenablage einfügen</value>
+  </data>
+  <data name="Pic_Hint" xml:space="preserve">
+    <value>oder Dateien hierher ziehen, oder Strg+V</value>
+  </data>
+  <data name="Pic_Caption" xml:space="preserve">
+    <value>Beschriftung (Seitentitel im Bericht)</value>
+  </data>
+  <data name="Pic_Up" xml:space="preserve">
+    <value>Früher im Bericht</value>
+  </data>
+  <data name="Pic_Down" xml:space="preserve">
+    <value>Später im Bericht</value>
+  </data>
+  <data name="Pic_Remove" xml:space="preserve">
+    <value>Bild entfernen</value>
+  </data>
+  <data name="Pic_Empty" xml:space="preserve">
+    <value>Noch keine Bilder. Dateien hinzufügen, hierher ziehen oder ein Bild kopieren und Strg+V drücken. Jedes wird nach den Belegungen auf einer eigenen Seite gedruckt.</value>
+  </data>
+  <data name="Pic_NotRead" xml:space="preserve">
+    <value>Diese konnten nicht als Bilder gelesen werden:</value>
+  </data>
+  <data name="Pic_ClipboardEmpty" xml:space="preserve">
+    <value>Die Zwischenablage enthält kein Bild.</value>
+  </data>
+  <data name="Pic_FileFilter" xml:space="preserve">
+    <value>Bilder</value>
+  </data>
+  <data name="Pic_AllFiles" xml:space="preserve">
+    <value>Alle Dateien</value>
+  </data>
+  <data name="Rep_PictureN" xml:space="preserve">
+    <value>Bild {0} von {1}</value>
+  </data>
 </root>
