@@ -571,7 +571,7 @@
         <!-- Two-Pane Work Area: Left = Runs/Iterations Table, Right = DxfViewer Run Preview -->
         <Grid Grid.Row="1" x:Name="nestWorkArea" SizeChanged="OnNestWorkAreaSizeChanged">
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="470" MinWidth="260" />
+            <ColumnDefinition Width="540" MinWidth="260" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" MinWidth="360" />
           </Grid.ColumnDefinitions>
@@ -596,6 +596,7 @@
               <ListView x:Name="runsListView"
                         MouseDoubleClick="OnRunsListDoubleClick"
                         SelectionChanged="OnRunsListSelectionChanged"
+                        GridViewColumnHeader.Click="OnRunsHeaderClick"
                         BorderThickness="0" Background="White">
                 <ListView.Resources>
                   <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource FlatGridViewColumnHeader}" />
@@ -610,8 +611,8 @@
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                   <GridView ColumnHeaderContainerStyle="{StaticResource CompactColumnHeader}">
-                    <GridViewColumn x:Name="colHeaderRunNum" Header="№" Width="36" DisplayMemberBinding="{Binding RunLabel}" />
-                    <GridViewColumn x:Name="colHeaderRunUtil" Header="% Утилиз." Width="88">
+                    <GridViewColumn x:Name="colHeaderRunNum" Header="№" Width="40" DisplayMemberBinding="{Binding RunLabel}" />
+                    <GridViewColumn x:Name="colHeaderRunUtil" Header="% Утилиз." Width="84">
                       <GridViewColumn.CellTemplate>
                         <DataTemplate>
                           <TextBlock Text="{Binding UtilizationText}" FontWeight="Bold" Foreground="{DynamicResource Brush.Accent}" />
@@ -620,8 +621,9 @@
                     </GridViewColumn>
                     <GridViewColumn x:Name="colHeaderRunPlaced" Header="Размещено" Width="88" DisplayMemberBinding="{Binding PlacedText}" />
                     <GridViewColumn x:Name="colHeaderRunSheets" Header="Листов" Width="60" DisplayMemberBinding="{Binding SheetsText}" />
-                    <GridViewColumn x:Name="colHeaderRunTime" Header="Время" Width="56" DisplayMemberBinding="{Binding TimeText}" />
-                    <GridViewColumn x:Name="colHeaderRunEngine" Header="Движок" Width="116" DisplayMemberBinding="{Binding EngineText}" />
+                    <GridViewColumn x:Name="colHeaderRunOffcut" Header="Остаток" Width="84" DisplayMemberBinding="{Binding OffcutText}" />
+                    <GridViewColumn x:Name="colHeaderRunTime" Header="Время" Width="64" DisplayMemberBinding="{Binding TimeText}" />
+                    <GridViewColumn x:Name="colHeaderRunEngine" Header="Движок" Width="100" DisplayMemberBinding="{Binding EngineText}" />
                   </GridView>
                 </ListView.View>
               </ListView>

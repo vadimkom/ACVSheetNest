@@ -186,6 +186,9 @@
   <data name="Col_RunEngine" xml:space="preserve">
     <value>Motor</value>
   </data>
+  <data name="Col_RunOffcut" xml:space="preserve">
+    <value>Retalho</value>
+  </data>
   <data name="Col_RunUtil" xml:space="preserve">
     <value>Aprov.</value>
   </data>
@@ -349,7 +352,7 @@
     <value>Marque as chapas que já foram cortadas</value>
   </data>
   <data name="Hint_RunsList" xml:space="preserve">
-    <value>💡 Cada clique em Rascunho ou Encaixar adiciona um encaixe completo de todo o pedido (rascunhos são marcados); iguais não se repetem. O melhor fica no topo (★): todas as peças colocadas, menos chapas, mais material aproveitado. Clique = visualizar, clique duplo = layout.</value>
+    <value>💡 Cada clique em Rascunho ou Encaixar adiciona um encaixe completo de todo o pedido, uma linha por motor (rascunhos são marcados). O melhor fica no topo (★): todas as peças colocadas, menos chapas, mais material aproveitado, o maior retalho (o maior retângulo livre, L × C), a execução mais rápida. Clique num cabeçalho = ordenar. Clique numa linha = visualizar, clique duplo = layout.</value>
   </data>
   <data name="Kpi_PartsPlaced" xml:space="preserve">
     <value>Peças colocadas:</value>

@@ -186,6 +186,9 @@
   <data name="Col_RunEngine" xml:space="preserve">
     <value>Engine</value>
   </data>
+  <data name="Col_RunOffcut" xml:space="preserve">
+    <value>Offcut</value>
+  </data>
   <data name="Col_RunUtil" xml:space="preserve">
     <value>Utilization</value>
   </data>
@@ -349,7 +352,7 @@
     <value>Tick the sheets that are already cut</value>
   </data>
   <data name="Hint_RunsList" xml:space="preserve">
-    <value>💡 Every press of Draft or Nest adds a finished nest of the whole job (drafts are marked); identical ones are not repeated. The best is on top (★): every part placed, fewest sheets, most material used. Click to preview, double-click for the layout.</value>
+    <value>💡 Every press of Draft or Nest adds a finished nest of the whole job, one row per engine (drafts are marked). The best is on top (★): every part placed, fewest sheets, most material used, the largest offcut (the biggest clean rectangle left, W × H), the quicker run. Click a column header to sort. Click a row to preview, double-click for the layout.</value>
   </data>
   <data name="Kpi_PartsPlaced" xml:space="preserve">
     <value>Parts placed:</value>

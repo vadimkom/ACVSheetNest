@@ -34,11 +34,48 @@ namespace DeepNestSharp.Ui.Views
 
       public bool IsBest { get; set; }
 
+      private string timeText;
+
       public INestResult Result { get; set; }
       public string UtilizationText { get; set; }
       public string PlacedText { get; set; }
       public string SheetsText { get; set; }
-      public string TimeText { get; set; }
+
+      /// <summary>The run's time, or "saved" (in the language of the moment) for a nest opened with its project.</summary>
+      public string TimeText
+      {
+        get => this.IsSaved ? Localization.Get("Run_Saved") : this.timeText;
+        set => this.timeText = value;
+      }
+
+      /// <summary>A nest opened with its project: no time of its own.</summary>
+      public bool IsSaved { get; set; }
+
+      /// <summary>Seconds the run took; infinite for a saved nest, so it never wins on time.</summary>
+      public double Seconds { get; set; } = double.PositiveInfinity;
+
+      /// <summary>Largest clean rectangle left on any of its sheets (<see cref="RasterNest.LargestOffcut"/>); null on shaped sheets.</summary>
+      public (double W, double H)? Offcut { get; set; }
+
+      // Sort keys of the columns (the list sorts on a click on a header).
+      public double Utilization => this.Result?.MaterialUtilization ?? 0;
+      public int Placed => this.Result?.TotalPlacedCount ?? 0;
+      public int Sheets => this.Result?.UsedSheets.Count ?? 0;
+      public double OffcutArea => this.Offcut is { } o ? o.W * o.H : 0;
+
+      public string OffcutText
+      {
+        get
+        {
+          if (this.Offcut is not { } o || o.W <= 0 || o.H <= 0)
+          {
+            return "—";
+          }
+
+          string f = Math.Max(o.W, o.H) >= 500 ? "0" : "0.#";
+          return o.W.ToString(f, System.Globalization.CultureInfo.InvariantCulture) + " × " + o.H.ToString(f, System.Globalization.CultureInfo.InvariantCulture);
+        }
+      }
 
       /// <summary>The engine that laid it (Sparrow, RNest, or an engine's file name); empty for a saved nest.</summary>
       public string EngineText { get; set; } = string.Empty;
@@ -1357,7 +1394,8 @@ namespace DeepNestSharp.Ui.Views
           UtilizationText = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%"),
           PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
           SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
-          TimeText = Localization.Get("Run_Saved")
+          IsSaved = true,
+          Offcut = RasterNest.LargestOffcut.Of(result, this.dxfViewer?.DefaultPartSpacing ?? 0),
         };
         this.nestRuns.Add(runItem);
         this.runsListView.SelectedItem = runItem;
@@ -1709,12 +1747,7 @@ namespace DeepNestSharp.Ui.Views
       if (this.cancelNestButton != null) this.cancelNestButton.Content = Localization.Get("Btn_StopNest");
       if (this.runsListTitle != null) this.runsListTitle.Text = Localization.Get("Lbl_RunsList");
       if (this.runsListHint != null) this.runsListHint.Text = Localization.Get("Hint_RunsList");
-      if (this.colHeaderRunNum != null) this.colHeaderRunNum.Header = Localization.Get("Col_RunNum");
-      if (this.colHeaderRunUtil != null) this.colHeaderRunUtil.Header = Localization.Get("Col_RunUtil");
-      if (this.colHeaderRunPlaced != null) this.colHeaderRunPlaced.Header = Localization.Get("Col_RunPlaced");
-      if (this.colHeaderRunSheets != null) this.colHeaderRunSheets.Header = Localization.Get("Col_RunSheets");
-      if (this.colHeaderRunTime != null) this.colHeaderRunTime.Header = Localization.Get("Col_RunTime");
-      if (this.colHeaderRunEngine != null) this.colHeaderRunEngine.Header = Localization.Get("Col_RunEngine");
+      this.UpdateRunHeaders();
 
       // Screen 4: Layout & Report
       if (this.viewTypeDxfRadio != null) this.viewTypeDxfRadio.Content = Localization.Get("Radio_DxfView");
@@ -4268,7 +4301,7 @@ namespace DeepNestSharp.Ui.Views
       }
       else
       {
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(470), MinWidth = 260 });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(540), MinWidth = 260 });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star), MinWidth = 360 });
       }
@@ -4297,21 +4330,145 @@ namespace DeepNestSharp.Ui.Views
     /// <summary>The key of the run just made: its engine, and whether a Draft.</summary>
     private string LastRunKey => EngineStats.Key(this.lastRunEngine, this.lastRunWasDraft);
 
-    private static (int Placed, int Sheets, double Util) Rank(INestResult r)
-      => (r.TotalPlacedCount, -r.UsedSheets.Count, r.MaterialUtilization);
+    /// <summary>
+    /// Which of two variants is better: &gt; 0 when <paramref name="a"/> is. Every part placed, then fewest
+    /// sheets, then most material used (it differs only when the sheets differ in size), then the largest
+    /// offcut, then the quicker run (2026-11-23, the user: utilisation is the same for every engine that lays
+    /// the job on as many sheets, and the time did not count). Utilisation within 0.1 %, an offcut within
+    /// 0.2 % of the sheet and times within half a second count as equal: below that is the grid and the clock.
+    /// </summary>
+    internal static int CompareRuns(NestRunHistoryItem a, NestRunHistoryItem b)
+    {
+      int c = a.Placed.CompareTo(b.Placed);
+      if (c != 0)
+      {
+        return c;
+      }
+
+      c = b.Sheets.CompareTo(a.Sheets);
+      if (c != 0)
+      {
+        return c;
+      }
+
+      if (Math.Abs(a.Utilization - b.Utilization) > 0.001)
+      {
+        return a.Utilization.CompareTo(b.Utilization);
+      }
+
+      double sheetArea = Math.Max(SheetArea(a.Result), SheetArea(b.Result));
+      if (a.Offcut != null && b.Offcut != null && Math.Abs(a.OffcutArea - b.OffcutArea) > 0.002 * sheetArea)
+      {
+        return a.OffcutArea.CompareTo(b.OffcutArea);
+      }
+
+      bool aTimed = !double.IsInfinity(a.Seconds), bTimed = !double.IsInfinity(b.Seconds);
+      if (aTimed != bTimed)
+      {
+        return aTimed ? 1 : -1;
+      }
+
+      return aTimed && Math.Abs(a.Seconds - b.Seconds) > 0.5 ? b.Seconds.CompareTo(a.Seconds) : 0;
+    }
+
+    // The variants list's sort: a header click sorts by that column, a second click the other way, a third
+    // puts the list back in its ranked order (2026-11-23, the user: "no sorting of the columns").
+    private string runsSortProperty;
+    private System.ComponentModel.ListSortDirection runsSortDirection;
+
+    /// <summary>The column's text key and the property it sorts by, and whether it starts from the largest.</summary>
+    private (string Key, string Property, bool LargestFirst)? RunColumn(GridViewColumn column)
+    {
+      if (column == this.colHeaderRunNum) return ("Col_RunNum", nameof(NestRunHistoryItem.RunNumber), false);
+      if (column == this.colHeaderRunUtil) return ("Col_RunUtil", nameof(NestRunHistoryItem.Utilization), true);
+      if (column == this.colHeaderRunPlaced) return ("Col_RunPlaced", nameof(NestRunHistoryItem.Placed), true);
+      if (column == this.colHeaderRunSheets) return ("Col_RunSheets", nameof(NestRunHistoryItem.Sheets), false);
+      if (column == this.colHeaderRunOffcut) return ("Col_RunOffcut", nameof(NestRunHistoryItem.OffcutArea), true);
+      if (column == this.colHeaderRunTime) return ("Col_RunTime", nameof(NestRunHistoryItem.Seconds), false);
+      if (column == this.colHeaderRunEngine) return ("Col_RunEngine", nameof(NestRunHistoryItem.EngineText), false);
+      return null;
+    }
+
+    private void UpdateRunHeaders()
+    {
+      foreach (var column in new[] { this.colHeaderRunNum, this.colHeaderRunUtil, this.colHeaderRunPlaced, this.colHeaderRunSheets, this.colHeaderRunOffcut, this.colHeaderRunTime, this.colHeaderRunEngine })
+      {
+        if (column == null || this.RunColumn(column) is not { } c)
+        {
+          continue;
+        }
+
+        string text = Localization.Get(c.Key);
+        if (c.Property == this.runsSortProperty)
+        {
+          text += this.runsSortDirection == System.ComponentModel.ListSortDirection.Ascending ? " ▲" : " ▼";
+        }
+
+        column.Header = text;
+      }
+    }
+
+    private void OnRunsHeaderClick(object sender, RoutedEventArgs e)
+    {
+      if (e.OriginalSource is not GridViewColumnHeader { Column: { } column } || this.RunColumn(column) is not { } c)
+      {
+        return;
+      }
+
+      var first = c.LargestFirst ? System.ComponentModel.ListSortDirection.Descending : System.ComponentModel.ListSortDirection.Ascending;
+      var view = System.Windows.Data.CollectionViewSource.GetDefaultView(this.nestRuns);
+      view.SortDescriptions.Clear();
+      if (this.runsSortProperty != c.Property)
+      {
+        this.runsSortProperty = c.Property;
+        this.runsSortDirection = first;
+      }
+      else if (this.runsSortDirection == first)
+      {
+        this.runsSortDirection = first == System.ComponentModel.ListSortDirection.Ascending ? System.ComponentModel.ListSortDirection.Descending : System.ComponentModel.ListSortDirection.Ascending;
+      }
+      else
+      {
+        this.runsSortProperty = null; // back to the ranked order, the best on top
+      }
+
+      if (this.runsSortProperty != null)
+      {
+        view.SortDescriptions.Add(new System.ComponentModel.SortDescription(this.runsSortProperty, this.runsSortDirection));
+      }
+
+      this.UpdateRunHeaders();
+    }
+
+    private static double SheetArea(INestResult r)
+      => r?.UsedSheets.Select(s => s.Sheet.WidthCalculated * s.Sheet.HeightCalculated).DefaultIfEmpty(0).Max() ?? 0;
 
     /// <summary>
     /// Adds a finished nest to the variants list: the best run of each engine (2026-11-19, the user: "the best
     /// runs of each engine that was run; I ran them all and could see only one"), a Draft apart from a Nest.
-    /// Rows go best first (every part placed, then fewest sheets, then most material used), the best starred.
-    /// A run no better than its engine's row is dropped and that row selected.
+    /// Rows go best first (<see cref="CompareRuns"/>), the best starred. A run no better than its engine's
+    /// row is dropped and that row selected.
     /// </summary>
     private void AddFinishedNest(INestResult result)
     {
       string key = this.LastRunKey;
       int number = ++this.finishedNests;
+      var item = new NestRunHistoryItem
+      {
+        RunNumber = number,
+        Result = result,
+        UtilizationText = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%"),
+        PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
+        SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
+        TimeText = this.lastRunWasDraft ? NestElapsed() + " · " + Localization.Get("Run_Draft") : NestElapsed(),
+        Seconds = this.nestStopwatch?.Elapsed.TotalSeconds ?? double.PositiveInfinity,
+        Offcut = RasterNest.LargestOffcut.Of(result, this.dxfViewer?.DefaultPartSpacing ?? 0),
+        EngineText = this.lastRunEngine,
+        EngineKey = key,
+      };
+
       var same = this.nestRuns.FirstOrDefault(r => !string.IsNullOrEmpty(r.EngineKey) && string.Equals(r.EngineKey, key, StringComparison.OrdinalIgnoreCase));
-      if (same != null && Rank(same.Result).CompareTo(Rank(result)) >= 0)
+      if (same != null && CompareRuns(same, item) >= 0)
       {
         this.runsListView.SelectedItem = same;
         return;
@@ -4322,20 +4479,8 @@ namespace DeepNestSharp.Ui.Views
         this.nestRuns.Remove(same);
       }
 
-      var item = new NestRunHistoryItem
-      {
-        RunNumber = number,
-        Result = result,
-        UtilizationText = FormattableString.Invariant($"{result.MaterialUtilization * 100:0.#}%"),
-        PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
-        SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
-        TimeText = this.lastRunWasDraft ? NestElapsed() + " · " + Localization.Get("Run_Draft") : NestElapsed(),
-        EngineText = this.lastRunEngine,
-        EngineKey = key,
-      };
-
       int at = 0;
-      while (at < this.nestRuns.Count && Rank(this.nestRuns[at].Result).CompareTo(Rank(result)) >= 0)
+      while (at < this.nestRuns.Count && CompareRuns(this.nestRuns[at], item) >= 0)
       {
         at++;
       }

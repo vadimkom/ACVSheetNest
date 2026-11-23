@@ -186,6 +186,9 @@
   <data name="Col_RunEngine" xml:space="preserve">
     <value>Moteur</value>
   </data>
+  <data name="Col_RunOffcut" xml:space="preserve">
+    <value>Chute</value>
+  </data>
   <data name="Col_RunUtil" xml:space="preserve">
     <value>Utilisation</value>
   </data>
@@ -349,7 +352,7 @@
     <value>Cochez les tôles déjà découpées</value>
   </data>
   <data name="Hint_RunsList" xml:space="preserve">
-    <value>💡 Chaque clic sur Brouillon ou Imbriquer ajoute une imbrication complète de toute la commande (les brouillons sont marqués) ; les doublons ne sont pas répétés. La meilleure est en haut (★) : toutes les pièces placées, le moins de tôles, la meilleure utilisation de la matière. Clic = aperçu, double-clic = placement.</value>
+    <value>💡 Chaque clic sur Brouillon ou Imbriquer ajoute une imbrication complète de toute la commande, une ligne par moteur (les brouillons sont marqués). La meilleure est en haut (★) : toutes les pièces placées, le moins de tôles, la meilleure utilisation de la matière, la plus grande chute (le plus grand rectangle libre, L × l), le calcul le plus rapide. Clic sur un en-tête = tri. Clic sur une ligne = aperçu, double-clic = placement.</value>
   </data>
   <data name="Kpi_PartsPlaced" xml:space="preserve">
     <value>Pièces placées :</value>
