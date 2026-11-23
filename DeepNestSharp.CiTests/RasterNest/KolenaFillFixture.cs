@@ -43,18 +43,74 @@ namespace DeepNestSharp.CiTests.RasterNest
         .Should().Be(0, "every part on the metal, none closer than the spacing");
     }
 
-    private static string Drawing()
+    /// <summary>
+    /// The operator's 1_fill (2026-11-23): one counted side R100/200 and the 150 side filling a 500 × 530 sheet
+    /// at 5 mm, 1 mm margin. By count, 3 of the 150 go on with the 200 (1_3); filled, only 1 did: the engine
+    /// left the counted part in the middle and the filler was laid in rows around it, never searched.
+    /// </summary>
+    [SparrowTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void AFillerAroundACountedSideGoesOnAsByCount(bool draft)
+    {
+      var parts = new List<RasterPartInfo>
+      {
+        new RasterPartInfo { Path = Drawing("side-E90-200-R100.dxf"), Quantity = 1, Rotations = 36 },
+        new RasterPartInfo { Path = Drawing("side-E90-150-R100.dxf"), Quantity = 1, Fill = true, Rotations = 36 },
+      };
+
+      var result = SparrowNestService.Nest(
+        parts,
+        new[] { (500, 530, 1, false, 5) },
+        rotations: 36,
+        spacing: 5,
+        margin: 1,
+        perSheetBudgetSec: 5,
+        SparrowExe.Resolve(),
+        out string error,
+        effort: draft ? NestEffort.Draft : NestEffort.Fast);
+
+      error.Should().BeNull();
+      result.UsedSheets.Should().HaveCount(1);
+      var sheet = result.UsedSheets[0];
+      sheet.PartPlacements.Count(p => p.Source == 0).Should().Be(1, "the counted side goes on");
+      sheet.PartPlacements.Count(p => p.Source == 1).Should().BeGreaterOrEqualTo(3);
+      PlacementAcceptance.CountUnfit(sheet.PartPlacements.ToList(), sheet.Sheet.WidthCalculated, sheet.Sheet.HeightCalculated, 1, (a, b) => 5 * 0.999)
+        .Should().Be(0, "every part on the metal, none closer than the spacing");
+    }
+
+    [SparrowTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void ByCountThreeGoOnWithTheCountedSide(bool draft)
+    {
+      var parts = new List<RasterPartInfo>
+      {
+        new RasterPartInfo { Path = Drawing("side-E90-200-R100.dxf"), Quantity = 1, Rotations = 36 },
+        new RasterPartInfo { Path = Drawing("side-E90-150-R100.dxf"), Quantity = 3, Rotations = 36 },
+      };
+
+      var result = SparrowNestService.Nest(
+        parts, new[] { (500, 530, 1, false, 5) }, rotations: 36, spacing: 5, margin: 1, perSheetBudgetSec: 5,
+        SparrowExe.Resolve(), out string error, effort: draft ? NestEffort.Draft : NestEffort.Fast);
+
+      error.Should().BeNull();
+      result.UsedSheets.Should().HaveCount(1);
+      result.UsedSheets[0].PartPlacements.Count.Should().Be(4);
+    }
+
+    private static string Drawing(string name = "side-E90-200-R100.dxf")
     {
       for (var d = new DirectoryInfo(AppContext.BaseDirectory); d != null; d = d.Parent)
       {
-        string candidate = Path.Combine(d.FullName, "test-data", "kolena", "side-E90-200-R100.dxf");
+        string candidate = Path.Combine(d.FullName, "test-data", "kolena", name);
         if (File.Exists(candidate))
         {
           return candidate;
         }
       }
 
-      throw new FileNotFoundException("test-data/kolena/side-E90-200-R100.dxf");
+      throw new FileNotFoundException("test-data/kolena/" + name);
     }
   }
 }

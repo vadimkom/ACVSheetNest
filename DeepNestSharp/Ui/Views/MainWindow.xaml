@@ -413,7 +413,7 @@
             <ListView.View>
               <GridView ColumnHeaderContainerStyle="{StaticResource CompactColumnHeader}">
                 <!-- The sheet in proportion; an offcut read from a drawing shows its own outline and holes. -->
-                <GridViewColumn x:Name="colHeaderSheetPreview" Header="Эскиз" Width="72">
+                <GridViewColumn x:Name="colHeaderSheetPreview" Header="Эскиз" Width="64">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <Border Width="48" Height="48" Margin="2" Background="White" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
@@ -434,7 +434,7 @@
                 </GridViewColumn>
 
                 <!-- Sheet Dimensions -->
-                <GridViewColumn x:Name="colHeaderSheetDimensions" Header="Размеры листа (Ширина × Высота), мм" Width="230">
+                <GridViewColumn x:Name="colHeaderSheetDimensions" Header="Размеры листа (Ширина × Высота), мм" Width="210">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
@@ -446,6 +446,9 @@
                             </MultiBinding>
                           </TextBlock.Text>
                         </TextBlock>
+                        <!-- Turn the sheet beside the size it swaps: the last column is cut off on a narrow screen. -->
+                        <Button Style="{DynamicResource ModernButton}" Content="⟲" Margin="8,0,0,0" MinWidth="30"
+                                Click="OnRotateSheet" Tag="{Binding}" ToolTip="{ui:Tr Tip_RotateSheet}" />
                         <!-- A sheet of any shape, read from a drawing: its file, beside the box round it. -->
                         <TextBlock Text="{Binding ShapeName, Mode=OneWay}" Margin="8,0,0,0" VerticalAlignment="Center"
                                    Foreground="{DynamicResource Brush.TextMuted}" ToolTip="{Binding ShapePath, Mode=OneWay}" />
@@ -455,7 +458,7 @@
                 </GridViewColumn>
 
                 <!-- Quantity -->
-                <GridViewColumn x:Name="colHeaderSheetQty" Header="Количество в наличии" Width="170">
+                <GridViewColumn x:Name="colHeaderSheetQty" Header="Количество в наличии" Width="150">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0">
@@ -469,7 +472,7 @@
                 </GridViewColumn>
 
                 <!-- Unlimited Stock Checkbox -->
-                <GridViewColumn x:Name="colHeaderSheetUnlimited" Header="Неограниченно" Width="165">
+                <GridViewColumn x:Name="colHeaderSheetUnlimited" Header="Неограниченно" Width="150">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <CheckBox IsChecked="{Binding Unlimited, Mode=TwoWay}" Content="{ui:Tr Sheet_UnlimitedShort}"
@@ -494,7 +497,7 @@
                 </GridViewColumn>
 
                 <!-- Available / Used Status -->
-                <GridViewColumn x:Name="colHeaderSheetStatus" Header="Использовано / в наличии" Width="200">
+                <GridViewColumn x:Name="colHeaderSheetStatus" Header="Использовано / в наличии" Width="150">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <Border Style="{DynamicResource CountBadge}">
@@ -505,14 +508,12 @@
                 </GridViewColumn>
 
                 <!-- Actions -->
-                <GridViewColumn x:Name="colHeaderSheetActions" Header="Действия" Width="200">
+                <GridViewColumn x:Name="colHeaderSheetActions" Header="Действия" Width="160">
                   <GridViewColumn.CellTemplate>
                     <DataTemplate>
                       <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Button Style="{DynamicResource ModernButton}" Content="{ui:Tr Btn_EditSheet}" Margin="2,0"
                                 Click="OnEditSheet" Tag="{Binding}" ToolTip="{ui:Tr Tip_EditSheet}" />
-                        <Button Style="{DynamicResource ModernButton}" Content="⟲" Margin="2,0" MinWidth="30"
-                                Click="OnRotateSheet" Tag="{Binding}" ToolTip="{ui:Tr Tip_RotateSheet}" />
                         <Button Style="{DynamicResource IconButton}" Content="✕" Margin="4,0,0,0"
                                 ToolTip="{ui:Tr Tip_RemoveSheet}"
                                 Command="{Binding DataContext.ActiveDocument.RemoveSheetCommand, RelativeSource={RelativeSource AncestorType=Window}}"

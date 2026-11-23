@@ -1866,16 +1866,19 @@ namespace DeepNestSharp.RasterNest
       var current = new Dictionary<int, int>(placedBySrc);
       List<IPartPlacement> keptPlacements = null;
       List<CommonEdgeIntent> keptEdges = null;
+      List<IPartPlacement> rows = null;
       if (fillers.Count == 1)
       {
-        var around = LatticeFill(loadedById[fillers[0]], pool[fillers[0]], placements, loadedById, w, h, margin);
-        if (around.Count == 0)
+        // Rows around the counted parts are clear by construction and the best there is for washers. A few
+        // large fillers go tighter searched with the counted parts, which the engine may also move: the elbow
+        // job (1_fill, 500 x 530, one counted side and the rest filled) got 1 filler in rows around a counted
+        // part the engine had left in the middle, where 3 go on by count (KolenaFillFixture).
+        rows = LatticeFill(loadedById[fillers[0]], pool[fillers[0]], placements, loadedById, w, h, margin);
+        if (rows.Count > LatticeSearchMax)
         {
-          return (null, null, null);
+          var by = new Dictionary<int, int>(placedBySrc) { [fillers[0]] = rows.Count };
+          return (placements.Concat(rows).ToList(), by, new List<CommonEdgeIntent>());
         }
-
-        var by = new Dictionary<int, int>(placedBySrc) { [fillers[0]] = around.Count };
-        return (placements.Concat(around).ToList(), by, new List<CommonEdgeIntent>());
       }
 
       if (fillers.Count > 1 && fillers.All(k => loadedById[k].Kit))
@@ -1932,10 +1935,11 @@ namespace DeepNestSharp.RasterNest
       foreach (int src in fillers)
       {
         double used = current.Sum(kv => kv.Value * Footprint(kv.Key));
-        int offer = Math.Min(pool[src], (int)Math.Floor((usable - used) / Footprint(src)));
+        int offer = Math.Min(pool[src], Math.Max((int)Math.Floor((usable - used) / Footprint(src)), (rows?.Count ?? 0) + 1));
 
         // Fewer each time a counted part was pushed off; a handful of tries, then the sheet stays as it is.
-        for (int attempt = 0; attempt < 3 && offer >= 1 && !cancel.IsCancellationRequested; attempt++)
+        Dictionary<int, int> best = null;
+        for (int attempt = 0; attempt < (rows == null ? 3 : 4) && offer >= 1 && !cancel.IsCancellationRequested; attempt++)
         {
           var batch = new Dictionary<int, int>(current) { [src] = offer };
           var (pl, by, _, _, _, _, edges, _) = PackOneSheet(
@@ -1957,18 +1961,47 @@ namespace DeepNestSharp.RasterNest
             commonLineMaxClusterParts,
             out _,
             seedOffset: seedOffset);
-          if (pl != null && by != null
-            && by.TryGetValue(src, out int got) && got > 0
-            && current.All(kv => by.TryGetValue(kv.Key, out int n) && n >= kv.Value))
+          if (pl != null && by != null && rows != null)
           {
-            current = by.Where(kv => kv.Value > 0).ToDictionary(kv => kv.Key, kv => kv.Value);
-            keptPlacements = pl;
-            keptEdges = edges;
-            break;
+            edges ??= new List<CommonEdgeIntent>();
+            DeferUnfit(pl, by, loadedById, edges, w, h, margin, commonLineGap, geometryTolerance);
           }
 
-          offer = (int)Math.Floor(offer * 0.7);
+          if (pl != null && by != null
+            && by.TryGetValue(src, out int got) && got > 0
+            && current.All(kv => by.TryGetValue(kv.Key, out int n) && n >= kv.Value)
+            && (best == null || got > best[src]))
+          {
+            best = by.Where(kv => kv.Value > 0).ToDictionary(kv => kv.Key, kv => kv.Value);
+            keptPlacements = pl;
+            keptEdges = edges;
+
+            // Offered more than goes on, the engine may seat fewer than when offered just enough: the elbow
+            // sides seat 2 of 4 offered, 3 of 3. A few large fillers are tried one less while that can win.
+            if (rows == null || got >= offer - 1)
+            {
+              break;
+            }
+          }
+
+          offer = offer <= 8 ? offer - 1 : (int)Math.Floor(offer * 0.7); // a few large parts: one less at a time
+          if (best != null && offer <= best[src])
+          {
+            break;
+          }
         }
+
+        if (best != null)
+        {
+          current = best;
+        }
+      }
+
+      if (rows != null && rows.Count > 0 && (keptPlacements == null || current[fillers[0]] <= rows.Count))
+      {
+        // The search seated no more than the rows: keep the rows, clear by construction.
+        var by = new Dictionary<int, int>(placedBySrc) { [fillers[0]] = rows.Count };
+        return (placements.Concat(rows).ToList(), by, new List<CommonEdgeIntent>());
       }
 
       return keptPlacements == null ? (null, null, null) : (keptPlacements, current, keptEdges);
