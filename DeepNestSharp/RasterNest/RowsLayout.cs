@@ -160,6 +160,22 @@ namespace DeepNestSharp.RasterNest
       return Span(rs) <= 1.05 * Span(es);
     }
 
+    /// <summary>Counted pieces from which rows of convex parts are kept without running the engine.</summary>
+    private const int RowsEnoughPieces = 100;
+
+    /// <summary>
+    /// Whether rows that hold a counted job are kept as they are, the engine not run (2026-11-25, the user's
+    /// 500 discs Ø20 and 200 Ø40: rows in 0.8 s, Sparrow the same length in 80 s, RNest no answer in 20 min).
+    /// Convex parts pack no tighter than in a lattice, so with many of them the engine only spends time:
+    /// every kind convex (area at least 97 % of its hull) and without holes (the engine's path seats small
+    /// parts in them), at least <see cref="RowsEnoughPieces"/> pieces.
+    /// </summary>
+    private static bool RowsAreEnough(List<Loaded> loaded)
+      => !loaded.Any(l => l.Fill)
+        && loaded.Sum(l => l.Qty) >= RowsEnoughPieces
+        && loaded.All(l => l.Nfp.Children == null || l.Nfp.Children.Count == 0)
+        && loaded.All(l => Math.Abs(l.Nfp.Area) >= 0.97 * Math.Abs(l.Nfp.GetHull().Area));
+
     private static INestResult RowsResult(List<(int W, int H, List<RowCell> Cells)> sheets, double commonLineGap, double geometryTolerance)
     {
       var collection = new SheetPlacementCollection();

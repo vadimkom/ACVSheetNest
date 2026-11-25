@@ -428,6 +428,10 @@ namespace DeepNestSharp.RasterNest
       if (rowsShown != null)
       {
         showAsIs?.Invoke(rowsShown);
+        if (RowsAreEnough(loaded))
+        {
+          return rowsShown;
+        }
       }
 
       INestResult PreferRows(INestResult engine)
