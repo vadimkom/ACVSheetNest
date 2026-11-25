@@ -1136,6 +1136,9 @@ SheetNest открывает проекты (*.dnest) и чертежи DXF и S
   <data name="Run_Draft" xml:space="preserve">
     <value>Черновик</value>
   </data>
+  <data name="Run_Rows" xml:space="preserve">
+    <value>Ряды</value>
+  </data>
   <data name="Run_Saved" xml:space="preserve">
     <value>Сохранённый</value>
   </data>

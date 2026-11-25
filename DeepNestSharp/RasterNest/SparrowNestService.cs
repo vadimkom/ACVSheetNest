@@ -422,14 +422,15 @@ namespace DeepNestSharp.RasterNest
 
       // A few kinds of part that all go on one sheet are laid in rows, as by hand: see RowsLayout.cs.
       // Shown at once, and kept over the engine unless the engine is clearly better (RowsBeatEngine).
-      var rows = RowsLayout(loaded, sizes, margin, commonLineGap, geometryTolerance, fillAsKit);
+      var rows = RowsLayout(loaded, sizes, margin, commonLineGap, geometryTolerance, fillAsKit, out bool rowsEnough);
       var rowsShown = rows == null || mirroredBack == null ? rows : mirroredBack(rows);
       var rowsJudge = loaded.ToList(); // the engine below changes the fillers counts, not their spacing
       if (rowsShown != null)
       {
         showAsIs?.Invoke(rowsShown);
-        if (RowsAreEnough(loaded))
+        if (rowsEnough && !cancel.IsCancellationRequested)
         {
+          RowsOnly.AddOrUpdate(rowsShown, RowsOnlyMark);
           return rowsShown;
         }
       }

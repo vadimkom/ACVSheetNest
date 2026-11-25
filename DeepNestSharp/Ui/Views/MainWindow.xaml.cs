@@ -82,10 +82,13 @@ namespace DeepNestSharp.Ui.Views
       /// <summary>A Draft run: its engine reads "Draft" (Sparrow's alone; the user, 1.1.90: no mark, call the engine Draft).</summary>
       public bool IsDraft { get; set; }
 
-      /// <summary>The engine that laid it (Sparrow, RNest, or an engine's file name), "Draft" for a Draft; empty for a saved nest.</summary>
+      /// <summary>Rows kept without running the engine (<see cref="SparrowNestService.IsRowsOnly"/>): its engine reads "Rows".</summary>
+      public bool IsRows { get; set; }
+
+      /// <summary>The engine that laid it (Sparrow, RNest, or an engine's file name), "Draft" for a Draft, "Rows" for rows alone; empty for a saved nest.</summary>
       public string EngineText
       {
-        get => this.IsDraft ? Localization.Get("Run_Draft") : this.engineText;
+        get => this.IsRows ? Localization.Get("Run_Rows") : this.IsDraft ? Localization.Get("Run_Draft") : this.engineText;
         set => this.engineText = value ?? string.Empty;
       }
 
@@ -4461,7 +4464,8 @@ namespace DeepNestSharp.Ui.Views
     /// </summary>
     private void AddFinishedNest(INestResult result)
     {
-      string key = this.LastRunKey;
+      bool rowsOnly = SparrowNestService.IsRowsOnly(result);
+      string key = rowsOnly ? RowsRunKey : this.LastRunKey;
       int number = ++this.finishedNests;
       var item = new NestRunHistoryItem
       {
@@ -4471,7 +4475,8 @@ namespace DeepNestSharp.Ui.Views
         PlacedText = FormattableString.Invariant($"{result.TotalPlacedCount} / {result.TotalPartsCount}"),
         SheetsText = FormattableString.Invariant($"{result.UsedSheets.Count}"),
         TimeText = NestElapsed(),
-        IsDraft = this.lastRunWasDraft,
+        IsDraft = this.lastRunWasDraft && !rowsOnly,
+        IsRows = rowsOnly,
         Seconds = this.nestStopwatch?.Elapsed.TotalSeconds ?? double.PositiveInfinity,
         Offcut = RasterNest.LargestOffcut.Of(result, this.dxfViewer?.DefaultPartSpacing ?? 0),
         EngineText = this.lastRunEngine,
@@ -4506,9 +4511,17 @@ namespace DeepNestSharp.Ui.Views
       this.runsListView.SelectedItem = item;
     }
 
+    /// <summary>The variants row of rows kept without an engine: one row of its own, never in the engine statistics.</summary>
+    private const string RowsRunKey = "\u0001rows";
+
     /// <summary>The run's line in the engine statistics: the engine, the job's size, what it laid, how long.</summary>
     private void NoteRunStats(IProjectInfo project, INestResult result)
     {
+      if (SparrowNestService.IsRowsOnly(result))
+      {
+        return; // no engine was run
+      }
+
       var rows = project?.DetailLoadInfos?.Where(p => p.IsIncluded && (p.Quantity > 0 || p.FillSheets)).ToList();
       string? file = (ViewModel.ActiveDocument as NestProjectViewModel)?.FilePath;
       EngineStats.NoteRun(
@@ -4528,7 +4541,7 @@ namespace DeepNestSharp.Ui.Views
     /// </summary>
     private void NoteRunsJob()
     {
-      var ran = this.nestRuns.Where(r => !string.IsNullOrEmpty(r.EngineKey)).ToList();
+      var ran = this.nestRuns.Where(r => !string.IsNullOrEmpty(r.EngineKey) && r.EngineKey != RowsRunKey).ToList();
       if (ran.Count > 1)
       {
         EngineStats.NoteJob(ran.Select(r => r.EngineKey), ran[0].EngineKey); // the list is best first
@@ -4540,7 +4553,7 @@ namespace DeepNestSharp.Ui.Views
     {
       var row = this.nestRuns.FirstOrDefault(r => ReferenceEquals(r.Result, exported))
         ?? this.runsListView.SelectedItem as NestRunHistoryItem;
-      if (row != null && !string.IsNullOrEmpty(row.EngineKey))
+      if (row != null && !string.IsNullOrEmpty(row.EngineKey) && row.EngineKey != RowsRunKey)
       {
         EngineStats.NoteDxf(row.EngineKey);
       }

@@ -62,6 +62,55 @@ namespace DeepNestSharp.CiTests.RasterNest
       static double Span(INestResult r) => r.UsedSheets[0].PartPlacements.Max(p => p.MaxY) - r.UsedSheets[0].PartPlacements.Min(p => p.MinY);
       this.output.WriteLine($"first candidate at {firstAt:F1} s, span {(first == null ? 0 : Span(first)):F1}; result span {Span(result):F1} in {clock.Elapsed.TotalSeconds:F1} s");
       clock.Elapsed.TotalSeconds.Should().BeLessThan(10);
+      SparrowNestService.IsRowsOnly(result).Should().BeTrue("discs in shifted rows are as tight as the engine gets them");
+    }
+
+    /// <summary>
+    /// Right triangles take a square each in rows (one step for the pair turned round and the next), half
+    /// what the engine gets pairing them on the long side: the engine must still be run (review of 1.1.91).
+    /// </summary>
+    [Fact]
+    public void RightTrianglesStillGoToTheEngine()
+    {
+      string exe = SparrowExe.Resolve();
+      if (exe == null)
+      {
+        return;
+      }
+
+      string dir = Path.Combine(Path.GetTempPath(), "sheetnest_triangles_" + Guid.NewGuid().ToString("N"));
+      Directory.CreateDirectory(dir);
+      try
+      {
+        string path = Path.Combine(dir, "triangle.dxf");
+        var file = new IxMilia.Dxf.DxfFile();
+        file.Header.Version = IxMilia.Dxf.DxfAcadVersion.R2007;
+        file.Entities.Add(new IxMilia.Dxf.Entities.DxfLwPolyline(new[]
+        {
+          new IxMilia.Dxf.Entities.DxfLwPolylineVertex { X = 0, Y = 0 },
+          new IxMilia.Dxf.Entities.DxfLwPolylineVertex { X = 100, Y = 0 },
+          new IxMilia.Dxf.Entities.DxfLwPolylineVertex { X = 0, Y = 100 },
+        })
+        { IsClosed = true, Layer = "0" });
+        file.Save(path, true);
+
+        var parts = new List<RasterPartInfo> { new RasterPartInfo { Path = path, Quantity = 100, Rotations = 4, Spacing = 5 } };
+        var result = SparrowNestService.Nest(parts, new[] { (1250, 2500, 1, false, 5) }, 4, 5, 5, 5, exe, out string error, effort: NestEffort.Draft);
+
+        error.Should().BeNull();
+        result.UnplacedParts.Should().BeEmpty();
+        SparrowNestService.IsRowsOnly(result).Should().BeFalse("rows of triangles are loose");
+      }
+      finally
+      {
+        try
+        {
+          Directory.Delete(dir, true);
+        }
+        catch (IOException)
+        {
+        }
+      }
     }
 
     private static string FindData()

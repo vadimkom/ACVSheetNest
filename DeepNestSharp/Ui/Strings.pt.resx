@@ -1136,6 +1136,9 @@ Abrir a página de download?</value>
   <data name="Run_Draft" xml:space="preserve">
     <value>Rascunho</value>
   </data>
+  <data name="Run_Rows" xml:space="preserve">
+    <value>Fileiras</value>
+  </data>
   <data name="Run_Saved" xml:space="preserve">
     <value>Salvo</value>
   </data>

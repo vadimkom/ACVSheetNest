@@ -35,8 +35,9 @@ namespace DeepNestSharp.RasterNest
     /// kits as go on a sheet in rows, the same on every sheet.</item>
     /// </list>
     /// </summary>
-    private static INestResult RowsLayout(List<Loaded> loaded, List<StockSize> sizes, double margin, double commonLineGap, double geometryTolerance, bool fillAsKit)
+    private static INestResult RowsLayout(List<Loaded> loaded, List<StockSize> sizes, double margin, double commonLineGap, double geometryTolerance, bool fillAsKit, out bool enough)
     {
+      enough = false;
       if (!RowsLayoutEnabled
           || loaded.Count == 0
           || loaded.Count > RowsMaxKinds
@@ -106,13 +107,18 @@ namespace DeepNestSharp.RasterNest
         return bestCells == null ? null : RowsResult(Enumerable.Repeat((size.W, size.H, bestCells), sheets).ToList(), commonLineGap, geometryTolerance);
       }
 
+      bool smallest = true;
       foreach (var size in first.OrderBy(s => (double)s.W * s.H))
       {
         var cells = RowsCells(loaded, loaded.ToDictionary(l => l, l => l.Qty), motifs, size.W, size.H, margin);
         if (cells != null)
         {
+          // Only on the smallest size: on a larger one the engine may still get the job onto a smaller sheet.
+          enough = smallest && RowsAreEnough(loaded, motifs, cells, size.W, size.H, margin);
           return RowsResult(new List<(int, int, List<RowCell>)> { (size.W, size.H, cells) }, commonLineGap, geometryTolerance);
         }
+
+        smallest = false;
       }
 
       return null;
@@ -160,21 +166,64 @@ namespace DeepNestSharp.RasterNest
       return Span(rs) <= 1.05 * Span(es);
     }
 
-    /// <summary>Counted pieces from which rows of convex parts are kept without running the engine.</summary>
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<INestResult, object> RowsOnly = new();
+    private static readonly object RowsOnlyMark = new();
+
+    /// <summary>
+    /// Whether this nest is rows kept without running the engine (<see cref="RowsAreEnough"/>): the variants
+    /// list names it "Rows", not the engine picked, and the engine statistics leave it out.
+    /// </summary>
+    internal static bool IsRowsOnly(INestResult result) => result != null && RowsOnly.TryGetValue(result, out _);
+
+    /// <summary>Counted pieces from which tight rows are kept without running the engine.</summary>
     private const int RowsEnoughPieces = 100;
+
+    /// <summary>The least share of its cell in the rows that each part's spaced outline must cover.</summary>
+    private const double RowsEnoughCellShare = 0.85;
+
+    /// <summary>How much longer than its cells laid end to end across the sheet the rows may run.</summary>
+    private const double RowsEnoughSlack = 1.10;
 
     /// <summary>
     /// Whether rows that hold a counted job are kept as they are, the engine not run (2026-11-25, the user's
     /// 500 discs Ø20 and 200 Ø40: rows in 0.8 s, Sparrow the same length in 80 s, RNest no answer in 20 min).
-    /// Convex parts pack no tighter than in a lattice, so with many of them the engine only spends time:
-    /// every kind convex (area at least 97 % of its hull) and without holes (the engine's path seats small
-    /// parts in them), at least <see cref="RowsEnoughPieces"/> pieces.
+    /// Only rows the engine could hardly better, judged on the rows themselves (the review of 1.1.91: right
+    /// triangles each take a square in rows, half what the engine gets; 140 × 50 strips in one direction
+    /// leave a strip empty beside them, 13 % longer than mixed directions):
+    /// <list type="bullet">
+    /// <item>no fillers, at least <see cref="RowsEnoughPieces"/> pieces, no part with holes (the engine's path seats small parts in them);</item>
+    /// <item>every part's spaced outline covers at least <see cref="RowsEnoughCellShare"/> of the cell of its densest motif (discs 0.907, triangles 0.5);</item>
+    /// <item>the rows run at most <see cref="RowsEnoughSlack"/> times the length of every part's densest cell laid end to end across the sheet (discs 1.07, the strips 1.15).</item>
+    /// </list>
+    /// A part may sit in looser rows than its densest (the small discs beside the large ones, square rows filling a strip): the run check counts that.
     /// </summary>
-    private static bool RowsAreEnough(List<Loaded> loaded)
-      => !loaded.Any(l => l.Fill)
-        && loaded.Sum(l => l.Qty) >= RowsEnoughPieces
-        && loaded.All(l => l.Nfp.Children == null || l.Nfp.Children.Count == 0)
-        && loaded.All(l => Math.Abs(l.Nfp.Area) >= 0.97 * Math.Abs(l.Nfp.GetHull().Area));
+    private static bool RowsAreEnough(List<Loaded> loaded, Dictionary<Loaded, List<RowMotif>> motifs, List<RowCell> cells, int w, int h, double margin)
+    {
+      if (loaded.Any(l => l.Fill)
+          || loaded.Sum(l => l.Qty) < RowsEnoughPieces
+          || loaded.Any(l => l.Nfp.Children != null && l.Nfp.Children.Count > 0))
+      {
+        return false;
+      }
+
+      var densest = new Dictionary<Loaded, double>();
+      foreach (var l in loaded)
+      {
+        double cell = motifs[l].Where(m => m.Px > 0 && m.Py > 0).Select(m => m.Px * m.Py).DefaultIfEmpty(0).Min();
+        if (cell <= 0 || Math.Abs((l.Dilated ?? l.Nfp).Area) < RowsEnoughCellShare * cell)
+        {
+          return false;
+        }
+
+        densest[l] = cell;
+      }
+
+      bool standing = h >= w;
+      double across = (standing ? w : h) - (2 * margin);
+      double run = (standing ? cells.Max(c => c.Y + c.Motif.H) : cells.Max(c => c.X + c.Motif.W)) - margin;
+      double tight = loaded.Sum(l => l.Qty * densest[l]) / Math.Max(1e-9, across);
+      return run <= RowsEnoughSlack * tight;
+    }
 
     private static INestResult RowsResult(List<(int W, int H, List<RowCell> Cells)> sheets, double commonLineGap, double geometryTolerance)
     {

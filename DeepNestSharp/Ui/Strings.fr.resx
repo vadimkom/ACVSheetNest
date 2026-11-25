@@ -1136,6 +1136,9 @@ Ouvrir la page de téléchargement ?</value>
   <data name="Run_Draft" xml:space="preserve">
     <value>Brouillon</value>
   </data>
+  <data name="Run_Rows" xml:space="preserve">
+    <value>Rangées</value>
+  </data>
   <data name="Run_Saved" xml:space="preserve">
     <value>Enregistrée</value>
   </data>

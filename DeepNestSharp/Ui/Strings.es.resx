@@ -1136,6 +1136,9 @@ SheetNest abre proyectos (*.dnest) y dibujos DXF y SC2000 (*.dxf, *.chf).</value
   <data name="Run_Draft" xml:space="preserve">
     <value>Borrador</value>
   </data>
+  <data name="Run_Rows" xml:space="preserve">
+    <value>Filas</value>
+  </data>
   <data name="Run_Saved" xml:space="preserve">
     <value>Guardado</value>
   </data>
