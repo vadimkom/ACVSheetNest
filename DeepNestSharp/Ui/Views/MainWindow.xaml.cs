@@ -2307,6 +2307,7 @@ namespace DeepNestSharp.Ui.Views
       this.suppressPartColorCanvas = true;
       this.partColorCanvas.SelectedColor = System.Windows.Media.Color.FromRgb(cr, cg, cb);
       this.suppressPartColorCanvas = false;
+      this.partColorPreview.Source = Converters.PartPreviewConverter.Large(part);
       this.partColorPopup.IsOpen = true;
     }
 
@@ -2341,6 +2342,10 @@ namespace DeepNestSharp.Ui.Views
       var doc = ViewModel.ActiveDocument as NestProjectViewModel;
       this.ApplyPartColours(doc?.ProjectInfo?.DetailLoadInfos);
       this.dxfViewer?.RefreshRender();
+      if (this.partColorPopup.IsOpen)
+      {
+        this.partColorPreview.Source = Converters.PartPreviewConverter.Large(part);
+      }
     }
 
     private int EffectiveColorOf(DeepNestLib.NestProject.IDetailLoadInfo part)

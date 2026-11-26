@@ -891,8 +891,13 @@
 
     <!-- Part colour picker popup -->
     <Popup x:Name="partColorPopup" StaysOpen="False" AllowsTransparency="True"
-           Placement="Left" HorizontalOffset="-4" PopupAnimation="Fade">
+           Placement="Right" HorizontalOffset="4" PopupAnimation="Fade">
       <Border Background="{DynamicResource Brush.Card}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" CornerRadius="4" Padding="6">
+        <StackPanel Orientation="Horizontal">
+        <!-- The part itself, large, beside its colour: thin outline, holes and dashed bends. -->
+        <Border Width="340" Height="340" Margin="0,0,8,0" Background="White" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1">
+          <Image x:Name="partColorPreview" Stretch="Uniform" Margin="10" />
+        </Border>
         <StackPanel>
           <TextBlock Text="{ui:Tr PartColour_Title}" FontWeight="SemiBold" Margin="0,0,0,4" />
           <ItemsControl x:Name="partColorSwatches">
@@ -913,6 +918,7 @@
           <Separator Margin="0,6" />
           <xctk:ColorCanvas x:Name="partColorCanvas" UsingAlphaChannel="False" Width="230"
                             SelectedColorChanged="OnPartColorCanvasChanged" />
+        </StackPanel>
         </StackPanel>
       </Border>
     </Popup>

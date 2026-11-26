@@ -84,6 +84,9 @@ namespace DeepNestSharp.Ui.UserControls
     // the placements currently overlapping something (drawn red).
     private readonly List<(System.Windows.Shapes.Path Path, IPartPlacement Pp)> partPaths = new List<(System.Windows.Shapes.Path, IPartPlacement)>();
 
+    // Each part's bend lines, dashed over the part; only parts that have bends.
+    private readonly List<(System.Windows.Shapes.Path Path, IPartPlacement Pp)> bendPaths = new List<(System.Windows.Shapes.Path, IPartPlacement)>();
+
     // Each part's name, by the same index as partPaths; null where a part has none to show.
     private readonly List<System.Windows.Shapes.Path> partLabels = new List<System.Windows.Shapes.Path>();
 
@@ -1070,6 +1073,11 @@ namespace DeepNestSharp.Ui.UserControls
       foreach (var pp in sheetPlacement.PartPlacements)
       {
         drawing.Children.Add(new GeometryDrawing(this.TypeFill(pp), new Pen(PartStroke, pen / 2), BuildPlacedGeometry(pp, h)));
+        var bends = BuildPlacedBends(pp, h);
+        if (bends != null)
+        {
+          drawing.Children.Add(new GeometryDrawing(null, new Pen(PartStroke, pen / 2) { DashStyle = BendDashes }, bends));
+        }
       }
 
       var image = new DrawingImage(drawing);
@@ -1126,6 +1134,7 @@ namespace DeepNestSharp.Ui.UserControls
       this.dragCache = null; // placements may have been replaced wholesale — never answer from stale geometry
       this.canvas.Children.Clear();
       this.partPaths.Clear();
+      this.bendPaths.Clear();
       this.partLabels.Clear();
       this.offcutShapes.Clear();
       this.ClearMeasure(); // canvas was cleared; drop dangling measure-shape references
@@ -1227,6 +1236,21 @@ namespace DeepNestSharp.Ui.UserControls
           };
           this.canvas.Children.Add(path);
           this.partPaths.Add((path, pp));
+
+          var bends = BuildPlacedBends(pp, h);
+          if (bends != null)
+          {
+            var bendPath = new System.Windows.Shapes.Path
+            {
+              Data = bends,
+              Stroke = PartStroke,
+              StrokeThickness = stroke,
+              StrokeDashArray = new DoubleCollection { 6, 4 },
+              IsHitTestVisible = false,
+            };
+            this.canvas.Children.Add(bendPath);
+            this.bendPaths.Add((bendPath, pp));
+          }
         }
         catch
         {
@@ -1522,6 +1546,39 @@ namespace DeepNestSharp.Ui.UserControls
         {
           ctx.BeginFigure(Tx(a.X, a.Y), false, false);
           ctx.LineTo(Tx(b.X, b.Y), true, false);
+        }
+      }
+
+      geometry.Freeze();
+      return geometry;
+    }
+
+    /// <summary>Bend lines are dashed, so they read as marks and not as cuts.</summary>
+    private static readonly DashStyle BendDashes = CreateBendDashes();
+
+    private static DashStyle CreateBendDashes()
+    {
+      var dashes = new DashStyle(new[] { 6.0, 4.0 }, 0);
+      dashes.Freeze();
+      return dashes;
+    }
+
+    /// <summary>A placed part's bend lines in sheet coordinates, Y flipped like the outline; null when it has none.</summary>
+    private static Geometry BuildPlacedBends(IPartPlacement pp, double sheetHeight)
+    {
+      var lines = DeepNestLib.IO.DxfBendLines.Placed(pp?.Part?.Name, pp?.X ?? 0, pp?.Y ?? 0, pp?.Part?.Rotation ?? 0, pp?.IsMirrored ?? false);
+      if (lines.Count == 0)
+      {
+        return null;
+      }
+
+      var geometry = new StreamGeometry();
+      using (var ctx = geometry.Open())
+      {
+        foreach (var line in lines)
+        {
+          ctx.BeginFigure(new Point(line[0].X, sheetHeight - line[0].Y), false, false);
+          ctx.PolyLineTo(line.Skip(1).Select(p => new Point(p.X, sheetHeight - p.Y)).ToList(), true, false);
         }
       }
 
@@ -2640,6 +2697,14 @@ namespace DeepNestSharp.Ui.UserControls
         if (this.partPaths[i].Pp == this.selectedPp)
         {
           this.partPaths[i].Path.Data = BuildPlacedGeometry(this.selectedPp, this.currentSheetH);
+          foreach (var (bendPath, bendPp) in this.bendPaths)
+          {
+            if (bendPp == this.selectedPp)
+            {
+              bendPath.Data = BuildPlacedBends(this.selectedPp, this.currentSheetH);
+            }
+          }
+
           if (i < this.partLabels.Count)
           {
             // The name goes where the part went.

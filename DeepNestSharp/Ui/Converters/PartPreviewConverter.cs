@@ -58,37 +58,93 @@ namespace DeepNestSharp.Ui.Converters
         return cached;
       }
 
-      ImageSource image = null;
-      try
+      if (!TryLoad(dxfPath, out INfp nfp, out bool timedOut))
       {
-        // Task.Run so a locked-file retry (await Task.Delay) can't deadlock the UI thread we're blocking
-        // on. The wait is BOUNDED: the parser retries a locked file for seconds, and a thumbnail isn't
-        // worth freezing the UI that long — on timeout show no image and skip the cache, so the thumbnail
-        // can still appear on a later refresh once the file is free.
-        var load = System.Threading.Tasks.Task.Run(() => DxfParser.LoadDxfFile(dxfPath));
-        if (!load.Wait(1500))
+        // On timeout skip the cache, so the thumbnail can still appear on a later refresh once the file is free.
+        if (!timedOut)
         {
-          return null;
+          Cache[path] = null;
         }
 
-        var raw = load.GetAwaiter().GetResult();
-        if (raw != null && raw.TryConvertToNfp(0, out INfp nfp))
-        {
-          image = Build(nfp, PartColors.For(colours, path));
-        }
-      }
-      catch
-      {
-        image = null;
+        return null;
       }
 
+      var image = Build(path, nfp, PartColors.For(colours, path), 60.0);
       Cache[path] = image;
       return image;
     }
 
+    /// <summary>The part drawn to be looked at large: the same picture as the thumbnail with a thin outline
+    /// (1/400 of the part's size instead of 1/60), so small holes stay holes. Not cached.</summary>
+    public static ImageSource Large(IDetailLoadInfo part)
+    {
+      string path = part?.Path;
+      if (string.IsNullOrEmpty(path) || !DxfFileExtensions.IsDxf(path))
+      {
+        return null;
+      }
+
+      // The colour picker redraws it on every move of the colour canvas: read the drawing once per file version.
+      DateTime stamp;
+      try
+      {
+        stamp = System.IO.File.GetLastWriteTimeUtc(path);
+      }
+      catch
+      {
+        return null;
+      }
+
+      INfp nfp;
+      if (lastLarge.Path == path && lastLarge.Stamp == stamp && lastLarge.Nfp != null)
+      {
+        nfp = lastLarge.Nfp;
+      }
+      else
+      {
+        if (!TryLoad(path, out nfp, out _))
+        {
+          return null;
+        }
+
+        lastLarge = (path, stamp, nfp);
+      }
+
+      return Build(path, nfp, PartColors.For(colours, path), 400.0);
+    }
+
+    private static (string Path, DateTime Stamp, INfp Nfp) lastLarge;
+
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Binding.DoNothing;
 
-    private static ImageSource Build(INfp nfp, (byte R, byte G, byte B) colour)
+    private static bool TryLoad(string dxfPath, out INfp nfp, out bool timedOut)
+    {
+      nfp = null;
+      timedOut = false;
+      try
+      {
+        // Task.Run so a locked-file retry (await Task.Delay) can't deadlock the UI thread we're blocking
+        // on. The wait is BOUNDED: the parser retries a locked file for seconds, and a picture isn't
+        // worth freezing the UI that long.
+        var load = System.Threading.Tasks.Task.Run(() => DxfParser.LoadDxfFile(dxfPath));
+        if (!load.Wait(1500))
+        {
+          timedOut = true;
+          return false;
+        }
+
+        var raw = load.GetAwaiter().GetResult();
+        return raw != null && raw.TryConvertToNfp(0, out nfp);
+      }
+      catch
+      {
+        nfp = null;
+        return false;
+      }
+    }
+
+    /// <param name="penDivisor">The outline is the part's larger side over this.</param>
+    private static ImageSource Build(string path, INfp nfp, (byte R, byte G, byte B) colour, double penDivisor)
     {
       var g = new StreamGeometry { FillRule = FillRule.EvenOdd };
       using (var ctx = g.Open())
@@ -110,14 +166,43 @@ namespace DeepNestSharp.Ui.Converters
       }
 
       double dim = Math.Max(g.Bounds.Width, g.Bounds.Height);
-      var pen = new Pen(new SolidColorBrush(Color.FromRgb(0x22, 0x22, 0x22)), dim / 60.0);
+      var pen = new Pen(new SolidColorBrush(Color.FromRgb(0x22, 0x22, 0x22)), dim / penDivisor);
       pen.Freeze();
       // The part's own colour, opaque, exactly as the viewer paints it on the sheet — this thumbnail is how
       // the operator maps a colour back to a part name.
       var fill = new SolidColorBrush(Color.FromRgb(colour.R, colour.G, colour.B));
       fill.Freeze();
 
-      var drawing = new GeometryDrawing(fill, pen, g);
+      var drawing = new DrawingGroup();
+      drawing.Children.Add(new GeometryDrawing(fill, pen, g));
+
+      // Bend lines, dashed: marks, not cuts.
+      var bends = DxfBendLines.Of(path);
+      if (bends.Count > 0)
+      {
+        var bendGeometry = new StreamGeometry();
+        using (var ctx = bendGeometry.Open())
+        {
+          foreach (var line in bends)
+          {
+            ctx.BeginFigure(new Point(line[0].X, -line[0].Y), false, false);
+            var rest = new List<Point>(line.Count - 1);
+            for (int i = 1; i < line.Count; i++)
+            {
+              rest.Add(new Point(line[i].X, -line[i].Y));
+            }
+
+            ctx.PolyLineTo(rest, true, false);
+          }
+        }
+
+        bendGeometry.Freeze();
+        var bendPen = new Pen(pen.Brush, pen.Thickness * 0.75) { DashStyle = new DashStyle(new[] { 4.0, 3.0 }, 0) };
+        bendPen.Freeze();
+        drawing.Children.Add(new GeometryDrawing(null, bendPen, bendGeometry));
+      }
+
+      drawing.Freeze();
       var image = new DrawingImage(drawing);
       image.Freeze();
       return image;
