@@ -2308,7 +2308,33 @@ namespace DeepNestSharp.Ui.Views
       this.partColorCanvas.SelectedColor = System.Windows.Media.Color.FromRgb(cr, cg, cb);
       this.suppressPartColorCanvas = false;
       this.partColorPreview.Source = Converters.PartPreviewConverter.Large(part);
+      if (this.partPreviewSize <= 0)
+      {
+        double saved = SessionState.Load()?.PartPreviewSize ?? 0;
+        this.partPreviewSize = saved >= PartPreviewMin ? saved : 340;
+      }
+
+      this.partColorPreviewBox.Width = this.partColorPreviewBox.Height = this.partPreviewSize;
       this.partColorPopup.IsOpen = true;
+    }
+
+    private const double PartPreviewMin = 200;
+    private double partPreviewSize;
+
+    /// <summary>The colour picker's corner dragged: the part view grows or shrinks, square, within the screen.</summary>
+    private void OnPartColorPopupResize(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+    {
+      double max = Math.Max(PartPreviewMin, SystemParameters.WorkArea.Height - 80);
+      double size = this.partColorPreviewBox.Width + Math.Max(e.HorizontalChange, e.VerticalChange);
+      this.partPreviewSize = Math.Clamp(size, PartPreviewMin, max);
+      this.partColorPreviewBox.Width = this.partColorPreviewBox.Height = this.partPreviewSize;
+    }
+
+    private void OnPartColorPopupResized(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+    {
+      var session = SessionState.Load() ?? new SessionState();
+      session.PartPreviewSize = this.partPreviewSize;
+      session.Save();
     }
 
     private void OnPartColorSwatchClick(object sender, RoutedEventArgs e)

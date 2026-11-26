@@ -127,6 +127,9 @@ namespace DeepNestSharp
     /// user: "our laser cuts from right to left"). Per machine, like the laser it suits.</summary>
     public bool NestFromRight { get; set; }
 
+    /// <summary>Side of the large part view in the colour picker, dragged by its corner (0 = default 340).</summary>
+    public double PartPreviewSize { get; set; }
+
     /// <summary>Cut the last sheet's leftover off as a rectangular offcut; null = default (off).</summary>
     public bool? PreferRectangularOffcut { get; set; }
 
